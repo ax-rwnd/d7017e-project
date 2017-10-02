@@ -1,5 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
+import { AlertModule } from 'ngx-bootstrap';
 
 import { AppComponent } from './app.component';
 import { StatisticsComponent } from './statistics/statistics.component';
@@ -25,6 +26,7 @@ const appRoutes: Routes = [
   ],
   imports: [
     BrowserModule,
+    AlertModule.forRoot(),
     RouterModule.forRoot(
       appRoutes
     )
