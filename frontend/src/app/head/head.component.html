@@ -73,6 +73,17 @@
       <div class="row" id="main" >
         <div class="col-sm-12 col-md-12 well" id="content">
           <h1>Welcome Admin!</h1>
+          <button type="button" class="btn btn-primary"
+                  (click)="isCollapsed = !isCollapsed">Toggle collapse
+          </button>
+          <hr>
+          <div (collapsed)="collapsed($event)"
+               (expanded)="expanded($event)"
+               [collapse]="isCollapsed"
+               class="card card-block card-header">
+            <div class="well well-lg">https://valor-software.com/ngx-bootstrap/#/collapse</div>
+          </div>
+
         </div>
       </div>
       <!-- /.row -->
@@ -81,5 +92,6 @@
   </div>
   <!-- /#page-wrapper -->
 </div><!-- /#wrapper -->
+
 
 
