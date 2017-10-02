@@ -5,17 +5,23 @@ import { AppComponent } from './app.component';
 import { StatisticsComponent } from './statistics/statistics.component';
 import {RouterModule, Routes} from '@angular/router';
 import { LoginComponent } from './login/login.component';
+import {HeadComponent} from './head/head.component';
+import {UserComponent} from './user/user.component';
 
 const appRoutes: Routes = [
   { path: '', component: LoginComponent },
-  { path: 'statistics', component: StatisticsComponent }
+  { path: 'statistics', component: StatisticsComponent },
+  { path: 'head', component: HeadComponent },
+  { path: 'user', component: UserComponent }
 ];
 
 @NgModule({
   declarations: [
     AppComponent,
     StatisticsComponent,
-    LoginComponent
+    HeadComponent,
+    LoginComponent,
+    UserComponent
   ],
   imports: [
     BrowserModule,
