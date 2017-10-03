@@ -1,0 +1,87 @@
+<link rel="stylesheet" href="http://codemirror.net/lib/codemirror.css">
+<script src="http://codemirror.net/lib/codemirror.js"></script>
+<script src="http://codemirror.net/addon/edit/matchbrackets.js"></script>
+<script src="http://codemirror.net/addon/edit/continuecomment.js"></script>
+<script src="http://codemirror.net/mode/javascript/javascript.js"></script>
+
+<div id="main-wrap">
+  <div id="description">
+    <!-- Description of the assignment -->
+
+    <!-- sample -->
+    <h1>Assignment 1</h1>
+    Skriv in följande program i textrutan:
+
+    print("Detta är ett program som räknar hur mycket kaffe du dricker.")
+    namn = "Anna andersson"
+    print("Jag heter" + namn)
+    n = 2
+    print("Jag har druckit " + str(n) + " koppar kaffe idag.")
+
+  </div>
+
+  <div id="inputField">
+
+
+    <!-- input field for assignment TODO: implement codeMirror -->
+    <script>
+      var readOnlyCodeMirror = CodeMirror.fromTextArea(document.getElementById('code'), {
+        mode: "javascript",
+        theme: "default",
+        lineNumbers: true,
+        readOnly: true
+      });
+    </script>
+
+    <textarea id="code" name="code" rows="50" cols="90">
+      // Demo code (the actual new parser character stream implementation)
+
+function StringStream(string) {
+  this.pos = 0;
+  this.string = string;
+}
+
+StringStream.prototype = {
+  done: function() {return this.pos >= this.string.length;},
+  peek: function() {return this.string.charAt(this.pos);},
+  next: function() {
+    if (this.pos < this.string.length)
+      return this.string.charAt(this.pos++);
+  },
+  eat: function(match) {
+    var ch = this.string.charAt(this.pos);
+    if (typeof match == "string") var ok = ch == match;
+    else var ok = ch && match.test ? match.test(ch) : match(ch);
+    if (ok) {this.pos++; return ch;}
+  },
+  eatWhile: function(match) {
+    var start = this.pos;
+    while (this.eat(match));
+    if (this.pos > start) return this.string.slice(start, this.pos);
+  },
+  backUp: function(n) {this.pos -= n;},
+  column: function() {return this.pos;},
+  eatSpace: function() {
+    var start = this.pos;
+    while (/\s/.test(this.string.charAt(this.pos))) this.pos++;
+    return this.pos - start;
+  },
+  match: function(pattern, consume, caseInsensitive) {
+    if (typeof pattern == "string") {
+      function cased(str) {return caseInsensitive ? str.toLowerCase() : str;}
+      if (cased(this.string).indexOf(cased(pattern), this.pos) == this.pos) {
+        if (consume !== false) this.pos += str.length;
+        return true;
+      }
+    }
+    else {
+      var match = this.string.slice(this.pos).match(pattern);
+      if (match && consume !== false) this.pos += match[0].length;
+      return match;
+    }
+  }
+};
+    </textarea>
+
+  </div>
+</div>

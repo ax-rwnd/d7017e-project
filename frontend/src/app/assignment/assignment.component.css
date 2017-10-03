@@ -1,0 +1,17 @@
+#description {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background-color: lightgreen;
+  float: left;
+  width: 40%;
+}
+
+#inputField {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background-color: green;
+  float: right;
+  width: 60%;
+}
