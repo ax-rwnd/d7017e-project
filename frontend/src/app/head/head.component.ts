@@ -12,11 +12,13 @@ export class HeadComponent implements OnInit {
   public isCollapsed:boolean = true;
   public subMenu1Collapsed:boolean = true;
   public mobileCollapse:boolean = false;
+  public profileCollapse:boolean = true;
 
   public downArrow:string = "fa fa-fw fa-angle-down pull-right";
   public rightArrow:string = "fa fa-fw fa-angle-right pull-right";
 
-  public angle:string = "down"
+  public angle:string = "down";
+  public angleProfile:string = "down";
 
   public toggleMenu1(){
     if (this.subMenu1Collapsed == true) {
@@ -25,6 +27,16 @@ export class HeadComponent implements OnInit {
       this.subMenu1Collapsed = true;
     }
     this.toggleAngle()
+  }
+
+  public toggleProfile(){
+    if (this.profileCollapse == true) {
+      this.profileCollapse = false;
+      this.angleProfile = "up"
+    } else {
+      this.profileCollapse = true;
+      this.angleProfile = "down"
+    }
   }
 
   public toggleAngle(){
