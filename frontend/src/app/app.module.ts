@@ -1,6 +1,12 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 
+//NG-BOOTSTRAP
+import { AlertModule } from 'ngx-bootstrap';
+import { ButtonsModule } from 'ngx-bootstrap';
+import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
+import { CollapseModule } from 'ngx-bootstrap/collapse';
+
 import { AppComponent } from './app.component';
 import { StatisticsComponent } from './statistics/statistics.component';
 import {RouterModule, Routes} from '@angular/router';
@@ -25,6 +31,10 @@ const appRoutes: Routes = [
   ],
   imports: [
     BrowserModule,
+    AlertModule.forRoot(),
+    ButtonsModule.forRoot(),
+    BsDropdownModule.forRoot(),
+    CollapseModule.forRoot(),
     RouterModule.forRoot(
       appRoutes
     )
