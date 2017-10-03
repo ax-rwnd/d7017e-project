@@ -1,3 +1,28 @@
-<p>
-  statistics works!
-</p>
+<div class="container">
+  <div class="row">
+    <div class="[ col-xs-12 col-sm-offset-2 col-sm-8 ]">
+      <ul class="event-list">
+        <li *ngFor="let course of courses">
+          <div class="latestBadge">
+            <span class="badgeTitle">Latest badge</span>
+            <div class="badge fillBadge">
+              <span class="glyphicon glyphicon-star customGlyph"></span>
+            </div>
+            <span class="year">2014</span>
+            <span class="time">ALL DAY</span>
+          </div>
+          <div class="info">
+            <h2 class="title">{{ course.code }}</h2>
+            <p class="desc">{{ course.name }}</p>
+            <div class="progress progress-margin">
+              <div class="progress-bar" role="progressbar" [attr.aria-valuenow]="course.progress" aria-valuemin="0" aria-valuemax ="100"
+                   [style.width]="course.progress*100 + '%'">
+              </div>
+            </div>
+          </div>
+
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
