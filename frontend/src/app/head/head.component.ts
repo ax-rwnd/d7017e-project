@@ -9,7 +9,7 @@ import { Component, OnInit } from '@angular/core';
 export class HeadComponent implements OnInit {
 
   //Det här är retarded. temporär lösning
-  public isCollapsed:boolean = true;
+  public isCollapsed:boolean = false;
   public subMenu1Collapsed:boolean = true;
   public mobileCollapse:boolean = false;
   public profileCollapse:boolean = true;
@@ -26,7 +26,7 @@ export class HeadComponent implements OnInit {
     } else {
       this.subMenu1Collapsed = true;
     }
-    this.toggleAngle()
+    this.toggleAngle();
   }
 
   public toggleProfile(){

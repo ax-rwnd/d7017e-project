@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { HeadComponent} from '../head/head.component';
 
 @Component({
   selector: 'app-statistics',
@@ -21,15 +22,15 @@ export class StatisticsComponent implements OnInit {
       },
       {
         name: 'Course2',
-        code: 'D0001',
+        code: 'D0002',
         progress: 0.7,
-        latestBadge: 'hammer'
+        latestBadge: 'wrench'
       },
       {
         name: 'Course3',
-        code: 'D0001',
+        code: 'D0003',
         progress: 0.4,
-        latestBadge: 'coffee'
+        latestBadge: 'flash'
       }
     ];
   }

@@ -15,9 +15,9 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="http://cijulenlinea.ucr.ac.cr/dev-users/">
-        <img src="http://placehold.it/200x50&text=LOGO" alt="LOGO">
-      </a>
+      <button type="button" class="btn btn-primary"
+              (click)="isCollapsed = !isCollapsed">Toggle collapse
+      </button>
     </div>
     <!-- Top Menu Items -->
     <ul class="nav navbar-right top-nav">
@@ -38,7 +38,7 @@
       </li>
     </ul>
     <!-- Sidebar Menu Items - These collapse to the responsive navigation menu on small screens -->
-    <div class="collapse navbar-collapse navbar-ex1-collapse" (collapsed)="collapsed($event)"
+    <div *ngIf="isCollapsed" class="collapse navbar-collapse navbar-ex1-collapse" (collapsed)="collapsed($event)"
          (expanded)="expanded($event)"
          [collapse]="mobileCollapse">
       <ul class="nav navbar-nav side-nav">
@@ -73,17 +73,6 @@
       <!-- Page Heading -->
       <div class="row" id="main" >
         <div class="col-sm-12 col-md-12 well" id="content">
-          <h1>Welcome derp!</h1>
-          <button type="button" class="btn btn-primary"
-                  (click)="isCollapsed = !isCollapsed">Toggle collapse
-          </button>
-          <hr>
-          <div (collapsed)="collapsed($event)"
-               (expanded)="expanded($event)"
-               [collapse]="isCollapsed"
-               class="card card-block card-header">
-            <div class="well well-lg">https://valor-software.com/ngx-bootstrap/#/collapse</div>
-          </div>
 
         </div>
       </div>

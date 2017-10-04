@@ -1,0 +1,23 @@
+body{
+  font-family: Verdana, Geneva, sans-serif;
+  font-size: medium;
+  color: #343434;
+}
+
+.center {
+  text-align: center;
+}
+
+.img-circle {
+  border-radius: 50%;
+}
+
+.userlinks {
+  text-decoration: none;
+  color: #343434;
+}
+
+a:hover {
+  color: grey;
+  cursor: pointer;
+}

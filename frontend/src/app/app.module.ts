@@ -17,13 +17,16 @@ import { LoginComponent } from './login/login.component';
 import {HeadComponent} from './head/head.component';
 import {UserComponent} from './user/user.component';
 import { AssignmentComponent } from './assignment/assignment.component';
+import { MainComponent } from './main/main.component';
+import { CoursesComponent } from './courses/courses.component';
 
 const appRoutes: Routes = [
   { path: '', component: LoginComponent },
   { path: 'statistics', component: StatisticsComponent },
   { path: 'head', component: HeadComponent },
   { path: 'assignment', component: AssignmentComponent },
-  { path: 'user', component: UserComponent }
+  { path: 'user', component: UserComponent },
+  { path: 'courses', component: CoursesComponent }
 ];
 
 
@@ -32,10 +35,12 @@ const appRoutes: Routes = [
     AppComponent,
     AssignmentComponent,
     AppComponent,
+    CoursesComponent,
     StatisticsComponent,
     HeadComponent,
     LoginComponent,
-    UserComponent
+    UserComponent,
+    MainComponent
   ],
   imports: [
     BrowserModule,
