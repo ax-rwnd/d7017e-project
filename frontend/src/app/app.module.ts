@@ -17,6 +17,7 @@ import { LoginComponent } from './login/login.component';
 import {HeadComponent} from './head/head.component';
 import {UserComponent} from './user/user.component';
 import { AssignmentComponent } from './assignment/assignment.component';
+import { MainComponent } from './main/main.component';
 
 const appRoutes: Routes = [
   { path: '', component: LoginComponent },
@@ -35,7 +36,8 @@ const appRoutes: Routes = [
     StatisticsComponent,
     HeadComponent,
     LoginComponent,
-    UserComponent
+    UserComponent,
+    MainComponent
   ],
   imports: [
     BrowserModule,

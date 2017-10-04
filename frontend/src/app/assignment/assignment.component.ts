@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import 'codemirror/mode/go/go';
+import { HeadComponent } from '../head/head.component';
 
 @Component({
   selector: 'app-assignment',
