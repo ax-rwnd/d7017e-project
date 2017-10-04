@@ -1,4 +1,17 @@
+#!/usr/bin/env node
+
 var http = require('http');
+const test_runner = require('./test-runner.js')
+
+// Parse port from command line
+var port
+var args = process.argv.slice(2)
+if (args.length < 1) {
+    throw new Error("too few arguments")
+} else {
+    port = parseInt(args[0])
+}
+
 //consider using express
 
 http.createServer(function (req, res) {
@@ -15,7 +28,7 @@ http.createServer(function (req, res) {
         try {
             //Convert the array of Buffers to a javascript object
             body = JSON.parse(Buffer.concat(body).toString())
-            let response = runTests(body).then( (resp) => {
+            let response = test_runner.runTests(body).then( (resp) => {
                 const resBody = { headers, method, url, resp }
                 res.writeHead(200, {'Content-Type': 'application/json'})
                 res.write(JSON.stringify(resBody))
@@ -27,4 +40,4 @@ http.createServer(function (req, res) {
             res.end()
         }
     });
-}).listen(8080)
+}).listen(port)
