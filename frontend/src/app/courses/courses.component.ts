@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { HeadComponent} from '../head/head.component';
+import {ActivatedRoute} from "@angular/router";
 
 @Component({
   selector: 'app-courses',
@@ -7,13 +8,15 @@ import { HeadComponent} from '../head/head.component';
   styleUrls: ['./courses.component.css']
 })
 export class CoursesComponent implements OnInit {
-	name:string;
+  course: string;
 	available: string[];
 
-  constructor() { }
+  constructor(
+    private route: ActivatedRoute
+  ) { }
 
   ngOnInit() {
-  	this.name = 'user1';
+    this.course = this.route.snapshot.paramMap.get('course');
   	this.available = ['assignment 1', 'assignment 2', 'assignment 3', 'laboration 1', 'laboration 2'];
   }
 

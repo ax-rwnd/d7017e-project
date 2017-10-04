@@ -2,15 +2,15 @@
   <div class="row">
     <div class="[ col-xs-12 col-sm-offset-2 col-sm-8 ]">
       <ul class="event-list">
-        <li routerLink="/courses" *ngFor="let course of courses">
-          <div class="latestBadge">
+        <li *ngFor="let course of courses">
+          <div [routerLink]="['/courses', course.name]" class="latestBadge">
             <span class="badgeTitle">Latest badge</span>
             <div class="badge fillBadge">
               <span class="glyphicon customGlyph" [ngClass]="{'glyphicon-star': course.latestBadge == 'star' ,
               'glyphicon-wrench': course.latestBadge == 'wrench', 'glyphicon-flash': course.latestBadge == 'flash'}"></span>
             </div>
           </div>
-          <div class="info">
+          <div [routerLink]="['/courses', course.name]" class="info">
             <h2 class="title">{{ course.code }}</h2>
             <p class="desc">{{ course.name }}</p>
             <div class="progress progress-margin">

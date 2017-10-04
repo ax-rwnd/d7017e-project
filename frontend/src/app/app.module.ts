@@ -22,11 +22,9 @@ import { CoursesComponent } from './courses/courses.component';
 
 const appRoutes: Routes = [
   { path: '', component: LoginComponent },
-  { path: 'statistics', component: StatisticsComponent },
-  { path: 'head', component: HeadComponent },
-  { path: 'assignment', component: AssignmentComponent },
-  { path: 'user', component: UserComponent },
-  { path: 'courses', component: CoursesComponent }
+  { path: 'courses/:course/assignment', component: AssignmentComponent },
+  { path: 'user/:user', component: UserComponent },
+  { path: 'courses/:course', component: CoursesComponent }
 ];
 
 

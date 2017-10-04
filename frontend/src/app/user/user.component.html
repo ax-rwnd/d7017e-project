@@ -9,7 +9,7 @@
   <br>
   <p><a class="userlinks">Settings</a></p>
   <p><a class="userlinks">Progress</a></p>
-  <p><a class="userlinks">Statistic</a></p>
+  <p><a class="userlinks" (click)="toggleStatistics()">Statistic</a></p>
 </div>
 
-<app-statistics></app-statistics>
+<app-statistics *ngIf="statistics"></app-statistics>
