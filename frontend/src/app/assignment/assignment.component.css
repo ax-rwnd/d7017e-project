@@ -2,9 +2,23 @@
   margin: 1%;
   padding: 0;
   height: 100%;
+  text-align: center;
   background-color: lightgray;
   float: left;
   width: 48%;
+  border-radius: 15px;
+  background-color: rgba(255, 255, 255, 0.8);
+  box-shadow: 1px 1px 3px rgba(180, 180, 180, 1);
+}
+
+#codeExample {
+  margin: 1%;
+  padding: 0;
+  height: 100%;
+  text-align: left;
+  background-color: lightgray;
+  float: left;
+  width: 90%;
   border-radius: 15px;
   background-color: rgba(255, 255, 255, 0.8);
   box-shadow: 1px 1px 3px rgba(180, 180, 180, 1);
