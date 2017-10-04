@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { HeadComponent} from '../head/head.component';
 
 @Component({
   selector: 'app-courses',
@@ -13,7 +14,7 @@ export class CoursesComponent implements OnInit {
 
   ngOnInit() {
   	this.name = 'user1';
-  	this.available = ['assignment 1', 'assignment 2', 'assignment 3', 'laboration 1', 'laboratio 2'];
+  	this.available = ['assignment 1', 'assignment 2', 'assignment 3', 'laboration 1', 'laboration 2'];
   }
 
 }

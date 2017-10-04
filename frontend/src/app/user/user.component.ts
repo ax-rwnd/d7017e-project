@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { HeadComponent} from '../head/head.component';
+import { StatisticsComponent} from '../statistics/statistics.component';
 
 import { User } from './user';
 
