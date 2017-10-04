@@ -16,19 +16,19 @@ export class StatisticsComponent implements OnInit {
     this.courses = [
       {
         name: 'Course1',
-        code: 'D0001',
+        code: 'D0001E',
         progress: 1.0,
         latestBadge: 'star'
       },
       {
         name: 'Course2',
-        code: 'D0002',
+        code: 'D0002E',
         progress: 0.7,
         latestBadge: 'wrench'
       },
       {
         name: 'Course3',
-        code: 'D0003',
+        code: 'D0003E',
         progress: 0.4,
         latestBadge: 'flash'
       }
