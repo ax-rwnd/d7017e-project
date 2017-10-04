@@ -6,10 +6,17 @@ const uuidv4 = require('uuid/v4');
 const request = require('request');
 const http = require('http');
 
-// Constants
-const PORT = 8080;
+
+// Parse port from command line
+var port
+var args = process.argv.slice(2)
+if (args.length < 1) {
+    throw new Error("too few arguments")
+} else {
+    port = parseInt(args[0])
+}
 const HOST = '0.0.0.0';
-const MAX_EXEC_TIME = 6000;
+const MAX_EXEC_TIME = 10000;
 
 var ports = [16000, 16001, 16002, 16003];
 var queue = [];
@@ -17,6 +24,10 @@ var queue = [];
 // App
 const app = express();
 app.get('/', (req, res) => {
+  res.send(ports+'\n'+queue+'\n');
+});
+
+app.post('/', (req, res) => {
   var port = ports.shift();
 
   if(port !== undefined) {
@@ -27,99 +38,94 @@ app.get('/', (req, res) => {
 });
 
 app.get('/status', (req, res) => {
-    res.send(ports+'\n'+queue+'\n');
+  res.send(ports+'\n'+queue+'\n');
 });
 
-app.listen(PORT, HOST);
-console.log(`Running on http://${HOST}:${PORT}`);
+app.listen(port, HOST);
+console.log(`Running on http://${HOST}:${port}`);
 
 function handleRequest(req, res, port) {
   const UUID = uuidv4();
 
-  var start = new Date().getTime()
+  var body = []
+  req.on('error', (err) => {
+      console.error(err)
+      res.statusCode = 400
+      res.end()
+  }).on('data', (chunk) => {
+      body.push(chunk)
+  }).on('end', () => {
+      try {
+          //Convert the array of Buffers to a javascript object
+          body = JSON.parse(Buffer.concat(body).toString())
 
-  console.log("time 0: " + (new Date().getTime() - start));
-
-  // Start docker container
-  const child = execFile('docker', ['run', '-d', '--rm', '-p', port+':8080', '--name', UUID, 'tester_python3'], (error, stdout, stderr) => {
-    if (error) {
-      console.error('stderr', stderr);
-      throw error;
-    }
-    console.log("docker running: " + (new Date().getTime() - start));
-    //console.log('stdout', stdout);
-  });
-
-  // Terminate if stuff take too long to run inside container
-  var max_exec_timeout = setTimeout(function () {
-    stopContainer(UUID, port, res, 'Error: Timeout because request took too long.\n');
-  }, MAX_EXEC_TIME);
-
-
-  // Wait until nodejs inside container is running
-
-  console.log("ping start: " + (new Date().getTime() - start));
-
-  var data = {"key": "value"}
-  var callback = function() {
-
-    console.log("ping done: " + (new Date().getTime() - start));
-    request.post(
-      {url: 'http://localhost:'+port, form: data},
-      function(error, response, body){
-        if (!error && response.statusCode == 200) {
-          clearTimeout(max_exec_timeout);
-          stopContainer(UUID, port, res, body);
-        } else {
-          console.log("error: " + error);
-          console.log("response: " + response);
-          console.log("body: " + body);
-        }
-      }
-    );
-  }
-  ping(port, callback);
-
-
-  /*var sent = false;
-  var ping = setInterval(function(){
-    http.get({
-      host: 'localhost',
-      port: port,
-      path: '/'
-    }, function(response) {
-      response.on('data', function(d) {
-        clearInterval(ping);
-        if (!sent) {
-          sent = !sent;
-          request.post(
-            {url: 'http://localhost:'+port, form: {"key":'value'}},
-            function(error, response, body){
-              if (!error && response.statusCode == 200) {
-                clearTimeout(max_exec_timeout);
-                stopContainer(UUID, port, res, body);
-              } else {
-                console.log("error: " + error);
-                console.log("response: " + response);
-                console.log("body: " + body);
-              }
+          // Start docker container
+          const child = execFile('docker', ['run', '-d', '--rm', '-p', port+':8080', '--name', UUID, 'tester_'+body['lang']], (error, stdout, stderr) => {
+            if (error) {
+              console.error('stderr', stderr);
+              throw error;
             }
-          );
-        }
-      });
-    }).on('error', function(e) {
-      //console.error(e);
-    });
-  }, 25);*/
+            //console.log('stdout', stdout);
+          });
+
+          // Terminate if stuff take too long to run inside container
+          var max_exec_timeout = setTimeout(function () {
+            stopContainer(UUID, port, res, 'Error: Timeout because request took too long.\n');
+          }, MAX_EXEC_TIME);
+
+          var callback = function() {
+            // Send request to docker containers NodeJS instance when its ready and wait for response.
+            request.post({
+              url: 'http://localhost:'+port+'/',
+              headers: {'Content-Type': 'application/json'},
+              json: body
+            }, function(error, response, body){
+              if(error) {
+                clearTimeout(max_exec_timeout);
+                stopContainer(UUID, port, res, 'Could not contact NodeJS instance inside Docker container');
+              } else {
+                clearTimeout(max_exec_timeout);
+                stopContainer(UUID, port, res, body['resp']);
+              }
+            });
+          }
+
+          // Wait until nodejs inside container is running
+          //ping(port, callback);
+
+
+          setTimeout(function () {
+            request.post({
+              url: 'http://localhost:'+port+'/',
+              headers: {'Content-Type': 'application/json'},
+              json: body
+            }, function(error, response, body){
+              if(error) {
+                clearTimeout(max_exec_timeout);
+                stopContainer(UUID, port, res, 'Could not contact NodeJS instance inside Docker container');
+              } else {
+                clearTimeout(max_exec_timeout);
+                stopContainer(UUID, port, res, body['resp']);
+              }
+            });
+          }, 3000);
+
+
+      } catch (e) {
+          console.log(e)
+          res.statusCode = 400
+          res.end()
+      }
+  });
 }
 
 function ping (port, callback) {
   var sent = false;
   var ping = setInterval(function(){
     http.get({
-      host: 'localhost',
+      host: 'http://localhost',
       port: port,
-      path: '/'
+      path: '/ping'
     }, function(response) {
       response.on('data', function(d) {
         clearInterval(ping);
@@ -129,9 +135,9 @@ function ping (port, callback) {
         }
       });
     }).on('error', function(e) {
-      //console.error(e);
+      console.error(e);
     });
-  }, 25);
+  }, 250);
 }
 
 function stopContainer(UUID, port, res, resMessage) {
@@ -141,7 +147,9 @@ function stopContainer(UUID, port, res, resMessage) {
       throw error;
     }
     //console.log('stdout', stdout);
-    res.send(resMessage);
+    if(!res.headerSent) {
+      res.send(resMessage);
+    }
     giveBackResources(port);
   });
 

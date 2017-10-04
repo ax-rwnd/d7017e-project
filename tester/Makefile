@@ -15,15 +15,15 @@ base:
 	echo "WORKDIR /usr/src/app">>"$(DOCKERFILE)"
 
 	# Install app dependencies
-	echo "ADD /container_nodejs/package.json /usr/src/app/">>"$(DOCKERFILE)"
+	echo "ADD /runner/package.json /usr/src/app/">>"$(DOCKERFILE)"
 	echo "RUN npm install">>"$(DOCKERFILE)"
 
 	# Bundle app source
-	echo "ADD /container_nodejs /usr/src/app">>"$(DOCKERFILE)"
+	echo "ADD /runner /usr/src/app">>"$(DOCKERFILE)"
 
 	echo "EXPOSE $(PORT)">>"$(DOCKERFILE)"
 
-	echo "CMD [ \"npm\", \"start\" ]">>"$(DOCKERFILE)"
+	echo "CMD [ \"npm\", \"start\", \"8080\" ]">>"$(DOCKERFILE)"
 
 build:
 	docker build -t tester_$(LANG) -f $(DOCKERFILE) .
