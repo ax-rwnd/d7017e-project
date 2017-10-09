@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { HeadComponent} from '../head/head.component';
+import {Component, Injector, OnInit} from '@angular/core';
+import { HeadComponent } from '../head/head.component';
 
 @Component({
   selector: 'app-statistics',
@@ -7,10 +7,10 @@ import { HeadComponent} from '../head/head.component';
   styleUrls: ['./statistics.component.css']
 })
 export class StatisticsComponent implements OnInit {
-
   courses: Course[];
 
-  constructor() { }
+  constructor() {
+  }
 
   ngOnInit() {
     this.courses = [

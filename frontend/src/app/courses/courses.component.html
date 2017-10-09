@@ -1,6 +1,6 @@
 <app-head></app-head>
 <h1>
- You are {{name}}
+ This is course {{course}}
 </h1>
 <h2>
 	Course Description
@@ -14,5 +14,5 @@
 You got these moments to do in this course
 </p>
 <ul>
-<li routerLink="/assignment" *ngFor="let n of available"> {{n}}</li>
+<li [routerLink]="['/courses', course, 'assignment']" *ngFor="let n of available"> {{n}}</li>
 </ul>

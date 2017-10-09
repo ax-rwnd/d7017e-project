@@ -18,7 +18,7 @@ export class AssignmentComponent implements OnInit {
       'print(\'Jag heter\' + namn)\n' +
       'n = 2\n' +
       'print(\'Jag har druckit \' + str(n) + \'\' koppar kaffe idag.\')';
-    this.content = "";
+    this.content = '';
   }
 
 }
