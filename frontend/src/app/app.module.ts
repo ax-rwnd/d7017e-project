@@ -20,6 +20,9 @@ import { AssignmentComponent } from './assignment/assignment.component';
 import { MainComponent } from './main/main.component';
 import { CoursesComponent } from './courses/courses.component';
 
+import {BackendService} from './services/backend.service';
+import {RewardService} from './services/reward.service';
+
 const appRoutes: Routes = [
   { path: '', component: LoginComponent },
   { path: 'courses/:course/assignment', component: AssignmentComponent },
@@ -38,7 +41,7 @@ const appRoutes: Routes = [
     HeadComponent,
     LoginComponent,
     UserComponent,
-    MainComponent
+    MainComponent,
   ],
   imports: [
     BrowserModule,
@@ -52,7 +55,9 @@ const appRoutes: Routes = [
       appRoutes
     )
   ],
-  providers: [],
+  providers: [
+    BackendService,
+    RewardService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

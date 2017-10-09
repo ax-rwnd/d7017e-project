@@ -44,7 +44,7 @@
 
     <div id="submitBar">
       <input type="submit" value="test">
-      <input type="submit" value="submit">
+      <input (click)="submitCode()" type="submit" value="submit">
     </div>
 
     <!--<textarea id="code" name="code" rows="50" cols="90">
@@ -54,4 +54,5 @@
     </textarea>-->
 
   </div>
+  {{progress.current}}
 </div>
