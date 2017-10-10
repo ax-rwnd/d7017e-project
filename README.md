@@ -6,7 +6,8 @@ To start node server follow this:
 Make sure you have node.js installed
 
 Download repo
-npm install ;inside project directory. (package.json)
+cd Backend
+npm install
 npm start
 
 Error will occour if a connection to mongoDB can not be established. 
