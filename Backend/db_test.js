@@ -11,4 +11,9 @@ db.once('open', function() {
 	a1.save(function(err, a1) {
 		if (err) return console.error(err);
 	});
+
+	Assignment.find(function(err, assignments) {
+		if (err) return console.log(err);
+		console.log(assignments);
+	});
 });
