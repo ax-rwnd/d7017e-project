@@ -5,7 +5,7 @@ var app = express();
 
 //Connect to db
 //If you have no mongodb running. Comment the below to prevent the app from crashing at start.
-mongoose.connect('localhost:2222');
+mongoose.connect('130.240.5.132.27017');
 
 
 //defining routes

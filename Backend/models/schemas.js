@@ -4,7 +4,8 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var testSchema = new Schema({
-    stdin: {type: String, required: true}, 
+    stdin: {type: String, required: false},
+    args: {[{type: String, required: false}],
     stdout: {type: String, required: true}, 
 });
 
