@@ -9,6 +9,7 @@
   },
   "author": "",
   "dependencies": {
+    "require-dir": "^0.3.2",
     "tmp": "0.0.33"
   }
 }
