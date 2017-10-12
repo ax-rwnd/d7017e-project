@@ -27,5 +27,3 @@ test_runner.runTests(request)
         console.log('Error:', err)
         process.exit(1)
     })
-
-
