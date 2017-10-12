@@ -1,17 +1,20 @@
 //Mongoose schemas.
 
-var test = new Schema({
-    ID: Number,    
-    stdin: String,
-    stdout: String
+var mongoose = require('mongoose');
+var Schema = mongoose.Schema;
+
+var testSchema = new Schema({
+    stdin: {type: String, required: true}, 
+    stdout: {type: String, required: true}, 
 });
 
-var assignment = new Schema({
-    ID:  Number,
-    tests: [test]
+var assignmentSchema = new Schema({
+    tests: [{type: Schema.Types.ObjectId, ref: 'Test', required: true}]
 });
 
-var submission = new Schema({
-  assignment:  assignment,
-  code: String
-});
+
+var Test = mongoose.model('Test', testsSchema);
+var Assignment = mongoose.model('Assignment', assignmentSchema);
+var Models = {Assignment: Assignment, Test: Test};
+
+module.exports = Models;

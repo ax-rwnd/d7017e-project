@@ -6,11 +6,10 @@ var dbURI = 'mongodb://localhost/test';
 
 mongoose.connect(dbURI);
 
-function getTest(assignmentID) {
+function getAssignment(assignmentID) {
     
     var Test = mongoose.model('Test', test);
     
     //find the test matching our assignmentID
-    Person.findOne({ 'ID': 'assignmentID' }) 
-    
+    Person.findOne({ 'ID': 'assignmentID' })  
 } 
