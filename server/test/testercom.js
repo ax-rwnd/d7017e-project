@@ -12,4 +12,5 @@ function getTest(assignmentID) {
     
     //find the test matching our assignmentID
     Person.findOne({ 'ID': 'assignmentID' }) 
+    
 } 
