@@ -1,12 +1,14 @@
 var express = require('express');
 var mongoose = require('mongoose');
+var bodyParser = require('body-parser');
 
 var app = express();
 
 //Connect to db
 //If you have no mongodb running. Comment the below to prevent the app from crashing at start.
-mongoose.connect('localhost:2222');
+//mongoose.connect('localhost:2222');
 
+app.use(bodyParser.json());
 
 //defining routes
 var api = express.Router();
@@ -16,7 +18,7 @@ app.use('/api', api);
 
 
 //NOT REALLY SURE WHAT THIS DOES
-app.use(function(req, res, next) {
+/*app.use(function(req, res, next) {
   var err = new Error('Not Found');
   err.status = 404;
   next(err);
@@ -31,7 +33,7 @@ app.use(function(err, req, res, next) {
   // render the error page
   res.status(err.status || 500);
   res.send("HTTP error: " + err.status + ". " + err.message);
-});
+});*/
 
 
 module.exports = app;
