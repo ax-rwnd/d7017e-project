@@ -6,7 +6,7 @@ var app = express();
 
 //Connect to db
 //If you have no mongodb running. Comment the below to prevent the app from crashing at start.
-//mongoose.connect('localhost:2222');
+//mongoose.connect('130.240.5.132:27017');
 
 app.use(bodyParser.json());
 
@@ -18,7 +18,7 @@ app.use('/api', api);
 
 
 //NOT REALLY SURE WHAT THIS DOES
-/*app.use(function(req, res, next) {
+app.use(function(req, res, next) {
   var err = new Error('Not Found');
   err.status = 404;
   next(err);
@@ -33,7 +33,7 @@ app.use(function(err, req, res, next) {
   // render the error page
   res.status(err.status || 500);
   res.send("HTTP error: " + err.status + ". " + err.message);
-});*/
+});
 
 
 module.exports = app;
