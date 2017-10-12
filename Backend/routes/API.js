@@ -1,5 +1,5 @@
-var Assignment = require('../models/example_model').Assignment;
-var Tests = require('../models/example_model').Tests;
+var Assignment = require('../models/schemas').Assignment;
+var Test = require('../models/schemas').Test;
 
 var request = require('request');
 
@@ -48,6 +48,18 @@ module.exports = function(router) {
 		}));
 	});
 
+    //TEST INSERT DB
+router.get('/temp' , function(req, res) {
+    var a1 = new Assignment({ tests: [new Test({ stdin: '', stdout: 'hello world\n' })] });
+    a1.save(function(err, a1) {
+        if (err) return console.error(err);
+    });
+
+    Assignment.find(function(err, assignments) {
+        if (err) return console.log(err);
+        console.log(assignments);
+    });
+});
 /*
  * /users/ Endpoints
  */
