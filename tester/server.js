@@ -3,9 +3,9 @@
 const express = require('express');
 const execFile = require('child_process').execFile;
 const uuidv4 = require('uuid/v4');
-const request = require('request');
 const http = require('http');
 
+const manager = require('./manager.js')
 
 // Parse port from command line
 var port
@@ -16,151 +16,85 @@ if (args.length < 1) {
     port = parseInt(args[0])
 }
 const HOST = '0.0.0.0';
-const MAX_EXEC_TIME = 10000;
-
-var ports = [16000, 16001, 16002, 16003];
-var queue = [];
 
 // App
 const app = express();
 app.get('/', (req, res) => {
-  res.send(ports+'\n'+queue+'\n');
+
+  var now = Date.now()
+
+  var s = ''
+
+  s += '<h1>Tester</h1>'
+
+  s += '<div style="float: left; width: 70%;">'
+  s += '<h2>Containers</h2>'
+  s += '<table style="border-spacing: 20px 0;">'
+  s += '<tr><th>Language</th><th>ID</th><th>Port</th><th>Used</th>'+
+    '<th>Ready</th><th>Time created</th><th>Time alive</th></tr>'
+  manager.LANGS.forEach(function(lang) {
+    for(var i = 0; i < manager.containers[lang].length; i++) {
+      var container = manager.containers[lang][i]
+
+      var time_alive = (now-container['time_created'])/1000
+
+      var days    = Math.floor(time_alive/(60*60*24))
+      time_alive  = time_alive%(60*60*24)
+      var hours   = Math.floor(time_alive/(60*60))
+      time_alive  = time_alive%(60*60)
+      var minutes = Math.floor(time_alive/(60))
+      time_alive  = time_alive%(60)
+      var seconds = Math.floor(time_alive)
+
+      time_alive = ""
+      if(days > 0) {
+        time_alive += days+"d"
+      }
+      if(hours > 0) {
+        time_alive += hours+"h"
+      }
+      if(minutes > 0) {
+        time_alive += minutes+"m"
+      }
+      time_alive += seconds+"s"
+
+
+      if(time_alive < 60) {
+        time_alive = Math.floor(time_alive) + "s"
+      } else if(time_alive > 60) {
+        time_alive = Math.floor(time_alive/60) + "m"
+      } else if(time_alive > 60*60) {
+        time_alive = Math.floor(time_alive/(60*60)) + "h"
+      } else if(time_alive > 60*60*24) {
+        time_alive = Math.floor(time_alive/(60*60*24)) + "d"
+      }
+
+      s += '<tr><td>'+lang+'</td><td>'+container['id']+'</td>'+
+        '<td>'+container['port']+'</td><td>'+container['used']+'</td>'+
+        '<td>'+container['ready']+'</td>'+
+        '<td>'+new Date(container['time_created']).toString()+'</td>'+
+        '<td>'+time_alive+'</td></tr>'
+    }
+  })
+  s += '</table>'
+  s += '</div>'
+
+  s += '<div style="float: right; width: 30%;">'
+  s += '<h2>Queue</h2>'
+  s += '<table>'
+  s += '<tr><th>Language</th><th>#</th></tr>'
+  manager.LANGS.forEach(function(lang) {
+    s += '<tr><td>'+lang+'</td><td>'+manager.queue[lang].length+'</td></tr>'
+  })
+  s += '</table>'
+  s += '</div>'
+
+  res.send(s);
 });
 
 app.post('/', (req, res) => {
-  var port = ports.shift();
-
-  if(port !== undefined) {
-    handleRequest(req, res, port);
-  } else {
-    queue.push([req, res]);
-  }
-});
-
-app.get('/status', (req, res) => {
-  res.send(ports+'\n'+queue+'\n');
+  manager.newRequest(req, res);
 });
 
 app.listen(port, HOST);
 console.log(`Running on http://${HOST}:${port}`);
-
-function handleRequest(req, res, port) {
-  const UUID = uuidv4();
-
-  var body = []
-  req.on('error', (err) => {
-      console.error(err)
-      res.statusCode = 400
-      res.end()
-  }).on('data', (chunk) => {
-      body.push(chunk)
-  }).on('end', () => {
-      try {
-          //Convert the array of Buffers to a javascript object
-          body = JSON.parse(Buffer.concat(body).toString())
-
-          // Start docker container
-          const child = execFile('docker', ['run', '-d', '--rm', '-p', port+':8080', '--name', UUID, 'tester_'+body['lang']], (error, stdout, stderr) => {
-            if (error) {
-              console.error('stderr', stderr);
-              throw error;
-            }
-            //console.log('stdout', stdout);
-          });
-
-          // Terminate if stuff take too long to run inside container
-          var max_exec_timeout = setTimeout(function () {
-            stopContainer(UUID, port, res, 'Error: Timeout because request took too long.\n');
-          }, MAX_EXEC_TIME);
-
-          var callback = function() {
-            // Send request to docker containers NodeJS instance when its ready and wait for response.
-            request.post({
-              url: 'http://localhost:'+port+'/',
-              headers: {'Content-Type': 'application/json'},
-              json: body
-            }, function(error, response, body){
-              if(error) {
-                clearTimeout(max_exec_timeout);
-                stopContainer(UUID, port, res, 'Could not contact NodeJS instance inside Docker container');
-              } else {
-                clearTimeout(max_exec_timeout);
-                stopContainer(UUID, port, res, body['resp']);
-              }
-            });
-          }
-
-          // Wait until nodejs inside container is running
-          //ping(port, callback);
-
-
-          setTimeout(function () {
-            request.post({
-              url: 'http://localhost:'+port+'/',
-              headers: {'Content-Type': 'application/json'},
-              json: body
-            }, function(error, response, body){
-              if(error) {
-                clearTimeout(max_exec_timeout);
-                stopContainer(UUID, port, res, 'Could not contact NodeJS instance inside Docker container');
-              } else {
-                clearTimeout(max_exec_timeout);
-                stopContainer(UUID, port, res, body['resp']);
-              }
-            });
-          }, 3000);
-
-
-      } catch (e) {
-          console.log(e)
-          res.statusCode = 400
-          res.end()
-      }
-  });
-}
-
-function ping (port, callback) {
-  var sent = false;
-  var ping = setInterval(function(){
-    http.get({
-      host: 'http://localhost',
-      port: port,
-      path: '/ping'
-    }, function(response) {
-      response.on('data', function(d) {
-        clearInterval(ping);
-        if (!sent) {
-          sent = !sent;
-          callback();
-        }
-      });
-    }).on('error', function(e) {
-      console.error(e);
-    });
-  }, 250);
-}
-
-function stopContainer(UUID, port, res, resMessage) {
-  const child = execFile('docker', ['stop', UUID], (error, stdout, stderr) => {
-    if (error) {
-      console.error('stderr', stderr);
-      throw error;
-    }
-    //console.log('stdout', stdout);
-    if(!res.headerSent) {
-      res.send(resMessage);
-    }
-    giveBackResources(port);
-  });
-
-}
-
-function giveBackResources(port) {
-  console.log("giveBackResources for port "+port);
-  var request = queue.shift();
-  if(request !== undefined) {
-    handleRequest(request[0], request[1], port);
-  } else {
-    ports.push(port)
-  }
-}
