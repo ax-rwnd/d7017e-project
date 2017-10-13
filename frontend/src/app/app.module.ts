@@ -23,6 +23,8 @@ import { CoursesComponent } from './courses/courses.component';
 import {BackendService} from './services/backend.service';
 import {RewardService} from './services/reward.service';
 
+import {HttpClientModule} from '@angular/common/http';
+
 const appRoutes: Routes = [
   { path: '', component: LoginComponent },
   { path: 'courses/:course/assignment', component: AssignmentComponent },
@@ -51,6 +53,7 @@ const appRoutes: Routes = [
     ButtonsModule.forRoot(),
     BsDropdownModule.forRoot(),
     CollapseModule.forRoot(),
+    HttpClientModule,
     RouterModule.forRoot(
       appRoutes
     )

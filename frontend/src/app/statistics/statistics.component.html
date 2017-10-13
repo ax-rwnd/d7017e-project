@@ -14,12 +14,11 @@
             <h2 class="title">{{ course.code }}</h2>
             <p class="desc">{{ course.name }}</p>
             <div class="progress progress-margin">
-              <div class="progress-bar" role="progressbar" [attr.aria-valuenow]="course.progress" aria-valuemin="0" aria-valuemax ="100"
-                   [style.width]="course.progress*100 + '%'">
+              <div class="progress-bar" role="progressbar" [attr.aria-valuenow]="course.progress['current']" aria-valuemin="0" aria-valuemax ="100"
+                   [style.width]="course.progress['current'] + '%'">
               </div>
             </div>
           </div>
-
         </li>
       </ul>
     </div>

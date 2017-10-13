@@ -8,5 +8,11 @@ export class RewardService {
   constructor() { }
   UpdateProgress(inc) {
     this.progress.current += inc;
-}
+  }
+
+  HandleResponse(value) {
+    if (value[0]['ok']) {
+      this.UpdateProgress(10);
+    }
+  }
 }
