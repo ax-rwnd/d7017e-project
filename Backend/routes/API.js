@@ -8,7 +8,7 @@ var testercom = require('../lib/testercom')
 module.exports = function(router) {
 
 	router.get('/', function (req, res) {
-    testercom.getTestsFromAssignment('59e0c2535bef1730c0d3cf64');
+    testercom.getTestsFromAssignment('59e0dbaaf01e8d190081694a');
 	   console.log("/ route retrieved");
 	   res.send('Hello World');
 	});
@@ -16,7 +16,7 @@ module.exports = function(router) {
 /*
  * /test/ Endpoints
  */ 
-    //
+    ////
 	router.post('/test', function (req, res) {
 		var lang = req.body.lang;
 		var code = req.body.code;
@@ -54,15 +54,58 @@ module.exports = function(router) {
 
     //TEST INSERT DB
 router.get('/temp' , function(req, res) {
-    var a1 = new Assignment({ tests: [new Test({ stdin: '', stdout: 'hello world\n' })] });
-    a1.save(function(err, a1) {
-        if (err) return console.error(err);
+	var t1 = new Test({
+		stdin: '', 
+		stdout: 'Hello world\n'
+	});
+	var t2 = new Test({
+		stdin: '', 
+		stdout: 'Hello world\n'
+	});
+
+
+    t1.save(function(err, savedt1) {
+        if (err) {
+        	console.log('Error' + err);
+        	return;
+    	}
+    	t2.save(function(err, savedt2) {
+    		if (err) {
+    			console.log('Error' + err);
+    			return;
+    		}
+    	
+	    	console.log("T1")
+	    	console.log(savedt1)
+	    	console.log("T2")
+	    	console.log(savedt2)
+
+	    	var a1 = new Assignment({
+	    		assignmentName: 'assignment-helloworld',
+	    		tests: [savedt1, savedt2]
+	    	});
+
+	    	a1.save(function(err, saveda1) {
+	    		if (err) {
+	    			console.log('Error: ' + err);
+	    			return;
+	    		}
+
+	    		console.log(saveda1)
+
+				console.log("Query DB")
+
+			    Assignment.findOne({ '_id': saveda1._id}, function(err, assignments) {
+			        if (err) return console.log(err);
+			        		console.log(assignments);
+			    });
+
+	    	});
+	    });
     });
 
-    Assignment.find(function(err, assignments) {
-        if (err) return console.log(err);
-        console.log(assignments);
-    });
+    
+
 });
 /*
  * /users/ Endpoints

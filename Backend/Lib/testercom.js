@@ -8,22 +8,26 @@ var Assignment = require('../models/schemas').Assignment;
 var Test = require('../models/schemas').Test;
 
 
-
+//
 var getTestsFromAssignment = function (assignmentID) {
     
     //assignment = getAssignment(assignmentID)
     
     //find all tests from an assignment
-    testss = []
+    testsToReturn = []
 
-    /*Assignment.findById(assignmentID)
+    /*Assignment.find(function(err, assignments) {
+        if (err) return console.log(err);
+        console.log(assignments);
+    }); */
+    Assignment.findById(assignmentID)
     .populate({
-        //model: 'Test',
-        path: '_id'
+        path: 'tests',
+        model: 'Test'
     })
     .exec(function(err, assignmentObject) {
         console.log(assignmentObject)
-    });*/
+    });
 
 
     /*Assignment.findOne( { '_id': assignmentID }, function(err, assignment) {
@@ -40,14 +44,20 @@ var getTestsFromAssignment = function (assignmentID) {
     });*/
     //console.log(testss) 
 
-    Assignment.findOne({ '_id': assignmentID})
-        .populate('tests')
+    /*Assignment.findOne({ '_id': assignmentID})
+        .populate({
+            path: "Test"
+        })
         .exec(function(err, assignment) {
 
 
             if (err) return console.log(err);
             console.log(assignment);
-        });
+        }); */
+
+    /*Test.findOne({ '_id': '59e0c91585ce9b3e74b46926'}, function(err, test) {
+        console.log(test);
+    }); */
 //
     
     
@@ -68,7 +78,7 @@ var getTestsFromAssignment = function (assignmentID) {
         console.log('%s %s %s %s.', test.stdin, test.args, test.stdout, test.id) // test print
     }); */
 
-    return testss;                   
+    return;                   
 }
 
 exports.getTestsFromAssignment = getTestsFromAssignment;
