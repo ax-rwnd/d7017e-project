@@ -1,5 +1,5 @@
 import {Component, Injector, OnInit} from '@angular/core';
-import { HeadComponent } from '../head/head.component';
+import {RewardService} from '../services/reward.service';
 
 @Component({
   selector: 'app-statistics',
@@ -9,12 +9,12 @@ import { HeadComponent } from '../head/head.component';
 export class StatisticsComponent implements OnInit {
   courses: Course[];
 
-  constructor() {
+  constructor(private rewardService: RewardService) {
   }
 
   ngOnInit() {
     this.courses = [
-      {
+      /*{
         name: 'Course1',
         code: 'D0001E',
         progress: 1.0,
@@ -25,21 +25,20 @@ export class StatisticsComponent implements OnInit {
         code: 'D0002E',
         progress: 0.7,
         latestBadge: 'wrench'
-      },
+      },*/
       {
         name: 'Course3',
         code: 'D0003E',
-        progress: 0.4,
+        progress: this.rewardService.progress,
         latestBadge: 'flash'
       }
     ];
   }
-
 }
 
 interface Course {
   name: string;
   code: string;
-  progress: number;
+  progress: any;
   latestBadge: string;
 }

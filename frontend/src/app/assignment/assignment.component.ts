@@ -26,9 +26,10 @@ export class AssignmentComponent implements OnInit {
   }
 
   submitCode() {
-    if (this.backendService.SubmitAssignment()) {
-      this.rewardService.UpdateProgress(10);
-    }
+    this.backendService.SubmitAssignment(this.content)
+      .then(value => this.rewardService.HandleResponse(value));
   }
+
+
 
 }
