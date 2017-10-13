@@ -10,7 +10,7 @@ var testSchema = new Schema({
 });
 
 var assignmentSchema = new Schema({
-    tests: [{type: Schema.Types.ObjectId, ref: 'Test', required: true}]
+    tests: [{ type: Schema.Types.ObjectId, ref: 'Test', required: true }]
 });
 
 
