@@ -23,18 +23,16 @@ module.exports = function(router) {
 		var test_id = req.body.test_id;
 
 		// GET TESTS
-        tests = getTestsFromAssignment(test_id);
+        tests = testercom.getTestsFromAssignment(test_id);
 
 		//var assignment = GetTest(test_id)
 
 		request.post(
-			'http://127.0.0.1:8000/api/tester',
+			'http://130.240.5.118:9100',
 			{ json: {
 			'lang' : lang,
 			'code' : code,
-			'tests' : [
-				{'stdin':'', 'stdout':'hello world\n', 'id':0}
-			]
+			'tests' : tests
 	    }},
 	    function (error, response, body){
 	    	console.log(body)
@@ -53,7 +51,7 @@ module.exports = function(router) {
 	});
 
     //TEST INSERT DB
-router.get('/temp' , function(req, res) {
+/*router.get('/temp' , function(req, res) {
 	var t1 = new Test({
 		stdin: '', 
 		stdout: 'Hello world\n'
@@ -61,7 +59,7 @@ router.get('/temp' , function(req, res) {
 	var t2 = new Test({
 		stdin: '', 
 		stdout: 'Hello world\n'
-	});
+	}); 
 
 
     t1.save(function(err, savedt1) {
@@ -106,7 +104,7 @@ router.get('/temp' , function(req, res) {
 
     
 
-});
+});*/
 /*
  * /users/ Endpoints
  */

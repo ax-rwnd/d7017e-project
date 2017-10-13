@@ -26,59 +26,19 @@ var getTestsFromAssignment = function (assignmentID) {
         model: 'Test'
     })
     .exec(function(err, assignmentObject) {
-        console.log(assignmentObject)
+        for (i = 0; i < assignmentObject.tests.length; i++) { 
+            testsToReturn.push( {stdin: assignmentObject.tests[i].stdin, 
+                args: assignmentObject.tests[i].args, 
+                stdout: assignmentObject.tests[i].stdout,
+                id: assignmentObject.tests[i]._id
+            } )
+        }
+        //console.log(assignmentObject)
+        
+        console.log(testsToReturn)
     });
 
-
-    /*Assignment.findOne( { '_id': assignmentID }, function(err, assignment) {
-        var t1 = assignment['tests']
-        Test.findByID( {t1}, function(err, test1) {
-
-            console.log(test1);
-        });
-    }); */
-    /*populate('tests').
-    exec(function(err, result){
-        testss.push(result)
-        console.log(result)
-    });*/
-    //console.log(testss) 
-
-    /*Assignment.findOne({ '_id': assignmentID})
-        .populate({
-            path: "Test"
-        })
-        .exec(function(err, assignment) {
-
-
-            if (err) return console.log(err);
-            console.log(assignment);
-        }); */
-
-    /*Test.findOne({ '_id': '59e0c91585ce9b3e74b46926'}, function(err, test) {
-        console.log(test);
-    }); */
-//
-    
-    
-    /*Assignment.find({ _id: assignmentID}, function(err, assignment) {
-        if (err) return console.log(err);
-        console.log(assignment.tests[1]);
-    });*/
-    /*Assignment.find({'assignment_id': assignmentID, 'assignment.tests': }).cursor();
-                     
-    cursor.on('data', function (err, test) {
-        //called once per document
-        if (err) return handleError(err);
-        
-        //append tests
-        test = {stdin: test.stdin, args: test.args, stdout:test.stdout, id: test._id};
-        tests.push(test);
-        
-        console.log('%s %s %s %s.', test.stdin, test.args, test.stdout, test.id) // test print
-    }); */
-
-    return;                   
+    return testsToReturn;                   
 }
 
 exports.getTestsFromAssignment = getTestsFromAssignment;
