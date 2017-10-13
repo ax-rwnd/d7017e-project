@@ -6,14 +6,14 @@ var Schema = mongoose.Schema;
 var testSchema = new Schema({
     stdin: {type: String, required: false},
     args: [{type: String, required: false}],
-    stdout: {type: String, required: true}, 
+    stdout: {type: String, required: true} 
 });
 
 var assignmentSchema = new Schema({
     tests: [{ type: Schema.Types.ObjectId, ref: 'Test', required: true }]
 });
 
-
+//
 var Test = mongoose.model('Test', testSchema);
 var Assignment = mongoose.model('Assignment', assignmentSchema);
 var Models = {Assignment: Assignment, Test: Test};

@@ -16,13 +16,14 @@ var getTestsFromAssignment = function (assignmentID) {
     //find all tests from an assignment
     testss = []
 
-    Assignment.findById(assignmentID)
+    /*Assignment.findById(assignmentID)
     .populate({
-        path: 'tests'
+        //model: 'Test',
+        path: '_id'
     })
     .exec(function(err, assignmentObject) {
         console.log(assignmentObject)
-    });
+    });*/
 
 
     /*Assignment.findOne( { '_id': assignmentID }, function(err, assignment) {
@@ -37,13 +38,17 @@ var getTestsFromAssignment = function (assignmentID) {
         testss.push(result)
         console.log(result)
     });*/
-   /* console.log(testss) 
+    //console.log(testss) 
 
-    Assignment.find(function(err, assignments) {
+    Assignment.findOne({ '_id': assignmentID})
         .populate('tests')
-        if (err) return console.log(err);
-        console.log(assignments);
-    });*/
+        .exec(function(err, assignment) {
+
+
+            if (err) return console.log(err);
+            console.log(assignment);
+        });
+//
     
     
     /*Assignment.find({ _id: assignmentID}, function(err, assignment) {
@@ -63,7 +68,7 @@ var getTestsFromAssignment = function (assignmentID) {
         console.log('%s %s %s %s.', test.stdin, test.args, test.stdout, test.id) // test print
     }); */
 
-    return tests;                   
+    return testss;                   
 }
 
 exports.getTestsFromAssignment = getTestsFromAssignment;

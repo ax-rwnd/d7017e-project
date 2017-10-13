@@ -8,7 +8,7 @@ var testercom = require('../lib/testercom')
 module.exports = function(router) {
 
 	router.get('/', function (req, res) {
-    testercom.getTestsFromAssignment('59df9821ef34722f80afb946');
+    testercom.getTestsFromAssignment('59e0c2535bef1730c0d3cf64');
 	   console.log("/ route retrieved");
 	   res.send('Hello World');
 	});
@@ -16,7 +16,7 @@ module.exports = function(router) {
 /*
  * /test/ Endpoints
  */ 
-    
+    //
 	router.post('/test', function (req, res) {
 		var lang = req.body.lang;
 		var code = req.body.code;
@@ -53,7 +53,7 @@ module.exports = function(router) {
 	});
 
     //TEST INSERT DB
-/*router.get('/temp' , function(req, res) {
+router.get('/temp' , function(req, res) {
     var a1 = new Assignment({ tests: [new Test({ stdin: '', stdout: 'hello world\n' })] });
     a1.save(function(err, a1) {
         if (err) return console.error(err);
@@ -63,7 +63,7 @@ module.exports = function(router) {
         if (err) return console.log(err);
         console.log(assignments);
     });
-});*/
+});
 /*
  * /users/ Endpoints
  */
