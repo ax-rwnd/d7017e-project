@@ -69,6 +69,10 @@ module.exports = function(router) {
  */
  	router.get('/users', function (req, res) {
  		var ids = req.query.ids;
+ 		if(!ids) {
+ 			res.sendStatus(404);
+ 			return
+ 		}
  		res.send("/users?ids=" + ids + " GET Endpoint");
  	});
 
