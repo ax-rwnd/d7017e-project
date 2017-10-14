@@ -1,3 +1,8 @@
+.img-circle {
+  border-radius: 50%;
+}
+
+/*
 body{
   font-family: Verdana, Geneva, sans-serif;
   font-size: medium;
@@ -8,9 +13,7 @@ body{
   text-align: center;
 }
 
-.img-circle {
-  border-radius: 50%;
-}
+
 
 .userlinks {
   text-decoration: none;
@@ -20,4 +23,4 @@ body{
 a:hover {
   color: grey;
   cursor: pointer;
-}
+}*/

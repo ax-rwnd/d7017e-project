@@ -1,12 +1,37 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit} from '@angular/core';
+import { trigger, state, style, animate, transition } from '@angular/animations';
+import { HeadService } from '../services/head.service';
 
 @Component({
   selector: 'app-head',
   templateUrl: './head.component.html',
-  styleUrls: ['./head.component.css']
+  styleUrls: ['./head.component.css'],
+  animations: [
+    trigger('sidebar', [
+      state('inactive', style({display: 'none', transform: 'translateX(-100%)'})),
+      state('active', style({display: 'block', transform: 'translateX(0)'})),
+      transition('inactive => active', animate('300ms')),
+      transition('active => inactive', animate('300ms'))
+    ])
+  ]
 })
 
 export class HeadComponent implements OnInit {
+  state;
+
+  constructor(private headService: HeadService) {
+    this.state = 'inactive';
+  }
+
+  toggleState() {
+    this.state = this.state === 'active' ? 'inactive' : 'active';
+    this.headService.setState(this.state);
+  }
+
+   ngOnInit() {}
+}
+
+/*export class HeadComponent implements OnInit {
 
   //Det här är retarded. temporär lösning
   public isCollapsed:boolean = false;
@@ -64,4 +89,4 @@ export class HeadComponent implements OnInit {
 
   }
 
-}
+}*/

@@ -1,13 +1,24 @@
 /* You can add global styles to this file, and also import other style files */
 @import '~bootstrap/dist/css/bootstrap.min.css';
 
-:root {
+:root { /* global varibles */
   --wSidebar: 15%;
 }
 
 body {
   color: black;
   font-family: Tahoma, Geneva, sans-serif;
+  padding-top: 30px;
+}
+
+.content {
+  margin-top: 1%;
+  padding-left: 2%;
+  padding-right: 2%;
+  padding-top: 30px; /* need this because we have a fixed navbar on top */
+  width: 100%;
+  float: left;
+  margin-left: var(--wSidebar);
 }
 
 /* the menu button for the sidebar */
@@ -21,6 +32,11 @@ body {
 .btn {
   background-color: #133756;
   border-style: none;
+  color: white;
+}
+
+.btn:hover {
+  color: lightgrey;
 }
 
 /* Pills modification */

@@ -1,18 +1,20 @@
 <app-head></app-head>
-<h1>
- This is course {{course}}
-</h1>
-<h2>
-	Course Description
-</h2>
-<p>
-	This will help you in this moment
-	(Fetching ltu course page)
-</p>
+<div id="cont" class="content" [@content]="state">
+  <h1>
+   This is course {{course}}
+  </h1>
+  <h2>
+    Course Description
+  </h2>
+  <p>
+    This will help you in this moment
+    (Fetching ltu course page)
+  </p>
 
-<p>
-You got these moments to do in this course
-</p>
-<ul>
-<li [routerLink]="['/courses', course, 'assignment']" *ngFor="let n of available"> {{n}}</li>
-</ul>
+  <p>
+  You got these moments to do in this course
+  </p>
+  <ul>
+  <li [routerLink]="['/courses', course, 'assignment']" *ngFor="let n of available"> {{n}}</li>
+  </ul>
+</div>

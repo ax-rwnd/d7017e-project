@@ -1,9 +1,27 @@
-@import url('https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css');
+.courseTitle {
+  color: white;
+  font-size: large;
+  margin-bottom: 5%;
+}
+
+/* Sidebar */
+.sidebar {
+  width: var(--wSidebar);
+  height: 100%;
+  background: #133756;
+  position: fixed;
+  padding-top: 5%;
+  left: 0;
+  padding-left: 1%;
+  font-size: 1.1em;
+}
+
+/*@import url('https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css');
 @media(min-width:768px) {
   body {
     margin-top: 50px;
   }
-  /*html, body, #wrapper, #page-wrapper {height: 100%; overflow: hidden;}*/
+  !*html, body, #wrapper, #page-wrapper {height: 100%; overflow: hidden;}*!
 }
 
 #wrapper {
@@ -26,7 +44,7 @@
   }
 }
 
-/* Top Navigation */
+!* Top Navigation *!
 
 .top-nav {
   padding: 0 15px;
@@ -57,7 +75,7 @@
   float: left;
   position: absolute;
   margin-top: 0;
-  /*border: 1px solid rgba(0,0,0,.15);*/
+  !*border: 1px solid rgba(0,0,0,.15);*!
   border-top-left-radius: 0;
   border-top-right-radius: 0;
   background-color: #fff;
@@ -69,7 +87,7 @@
   white-space: normal;
 }
 
-/* Side Navigation */
+!* Side Navigation *!
 
 @media(min-width:768px) {
   .side-nav {
@@ -83,7 +101,7 @@
     border-top: 1px rgba(0,0,0,.5) solid;
     overflow-y: auto;
     background-color: #222;
-    /*background-color: #5A6B7D;*/
+    !*background-color: #5A6B7D;*!
     bottom: 0;
     overflow-x: hidden;
     padding-bottom: 40px;
@@ -110,7 +128,7 @@
   display: block;
   padding: 10px 15px 10px 38px;
   text-decoration: none;
-  /*color: #999;*/
+  !*color: #999;*!
   color: #fff;
 }
 
@@ -140,4 +158,4 @@
 
 .navbar-brand {
   padding: 5px 15px;
-}
+}*/
