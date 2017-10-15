@@ -9,6 +9,7 @@
     "express": "^4.16.1",
     "mongoose": "^4.12.1",
     "body-parser": "^1.18.2",
-    "request": "^2.83.0"
+    "request": "^2.83.0",
+    "debug": "~2.2.0"
   }
 }
