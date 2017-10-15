@@ -12,6 +12,6 @@
     "body-parser": "^1.18.2",
     "request": "^2.83.0",
     "debug": "~2.2.0",
-    "forever-service": "~0.15.3"
+    "forever": "~0.15.3"
   }
 }
