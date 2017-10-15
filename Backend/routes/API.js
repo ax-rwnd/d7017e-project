@@ -16,29 +16,32 @@ module.exports = function(router) {
 /*
  * /test/ Endpoints
  */ 
-    ////
+    
 	router.post('/test', function (req, res) {
 		var lang = req.body.lang;
 		var code = req.body.code;
-		var test_id = req.body.test_id;
+		var assignment_id = req.body.assignment_id;
 
-		// GET TESTS
-        tests = testercom.getTestsFromAssignment(test_id);
-
-		//var assignment = GetTest(test_id)
-
-		request.post(
-			'http://130.240.5.118:9100',
-			{ json: {
-			'lang' : lang,
-			'code' : code,
-			'tests' : tests
-	    }},
-	    function (error, response, body){
-	    	console.log(body)
-	    	res.set('Content-Type', 'application/json');
-	    	res.send(body);
-	    });
+		//Get tests from our database
+        testercom.getTestsFromAssignment(assignment_id, function(tests) {
+    		/* var assignment = GetTest(test_id)
+			//console.log(tests)
+			//jsonPackage = {'lang': lang, 'code': code, 'tests': tests}
+			//console.log(jsonPackage) */
+			request.post(
+				'http://130.240.5.118:9100',
+				{ json: {
+				'lang' : lang,
+				'code' : code,
+				'tests' : tests
+		    }},
+		    function (error, response, body){
+		    	console.log("asdf")
+		    	console.log(body)
+		    	res.set('Content-Type', 'application/json');
+		    	res.send(body);
+		    });
+        });
 	});
 
     // TEMPORARY FUNCTION WHILE NOT CONNECTED TO TESTER

@@ -8,24 +8,18 @@ var Assignment = require('../models/schemas').Assignment;
 var Test = require('../models/schemas').Test;
 
 
-//
-var getTestsFromAssignment = function (assignmentID) {
+/* This function will get all tests related to a specific assignment. */
+var getTestsFromAssignment = function (assignmentID, callback) {
     
-    //assignment = getAssignment(assignmentID)
-    
-    //find all tests from an assignment
     testsToReturn = []
 
-    /*Assignment.find(function(err, assignments) {
-        if (err) return console.log(err);
-        console.log(assignments);
-    }); */
     Assignment.findById(assignmentID)
     .populate({
         path: 'tests',
         model: 'Test'
     })
     .exec(function(err, assignmentObject) {
+        //The tests needs to match the format used by Tester.
         for (i = 0; i < assignmentObject.tests.length; i++) { 
             testsToReturn.push( {stdin: assignmentObject.tests[i].stdin, 
                 args: assignmentObject.tests[i].args, 
@@ -33,12 +27,11 @@ var getTestsFromAssignment = function (assignmentID) {
                 id: assignmentObject.tests[i]._id
             } )
         }
-        //console.log(assignmentObject)
-        
-        console.log(testsToReturn)
+
+        callback(testsToReturn)
     });
 
-    return testsToReturn;                   
+                       
 }
 
 exports.getTestsFromAssignment = getTestsFromAssignment;
