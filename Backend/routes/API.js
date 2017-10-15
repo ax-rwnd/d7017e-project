@@ -8,10 +8,11 @@ var queries = require('../lib/queries')
 module.exports = function(router) {
 
 	router.get('/', function (req, res) {
-    queries.getTestsFromAssignment('59e0dbaaf01e8d190081694a');
+    queries.getTestsFromAssignment('59e0dbaaf01e8d190081694a', function(tests) {
 	   console.log("/ route retrieved");
 	   res.send('Hello World');
-	});
+    });
+});
 
 /*
  * /test/ Endpoints
