@@ -8,28 +8,30 @@ import {RewardService} from '../services/reward.service';
 })
 export class StatisticsComponent implements OnInit {
   courses: Course[];
+  progress: any;
 
   constructor(private rewardService: RewardService) {
   }
 
   ngOnInit() {
+    this.progress = this.rewardService.progress;
     this.courses = [
-      /*{
+      {
         name: 'Course1',
         code: 'D0001E',
-        progress: 1.0,
+        progress: 100,
         latestBadge: 'star'
       },
       {
         name: 'Course2',
         code: 'D0002E',
-        progress: 0.7,
+        progress: 70,
         latestBadge: 'wrench'
-      },*/
+      },
       {
         name: 'Course3',
-        code: 'D0003E',
-        progress: this.rewardService.progress,
+        code: 'D0009E',
+        progress: this.progress['D0009E'],
         latestBadge: 'flash'
       }
     ];

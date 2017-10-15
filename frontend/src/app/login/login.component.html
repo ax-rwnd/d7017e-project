@@ -3,14 +3,14 @@
     <form>
       <div class="form-group">
         <label for="userName">User:</label>
-        <input [(ngModel)]="user" type="string" class="form-control" id="userName" name="user">
+        <input [(ngModel)]="user.id" type="string" class="form-control" id="userName" name="user">
       </div>
       <div class="form-group">
         <label for="pwd">Password:</label>
         <input type="password" class="form-control" id="pwd">
       </div>
       <div class="form-group">
-        <button [routerLink]="['/user', user]" type="submit" class="btn">Login</button>
+        <button routerLink='/user' type="submit" class="btn">Login</button>
       </div>
     </form>
   </div>

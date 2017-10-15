@@ -28,11 +28,12 @@ import {HttpClientModule} from '@angular/common/http';
 // Animation
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HeadService } from './services/head.service';
+import {UserService} from './services/user.service';
 
 const appRoutes: Routes = [
   { path: '', component: LoginComponent },
   { path: 'courses/:course/assignment', component: AssignmentComponent },
-  { path: 'user/:user', component: UserComponent },
+  { path: 'user', component: UserComponent },
   { path: 'courses/:course', component: CoursesComponent }
 ];
 
@@ -66,7 +67,9 @@ const appRoutes: Routes = [
   providers: [
     HeadService, // the state variable that head provides
     BackendService,
-    RewardService],
+    RewardService,
+    UserService
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

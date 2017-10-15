@@ -3,7 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { trigger, state, style, animate, transition } from '@angular/animations';
 import { HeadService } from '../services/head.service';
 
-import { User } from './user';
+import {UserService} from '../services/user.service';
 
 @Component({
   selector: 'app-user',
@@ -20,20 +20,16 @@ import { User } from './user';
 })
 
 export class UserComponent implements OnInit {
-  user: User = {
-    firstName: 'First',
-    lastName: 'LastName',
-    ltuid: 'test-3'
-  };
+  user: any;
   statistics: boolean;
   state = 'inactive'; // state of sidebar
 
-  constructor(private route: ActivatedRoute, private headService: HeadService) {
+  constructor(private route: ActivatedRoute, private headService: HeadService, private userService: UserService) {
     this.headService.stateChange.subscribe(state => { this.state = state; }); // subscribe to the state value head provides
   }
 
   ngOnInit() {
-    this.user.ltuid = this.route.snapshot.paramMap.get('user');
+    this.user = this.userService.userInfo;
     this.statistics = false;
   }
   toggleStatistics() {

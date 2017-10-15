@@ -8,10 +8,10 @@
       <span class="navbar-brand">Frontend</span>
     </div>
     <ul class="nav navbar-nav navbar-right">
-      <li><a href="#">
+      <li><a>
         <span class="glyphicon glyphicon-bell"></span>
       </a></li>
-      <li><a href="#">
+      <li><a routerLink="/user">
         <span class="	glyphicon glyphicon-user"></span>
         Profil
       </a></li>
@@ -26,9 +26,9 @@
 <div id="menu" class="sidebar" [@sidebar]="state"><!-- sidebar collapse width [ngStyle]="setSidebar"() -->
   <div class="courseTitle"> KURSER</div>
   <ul class="nav nav-pills nav-stacked">
-    <li class="active"><a href="#">D0012E</a></li>
-    <li><a href="#">D0010E</a></li>
-    <li><a href="#">D0007E</a></li>
+    <li class="active"><a routerLink="/courses/D0012E">D0012E</a></li>
+    <li><a routerLink="/courses/D0010E">D0010E</a></li>
+    <li><a routerLink="/courses/D0007E">D0007E</a></li>
   </ul>
 </div>
 

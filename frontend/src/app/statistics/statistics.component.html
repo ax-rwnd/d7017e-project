@@ -15,7 +15,7 @@
             <p class="desc">{{ course.name }}</p>
             <div class="progress progress-margin">
               <div class="progress-bar" role="progressbar" [attr.aria-valuenow]="course.progress['current']" aria-valuemin="0" aria-valuemax ="100"
-                   [style.width]="course.progress['current'] + '%'">
+                   [style.width]="course.progress + '%'">
               </div>
             </div>
           </div>
