@@ -9,7 +9,7 @@ var app = express();
 mongoose.connect('130.240.5.132:27017');
 //
 //mongoose.set('debug', true);
-process.title = "d7017e-backend";
+process.title = 'd7017e-backend';
 
 app.use(bodyParser.json());
 
