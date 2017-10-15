@@ -3,12 +3,12 @@ var Test = require('../models/schemas').Test;
 
 var request = require('request');
 
-var testercom = require('../lib/testercom')
+var queries = require('../lib/queries')
 
 module.exports = function(router) {
 
 	router.get('/', function (req, res) {
-    testercom.getTestsFromAssignment('59e0dbaaf01e8d190081694a');
+    queries.getTestsFromAssignment('59e0dbaaf01e8d190081694a');
 	   console.log("/ route retrieved");
 	   res.send('Hello World');
 	});
@@ -23,7 +23,7 @@ module.exports = function(router) {
 		var assignment_id = req.body.assignment_id;
 
 		//Get tests from our database
-        testercom.getTestsFromAssignment(assignment_id, function(tests) {
+        queries.getTestsFromAssignment(assignment_id, function(tests) {
     		/* var assignment = GetTest(test_id)
 			//console.log(tests)
 			//jsonPackage = {'lang': lang, 'code': code, 'tests': tests}
