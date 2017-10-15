@@ -4,7 +4,6 @@
   "private": true,
   "scripts": {
     "start": "forever start ./bin/www",
-    "local": "node ./bin/www",
     "stop": "forever stopall"
   },
   "dependencies": {
