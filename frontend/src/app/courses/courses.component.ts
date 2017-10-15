@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import { trigger, state, style, animate, transition } from '@angular/animations';
 import { HeadService } from '../services/head.service';
+import {RewardService} from '../services/reward.service';
 
 @Component({
   selector: 'app-courses',
@@ -20,14 +21,16 @@ export class CoursesComponent implements OnInit {
   course: string;
   available: string[];
   state = 'inactive'; // state of sidebar
+  progress: any;
 
-  constructor(private route: ActivatedRoute, private headService: HeadService) {
+  constructor(private route: ActivatedRoute, private headService: HeadService, private rewardService: RewardService) {
     this.headService.stateChange.subscribe(state => { this.state = state; });
   }
 
   ngOnInit() {
     this.course = this.route.snapshot.paramMap.get('course');
     this.available = ['assignment 1', 'assignment 2', 'assignment 3', 'laboration 1', 'laboration 2'];
+    this.progress = this.rewardService.progress;
   }
 
 }

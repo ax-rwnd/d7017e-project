@@ -1,4 +1,4 @@
-import {Component, Injector, OnInit} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {RewardService} from '../services/reward.service';
 
 @Component({
@@ -18,14 +18,14 @@ export class StatisticsComponent implements OnInit {
     this.courses = [
       {
         name: 'Course1',
-        code: 'D0001E',
-        progress: 100,
+        code: 'D0012E',
+        progress: this.progress['D0012E'],
         latestBadge: 'star'
       },
       {
         name: 'Course2',
-        code: 'D0002E',
-        progress: 70,
+        code: 'D0010E',
+        progress: this.progress['D0010E'],
         latestBadge: 'wrench'
       },
       {

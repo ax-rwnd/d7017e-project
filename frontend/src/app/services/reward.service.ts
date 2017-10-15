@@ -3,11 +3,13 @@ import { Injectable } from '@angular/core';
 @Injectable()
 export class RewardService {
   progress = {
-    'D0009E': 0
+    D0012E: 100,
+    D0010E: 70,
+    D0009E: 0
   };
   assignmentScore = {
     'assignment1': 0
-  }
+  };
   constructor() { }
   UpdateProgress(inc) {
     this.progress.D0009E += inc;

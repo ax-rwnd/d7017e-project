@@ -10,10 +10,18 @@
     This will help you in this moment
     (Fetching ltu course page)
   </p>
-
+  <p>
+    Progress:
+  </p>
+  <div class="progress progress-margin">
+    <div class="progress-bar" role="progressbar" [attr.aria-valuenow]="progress[course]" aria-valuemin="0" aria-valuemax ="100"
+         [style.width]="progress[course] + '%'">
+    </div>
+  </div>
   <p>
   You got these moments to do in this course
   </p>
+
   <ul>
   <li *ngFor="let n of available">
   <a [routerLink]="['/courses', course, 'assignment']">{{n}}</a>
