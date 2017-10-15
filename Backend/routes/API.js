@@ -3,7 +3,7 @@ var Test = require('../models/schemas').Test;
 
 var request = require('request');
 
-var testercom = require('../Lib/testercom')
+var testercom = require('../lib/testercom')
 
 module.exports = function(router) {
 
