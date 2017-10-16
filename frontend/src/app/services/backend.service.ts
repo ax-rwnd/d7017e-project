@@ -9,13 +9,14 @@ export class BackendService {
       const body = {
         lang: 'python3',
         code: code,
-        test_id: 1
+        assignment_id: '59e46c453867bc21d4ca69ed'
       };
-      resolve([{'id': 0, 'time': 45, 'ok': true}]);
-      /*this.http.post('130.240.5.119:2223/api/test', body)
+      // resolve([{'id': 0, 'time': 45, 'ok': true}]);
+      this.http.post('http://130.240.5.119:8000/api/test/', body)
         .subscribe(data => {
+          console.log(data);
           resolve(data['results']);
-        });*/
+        });
       }
     );
   }

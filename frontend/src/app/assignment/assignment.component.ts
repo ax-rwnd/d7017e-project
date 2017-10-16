@@ -23,6 +23,7 @@ export class AssignmentComponent implements OnInit {
   assignment: string;
   content: string;
   progress: any;
+  assignmentScore: any;
   state = 'inactive'; // state of sidebar
 
   constructor(private backendService: BackendService, private rewardService: RewardService, private headService: HeadService) {
@@ -34,9 +35,10 @@ export class AssignmentComponent implements OnInit {
       'namn = \'Anna andersson\'\n' +
       'print(\'Jag heter\' + namn)\n' +
       'n = 2\n' +
-      'print(\'Jag har druckit \' + str(n) + \'\' koppar kaffe idag.\')';
+      'print(\'Jag har druckit \' + str(n) + \' koppar kaffe idag.\')';
     this.content = '';
     this.progress = this.rewardService.progress;
+    this.assignmentScore = this.rewardService.assignmentScore;
   }
 
   submitCode() {
