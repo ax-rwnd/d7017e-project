@@ -8,7 +8,7 @@ var queries = require('../lib/queries')
 module.exports = function(router) {
 
 	router.get('/', function (req, res) {
-    queries.getTestsFromAssignment('59e46c453867bc21d4ca69ed', function(tests) {
+    queries.getTestsFromAssignment('59e47512d6bcdd1110d20f40', function(tests) {
 	   console.log("/ route retrieved");
 	   console.log(tests)
 	   res.send('Hello World');
@@ -26,10 +26,7 @@ module.exports = function(router) {
 
 		//Get tests from our database
         queries.getTestsFromAssignment(assignment_id, function(tests) {
-    		/* var assignment = GetTest(test_id)
-			//console.log(tests)
-			//jsonPackage = {'lang': lang, 'code': code, 'tests': tests}
-			//console.log(jsonPackage) */
+
 			request.post(
 				'http://130.240.5.118:9100',
 				{ json: {
@@ -38,7 +35,6 @@ module.exports = function(router) {
 				'tests' : tests
 		    }},
 		    function (error, response, body){
-		    	console.log("asdf")
 		    	console.log(body)
 		    	res.set('Content-Type', 'application/json');
 		    	res.send(body);
