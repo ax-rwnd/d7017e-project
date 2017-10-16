@@ -8,8 +8,9 @@ var queries = require('../lib/queries')
 module.exports = function(router) {
 
 	router.get('/', function (req, res) {
-    queries.getTestsFromAssignment('59e0dbaaf01e8d190081694a', function(tests) {
+    queries.getTestsFromAssignment('59e46c453867bc21d4ca69ed', function(tests) {
 	   console.log("/ route retrieved");
+	   console.log(tests)
 	   res.send('Hello World');
     });
 });
@@ -55,14 +56,125 @@ module.exports = function(router) {
 	});
 
     //TEST INSERT DB
+router.get('/temp' , function(req, res) {
+	var t1 = new Test({
+		stdin: '', 
+		stdout: 'Detta är ett program som räknar hur mycket kaffe du dricker.\nJag heter Anna andersson\nJag har druckit 2 koppar kaffe idag.\n'
+	});
+
+
+
+    t1.save(function(err, savedt1) {
+        if (err) {
+        	console.log('Error' + err);
+        	return;
+    	}
+    		
+    	
+	    	console.log("T1")
+	    	console.log(savedt1)
+
+
+	    	var a1 = new Assignment({
+	    		assignmentName: 'assignment-kaffe',
+	    		tests: [savedt1]
+	    	});
+
+	    	a1.save(function(err, saveda1) {
+	    		if (err) {
+	    			console.log('Error: ' + err);
+	    			return;
+	    		}
+
+	    		console.log(saveda1)
+
+				console.log("Query DB")
+
+			    Assignment.findOne({ '_id': saveda1._id}, function(err, assignments) {
+			        if (err) return console.log(err);
+			        		console.log(assignments);
+			    });
+
+	    	});
+	    });
+
+    
 /*router.get('/temp' , function(req, res) {
 	var t1 = new Test({
 		stdin: '', 
-		stdout: 'Hello world\n'
+		stdout: 'Detta är ett program som räknar hur mycket kaffe du dricker.\n'
 	});
 	var t2 = new Test({
 		stdin: '', 
-		stdout: 'Hello world\n'
+		stdout: 'Jag heter Anna andersson\n'
+	}); 
+	var t3 = new Test({
+		stdin: '', 
+		stdout: 'Jag har druckit 2 koppar kaffe idag.\n'
+	}); 
+
+
+    t1.save(function(err, savedt1) {
+        if (err) {
+        	console.log('Error' + err);
+        	return;
+    	}
+    	t2.save(function(err, savedt2) {
+    		if (err) {
+    			console.log('Error' + err);
+    			return;
+    		}
+    		t3.save(function(err, savedt3) {
+    			if (err) {
+    				console.log('Error' + err)
+    				return;
+    			}
+    		
+    	
+	    	console.log("T1")
+	    	console.log(savedt1)
+	    	console.log("T2")
+	    	console.log(savedt2)
+	    	console.log("T3")
+	    	console.log(savedt3)
+
+	    	var a1 = new Assignment({
+	    		assignmentName: 'assignment-kaffe',
+	    		tests: [savedt1, savedt2, savedt3]
+	    	});
+
+	    	a1.save(function(err, saveda1) {
+	    		if (err) {
+	    			console.log('Error: ' + err);
+	    			return;
+	    		}
+
+	    		console.log(saveda1)
+
+				console.log("Query DB")
+
+			    Assignment.findOne({ '_id': saveda1._id}, function(err, assignments) {
+			        if (err) return console.log(err);
+			        		console.log(assignments);
+			    });
+
+	    	});
+	    });
+	});
+    });*/
+
+/*router.get('/temp' , function(req, res) {
+	var t1 = new Test({
+		stdin: '', 
+		stdout: 'Detta är ett program som räknar hur mycket kaffe du dricker.\n'
+	});
+	var t2 = new Test({
+		stdin: '', 
+		stdout: 'Jag heter Anna andersson\n'
+	}); 
+	var t3 = new Test({
+		stdin: '', 
+		stdout: 'Jag har druckit 2 koppar kaffe idag.\n'
 	}); 
 
 
@@ -104,11 +216,9 @@ module.exports = function(router) {
 
 	    	});
 	    });
-    });
+    });*/    
 
-    
-
-});*/
+});
 /*
  * /users/ Endpoints
  */
