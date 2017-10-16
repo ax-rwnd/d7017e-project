@@ -31,11 +31,11 @@ export class AssignmentComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.assignment = 'print(\'Detta är ett program som räknar hur mycket kaffe du dricker.\')\n' +
-      'namn = \'Anna andersson\'\n' +
-      'print(\'Jag heter\' + namn)\n' +
-      'n = 2\n' +
-      'print(\'Jag har druckit \' + str(n) + \' koppar kaffe idag.\')';
+    this.assignment = 'print(\'Detta är ett program som räknar hur mycket kaffe du dricker.\');\n' +
+      'namn = \'Anna andersson\';\n' +
+      'print(\'Jag heter \' + namn);\n' +
+      'n = 2;\n' +
+      'print(\'Jag har druckit \' + str(n) + \' koppar kaffe idag.\');';
     this.content = '';
     this.progress = this.rewardService.progress;
     this.assignmentScore = this.rewardService.assignmentScore;
