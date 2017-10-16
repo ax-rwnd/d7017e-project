@@ -22,6 +22,8 @@ app.use('/api', api);
 
 //NOT REALLY SURE WHAT THIS DOES
 app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   var err = new Error('Not Found');
   err.status = 404;
   next(err);
@@ -29,6 +31,8 @@ app.use(function(req, res, next) {
 
 //NOT REALLY SURE WHAT THIS DOES
 app.use(function(err, req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   // set locals, only providing error in development
   //res.locals.message = err.message;
   //res.locals.error = req.app.get('env') === 'development' ? err : {};
