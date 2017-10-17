@@ -20,16 +20,14 @@ var api = express.Router();
 require('./routes/API')(api);
 app.use('/api', api);
 
-//
-
-//NOT REALLY SURE WHAT THIS DOES
+//Route not found.
 app.use(function(req, res, next) {
   var err = new Error('Not Found');
   err.status = 404;
   next(err);
 });
 
-//NOT REALLY SURE WHAT THIS DOES
+//Error in server. Basically http error 500, internal server error.
 app.use(function(err, req, res, next) {
   // set locals, only providing error in development
   //res.locals.message = err.message;
