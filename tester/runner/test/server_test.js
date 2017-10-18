@@ -21,7 +21,7 @@ describe('testing runner', function() {
             .expect(200, done);
     });
 
-    it('test post', function testPost(done) {
+    it('tests tester', function testPost(done) {
         const req = {
             'lang':'python3',
             'code':'import sys;print("hello world");print("debug", file=sys.stderr)',
@@ -49,6 +49,18 @@ describe('testing runner', function() {
                 assert.equal(expected, JSON.stringify(res.body.resp));
                 done();
             });
+    });
+
+    it('tests invalid get', function testInvalidGet(done) {
+        request(runner.server)
+            .get('/dummy')
+            .expect(404, done)
+    });
+
+    it('tests invalid post', function testInvalidPost(done) {
+        request(runner.server)
+            .post('/dummy')
+            .expect(404, done);
     });
 
 });
