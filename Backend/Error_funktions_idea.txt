@@ -1,6 +1,6 @@
 Ungefärlig tanke med error funktion
 
-
+Funktion i lib mapp.
 
 Function(arg0) {
     
