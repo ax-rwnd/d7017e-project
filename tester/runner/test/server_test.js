@@ -5,7 +5,7 @@ var assert = require('assert')
 var old_args = process.argv
 process.argv = [process.argv[0], process.argv[1], "19100"]
 
-describe('testing runner', function() {
+describe('testing server for runner', function() {
     var runner;
     beforeEach(function() {
         runner = require('../server.js');
