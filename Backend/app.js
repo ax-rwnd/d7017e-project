@@ -1,6 +1,7 @@
 var express = require('express');
 var mongoose = require('mongoose');
 var bodyParser = require('body-parser');
+var passport = require('passport');
 var cors = require('cors');
 
 var app = express();
@@ -13,6 +14,7 @@ mongoose.connect('130.240.5.132:27017');
 process.title = 'd7017e-backend';
 
 app.use(bodyParser.json());
+app.use(passport.initialize());
 app.use(cors({origin: '*'}));
 
 //defining routes

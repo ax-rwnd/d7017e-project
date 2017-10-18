@@ -13,6 +13,8 @@
     "request": "^2.83.0",
     "debug": "~2.2.0",
     "forever": "~0.15.3",
-    "cors": "^2.8.4"
+    "cors": "^2.8.4",
+    "passport": "^0.4.0",
+    "passport-cas": "^0.1.1"
   }
 }
