@@ -1,0 +1,23 @@
+Ungefärlig tanke med error funktion
+
+Funktion i lib mapp.
+
+Function(arg0) {
+    
+    switch arg0{
+        case 1:
+        res.statusCode(xxx).message(xxx)
+
+        case 2:
+
+        case 3:
+    }
+
+    res.send()
+
+
+
+}
+
+
+404 error (route finns inte) är hanterad i app.js redan.
