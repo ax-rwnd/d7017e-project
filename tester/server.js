@@ -69,9 +69,10 @@ function formatContainer(lang, container) {
     return s;
 }
 
-// App
 const app = express();
 app.get('/', (req, res) => {
+	// Presents the user with a stat page that details which containers
+	// are running.
 
     const s = `
         <h1>Tester</h1>
