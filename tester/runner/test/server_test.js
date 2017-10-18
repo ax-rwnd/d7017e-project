@@ -1,9 +1,9 @@
-var request = require('supertest')
-var assert = require('assert')
+var request = require('supertest');
+var assert = require('assert');
 
 // Setup code, server requires command line arguments
-var old_args = process.argv
-process.argv = [process.argv[0], process.argv[1], "19100"]
+var old_args = process.argv;
+process.argv = [process.argv[0], process.argv[1], "19100"];
 
 describe('testing server for runner', function() {
     var runner;
@@ -12,7 +12,7 @@ describe('testing server for runner', function() {
     });
 
     afterEach(function() {
-        runner.server.close()
+        runner.server.close();
     });
 
     it('tests ping', function testPing(done) {
@@ -30,14 +30,14 @@ describe('testing server for runner', function() {
                 {'stdin': 'hi', 'args': [], 'stdout' :'bad test\n', 'id': 1}
             ],
             'optional_tests': []
-        }
+        };
 
         const resp = {
             results: [
                 {id: 0, ok: true, stderr: 'debug\n'},
                 {id: 1, ok: false, stderr: 'debug\n'}
             ]
-        }
+        };
         const expected = JSON.stringify(resp);
 
         request(runner.server)
@@ -54,7 +54,7 @@ describe('testing server for runner', function() {
     it('tests invalid get', function testInvalidGet(done) {
         request(runner.server)
             .get('/dummy')
-            .expect(404, done)
+            .expect(404, done);
     });
 
     it('tests invalid post', function testInvalidPost(done) {
