@@ -17,15 +17,15 @@ import { HeadService } from '../services/head.service';
 })
 
 export class HeadComponent implements OnInit {
-  state;
+  sidebarState;
 
   constructor(private headService: HeadService) {
-    this.state = 'inactive';
+    this.sidebarState = 'inactive';
   }
 
   toggleState() {
-    this.state = this.state === 'active' ? 'inactive' : 'active';
-    this.headService.setState(this.state);
+    this.sidebarState = this.sidebarState === 'active' ? 'inactive' : 'active';
+    this.headService.setState(this.sidebarState);
   }
 
    ngOnInit() {}

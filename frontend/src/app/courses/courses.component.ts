@@ -20,11 +20,11 @@ import {RewardService} from '../services/reward.service';
 export class CoursesComponent implements OnInit {
   course: string;
   available: string[];
-  state = 'inactive'; // state of sidebar
+  sidebarState = 'inactive'; // state of sidebar
   progress: any;
 
   constructor(private route: ActivatedRoute, private headService: HeadService, private rewardService: RewardService) {
-    this.headService.stateChange.subscribe(state => { this.state = state; });
+    this.headService.stateChange.subscribe(sidebarState => { this.sidebarState = sidebarState; });
   }
 
   ngOnInit() {

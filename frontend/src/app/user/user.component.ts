@@ -22,10 +22,10 @@ import {UserService} from '../services/user.service';
 export class UserComponent implements OnInit {
   user: any;
   statistics: boolean;
-  state = 'inactive'; // state of sidebar
+  sidebarState = 'inactive'; // state of sidebar
 
   constructor(private route: ActivatedRoute, private headService: HeadService, private userService: UserService) {
-    this.headService.stateChange.subscribe(state => { this.state = state; }); // subscribe to the state value head provides
+    this.headService.stateChange.subscribe(sidebarState => { this.sidebarState = sidebarState; }); // subscribe to the state value head provides
   }
 
   ngOnInit() {

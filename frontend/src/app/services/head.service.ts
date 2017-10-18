@@ -5,7 +5,7 @@ import { Subject } from 'rxjs/Subject';
 export class HeadService {
   public stateChange = new Subject<any>();
 
-  setState(state) {
-    return this.stateChange.next(state);
+  setState(sidebarState) {
+    return this.stateChange.next(sidebarState);
   }
 }

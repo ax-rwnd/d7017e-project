@@ -24,10 +24,10 @@ export class AssignmentComponent implements OnInit {
   content: string;
   progress: any;
   assignmentScore: any;
-  state = 'inactive'; // state of sidebar
+  sidebarState = 'inactive'; // state of sidebar
 
   constructor(private backendService: BackendService, private rewardService: RewardService, private headService: HeadService) {
-    this.headService.stateChange.subscribe(state => { this.state = state; });
+    this.headService.stateChange.subscribe(sidebarState => { this.sidebarState = sidebarState; });
   }
 
   ngOnInit() {
