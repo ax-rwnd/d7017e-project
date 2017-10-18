@@ -1,71 +1,76 @@
-const tmp = require('tmp')
-const fs = require('fs')
-const requireDir = require('require-dir')
-const languages = requireDir('./languages')
+/* jshint node: true */
+'use strict';
 
-const timeout = 5000 // ms
+var tmp = require('tmp');
+var fs = require('fs');
+var requireDir = require('require-dir');
+var languages = requireDir('./languages');
+
+const timeout = 5000; // ms
 
 function result(id, ok, stderr) {
-    this.id = id
-    this.ok = ok
-    this.stderr = stderr
+    // Build a result struct
+    return {id:id, ok:ok, stderr:stderr};
 }
 
 async function runTests(request) {
-    const codeFile = tmp.fileSync()
-    fs.writeFileSync(codeFile.fd, request.code)
-    let res = {results: []} 
-    let langModule = resolveLanguage(request.lang)
-    let executable = langModule.prepare(codeFile.name)
+    // Run some tests on the tester
+
+    const codeFile = tmp.fileSync();
+    fs.writeFileSync(codeFile.fd, request.code);
+
+    let res = {results: []};
+    let langModule = resolveLanguage(request.lang);
+    let executable = langModule.prepare(codeFile.name);
+
     for (const test of request.tests) {
         try {
-            let output = await validateAndRun(executable, test, langModule)
+            let output = await validateAndRun(executable, test, langModule);
             if (output.stdout !== test.stdout) {
-                console.log('failed test, expected:')
-                console.log(test.stdout)
-                console.log('got:')
-                console.log(output.stdout)
                 // TODO: tell them what broke our expectations
-                res.results.push(new result(test.id, false, output.stderr))
+                res.results.push(new result(test.id, false, output.stderr));
             } else {
-                console.log('ok', test.id)
-                res.results.push(new result(test.id, true, output.stderr))
+                res.results.push(new result(test.id, true, output.stderr));
             }
         } catch (e) {
             // SIGTERM is sent to the child process on timeout
             if (e.signal == 'SIGTERM') {
                 // TODO: tell them that the failure was from a timeout
-                console.log('Execution timed out on test:', test.id)
-                res.results.push(new result(test.id, false, ''))
+                console.log('Execution timed out on test:', test.id);
+                res.results.push(new result(test.id, false, ''));
             } else {
-                throw e
+                throw e;
             }
         }
     }
-    console.log('done')
-    codeFile.removeCallback()
-    return res
+
+    codeFile.removeCallback();
+    return res;
 }
 
 function validateAndRun(file, test, langModule) {
+    // Make sure that required fields are present before running
+
     if (!test.hasOwnProperty('args')) {
-        test.args = []
+        test.args = [];
     }
     if (!test.hasOwnProperty('stdin')) {
-        test.stdin = ''
+        test.stdin = '';
     }
-    return langModule.run(file, test, timeout)
+    return langModule.run(file, test, timeout);
 }
 
 function resolveLanguage(lang) {
-    const langModule = languages[lang]
+    // Lookup language module from lang-string
+
+    const langModule = languages[lang];
     if (!langModule) {
-        throw new Error('lang `' + lang + '`is not supported')
+        throw new Error('lang `' + lang + '`is not supported');
     }
     if (!langModule.hasOwnProperty('prepare')) {
-        langModule.prepare = (file) => {return file}
+        langModule.prepare = (file) => {return file;};
     }
-    return langModule
+    return langModule;
 }
 
-exports.runTests = runTests
+exports.runTests = runTests;

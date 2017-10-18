@@ -1,4 +1,5 @@
-#!/usr/bin/env node
+/* jshint node: true */
+'use strict';
 
 var http = require('http');
 var test_runner = require('./test-runner.js');
