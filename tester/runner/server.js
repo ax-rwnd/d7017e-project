@@ -54,7 +54,7 @@ function handlePing(req, res) {
     res.end()
 }
 
-http.createServer(function (req, res) {
+exports.server = http.createServer(function (req, res) {
     const { headers, method, url } = req
 
     if (url === "/") {
