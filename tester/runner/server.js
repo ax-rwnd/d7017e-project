@@ -40,7 +40,7 @@ function handleTest(req, res) {
                     //TODO: handle errors separately
                     res.statusCode = 500;
                     res.end();
-                })
+                });
         } catch (e) {
             console.log(e);
             res.statusCode = 400;
