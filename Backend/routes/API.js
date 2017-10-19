@@ -8,6 +8,8 @@ var queries = require('../lib/queries');
 var passport = require('passport');
 var CasStrategy = require('passport-cas').Strategy;
 
+var errors = require('../lib/errors.js');
+
 const TESTER_IP = 'http://130.240.5.118:9100'
 
 module.exports = function(router) {
@@ -22,8 +24,14 @@ module.exports = function(router) {
 
 /*
  * /test/ Endpoints
- */ 
-    
+ */
+
+// Test to send easy error messages
+router.get('/errortest', function (req, res) {
+    res.status(errors.TEST.code).send(errors.TEST.msg);
+});
+
+
 router.post('/test', function (req, res) {
     var lang = req.body.lang;
     var code = req.body.code;
