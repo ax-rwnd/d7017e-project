@@ -25,19 +25,26 @@ describe('testing server for runner', function() {
         const req = {
             'lang':'python3',
             'code':'import sys;print("hello world");print("debug", file=sys.stderr)',
-            'tests': [
-                {'stdin': '', 'stdout': 'hello world\n', 'id': 0},
-                {'stdin': 'hi', 'args': [], 'stdout' :'bad test\n', 'id': 1}
-            ],
+            'tests': {
+                'io': [
+                    {'stdin': '', 'stdout': 'hello world\n', 'id': 0},
+                    {'stdin': 'hi', 'args': [], 'stdout' :'bad test\n', 'id': 1}
+                ],
+                'lint': true
+            },
             'optional_tests': []
         };
 
         const resp = {
-            results: [
-                {id: 0, ok: true, stderr: 'debug\n'},
-                {id: 1, ok: false, stderr: 'debug\n'}
-            ]
+            results: {
+                io: [
+                    {id: 0, ok: true, stderr: 'debug\n'},
+                    {id: 1, ok: false, stderr: 'debug\n'}
+                ],
+                lint: ''
+            }
         };
+
         const expected = JSON.stringify(resp);
 
         request(runner.server)
