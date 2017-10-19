@@ -24,13 +24,14 @@ export class AssignmentComponent implements OnInit {
   content: string;
   progress: any;
   assignmentScore: any;
-  sidebarState = 'inactive'; // state of sidebar
+  sidebarState; // state of sidebar
 
   constructor(private backendService: BackendService, private rewardService: RewardService, private headService: HeadService) {
     this.headService.stateChange.subscribe(sidebarState => { this.sidebarState = sidebarState; });
   }
 
   ngOnInit() {
+    this.sidebarState = this.headService.getCurrentState();
     this.assignment = 'print(\'Detta är ett program som räknar hur mycket kaffe du dricker.\');\n' +
       'namn = \'Anna andersson\';\n' +
       'print(\'Jag heter \' + namn);\n' +

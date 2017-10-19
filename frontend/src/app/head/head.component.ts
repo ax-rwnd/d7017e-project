@@ -1,6 +1,7 @@
-import { Component, OnInit} from '@angular/core';
+import {Component, forwardRef, OnInit, Inject} from '@angular/core';
 import { trigger, state, style, animate, transition } from '@angular/animations';
 import { HeadService } from '../services/head.service';
+import {AppComponent} from '../app.component';
 
 @Component({
   selector: 'app-head',
@@ -19,16 +20,19 @@ import { HeadService } from '../services/head.service';
 export class HeadComponent implements OnInit {
   sidebarState;
 
-  constructor(private headService: HeadService) {
-    this.sidebarState = 'inactive';
+  constructor(@Inject(forwardRef(() => AppComponent)) private appComponent: AppComponent, private headService: HeadService) {
+     // shouldn't be inactive, should only get state from app component
   }
 
-  toggleState() {
+  toggleState() { // send to the sidebar in app component that it should toggle state
     this.sidebarState = this.sidebarState === 'active' ? 'inactive' : 'active';
     this.headService.setState(this.sidebarState);
   }
 
-   ngOnInit() {}
+   ngOnInit() {
+     this.sidebarState = this.appComponent.sidebarState;
+     this.headService.setState(this.sidebarState);
+   }
 }
 
 /*export class HeadComponent implements OnInit {

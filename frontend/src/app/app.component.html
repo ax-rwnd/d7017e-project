@@ -1,1 +1,10 @@
-<router-outlet></router-outlet>
+<router-outlet>
+  <div id="menu" class="sidebar" [@sidebar]="sidebarState"><!-- sidebar collapse width [ngStyle]="setSidebar"() -->
+    <div class="courseTitle"> KURSER</div>
+    <ul class="nav nav-pills nav-stacked"> <!-- iterates over a list of courses -->
+      <li [routerLinkActive]="['active']" *ngFor="let course of courses">
+        <a routerLink="/courses/{{course.id}}">{{course.id}}</a>
+      </li>
+    </ul>
+  </div>
+</router-outlet>

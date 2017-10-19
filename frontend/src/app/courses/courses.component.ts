@@ -20,7 +20,7 @@ import {RewardService} from '../services/reward.service';
 export class CoursesComponent implements OnInit {
   course: string;
   available: string[];
-  sidebarState = 'inactive'; // state of sidebar
+  sidebarState; // state of sidebar
   progress: any;
 
   constructor(private route: ActivatedRoute, private headService: HeadService, private rewardService: RewardService) {
@@ -28,6 +28,7 @@ export class CoursesComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.sidebarState = this.headService.getCurrentState();
     this.course = this.route.snapshot.paramMap.get('course');
     this.available = ['assignment 1', 'assignment 2', 'assignment 3', 'laboration 1', 'laboration 2'];
     this.progress = this.rewardService.progress;

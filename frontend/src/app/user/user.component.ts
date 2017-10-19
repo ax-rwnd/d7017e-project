@@ -22,13 +22,14 @@ import {UserService} from '../services/user.service';
 export class UserComponent implements OnInit {
   user: any;
   statistics: boolean;
-  sidebarState = 'inactive'; // state of sidebar
+  sidebarState; // get current state
 
   constructor(private route: ActivatedRoute, private headService: HeadService, private userService: UserService) {
     this.headService.stateChange.subscribe(sidebarState => { this.sidebarState = sidebarState; }); // subscribe to the state value head provides
   }
 
   ngOnInit() {
+    this.sidebarState = this.headService.getCurrentState();
     this.user = this.userService.userInfo;
     this.statistics = false;
   }

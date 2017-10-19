@@ -46,15 +46,14 @@ body {
   border-bottom-right-radius: 0;
 }
 
-.nav-pills > li > a:hover,
-.nav-pills > li > a:focus {
+.nav-pills > li > a:hover {
   color: lightgrey;
   background-color: #133756;
 }
 
 .nav-pills > li.active > a,
 .nav-pills > li.active > a:hover,
-.nav-pills > li.hover > a{
+.nav-pills > li.active > a:focus {
   background-color: white;
   color: black;
 }
