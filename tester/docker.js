@@ -2,11 +2,15 @@
 'use strict';
 
 var uuidv4 = require('uuid/v4');
-var execFile = require('child_process').execFile;
 var http = require('http');
 var request = require('request');
 var locks = require('locks');
 var tcpPortUsed = require('tcp-port-used');
+var Docker = require('dockerode');
+
+
+var docker = new Docker({socketPath: '/var/run/docker.sock'});
+var docker = new Docker();
 
 //TODO: move this into the config file
 const LANGS = ['python27', 'python3', 'java'];
@@ -21,52 +25,24 @@ var available_ports = [];
 var containers = {};
 
 // Remove old docker images that are still running
-const child = execFile('docker', ['ps', '-q'], (error, stdout, stderr) => {
-    if (error) {
-        console.error('stderr', stderr);
-        throw error;
-    }
-
-    // Stop containers
-    // TODO: shouldn't this be done using stopContainer(id)?
-    cleanArray(stdout.split('\n')).forEach(function(id) {
-        const child = execFile('docker', ['stop', id], (error, stdout, stderr) => {
-            if (error) {
-                console.error('stderr', stderr);
-                throw error;
-            }
-        });
-    });
-
-    // Pool maintenance
-    setTimeout(function () {
-        for (var i = 0; i < MAX_GLOABAL_CONTAINERS; i++) {
-            available_ports.push(START_PORT+i);
-        }
-
-        LANGS.forEach(function(lang) {
-            containers[lang] = [];
-
-            // Start containers to maintain pool
-            for(i = 0; i < MIN_UNUSED_CONTAINERS_PER_LANG; i++) {
-                startContainer(lang);
-            }
-        });
-    }, 1000);
+docker.listContainers(function (err, containers) {
+  containers.forEach(function (containerInfo) {
+    docker.getContainer(containerInfo.Id).stop();
+  });
 });
 
-function cleanArray(actual) {
-    // Remove false elements from an array
-    
-    var newArray = [];
-    for (var i = 0; i < actual.length; i++) {
-        if (actual[i]) {
-            newArray.push(actual[i]);
-        }
-    }
-
-    return newArray;
+for (var i = 0; i < MAX_GLOABAL_CONTAINERS; i++) {
+    available_ports.push(START_PORT+i);
 }
+
+LANGS.forEach(function(lang) {
+    containers[lang] = [];
+
+    // Start containers to maintain pool
+    for(i = 0; i < MIN_UNUSED_CONTAINERS_PER_LANG; i++) {
+        startContainer(lang);
+    }
+});
 
 function getID() {
     return uuidv4();
@@ -74,9 +50,8 @@ function getID() {
 
 function getPort() {
     // Get one of the available ports
-
     if(available_ports.length == 0) {
-        return -1; //TODO: can we handle errors better?
+        throw new Error('No ports are available');
     } else {
         return available_ports.shift();
     }
@@ -84,113 +59,102 @@ function getPort() {
 
 function returnPort(port) {
     // Return port to pool
-
-    tcpPortUsed.waitUntilFree(port, 250, 10000)
-        .then(function() {
-            available_ports.push(port);
-        }, function(err) {
-            console.log('Error:', err.message);
-            throw err;
-        });
+    tcpPortUsed.waitUntilFree(port, 250, 10000).then(function() {
+        available_ports.push(port);
+    }, function(err) {
+        console.log('Error:', err.message);
+        throw err;
+    });
 }
 
 function startContainer(lang) {
     var id = getID();
-    var port = getPort();
-    //var timeout;
+    var port;
 
-    //TODO: can we handle this any better?
-    if(port == -1) {
-        return;
+    try {
+        port = getPort();
+    } catch (e) {
+        throw e;
     }
 
-    var c = {
-        id: id,
-        port: port,
-        used: false,
-        ready: false,
-        time_created: Date.now()
-    };
-    var index = containers[lang].push(c);
+        var portText = port+"/tcp";
+        console.log(portText);
 
-    const child = execFile('docker', ['run', '-d', '--rm', '-p',
-            port+':8080', '--name', id, 'tester_'+lang],
-            (error, stdout, stderr) => {
-
-        if (error) {
-            returnPort(port);
-            var r = containers[lang].splice(index-1, 1);
-
-            console.error('stderr', stderr);
-            console.log(c);
-
-            //var timeout = setTimeout(function() {
-            setTimeout(function() {
-                startContainer(lang);
-            }, 50);
-
-            return false;
-        }
-
-    // Wait for contianer to get ready
-    var ping = waitForContainer(c);
-
-    // Stop container if too many are running and container is not used
-    //timeout = setTimeout(function() {
-    setTimeout(function() {
-        for(var i = 0; i < containers[lang].length; i++) {
-            var c2 = containers[lang][i];
-
-            if(c2.id == c.id && !c2.ready) {
-                console.log(c2);
+        var containerConfig = {
+            Image: 'tester_'+lang,
+            Cmd: [],
+            name: id,
+            'Hostconfig': {
+                AutoRemove: true,
+                PortBindings: {
+                    "8080/tcp": [{ "HostPort": port.toString() }]
+                }
             }
+        };
 
-            if(c2.id == c.id &&
-            containers[lang].length > MIN_UNUSED_CONTAINERS_PER_LANG &&
-            !c2.used || c2.id == c.id && !c2.ready) {
-                //console.log('Docker\tIdle\t'+id+'\t'+port);
-                clearInterval(ping);
-                r = containers[lang].splice(i, 1);
-                stopContainer(id);
+        docker.createContainer(containerConfig, function (err, container) {
+            if(err) {
+                returnPort(port);
+                console.error(err);
+            } else {
+                container.start(function (err, data) {
+                    if(err) {
+                        returnPort(port);
+                        console.log(err);
+                    } else {
+                        var c = {
+                            lang: lang,
+                            id: id,
+                            port: port,
+                            used: false,
+                            ready: false,
+                            time_created: Date.now()
+                        };
+                        containers[lang].push(c);
+
+                        waitForContainer(c);
+
+                        setTimeout(function() {
+                            if(containers[lang].length > MIN_UNUSED_CONTAINERS_PER_LANG &&
+                                    !c.used || !c.ready) {
+                                stopContainer(c);
+                            }
+                        }, IDLE_TIMEOUT);
+                    }
+                });
             }
-        }
-    }, IDLE_TIMEOUT);
+        });
 
-    return true;
-    });
 }
 
-function waitForContainer(c) {
-    // Marks a container as ready
+function waitForContainer(c, iteration = 0) {
 
-    var ping = setInterval(function(){
-        request
-            .get('http://localhost:'+c.port+'/ping')
-            .on('response', function(response) {
-
+    if(iteration > 20) {
+        console.error("Something went wrong inside container; ", c);
+    } else {
+        request.get('http://localhost:'+c.port+'/ping')
+        .on('response', function(response) {
             if(response.statusCode == 200) {
-                clearInterval(ping);
+                // Marks a container as ready
                 c.ready = true;
+            } else {
+                setTimeout(function () {
+                    waitForContainer(c, iteration+1);
+                }, 250);
             }
-            }).on('error', function(error) {
-                //TODO: Handle errors?
-            });
-    }, 250);
-
-    return ping;
+        }).on('error', function(error) {
+            setTimeout(function () {
+                waitForContainer(c, iteration+1);
+            }, 250);
+        });
+    }
 }
 
-function stopContainer(id) {
-    // Stop a container by id, returns whether or not it was removed
-     
-    const child = execFile('docker', ['stop', id], (error, stdout, stderr) => {
-        if (error) {
-            console.error('stderr', stderr);
-            return false;
-        } else {
-            return true;
-        }
-    });
+function stopContainer(c) {
+    var container = docker.getContainer(c.id);
+    container.stop();
+    containers[c.lang].splice(containers[c.lang].indexOf(c), 1);
+    returnPort(c.port);
 }
 
 function getContainer(lang) {
@@ -198,13 +162,12 @@ function getContainer(lang) {
 
     // Docker class hasn't been initiated yet
     if (containers[lang] === undefined) {
-        throw new Error('docker is not initialized');
+        throw new Error('Docker containers for that language is not initialized');
     }
 
     if(containers[lang].length == 0) {
         startContainer(lang);
-        //TODO: shouldn't this return info for the new container?
-        return null;
+        throw new Error('No containers available for that language right now');
     }
 
     // Update existing containers and start new if less than max
@@ -222,7 +185,7 @@ function getContainer(lang) {
         }
     }
 
-    return null;
+    throw new Error('No container was ready for use');
 }
 
 function returnContainer(id) {
@@ -234,15 +197,11 @@ function returnContainer(id) {
 
             // Container found recycle it
             if(c.id === id) {
-                returnPort(c.port);
-                containers[lang].splice(i, 1);
-
                 // Start a new container to replace the one returned
                 if(containers[lang].length < MAX_CONTAINERS_PER_LANG) {
                     startContainer(lang);
                 }
-
-                stopContainer(id);
+                stopContainer(c);
             }
         }
     });
