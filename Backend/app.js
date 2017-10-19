@@ -3,26 +3,16 @@ var mongoose = require('mongoose'); //Database communication
 var bodyParser = require('body-parser');
 var passport = require('passport'); //authentication
 var cors = require('cors');
-var flags = require('flags'); //flags to start node with
+var config = require('config');
+
+
 var app = express();
 
-var isProductionMode = false;
-
-// Function to initiate the app/server into development- or production mode.
+// Function to initiate the app/server into development- or production mode. (depends on NODE_ENV)
 function initApp() {
-  flags.defineBoolean('production', false, 'Run server as production environment?'); // Define a bool flag (true by default)
-  flags.parse(); // Parse flag input
-
-  isProductionMode = flags.get('production'); // Get flag if bool or not
-
-  //Connect to development- or production database
-  if (!isProductionMode){
-    console.log("Server initialized in Development mode");  
-    mongoose.connect('130.240.5.132:27017'); // Dev database
-  } else{
-    console.log("Server initialized in Production mode");  
-    //mongoose.connect('130.240.5.132:27017'); // Production database
-  }
+  var dbConfig = config.get('Mongo.dbConfig'); //Get mongo database config
+  console.log("Server running in "+app.get('env')+" mode.");
+  mongoose.connect(dbConfig.host+":"+dbConfig.port); // Connect to development- or production database
 }
 
 initApp();
