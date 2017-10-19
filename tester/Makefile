@@ -38,6 +38,7 @@ python27:
 
 	# Python27 specific code
 	echo "RUN apk add --update python">>"$(DOCKERFILE)"
+	echo "RUN apk add --update flake8">>"$(DOCKERFILE)"
 	echo "RUN rm -rf /var/cache/apk/*">>"$(DOCKERFILE)"
 
 	# Build image
@@ -51,6 +52,7 @@ python3:
 
 	# Python3 specific code
 	echo "RUN apk add --update python3">>"$(DOCKERFILE)"
+	echo "RUN apk add --update flake8">>"$(DOCKERFILE)"
 	echo "RUN rm -rf /var/cache/apk/*">>"$(DOCKERFILE)"
 
 	# Build image
