@@ -2,9 +2,14 @@ BASEIMAGE="node:alpine"
 APP_DIR="/usr/src/app"
 PORT=8080
 
+CONFIGFILE="./config/languages.js"
+space=$(empty) $(empty)
+sub=\",\"
+
 .DEFAULT_GOAL := all
 
 all: python27 python3 java
+	echo "exports.languages=[\"$(subst $(space),$(sub),$^)\"];" > $(CONFIGFILE);
 
 base:
 	# Set image environment

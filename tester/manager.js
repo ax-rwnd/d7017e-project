@@ -3,7 +3,7 @@
 
 const request = require('request');
 const docker = require('./docker.js');
-const MAX_EXECUTE_TIME = 10000;
+var config = require('config');
 
 var queue = {};
 
@@ -82,7 +82,7 @@ function handleRequest(container, body, res) {
             docker.returnContainer(container.id);
             res.sendStatus(408);
         }
-    }, MAX_EXECUTE_TIME);
+    }, config.manager.MAX_EXECUTE_TIME);
 
     // Forward request to node on the container
     request.post({
