@@ -198,7 +198,7 @@ function getContainer(lang) {
 
     // Docker class hasn't been initiated yet
     if (containers[lang] === undefined) {
-        return null; //TODO: this shouldn't happen, throw instead?
+        throw new Error('docker is not initialized');
     }
 
     if(containers[lang].length == 0) {
