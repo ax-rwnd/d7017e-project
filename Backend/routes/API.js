@@ -1,104 +1,15 @@
 var Assignment = require('../models/schemas').Assignment;
-var Test = require('../models/schemas').Test;
-
+var test = require('../models/schemas').Test;
 var request = require('request');
-
 var queries = require('../lib/queries');
-
 var passport = require('passport');
-var CasStrategy = require('passport-cas').Strategy;
+var casStrategy = require('passport-cas').Strategy;
 
 const TESTER_IP = 'http://130.240.5.118:9100'
 
 module.exports = function(router) {
 
-    router.get('/', function (req, res) {
-        queries.getTestsFromAssignment('59e47512d6bcdd1110d20f40', function(tests) {
-           console.log("/ route retrieved");
-           console.log(tests)
-           res.send('Hello World');
-        });
-});
 
-/*
- * /test/ Endpoints
- */ 
-    
-router.post('/test', function (req, res) {
-    var lang = req.body.lang;
-    var code = req.body.code;
-    var assignment_id = req.body.assignment_id;
-
-    //Get tests from our database
-    queries.getTestsFromAssignment(assignment_id, function(tests) {
-
-        request.post(
-            TESTER_IP,
-            { json: {
-            'lang' : lang,
-            'code' : code,
-            'tests' : tests
-        }},
-        function (error, response, body){
-            console.log(body)
-            res.set('Content-Type', 'application/json');
-            res.send(body);
-        });
-    });
-});
-
-// TEMPORARY FUNCTION WHILE NOT CONNECTED TO TESTER
-router.post('/tester', function (req, res) {
-    res.json(JSON.stringify({
-        'results': [
-            {'id':0, 'time': 45, 'ok': true},
-        ]
-    }));
-});
-
-//TEST INSERT DB
-/*router.get('/temp' , function(req, res) {
-    var t1 = new Test({
-        stdin: '', 
-        stdout: 'Detta är ett program som räknar hur mycket kaffe du dricker.\nJag heter Anna andersson\nJag har druckit 2 koppar kaffe idag.\n'
-    });
-
-
-
-    t1.save(function(err, savedt1) {
-        if (err) {
-            console.log('Error' + err);
-            return;
-        }
-            
-        
-            console.log("T1")
-            console.log(savedt1)
-
-
-            var a1 = new Assignment({
-                assignmentName: 'assignment-kaffe',
-                tests: [savedt1]
-            });
-
-            a1.save(function(err, saveda1) {
-                if (err) {
-                    console.log('Error: ' + err);
-                    return;
-                }
-
-                console.log(saveda1)
-
-                console.log("Query DB")
-
-                Assignment.findOne({ '_id': saveda1._id}, function(err, assignments) {
-                    if (err) return console.log(err);
-                            console.log(assignments);
-                });
-
-            });
-        });
-});*/
 
 /*
  * /login/ Endpoings
