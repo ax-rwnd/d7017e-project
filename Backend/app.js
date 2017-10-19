@@ -1,15 +1,32 @@
-var express = require('express');
-var mongoose = require('mongoose');
+var express = require('express'); //Routes package
+var mongoose = require('mongoose'); //Database communication
 var bodyParser = require('body-parser');
-var passport = require('passport');
+var passport = require('passport'); //authentication
 var cors = require('cors');
-
+var flags = require('flags'); //flags to start node with
 var app = express();
 
-//Connect to db
-//If you have no mongodb running. Comment the below to prevent the app from crashing at start.
-mongoose.connect('130.240.5.132:27017');
-//
+var isProductionMode = false;
+
+// Function to initiate the app/server into development- or production mode.
+function initApp() {
+  flags.defineBoolean('production', false, 'Run server as production environment?'); // Define a bool flag (true by default)
+  flags.parse(); // Parse flag input
+
+  isProductionMode = flags.get('production'); // Get flag if bool or not
+
+  //Connect to development- or production database
+  if (!isProductionMode){
+    console.log("Server initialized in Development mode");  
+    mongoose.connect('130.240.5.132:27017'); // Dev database
+  } else{
+    console.log("Server initialized in Production mode");  
+    //mongoose.connect('130.240.5.132:27017'); // Production database
+  }
+}
+
+initApp();
+
 //mongoose.set('debug', true);
 process.title = 'd7017e-backend';
 
