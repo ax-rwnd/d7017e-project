@@ -6,19 +6,11 @@ var http = require('http');
 var request = require('request');
 var locks = require('locks');
 var tcpPortUsed = require('tcp-port-used');
+var config = require('config');
 var Docker = require('dockerode');
-
 
 var docker = new Docker({socketPath: '/var/run/docker.sock'});
 var docker = new Docker();
-
-//TODO: move this into the config file
-const LANGS = ['python27', 'python3', 'java'];
-const MIN_UNUSED_CONTAINERS_PER_LANG = 1;
-const MAX_CONTAINERS_PER_LANG = 6;
-const MAX_GLOABAL_CONTAINERS = 8;
-const START_PORT = 16000;
-const IDLE_TIMEOUT = 10000;
 
 var mutex = locks.createMutex();
 var available_ports = [];
@@ -31,16 +23,20 @@ docker.listContainers(function (err, containers) {
   });
 });
 
-for (var i = 0; i < MAX_GLOABAL_CONTAINERS; i++) {
-    available_ports.push(START_PORT+i);
+for (var i = 0; i < config.docker.MAX_GLOABAL_CONTAINERS; i++) {
+    available_ports.push(config.docker.START_PORT+i);
 }
 
-LANGS.forEach(function(lang) {
+config.docker.LANGS.forEach(function(lang) {
     containers[lang] = [];
 
     // Start containers to maintain pool
-    for(i = 0; i < MIN_UNUSED_CONTAINERS_PER_LANG; i++) {
-        startContainer(lang);
+    for(i = 0; i < config.docker.MIN_UNUSED_CONTAINERS_PER_LANG; i++) {
+        try {
+            startContainer(lang);
+        } catch (e) {
+            console.log(e);
+        }
     }
 });
 
@@ -74,63 +70,59 @@ function startContainer(lang) {
     try {
         port = getPort();
     } catch (e) {
-        throw e;
+        console.log(e);
     }
 
-        var portText = port+"/tcp";
-        console.log(portText);
+    var containerConfig = {
+        Image: 'tester_'+lang,
+        Cmd: [],
+        name: id,
+        'Hostconfig': {
+            AutoRemove: true,
+            PortBindings: {
+                "8080/tcp": [{ "HostPort": port.toString() }]
+            }
+        }
+    };
 
-        var containerConfig = {
-            Image: 'tester_'+lang,
-            Cmd: [],
-            name: id,
-            'Hostconfig': {
-                AutoRemove: true,
-                PortBindings: {
-                    "8080/tcp": [{ "HostPort": port.toString() }]
+    docker.createContainer(containerConfig, function (err, container) {
+        if(err) {
+            returnPort(port);
+            console.log(err);
+        } else {
+            container.start(function (err, data) {
+                if(err) {
+                    returnPort(port);
+                    console.log(err);
+                } else {
+                    var c = {
+                        lang: lang,
+                        id: id,
+                        port: port,
+                        used: false,
+                        ready: false,
+                        time_created: Date.now()
+                    };
+                    containers[lang].push(c);
+
+                    waitForContainer(c);
+
+                    setTimeout(function() {
+                        if(containers[lang].length > config.docker.MIN_UNUSED_CONTAINERS_PER_LANG &&
+                                !c.used || !c.ready) {
+                            stopContainer(c);
+                        }
+                    }, config.docker.IDLE_TIMEOUT);
                 }
-            }
-        };
-
-        docker.createContainer(containerConfig, function (err, container) {
-            if(err) {
-                returnPort(port);
-                console.error(err);
-            } else {
-                container.start(function (err, data) {
-                    if(err) {
-                        returnPort(port);
-                        console.log(err);
-                    } else {
-                        var c = {
-                            lang: lang,
-                            id: id,
-                            port: port,
-                            used: false,
-                            ready: false,
-                            time_created: Date.now()
-                        };
-                        containers[lang].push(c);
-
-                        waitForContainer(c);
-
-                        setTimeout(function() {
-                            if(containers[lang].length > MIN_UNUSED_CONTAINERS_PER_LANG &&
-                                    !c.used || !c.ready) {
-                                stopContainer(c);
-                            }
-                        }, IDLE_TIMEOUT);
-                    }
-                });
-            }
-        });
-
+            });
+        }
+    });
 }
 
 function waitForContainer(c, iteration = 0) {
 
     if(iteration > 20) {
-        console.error("Something went wrong inside container; ", c);
+        console.log("Something went wrong inside container; ", c);
     } else {
         request.get('http://localhost:'+c.port+'/ping')
         .on('response', function(response) {
@@ -166,7 +158,11 @@ function getContainer(lang) {
     }
 
     if(containers[lang].length == 0) {
-        startContainer(lang);
+        try {
+            startContainer(lang);
+        } catch(e) {
+            console.log(e);
+        }
         throw new Error('No containers available for that language right now');
     }
 
@@ -177,8 +173,12 @@ function getContainer(lang) {
         if(!c.used && c.ready) {
             c.used = true;
 
-            if(containers[lang].length < MAX_CONTAINERS_PER_LANG) {
-                startContainer(lang);
+            if(containers[lang].length < config.docker.MAX_CONTAINERS_PER_LANG) {
+                try {
+                    startContainer(lang);
+                } catch(e) {
+                    console.log(e);
+                }
             }
 
             return {id: c.id, port: c.port};
@@ -191,15 +191,19 @@ function getContainer(lang) {
 function returnContainer(id) {
     // Destroys or recycles a container
 
-    LANGS.forEach((lang) => {
+    config.docker.LANGS.forEach((lang) => {
         for(var i = 0; i < containers[lang].length; i++) {
             var c = containers[lang][i];
 
             // Container found recycle it
             if(c.id === id) {
                 // Start a new container to replace the one returned
-                if(containers[lang].length < MAX_CONTAINERS_PER_LANG) {
-                    startContainer(lang);
+                if(containers[lang].length < config.docker.MAX_CONTAINERS_PER_LANG) {
+                    try {
+                        startContainer(lang);
+                    } catch(e) {
+                        console.log(e);
+                    }
                 }
                 stopContainer(c);
             }
@@ -209,5 +213,5 @@ function returnContainer(id) {
 
 exports.getContainer = getContainer;
 exports.returnContainer = returnContainer;
-exports.LANGS = LANGS;
+exports.LANGS = config.docker.LANGS;
 exports.containers = containers;
