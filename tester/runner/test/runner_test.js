@@ -10,7 +10,8 @@ describe('testing runner', () => {
                 'io': [
                     {'stdin': '', 'stdout': 'hello world\n', 'id': 0},
                     {'stdin': 'hi', 'args': [], 'stdout' :'bad test\n', 'id': 1}
-                ]
+                ],
+                'lint': true
             },
             'optional_tests': []
         };
@@ -21,7 +22,10 @@ describe('testing runner', () => {
                     {id: 0, ok: true, stderr: 'debug\n'},
                     {id: 1, ok: false, stderr: 'debug\n'}
                 ],
-                lint: ''
+                lint: `hello.py:1:11: E702 multiple statements on one line (semicolon)
+hello.py:1:11: E231 missing whitespace after ';'
+hello.py:1:32: E702 multiple statements on one line (semicolon)
+hello.py:1:32: E231 missing whitespace after ';'`
             }
         };
         

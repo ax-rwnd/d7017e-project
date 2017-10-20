@@ -41,7 +41,10 @@ describe('testing server for runner', function() {
                     {id: 0, ok: true, stderr: 'debug\n'},
                     {id: 1, ok: false, stderr: 'debug\n'}
                 ],
-                lint: ''
+                lint: `hello.py:1:11: E702 multiple statements on one line (semicolon)
+hello.py:1:11: E231 missing whitespace after ';'
+hello.py:1:32: E702 multiple statements on one line (semicolon)
+hello.py:1:32: E231 missing whitespace after ';'`
             }
         };
 
@@ -53,7 +56,7 @@ describe('testing server for runner', function() {
             .expect('Content-Type', 'application/json')
             .expect(200)
             .end(function(err, res) {
-                assert.equal(expected, JSON.stringify(res.body.resp));
+                assert.equal(JSON.stringify(res.body.resp), expected);
                 done();
             });
     });

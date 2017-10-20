@@ -18,6 +18,7 @@ async function runTests(request) {
 
     const codeFile = tmp.fileSync();
     fs.writeFileSync(codeFile.fd, request.code);
+    fs.closeSync(codeFile.fd);
 
     let res = {results: {io: []}};
     let langModule = resolveLanguage(request.lang);
@@ -47,11 +48,11 @@ async function runTests(request) {
     }
 
     // Lint
-    if (request.lint === true) {
+    if (request.tests.lint === true) {
         try {
-            res.results.lint = await request.tests.lint(codeFile);
+            res.results.lint = await langModule.lint(codeFile.name);
         } catch (e) {
-            res.results.lint = 'Unknown linter error';
+            res.results.lint = 'Unknown linter error: ' + e;
         }
     }
 
