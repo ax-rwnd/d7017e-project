@@ -1,0 +1,13 @@
+{   //Development environment config
+    // MongoDB config module
+    "Mongo": {
+      "dbConfig": {
+        "host": "mongodb://130.240.5.132",
+        "port": 27018
+      }
+    },
+    //Tester config module
+    "Tester": {
+
+    }
+  }

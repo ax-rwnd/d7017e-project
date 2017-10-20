@@ -1,15 +1,24 @@
-var express = require('express');
-var mongoose = require('mongoose');
+var express = require('express'); //Routes package
+var mongoose = require('mongoose'); //Database communication
 var bodyParser = require('body-parser');
-var passport = require('passport');
+var passport = require('passport'); //authentication
 var cors = require('cors');
+var config = require('config');
+
 
 var app = express();
 
-//Connect to db
-//If you have no mongodb running. Comment the below to prevent the app from crashing at start.
-mongoose.connect('130.240.5.132:27017');
-//
+// Function to initiate the app/server into development- or production mode. (depends on NODE_ENV)
+function initApp() {
+  var dbConfig = config.get('Mongo.dbConfig'); //Get mongo database config
+  console.log("Server running in "+app.get('env')+" mode.");
+  mongoose.connect(dbConfig.host+":"+dbConfig.port, { // Connect to development- or production database
+    useMongoClient: true //To get rid if depricationWarning for 'open() should be openURI()'
+  }); 
+}
+
+initApp();
+
 //mongoose.set('debug', true);
 process.title = 'd7017e-backend';
 
