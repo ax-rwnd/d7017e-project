@@ -12,7 +12,9 @@ var app = express();
 function initApp() {
   var dbConfig = config.get('Mongo.dbConfig'); //Get mongo database config
   console.log("Server running in "+app.get('env')+" mode.");
-  mongoose.connect(dbConfig.host+":"+dbConfig.port); // Connect to development- or production database
+  mongoose.connect(dbConfig.host+":"+dbConfig.port, { // Connect to development- or production database
+    useMongoClient: true //To get rid if depricationWarning for 'open() should be openURI()'
+  }); 
 }
 
 initApp();
