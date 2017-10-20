@@ -10,7 +10,7 @@ var testSchema = new Schema({
 });
 
 var assignmentSchema = new Schema({
-	assignmentName: {type: String, required: false},
+    assignmentName: {type: String, required: false},
     tests: [{ type: Schema.Types.ObjectId, ref: 'Test', required: true }]
 });
 
@@ -18,4 +18,4 @@ var Test = mongoose.model('Test', testSchema);
 var Assignment = mongoose.model('Assignment', assignmentSchema);
 var models = {Assignment: Assignment, Test: Test};
 
-module.exports = Models;
+module.exports = models;
