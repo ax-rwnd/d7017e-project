@@ -3,28 +3,10 @@
 
 const request = require('request');
 const docker = require('./docker.js');
+const container_queue = require('./container_queue.js');
 var config = require('config');
 
-var queue = {};
-
-// Construct queues for each language
-config.get('docker.LANGS)'.forEach(function(lang) {
-    queue[lang] = [];
-});
-
-setInterval(function(){
-    config.get('docker.LANGS').forEach(function(lang) {
-        try {
-            while(queue[lang].length > 0) {
-                var container = docker.getContainer(lang);
-                var queueItem = queue[lang].shift();
-                handleRequest(container, queueItem[0], queueItem[1]);
-            }
-        } catch (e) {
-            console.error(e);
-        }
-    });
-}, 250);
+container_queue.init(docker);
 
 function newRequest(req, res) {
     // Handle request from network interface
@@ -36,46 +18,44 @@ function newRequest(req, res) {
     }).on('data', (chunk) => {
         chunks.push(chunk);
     }).on('end', () => {
-        try {
-            //Convert the array of Buffers to a javascript object
-            var body = JSON.parse(Buffer.concat(chunks).toString());
+        //Convert the array of Buffers to a javascript object
+        var body = JSON.parse(Buffer.concat(chunks).toString());
 
-            // Fail softly if the language isn't supported
-            if(config.get('docker.LANGS').indexOf(body.lang) == -1) {
-                console.log('Not a vaild language');
-                res.sendStatus(400);
-                return;
-            }
-
-            // Requests of that lang already queued
-            // Put this new request last in queue
-            if(queue[body.lang].length > 0) {
-                queue[body.lang].push([body, res]);
-                return;
-            }
-
-            // If there are no available containers add request to queue
-            // otherwise, handle the request normally
-            try {
-                var container = docker.getContainer(body.lang);
-                handleRequest(container, body, res);
-            } catch (e) {
-                queue[body.lang].push([body, res]);
-            }
-        } catch (e) {
-            console.log(e);
+        if(!isValidInput(body)) {
             res.sendStatus(400);
+            return;
+        }
+
+        // Fail softly if the language isn't supported
+        if(config.get('docker.LANGS').indexOf(body.lang) == -1) {
+            console.log('Not a vaild language');
+            res.sendStatus(400);
+            return;
+        }
+
+        // Requests of that lang already queued
+        // Put this new request last in queue
+        if(container_queue.getLengthForLanguage(body.lang) > 0) {
+            container_queue.queueRequest(body, res);
+            return;
+        }
+
+        // If there are no available containers add request to queue
+        // otherwise, handle the request normally
+        try {
+            var container = docker.getContainer(body.lang);
+            handleRequest(container, body, res);
+        } catch (e) {
+            container_queue.queueRequest(body, res);
         }
     });
 }
 
 function handleRequest(container, body, res) {
-    // Start a container to run the test
 
-    // Wait for container to boot, or fail softly
+    // Send Request Timeout if container takes too long to execute
     var timeout = setTimeout(function() {
         if(!res.headersSent) {
-            //console.log('Manager\t'+container.id+'\tRequest took too long')
             docker.returnContainer(container.id);
             res.sendStatus(408);
         }
@@ -89,23 +69,52 @@ function handleRequest(container, body, res) {
     }, function(error, response, body){
         if(error) {
             if(!res.headersSent) {
-                //console.log('Manager\t'+container.id+'\tRequest responded with error');
                 docker.returnContainer(container.id);
                 res.sendStatus(500);
             }
         } else {
-            if (body === undefined) {
-                docker.returnContainer(container.id);
+            docker.returnContainer(container.id);
+            if (body === undefined && !res.headersSent) {
                 res.sendStatus(400);
             } else if(!res.headersSent) {
-                //console.log('Manager\t'+container.id+'\tRequest done');
-                docker.returnContainer(container.id);
                 res.send(JSON.stringify(body.resp));
             }
         }
     });
 }
 
+function isValidInput(input) {
+    var valid = true;
+
+    // lang parameter has to be in input data
+    if (!('lang' in input)) {
+        valid = false;
+    }
+
+    // Check so langauge actually is supported by the system
+    if('lang' in input && config.get('docker.LANGS').indexOf(input.lang) == -1) {
+        valid = false;
+    }
+
+    // lang parameter has to be in input data
+    if (!('code' in input)) {
+        valid = false;
+    }
+
+    // lang parameter has to be in input data
+    if (!('tests' in input)) {
+        valid = false;
+    }
+
+    return valid;
+}
+
+
+
+exports.handleRequest = handleRequest;
 exports.newRequest = newRequest;
-exports.queue = queue;
+exports.queue = container_queue.queue;
 exports.containers = docker.containers;
+
+exports.stopContainers = docker.stopContainers;
+exports.emptyQueue = container_queue.emptyQueue;

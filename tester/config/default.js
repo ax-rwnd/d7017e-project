@@ -4,7 +4,8 @@ var { languages } = require('./languages.js');
 //other config files will overwrite some or all default fields
 module.exports = {
     manager : {
-        MAX_EXECUTE_TIME : 10000
+        MAX_EXECUTE_TIME : 10000,
+        MAX_QUEUE_SIZE : 32
     },
     docker : {
         LANGS : languages,
