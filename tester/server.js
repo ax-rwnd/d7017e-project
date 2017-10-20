@@ -6,6 +6,7 @@ var execFile = require('child_process').execFile;
 var uuidv4 = require('uuid/v4');
 var http = require('http');
 
+var config = require('config');
 var manager = require('./manager.js');
 
 const HOST = '0.0.0.0';
@@ -89,7 +90,7 @@ app.get('/', (req, res) => {
             <th>Time alive</th>
         </tr>
 
-        ${formatLanguages(manager.LANGS, manager.containers)}
+        ${formatLanguages(config.docker.LANGS, manager.containers)}
 
         </table>
         </div>
@@ -102,7 +103,7 @@ app.get('/', (req, res) => {
                 <th>#</th>
             </tr>
 
-			${formatQueues(manager.LANGS, manager.queue)}
+			${formatQueues(config.docker.LANGS, manager.queue)}
             </table>
         </div>
     `;
@@ -113,6 +114,29 @@ app.get('/', (req, res) => {
 app.post('/', (req, res) => {
     manager.newRequest(req, res);
 });
+var server = app.listen(port, HOST);
 
-app.listen(port, HOST);
+var exitMessage = false;
+process.on('SIGINT', function() {
+    // Graceful shutdown
+
+    if(!exitMessage) {
+        exitMessage = true;
+
+        server.close();
+
+        console.log("Empty container queue...");
+        manager.emptyQueue();
+
+
+        console.log('Stopping all running containers... Shutting down shortly...');
+        var cb = function() {
+            console.log('Containers stopped. Good bye');
+            process.exit();
+        };
+        manager.stopContainers(cb);
+    }
+});
+
+
 console.log(`Running on http://${HOST}:${port}`);
