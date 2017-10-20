@@ -6,7 +6,7 @@ var http = require('http');
 var request = require('request');
 var locks = require('locks');
 var tcpPortUsed = require('tcp-port-used');
-var config = require('config');
+var config = require('config').get('docker');
 var Docker = require('dockerode');
 
 var docker = new Docker({socketPath: '/var/run/docker.sock'});
@@ -16,15 +16,15 @@ var mutex = locks.createMutex();
 var available_ports = [];
 var containers = {};
 
-for (var i = 0; i < config.docker.MAX_GLOBAL_CONTAINERS; i++) {
-    available_ports.push(config.docker.START_PORT+i);
+for (var i = 0; i < config.get('MAX_GLOBAL_CONTAINERS'); i++) {
+    available_ports.push(config.get('START_PORT')+i);
 }
 
-config.docker.LANGS.forEach(function(lang) {
+config.get('LANGS').forEach(function(lang) {
     containers[lang] = [];
 
     // Start containers to maintain pool
-    for(i = 0; i < config.docker.MIN_UNUSED_CONTAINERS_PER_LANG; i++) {
+    for(i = 0; i < config.get('MIN_UNUSED_CONTAINERS_PER_LANG'); i++) {
         try {
             startContainer(lang);
         } catch (e) {
@@ -101,11 +101,11 @@ function startContainer(lang) {
                     waitForContainer(c);
 
                     setTimeout(function() {
-                        if(containers[lang].length > config.docker.MIN_UNUSED_CONTAINERS_PER_LANG &&
+                        if(containers[lang].length > config.get('MIN_UNUSED_CONTAINERS_PER_LANG') &&
                                 !c.used || !c.ready) {
                             stopContainer(c);
                         }
-                    }, config.docker.IDLE_TIMEOUT);
+                    }, config.get('IDLE_TIMEOUT'));
                 }
             });
         }
@@ -166,7 +166,7 @@ function getContainer(lang) {
         if(!c.used && c.ready) {
             c.used = true;
 
-            if(containers[lang].length < config.docker.MAX_CONTAINERS_PER_LANG) {
+            if(containers[lang].length < config.get('MAX_CONTAINERS_PER_LANG')) {
                 try {
                     startContainer(lang);
                 } catch(e) {
@@ -182,16 +182,15 @@ function getContainer(lang) {
 }
 
 function returnContainer(id) {
-
     // Destroys or recycles a container
-    config.docker.LANGS.forEach((lang) => {
+    config.get('LANGS').forEach((lang) => {
         for(var i = 0; i < containers[lang].length; i++) {
             var c = containers[lang][i];
 
             // Container found recycle it
             if(c.id === id) {
                 // Start a new container to replace the one returned
-                if(containers[lang].length < config.docker.MAX_CONTAINERS_PER_LANG) {
+                if(containers[lang].length < config.get('MAX_CONTAINERS_PER_LANG')) {
                     try {
                         startContainer(lang);
                     } catch(e) {

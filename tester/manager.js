@@ -27,7 +27,7 @@ function newRequest(req, res) {
         }
 
         // Fail softly if the language isn't supported
-        if(config.docker.LANGS.indexOf(body.lang) == -1) {
+        if(config.get('docker.LANGS').indexOf(body.lang) == -1) {
             console.log('Not a vaild language');
             res.sendStatus(400);
             return;
@@ -59,7 +59,7 @@ function handleRequest(container, body, res) {
             docker.returnContainer(container.id);
             res.sendStatus(408);
         }
-    }, config.manager.MAX_EXECUTE_TIME);
+    }, config.get('manager.MAX_EXECUTE_TIME'));
 
     // Forward request to node on the container
     request.post({
@@ -92,7 +92,7 @@ function isValidInput(input) {
     }
 
     // Check so langauge actually is supported by the system
-    if('lang' in input && config.docker.LANGS.indexOf(input.lang) == -1) {
+    if('lang' in input && config.get('docker.LANGS').indexOf(input.lang) == -1) {
         valid = false;
     }
 
