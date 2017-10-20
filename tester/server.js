@@ -1,6 +1,9 @@
 /* jshint node: true */
 'use strict';
 
+// Configure and define winston logger
+var logger = require('./log.js');
+
 var express = require('express');
 var execFile = require('child_process').execFile;
 var uuidv4 = require('uuid/v4');
@@ -90,7 +93,7 @@ app.get('/', (req, res) => {
             <th>Time alive</th>
         </tr>
 
-        ${formatLanguages(config.docker.LANGS, manager.containers)}
+        ${formatLanguages(config.get('docker.LANGS'), manager.containers)}
 
         </table>
         </div>
@@ -103,7 +106,7 @@ app.get('/', (req, res) => {
                 <th>#</th>
             </tr>
 
-			${formatQueues(config.docker.LANGS, manager.queue)}
+			${formatQueues(config.get('docker.LANGS'), manager.queue)}
             </table>
         </div>
     `;
@@ -125,13 +128,13 @@ process.on('SIGINT', function() {
 
         server.close();
 
-        console.log("Empty container queue...");
+        logger.info("Empty container queue...");
         manager.emptyQueue();
 
 
-        console.log('Stopping all running containers... Shutting down shortly...');
+        logger.info('Stopping all running containers... Shutting down shortly...');
         var cb = function() {
-            console.log('Containers stopped. Good bye');
+            logger.info('Containers stopped. Good bye');
             process.exit();
         };
         manager.stopContainers(cb);
@@ -139,4 +142,4 @@ process.on('SIGINT', function() {
 });
 
 
-console.log(`Running on http://${HOST}:${port}`);
+logger.info(`Running on http://${HOST}:${port}`);
