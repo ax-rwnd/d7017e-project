@@ -5,6 +5,7 @@ var express = require('express');
 var execFile = require('child_process').execFile;
 var uuidv4 = require('uuid/v4');
 var http = require('http');
+var config = require('config');
 
 var manager = require('./manager.js');
 
@@ -89,7 +90,7 @@ app.get('/', (req, res) => {
             <th>Time alive</th>
         </tr>
 
-        ${formatLanguages(manager.LANGS, manager.containers)}
+        ${formatLanguages(config.get('docker.LANGS'), manager.containers)}
 
         </table>
         </div>
@@ -102,7 +103,7 @@ app.get('/', (req, res) => {
                 <th>#</th>
             </tr>
 
-			${formatQueues(manager.LANGS, manager.queue)}
+			${formatQueues(config.get('docker.LANGS'), manager.queue)}
             </table>
         </div>
     `;

@@ -8,12 +8,12 @@ var config = require('config');
 var queue = {};
 
 // Construct queues for each language
-docker.LANGS.forEach(function(lang) {
+config.get('docker.LANGS)'.forEach(function(lang) {
     queue[lang] = [];
 });
 
 setInterval(function(){
-    docker.LANGS.forEach(function(lang) {
+    config.get('docker.LANGS').forEach(function(lang) {
         try {
             while(queue[lang].length > 0) {
                 var container = docker.getContainer(lang);
@@ -41,7 +41,7 @@ function newRequest(req, res) {
             var body = JSON.parse(Buffer.concat(chunks).toString());
 
             // Fail softly if the language isn't supported
-            if(docker.LANGS.indexOf(body.lang) == -1) {
+            if(config.get('docker.LANGS').indexOf(body.lang) == -1) {
                 console.log('Not a vaild language');
                 res.sendStatus(400);
                 return;
@@ -79,7 +79,7 @@ function handleRequest(container, body, res) {
             docker.returnContainer(container.id);
             res.sendStatus(408);
         }
-    }, config.manager.MAX_EXECUTE_TIME);
+    }, config.get('manager.MAX_EXECUTE_TIME'));
 
     // Forward request to node on the container
     request.post({
@@ -108,5 +108,4 @@ function handleRequest(container, body, res) {
 
 exports.newRequest = newRequest;
 exports.queue = queue;
-exports.LANGS = docker.LANGS;
 exports.containers = docker.containers;
