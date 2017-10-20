@@ -28,4 +28,9 @@ router.get('/test/2', function(req, res) {
     });
 });   
 
+// Test to send easy error messages
+router.get('/errortest', function (req, res) {
+    res.status(errors.TEST.code).send(errors.TEST.msg);
+});
+
 }
