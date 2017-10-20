@@ -1,6 +1,7 @@
 /* jshint node: true */
 'use strict';
 
+var logger = require('winston');
 const request = require('request');
 const docker = require('./docker.js');
 const container_queue = require('./container_queue.js');
@@ -13,7 +14,7 @@ function newRequest(req, res) {
 
     var chunks = [];
     req.on('error', (err) => {
-        console.error(err);
+        logger.warn(err);
         res.sendStatus(400);
     }).on('data', (chunk) => {
         chunks.push(chunk);
@@ -28,7 +29,7 @@ function newRequest(req, res) {
 
         // Fail softly if the language isn't supported
         if(config.docker.LANGS.indexOf(body.lang) == -1) {
-            console.log('Not a vaild language');
+            logger.warn('Not a vaild language');
             res.sendStatus(400);
             return;
         }

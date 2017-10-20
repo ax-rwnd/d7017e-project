@@ -1,6 +1,7 @@
 /* jshint node: true */
 'use strict';
 
+var logger = require('winston');
 var uuidv4 = require('uuid/v4');
 var http = require('http');
 var request = require('request');
@@ -28,7 +29,7 @@ config.docker.LANGS.forEach(function(lang) {
         try {
             startContainer(lang);
         } catch (e) {
-            console.log(e);
+            logger.info(e);
         }
     }
 });
@@ -51,7 +52,7 @@ function returnPort(port) {
     tcpPortUsed.waitUntilFree(port, 250, 10000).then(function() {
         available_ports.push(port);
     }, function(err) {
-        console.log('Error:', err.message);
+        logger.error(err);
         throw err;
     });
 }
@@ -81,12 +82,12 @@ function startContainer(lang) {
     docker.createContainer(containerConfig, function (err, container) {
         if(err) {
             returnPort(port);
-            console.log(err);
+            logger.warn(err);
         } else {
             container.start(function (err, data) {
                 if(err) {
                     returnPort(port);
-                    console.log(err);
+                    logger.warn(err);
                 } else {
                     var c = {
                         lang: lang,
@@ -115,7 +116,7 @@ function startContainer(lang) {
 function waitForContainer(c, iteration = 0) {
 
     if(iteration > 20) {
-        console.log("Something went wrong inside container; ", c);
+        logger.warn("Something went wrong inside container; " + c);
     } else {
         request.get('http://localhost:'+c.port+'/ping')
         .on('response', function(response) {
@@ -154,7 +155,7 @@ function getContainer(lang) {
         try {
             startContainer(lang);
         } catch(e) {
-            console.log(e);
+            logger.error(e);
         }
         throw new Error('No containers available for that language right now');
     }
@@ -170,7 +171,7 @@ function getContainer(lang) {
                 try {
                     startContainer(lang);
                 } catch(e) {
-                    console.log(e);
+                    logger.info(e);
                 }
             }
 
@@ -195,7 +196,7 @@ function returnContainer(id) {
                     try {
                         startContainer(lang);
                     } catch(e) {
-                        console.log(e);
+                        logger.info(e);
                     }
                 }
                 stopContainer(c);
