@@ -13,16 +13,16 @@ const TESTER_IP = 'http://130.240.5.118:9100'
 module.exports = function(router) {
 
 /*
-<<<<<<< HEAD
  * /ROUTE/TO/POST/CODE        THIS NEEDS A PROPER ROUTE
  */
 
 /*router.post('/ROUTE/TO/POST/CODE', function(req, res) {
-=======
- * /test/ Endpoints
- */
+        var lang = req.body.lang;
+    var code = req.body.code;
+    var assignment_id = req.body.assignment_id;
 
-
+    testerCom.validateCode(lang, code, assignment_id);
+}*/
 
 
 /*

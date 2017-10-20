@@ -4,7 +4,7 @@ var Test = require('../../models/schemas').Test;
 
 //get all tests related to a specific assignment. 
 function getTestsFromAssignment(assignmentID, callback) {
-
+    console.log(assignmentID)
     Assignment.findById(assignmentID)
     .populate({
         path: 'tests',

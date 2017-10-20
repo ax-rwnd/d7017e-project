@@ -12,7 +12,7 @@ module.exports = function(router) {
 
 //Retrieve tests from db and send them to tester
 router.post('/test/1', function(req, res) {
-    console.log("hej")
+    
     var lang = req.body.lang;
     var code = req.body.code;
     var assignment_id = req.body.assignment_id;
@@ -21,7 +21,7 @@ router.post('/test/1', function(req, res) {
 });
 
 router.get('/test/2', function(req, res) {
-    queries.getTestsFromAssignment('59e47512d6bcdd1110d20f40', function(tests) {
+    queries.getTestsFromAssignment('59e4cb34d679e102ff66b866', function(tests) {
        console.log("/ route retrieved");
        console.log(tests)
        res.send('Hello World');
