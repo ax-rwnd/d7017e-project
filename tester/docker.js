@@ -16,13 +16,6 @@ var mutex = locks.createMutex();
 var available_ports = [];
 var containers = {};
 
-// Remove old docker images that are still running
-docker.listContainers(function (err, containers) {
-  containers.forEach(function (containerInfo) {
-    docker.getContainer(containerInfo.Id).stop();
-  });
-});
-
 for (var i = 0; i < config.docker.MAX_GLOBAL_CONTAINERS; i++) {
     available_ports.push(config.docker.START_PORT+i);
 }
@@ -70,7 +63,7 @@ function startContainer(lang) {
     try {
         port = getPort();
     } catch (e) {
-        console.log(e);
+        return;
     }
 
     var containerConfig = {
@@ -189,8 +182,8 @@ function getContainer(lang) {
 }
 
 function returnContainer(id) {
-    // Destroys or recycles a container
 
+    // Destroys or recycles a container
     config.docker.LANGS.forEach((lang) => {
         for(var i = 0; i < containers[lang].length; i++) {
             var c = containers[lang][i];
@@ -211,7 +204,29 @@ function returnContainer(id) {
     });
 }
 
+function stopContainers(cb) {
+
+    // TODO Handle new requests that start new containers when shutdown is being done.
+    //      These new containers wont then be shut down and will block ports 
+    docker.listContainers(function (err, containers) {
+        if(containers.length == 0) {
+            cb();
+        } else {
+            var remaining = containers.length;
+            containers.forEach(function (containerInfo) {
+                var callback = function(data) {
+                    remaining--;
+                    if(remaining == 0) {
+                        cb();
+                    }
+                };
+                docker.getContainer(containerInfo.Id).stop(callback);
+            });
+        }
+    });
+}
+
 exports.getContainer = getContainer;
 exports.returnContainer = returnContainer;
-exports.LANGS = config.docker.LANGS;
 exports.containers = containers;
+exports.stopContainers = stopContainers;
