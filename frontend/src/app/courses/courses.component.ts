@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
+
+import {CourseService} from '../services/course.service';
 import { trigger, state, style, animate, transition } from '@angular/animations';
 import { HeadService } from '../services/head.service';
-import {RewardService} from '../services/reward.service';
 
 @Component({
   selector: 'app-courses',
@@ -18,20 +19,20 @@ import {RewardService} from '../services/reward.service';
   ]
 })
 export class CoursesComponent implements OnInit {
-  course: string;
+  courseCode: string;
   available: string[];
   sidebarState; // state of sidebar
   progress: any;
+  currentCourse: any;
 
-  constructor(private route: ActivatedRoute, private headService: HeadService, private rewardService: RewardService) {
+  constructor(private courseService: CourseService, private route: ActivatedRoute, private headService: HeadService) {
     this.headService.stateChange.subscribe(sidebarState => { this.sidebarState = sidebarState; });
-    this.route.params.subscribe( params => this.course = params['course']);
+    this.route.params.subscribe( params => this.currentCourse = this.courseService.GetCourse(params['course']));
   }
 
   ngOnInit() {
     this.sidebarState = this.headService.getCurrentState();
     this.available = ['assignment 1', 'assignment 2', 'assignment 3', 'laboration 1', 'laboration 2'];
-    this.progress = this.rewardService.progress;
   }
 
 }

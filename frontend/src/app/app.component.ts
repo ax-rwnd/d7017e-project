@@ -1,19 +1,20 @@
 import { Component, OnInit } from '@angular/core';
 import { trigger, state, style, animate, transition } from '@angular/animations';
 import { HeadService } from './services/head.service';
+import { CourseService } from './services/course.service';
 
 class Course {
   id: string;
 }
 
-const courses: Course[] = [
+/*const courses: Course[] = [
   { id: 'D0009E'},
   { id: 'D0011E'},
   { id: 'D0012E'},
   { id: 'D0024E'},
   { id: 'D0099E'},
   { id: 'D1337E'}
-]
+]*/
 
 @Component({
   selector: 'app-root',
@@ -31,14 +32,15 @@ const courses: Course[] = [
 export class AppComponent implements OnInit {
   title = 'app';
   sidebarState;
-  courses: Course[] = courses;
+  courses: any;
 
-  constructor(private headService: HeadService) {
+  constructor(private headService: HeadService, private courseService: CourseService) {
     this.headService.stateChange.subscribe(sidebarState => { this.sidebarState = sidebarState; });
   }
 
   ngOnInit() {
     this.sidebarState = 'inactive';
+    this.courses = this.courseService.courses;
   }
 
 }

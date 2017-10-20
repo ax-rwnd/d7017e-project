@@ -1,3 +1,17 @@
 .progress-margin {
   width: 33%;
 }
+.fillBadge {
+  width: 60px;
+  height: 60px;
+  margin-right: 5px;
+  margin-bottom: 10px;
+  background: #000000;
+}
+
+.customGlyph {
+  font-size: 40px;
+  margin-top: 5px;
+  margin-left: 5px;
+  color: #d19b3d;
+}

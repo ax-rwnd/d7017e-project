@@ -29,6 +29,7 @@ import {HttpClientModule} from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HeadService } from './services/head.service';
 import {UserService} from './services/user.service';
+import {CourseService} from './services/course.service';
 
 const appRoutes: Routes = [
   { path: '', component: LoginComponent },
@@ -68,7 +69,8 @@ const appRoutes: Routes = [
     HeadService, // the state variable that head provides
     BackendService,
     RewardService,
-    UserService
+    UserService,
+    CourseService
   ],
   bootstrap: [AppComponent]
 })
