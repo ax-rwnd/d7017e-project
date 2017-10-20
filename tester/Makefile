@@ -9,6 +9,7 @@ sub=\",\"
 .DEFAULT_GOAL := all
 
 all: python27 python3 java
+	# Generate list of supported languages
 	echo "exports.languages=[\"$(subst $(space),$(sub),$^)\"];" > $(CONFIGFILE);
 
 base:

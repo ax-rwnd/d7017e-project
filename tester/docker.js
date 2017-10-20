@@ -23,7 +23,7 @@ docker.listContainers(function (err, containers) {
   });
 });
 
-for (var i = 0; i < config.docker.MAX_GLOABAL_CONTAINERS; i++) {
+for (var i = 0; i < config.docker.MAX_GLOBAL_CONTAINERS; i++) {
     available_ports.push(config.docker.START_PORT+i);
 }
 
