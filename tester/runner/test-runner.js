@@ -25,6 +25,9 @@ async function runTests(request) {
     let executable = langModule.prepare(codeFile.name);
 
     // Run mandatory IO tests
+    if (!request.tests.hasOwnProperty('io')) {
+        request.tests.io = [];
+    }
     for (const test of request.tests.io) {
         try {
             let output = await validateAndRun(executable, test, langModule);

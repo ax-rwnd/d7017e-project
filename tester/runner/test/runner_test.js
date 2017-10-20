@@ -5,7 +5,7 @@ describe('testing runner', () => {
     it('runs tests in containers', (done) => {
         const req = {
             'lang':'python3',
-            'code':'import sys;print("hello world");print("debug", file=sys.stderr)',
+            'code':'import sys\nprint("hello world")\nprint("debug", file=sys.stderr)\n',
             'tests': {
                 'io': [
                     {'stdin': '', 'stdout': 'hello world\n', 'id': 0},
@@ -22,10 +22,7 @@ describe('testing runner', () => {
                     {id: 0, ok: true, stderr: 'debug\n'},
                     {id: 1, ok: false, stderr: 'debug\n'}
                 ],
-                lint: `hello.py:1:11: E702 multiple statements on one line (semicolon)
-hello.py:1:11: E231 missing whitespace after ';'
-hello.py:1:32: E702 multiple statements on one line (semicolon)
-hello.py:1:32: E231 missing whitespace after ';'`
+                lint: ''
             }
         };
         

@@ -16,7 +16,7 @@ function run(file, test, timeout) {
 function lint(file) {
     return new Promise((resolve, reject) => {
         const child = execFile('flake8', [file], (err, stdout, stderr) => {
-            if (err) {
+            if (err && err.code !== 1) {
                 reject(err);
             }
             let result = stdout;
