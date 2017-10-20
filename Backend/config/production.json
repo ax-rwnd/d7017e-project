@@ -3,7 +3,7 @@
     "Mongo": {
       "dbConfig": {
         "host": "130.240.5.132",
-        "port": 27018
+        "port": 27019
       }
     },
     //Tester config module
