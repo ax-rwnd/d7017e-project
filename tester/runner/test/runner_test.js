@@ -25,7 +25,7 @@ describe('testing runner', () => {
                 lint: ''
             }
         };
-        
+
         var promise = new Promise(function(resolve, reject) {
             setTimeout(() => {
                 resolve(runner.runTests(req));
@@ -34,6 +34,12 @@ describe('testing runner', () => {
 
         promise.then((result) => {
             try {
+                result.results.io.forEach(iores => {
+                    // just test that the type is correct since the time varies
+                    assert.equal(typeof(iores.time), 'number');
+                    // delete it so it's not checked later
+                    delete iores.time;
+                });
                 assert.equal(JSON.stringify(result.results), JSON.stringify(resp.results));
                 done();
             } catch (err) {

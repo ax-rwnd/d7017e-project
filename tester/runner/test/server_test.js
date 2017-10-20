@@ -35,7 +35,7 @@ describe('testing server for runner', function() {
             'optional_tests': []
         };
 
-        const resp = {
+        const expected_resp = {
             results: {
                 io: [
                     {id: 0, ok: true, stderr: 'debug\n'},
@@ -45,7 +45,7 @@ describe('testing server for runner', function() {
             }
         };
 
-        const expected = JSON.stringify(resp);
+        const expected = JSON.stringify(expected_resp);
 
         request(runner.server)
             .post('/')
@@ -53,7 +53,14 @@ describe('testing server for runner', function() {
             .expect('Content-Type', 'application/json')
             .expect(200)
             .end(function(err, res) {
-                assert.equal(JSON.stringify(res.body.resp), expected);
+                const response = res.body.resp;
+                response.results.io.forEach(iores => {
+                    // just test that the type is correct since the time varies
+                    assert.equal(typeof(iores.time), 'number');
+                    // delete it so it's not checked later
+                    delete iores.time;
+                });
+                assert.equal(JSON.stringify(response), expected);
                 done();
             });
     });

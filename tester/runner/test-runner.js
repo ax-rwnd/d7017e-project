@@ -8,9 +8,9 @@ var languages = requireDir('./languages');
 
 const timeout = 5000; // ms
 
-function result(id, ok, stderr) {
+function result(id, ok, stderr, time) {
     // Build a result struct
-    return {id:id, ok:ok, stderr:stderr};
+    return {id:id, ok:ok, stderr:stderr, time:time};
 }
 
 async function runTests(request) {
@@ -33,17 +33,17 @@ async function runTests(request) {
             let output = await validateAndRun(executable, test, langModule);
             if (output.stdout !== test.stdout) {
                 // TODO: tell them what broke our expectations
-                res.results.io.push(new result(test.id, false, output.stderr));
+                res.results.io.push(new result(test.id, false, output.stderr, output.time));
             } else {
                 // test succeeded
-                res.results.io.push(new result(test.id, true, output.stderr));
+                res.results.io.push(new result(test.id, true, output.stderr, output.time));
             }
         } catch (e) {
             // SIGTERM is sent to the child process on timeout
             if (e.signal == 'SIGTERM') {
                 // TODO: tell them that the failure was from a timeout
                 console.log('Execution timed out on test:', test.id);
-                res.results.io.push(new result(test.id, false, ''));
+                res.results.io.push(new result(test.id, false, '', output.time));
             } else {
                 throw e;
             }
@@ -72,8 +72,18 @@ function validateAndRun(file, test, langModule) {
     if (!test.hasOwnProperty('stdin')) {
         test.stdin = '';
     }
-    return langModule.run(file, test, timeout);
+    return timedRun(file, test, langModule);
 }
+
+async function timedRun(file, test, langModule) {
+    const start_time = process.hrtime();
+    let res = await langModule.run(file, test, timeout);
+    const diff = process.hrtime(start_time);
+    const NS_PER_SEC = 1e9;
+    res.time = diff[0] * NS_PER_SEC + diff[1];
+    return res;
+}
+
 
 function resolveLanguage(lang) {
     // Lookup language module from lang-string
