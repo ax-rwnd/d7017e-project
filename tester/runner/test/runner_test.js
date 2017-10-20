@@ -22,6 +22,7 @@ describe('testing runner', () => {
                     {id: 0, ok: true, stderr: 'debug\n'},
                     {id: 1, ok: false, stderr: 'debug\n'}
                 ],
+                code_size: 64,
                 lint: ''
             }
         };

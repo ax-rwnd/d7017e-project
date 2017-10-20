@@ -24,6 +24,13 @@ async function runTests(request) {
     let langModule = resolveLanguage(request.lang);
     let executable = langModule.prepare(codeFile.name);
 
+    // Measure code size
+    if (typeof(request.code) === 'string') {
+        res.results.code_size = request.code.length;
+    } else {
+        throw new Error('code is not a string');
+    }
+
     // Run mandatory IO tests
     if (!request.tests.hasOwnProperty('io')) {
         request.tests.io = [];
@@ -43,7 +50,7 @@ async function runTests(request) {
             if (e.signal == 'SIGTERM') {
                 // TODO: tell them that the failure was from a timeout
                 console.log('Execution timed out on test:', test.id);
-                res.results.io.push(new result(test.id, false, '', output.time));
+                res.results.io.push(new result(test.id, false, '', undefined));
             } else {
                 throw e;
             }
