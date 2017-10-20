@@ -8,11 +8,11 @@ sub=\",\"
 
 .DEFAULT_GOAL := all
 
-all: python27 python3 java
+all: python27 python3
 	# Generate list of supported languages
 	echo "exports.languages=[\"$(subst $(space),$(sub),$^)\"];" > $(CONFIGFILE);
 
-base:
+pre:
 	# Set image environment
 	echo "FROM $(BASEIMAGE)">$(DOCKERFILE)
 
@@ -25,13 +25,20 @@ base:
 	echo "RUN npm install">>"$(DOCKERFILE)"
 
 	# Bundle app source
-	echo "ADD /runner /usr/src/app">>"$(DOCKERFILE)"
+	echo "ADD /runner /usr/src/app/">>"$(DOCKERFILE)"
 
 	echo "EXPOSE $(PORT)">>"$(DOCKERFILE)"
 
 	echo "CMD [ \"npm\", \"start\", \"8080\" ]">>"$(DOCKERFILE)"
 
-build:
+post:
+	# Remove all language specific files in image
+	echo "RUN rm languages/*">>"$(DOCKERFILE)"
+
+	# Add language specific files to test
+	echo "ADD /runner/languages/$(LANG).js /usr/src/app/languages/">>"$(DOCKERFILE)"
+
+	#Build image
 	docker build -t tester_$(LANG) -f $(DOCKERFILE) .
 
 # Languages below
@@ -40,21 +47,21 @@ python27:
 	$(eval LANG="python27")
 	$(eval DOCKERFILE="Dockerfile_Python27")
 
-	make base DOCKERFILE=$(DOCKERFILE)
+	make pre DOCKERFILE=$(DOCKERFILE)
 
 	# Python27 specific code
 	echo "RUN apk add --update python">>"$(DOCKERFILE)"
 	echo "RUN apk add --update flake8">>"$(DOCKERFILE)"
 	echo "RUN rm -rf /var/cache/apk/*">>"$(DOCKERFILE)"
 
-	# Build image
-	make build DOCKERFILE=$(DOCKERFILE) LANG=$(LANG)
+	# Add language specific file and build image
+	make post DOCKERFILE=$(DOCKERFILE) LANG=$(LANG)
 
 python3:
 	$(eval LANG="python3")
 	$(eval DOCKERFILE="Dockerfile_Python3")
 
-	make base DOCKERFILE=$(DOCKERFILE)
+	make pre DOCKERFILE=$(DOCKERFILE)
 
 	# Python3 specific code
 	echo "RUN apk add --update python3">>"$(DOCKERFILE)"
@@ -64,8 +71,8 @@ python3:
 	echo "RUN pip3 install flake8">>"$(DOCKERFILE)"
 	echo "RUN rm -rf /var/cache/apk/*">>"$(DOCKERFILE)"
 
-	# Build image
-	make build DOCKERFILE=$(DOCKERFILE) LANG=$(LANG)
+	# Add language specific file and build image
+	make post DOCKERFILE=$(DOCKERFILE) LANG=$(LANG)
 
 	# cleanup
 	rm get-pip.py
@@ -74,11 +81,11 @@ java:
 	$(eval LANG="java")
 	$(eval DOCKERFILE="Dockerfile_Java")
 
-	make base DOCKERFILE=$(DOCKERFILE)
+	make pre DOCKERFILE=$(DOCKERFILE)
 
 	# Java specific code
 	echo "RUN apk --update add openjdk8-jre">>"$(DOCKERFILE)"
 	echo "RUN rm -rf /var/cache/apk/*">>"$(DOCKERFILE)"
 
-	# Build image
-	make build DOCKERFILE=$(DOCKERFILE) LANG=$(LANG)
+	# Add language specific file and build image
+	make post DOCKERFILE=$(DOCKERFILE) LANG=$(LANG)
