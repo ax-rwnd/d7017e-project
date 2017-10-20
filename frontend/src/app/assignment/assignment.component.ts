@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import 'codemirror/mode/go/go';
 import {BackendService} from '../services/backend.service';
 import {RewardService} from '../services/reward.service';
-
 import { trigger, state, style, animate, transition } from '@angular/animations';
 import { HeadService } from '../services/head.service';
 

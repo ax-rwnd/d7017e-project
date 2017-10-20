@@ -12,8 +12,48 @@
   </div>
 
 
+  <div id="feedback">
+
+    <div id="points">
+      <h2>Feedback</h2>
+    </div>
+
+    <div>
+      {{progress.current}}
+    </div>
+
+    <div class="progress progress-margin">
+      <div class="progress-bar" role="progressbar" [attr.aria-valuenow]="progress['current']" aria-valuemin="0" aria-valuemax ="10"
+           [style.width]="progress['current']*10 + '%'">
+      </div>
+    </div>
+
+    <!-- Should contain the results of test/feedback -->
+
+  </div>
 
 
+
+  <div id="inputField">
+
+    <div>
+      <codemirror [(ngModel)]="content" [config]="{lineNumbers: true}"></codemirror>
+    </div>
+
+
+
+    <div id="submitBar">
+      <input type="submit" value="test" class="btn">
+      <input (click)="submitCode()" type="submit" value="submit" class="btn">
+    </div>
+
+    <!--<textarea id="code" name="code" rows="50" cols="90">
+      // Demo code (the actual new parser character stream implementation)
+
+
+    </textarea>-->
+
+  </div>
 
   <div id="description">
     <!-- Description of the assignment -->
@@ -27,34 +67,11 @@
     <div id="codeExample">
       <codemirror [(ngModel)]="assignment" [config]="{lineNumbers: true, readOnly: true}"></codemirror>
     </div>
-
-
-    <!-- sample -->
-
-
-
-    <h3>Assignment score: {{assignmentScore['assignment1']}}/10</h3>
   </div>
-  <div id="inputField">
-
-    <div>
-      <codemirror [(ngModel)]="content" [config]="{lineNumbers: true}"></codemirror>
-    </div>
-    <!-- input field for assignment TODO: implement codeMirror -->
 
 
-    <div id="submitBar">
-      <input type="submit" value="test">
-      <input (click)="submitCode()" type="submit" value="submit">
-    </div>
-
-    <!--<textarea id="code" name="code" rows="50" cols="90">
-      // Demo code (the actual new parser character stream implementation)
+  <div id="footer">Next assignment</div>
 
 
-    </textarea>-->
-
-  </div>
-  {{progress.current}}
 </div>
 </div>
