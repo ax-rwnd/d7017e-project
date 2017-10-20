@@ -1,0 +1,21 @@
+.content {
+  margin-top: 1%;
+  padding-left: 2%;
+  padding-right: 2%;
+  padding-top: 30px; /* need this because we have a fixed navbar on top */
+  float: left;
+  margin-left: var(--wSidebar);
+}
+
+/* Sidebar */
+.sidebar {
+  color: white;
+  width: var(--wSidebar);
+  height: 100%;
+  background: #133756;
+  position: fixed;
+  padding-top: 5%;
+  left: 0;
+  padding-left: 1%;
+  font-size: 1.1em;
+}

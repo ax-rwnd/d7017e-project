@@ -5,6 +5,7 @@
 <script src="http://codemirror.net/mode/javascript/javascript.js"></script>
 
 <app-head></app-head>
+<div id="cont" class="content" [@content]="sidebarState">
 <div id="main-wrap">
   <div id="header">
       <h1>D0009E - Introduktion till programmering</h1>
@@ -32,8 +33,8 @@
 
 
 
+    <h3>Assignment score: {{assignmentScore['assignment1']}}/10</h3>
   </div>
-
   <div id="inputField">
 
     <div>
@@ -55,4 +56,5 @@
 
   </div>
   {{progress.current}}
+</div>
 </div>

@@ -1,14 +1,15 @@
 <app-head></app-head>
 
-<div class="container">
+<div id="cont" class="content" [@content]="sidebarState"><!-- [@content]="state" -->
   <img width="200" class="img-circle" src="../../assets/images/default-user.png">
   <h2>
     {{user.firstName}} {{user.lastName}}
   </h2>
-  <p>{{user.ltuid}}</p>
+  <p>{{user.id}}</p>
   <br>
   <p><a class="userlinks">Settings</a></p>
   <p><a class="userlinks" (click)="toggleStatistics()">Statistics</a></p>
+  <app-statistics *ngIf="statistics"></app-statistics>
 </div>
 
-<app-statistics *ngIf="statistics"></app-statistics>
+

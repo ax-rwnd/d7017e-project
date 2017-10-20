@@ -1,12 +1,41 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, forwardRef, OnInit, Inject} from '@angular/core';
+import { trigger, state, style, animate, transition } from '@angular/animations';
+import { HeadService } from '../services/head.service';
+import {AppComponent} from '../app.component';
 
 @Component({
   selector: 'app-head',
   templateUrl: './head.component.html',
-  styleUrls: ['./head.component.css']
+  styleUrls: ['./head.component.css'],
+  animations: [
+    trigger('sidebar', [
+      state('inactive', style({display: 'none', transform: 'translateX(-100%)'})),
+      state('active', style({display: 'block', transform: 'translateX(0)'})),
+      transition('inactive => active', animate('300ms')),
+      transition('active => inactive', animate('300ms'))
+    ])
+  ]
 })
 
 export class HeadComponent implements OnInit {
+  sidebarState;
+
+  constructor(@Inject(forwardRef(() => AppComponent)) private appComponent: AppComponent, private headService: HeadService) {
+     // shouldn't be inactive, should only get state from app component
+  }
+
+  toggleState() { // send to the sidebar in app component that it should toggle state
+    this.sidebarState = this.sidebarState === 'active' ? 'inactive' : 'active';
+    this.headService.setState(this.sidebarState);
+  }
+
+   ngOnInit() {
+     this.sidebarState = this.appComponent.sidebarState;
+     this.headService.setState(this.sidebarState);
+   }
+}
+
+/*export class HeadComponent implements OnInit {
 
   //Det här är retarded. temporär lösning
   public isCollapsed:boolean = false;
@@ -64,4 +93,4 @@ export class HeadComponent implements OnInit {
 
   }
 
-}
+}*/
