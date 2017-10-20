@@ -25,11 +25,11 @@ export class CoursesComponent implements OnInit {
 
   constructor(private route: ActivatedRoute, private headService: HeadService, private rewardService: RewardService) {
     this.headService.stateChange.subscribe(sidebarState => { this.sidebarState = sidebarState; });
+    this.route.params.subscribe( params => this.course = params['course']);
   }
 
   ngOnInit() {
     this.sidebarState = this.headService.getCurrentState();
-    this.course = this.route.snapshot.paramMap.get('course');
     this.available = ['assignment 1', 'assignment 2', 'assignment 3', 'laboration 1', 'laboration 2'];
     this.progress = this.rewardService.progress;
   }
