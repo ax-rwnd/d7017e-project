@@ -97,7 +97,10 @@ function handleRequest(container, body, res) {
                 res.sendStatus(500);
             }
         } else {
-            if(!res.headersSent) {
+            if (body === undefined) {
+                docker.returnContainer(container.id);
+                res.sendStatus(400);
+            } else if(!res.headersSent) {
                 //console.log('Manager\t'+container.id+'\tRequest done');
                 docker.returnContainer(container.id);
                 res.send(JSON.stringify(body.resp));
