@@ -93,7 +93,7 @@ app.get('/', (req, res) => {
             <th>Time alive</th>
         </tr>
 
-        ${formatLanguages(config.docker.LANGS, manager.containers)}
+        ${formatLanguages(config.get('docker.LANGS'), manager.containers)}
 
         </table>
         </div>
@@ -106,7 +106,7 @@ app.get('/', (req, res) => {
                 <th>#</th>
             </tr>
 
-			${formatQueues(config.docker.LANGS, manager.queue)}
+			${formatQueues(config.get('docker.LANGS'), manager.queue)}
             </table>
         </div>
     `;
