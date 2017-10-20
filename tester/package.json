@@ -16,6 +16,7 @@
     "request": "^2.83.0",
     "supertest": "^3.0.0",
     "tcp-port-used": "^0.1.2",
-    "uuid": "^3.1.0"
+    "uuid": "^3.1.0",
+    "dockerode": "^2.5.2"
   }
 }

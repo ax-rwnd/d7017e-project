@@ -14,18 +14,15 @@ docker.LANGS.forEach(function(lang) {
 
 setInterval(function(){
     docker.LANGS.forEach(function(lang) {
-        if(queue[lang].length > 0) {
-            var container = docker.getContainer(lang);
-
-            while(container != null && queue[lang].length > 0) {
+        try {
+            while(queue[lang].length > 0) {
+                var container = docker.getContainer(lang);
                 var queueItem = queue[lang].shift();
                 handleRequest(container, queueItem[0], queueItem[1]);
-
-                if(queue[lang].length > 0) {
-                    container = docker.getContainer(lang);
-                }
             }
-        }//container;
+        } catch (e) {
+            console.error(e);
+        }
     });
 }, 250);
 
@@ -59,11 +56,11 @@ function newRequest(req, res) {
 
             // If there are no available containers add request to queue
             // otherwise, handle the request normally
-            var container = docker.getContainer(body.lang);
-            if(container == null) {
-                queue[body.lang].push([body, res]);
-            } else {
+            try {
+                var container = docker.getContainer(body.lang);
                 handleRequest(container, body, res);
+            } catch (e) {
+                queue[body.lang].push([body, res]);
             }
         } catch (e) {
             console.log(e);
@@ -97,7 +94,10 @@ function handleRequest(container, body, res) {
                 res.sendStatus(500);
             }
         } else {
-            if(!res.headersSent) {
+            if (body === undefined) {
+                docker.returnContainer(container.id);
+                res.sendStatus(400);
+            } else if(!res.headersSent) {
                 //console.log('Manager\t'+container.id+'\tRequest done');
                 docker.returnContainer(container.id);
                 res.send(JSON.stringify(body.resp));
