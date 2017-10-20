@@ -58,11 +58,17 @@ python3:
 
 	# Python3 specific code
 	echo "RUN apk add --update python3">>"$(DOCKERFILE)"
-	echo "RUN apk add --update flake8">>"$(DOCKERFILE)"
+	wget https://bootstrap.pypa.io/get-pip.py
+	echo "COPY get-pip.py /get-pip.py">>"$(DOCKERFILE)"
+	echo "RUN python3 /get-pip.py">>"$(DOCKERFILE)"
+	echo "RUN pip3 install flake8">>"$(DOCKERFILE)"
 	echo "RUN rm -rf /var/cache/apk/*">>"$(DOCKERFILE)"
 
 	# Build image
 	make build DOCKERFILE=$(DOCKERFILE) LANG=$(LANG)
+
+	# cleanup
+	rm get-pip.py
 
 java:
 	$(eval LANG="java")
