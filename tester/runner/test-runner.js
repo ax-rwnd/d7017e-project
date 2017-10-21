@@ -103,7 +103,7 @@ function resolveLanguage(lang) {
         langModule.prepare = (file) => {return file;};
     }
     if (!langModule.hasOwnProperty('lint')) {
-        langModule.prepare = (file) => {return '';};
+        langModule.lint = (file) => {return '';};
     }
     return langModule;
 }
