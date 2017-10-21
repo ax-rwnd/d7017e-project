@@ -14,8 +14,8 @@ function newRequest(req, res) {
 
     var chunks = [];
     req.on('error', (err) => {
-        logger.warn(err);
-        res.sendStatus(400);
+        logger.error(err);
+        res.sendStatus(500);
     }).on('data', (chunk) => {
         chunks.push(chunk);
     }).on('end', () => {
@@ -23,13 +23,7 @@ function newRequest(req, res) {
         var body = JSON.parse(Buffer.concat(chunks).toString());
 
         if(!isValidInput(body)) {
-            res.sendStatus(400);
-            return;
-        }
-
-        // Fail softly if the language isn't supported
-        if(config.get('docker.LANGS').indexOf(body.lang) == -1) {
-            logger.warn('Not a vaild language');
+            logger.warn('Not vaild input data');
             res.sendStatus(400);
             return;
         }
@@ -76,7 +70,8 @@ function handleRequest(container, body, res) {
         } else {
             docker.returnContainer(container.id);
             if (body === undefined && !res.headersSent) {
-                res.sendStatus(400);
+                logger.warn('Request returned undefined');
+                res.sendStatus(500);
             } else if(!res.headersSent) {
                 res.send(JSON.stringify(body.resp));
             }
@@ -89,21 +84,25 @@ function isValidInput(input) {
 
     // lang parameter has to be in input data
     if (!('lang' in input)) {
+        logger.info('lang parameter has to be in input data');
         valid = false;
+    } else {
+        // Check so langauge actually is supported by the system
+        if('lang' in input && config.get('docker.LANGS').indexOf(input.lang) == -1) {
+            logger.info('Langauge actually is not supported by the system. Got:', input.lang);
+            valid = false;
+        }
     }
 
-    // Check so langauge actually is supported by the system
-    if('lang' in input && config.get('docker.LANGS').indexOf(input.lang) == -1) {
-        valid = false;
-    }
-
-    // lang parameter has to be in input data
+    // code parameter has to be in input data
     if (!('code' in input)) {
+        logger.info('code parameter has to be in input data');
         valid = false;
     }
 
-    // lang parameter has to be in input data
+    // tests parameter has to be in input data
     if (!('tests' in input)) {
+        logger.info('tests parameter has to be in input data');
         valid = false;
     }
 

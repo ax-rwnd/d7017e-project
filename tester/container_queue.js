@@ -33,11 +33,6 @@ function init(d) {
 }
 
 function queueRequest(body, res) {
-    if(config.docker.LANGS.indexOf(body.lang) == -1) {
-        res.sendStatus(501);
-        return;
-    }
-
     if(getTotalLength() < config.manager.MAX_QUEUE_SIZE) {
         queue[body.lang].push([body, res]);
     } else {
