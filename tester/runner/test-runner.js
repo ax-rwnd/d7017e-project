@@ -32,28 +32,27 @@ async function runTests(request) {
     }
 
     // Run mandatory IO tests
+    let testsPassed = true;
     if (!request.tests.hasOwnProperty('io')) {
         request.tests.io = [];
     }
     for (const test of request.tests.io) {
-        try {
-            let output = await validateAndRun(executable, test, langModule);
-            if (output.stdout !== test.stdout) {
-                // TODO: tell them what broke our expectations
-                res.results.io.push(new result(test.id, false, output.stderr, output.time));
-            } else {
-                // test succeeded
-                res.results.io.push(new result(test.id, true, output.stderr, output.time));
-            }
-        } catch (e) {
-            // SIGTERM is sent to the child process on timeout
-            if (e.signal == 'SIGTERM') {
-                // TODO: tell them that the failure was from a timeout
-                console.log('Execution timed out on test:', test.id);
-                res.results.io.push(new result(test.id, false, '', undefined));
-            } else {
-                throw e;
-            }
+        let result = await runTest(test, executable, langModule);
+        res.results.io.push(result);
+        if(!result.ok) {
+            testsPassed = false;
+            break;
+        }
+    }
+
+    // Run optional tests if mandatory IO tests passed
+    if(testsPassed) {
+        res.results.optional_tests = [];
+        if (!request.tests.hasOwnProperty('optional_tests')) {
+            request.tests.optional_tests = [];
+        }
+        for (const test of request.optional_tests.io) {
+            res.results.optional_tests.push(await runTest(test, executable, langModule));
         }
     }
 
@@ -68,6 +67,28 @@ async function runTests(request) {
 
     codeFile.removeCallback();
     return res;
+}
+
+async function runTest(test, executable, langModule) {
+    try {
+        let output = await validateAndRun(executable, test, langModule);
+        if (output.stdout !== test.stdout) {
+            // TODO: tell them what broke our expectations
+            return new result(test.id, false, output.stderr, output.time);
+        } else {
+            // test succeeded
+            return new result(test.id, true, output.stderr, output.time);
+        }
+    } catch (e) {
+        // SIGTERM is sent to the child process on timeout
+        if (e.signal == 'SIGTERM') {
+            console.log('Execution timed out on test:', test.id);
+            return new result(test.id, false, 'Test took too long', undefined);
+        } else {
+            return new result(test.id, false, e.message, undefined);
+            //throw e;
+        }
+    }
 }
 
 function validateAndRun(file, test, langModule) {

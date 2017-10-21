@@ -1,1 +1,1 @@
-exports.languages=["python27","python3"];
+exports.languages=['python27', 'python3'];
