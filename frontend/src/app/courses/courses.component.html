@@ -31,8 +31,10 @@
     <p>
       Badges:
     </p>
-    <div *ngFor="let badge of currentCourse.rewards.badges" class="badge fillBadge">
-      <span class="glyphicon customGlyph" [ngClass]="{'glyphicon-star': badge == 'star', 'glyphicon-wrench': badge == 'wrench', 'glyphicon-flash': badge == 'flash'}"></span>
+    <div *ngFor="let badge of currentCourse.rewards.badges" class="fillBadge">
+      <!--<span class="glyphicon customGlyph" [ngClass]="{'glyphicon-star': badge == 'star', 'glyphicon-wrench': badge == 'wrench', 'glyphicon-flash': badge == 'flash'}"></span>
+      -->
+      <img src="../../assets/images/{{badge}}.png">
     </div>
   </div>
 

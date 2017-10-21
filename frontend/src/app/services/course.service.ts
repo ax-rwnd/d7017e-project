@@ -12,7 +12,7 @@ export class CourseService {
     let lbEntry4 = {name: 'anonymous', score: 67};
     let lbEntry5 = {name: 'anonymous', score: 65};
     let leaderboard = [lbEntry1, lbEntry2, lbEntry3, lbEntry4, lbEntry5];
-    const rewards1 = newRewards(50, 70, ['flash', 'wrench'], leaderboard);
+    const rewards1 = newRewards(50, 70, ['silver_medal_badge', 'bronze_trophy_badge'], leaderboard);
     const course0 = newCourse('Introduktion till programmering', 'D0009E', 'Course info', rewards1);
     lbEntry1 = {name: 'anonymous', score: 200};
     lbEntry2 = {name: 'anonymous', score: 190};
@@ -20,11 +20,11 @@ export class CourseService {
     lbEntry4 = {name: 'anonymous', score: 178};
     lbEntry5 = {name: 'anonymous', score: 165};
     leaderboard = [lbEntry1, lbEntry2, lbEntry3, lbEntry4, lbEntry5];
-    const rewards2 = newRewards(90, 180, ['flash', 'star'], leaderboard);
+    const rewards2 = newRewards(90, 180, ['bronze_medal_badge', 'silver_trophy_badge'], leaderboard);
     const course1 = newCourse('Course name 2', 'D0010E', 'Course info', rewards2);
     const rewards3 = newRewards(40, 50, false, false);
     const course2 = newCourse('Course name 3', 'D0011E', 'Course info', rewards3);
-    const rewards4 = newRewards(false, false, ['flash', 'star', 'wrench'], false);
+    const rewards4 = newRewards(false, false, ['gold_medal_badge', 'gold_trophy_badge', 'computer_badge'], false);
     const course3 = newCourse('Course name 4', 'D0012E', 'Course info', rewards4);
     this.courses[0] = course0;
     this.courses[1] = course1;
