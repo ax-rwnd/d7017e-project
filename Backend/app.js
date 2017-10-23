@@ -4,6 +4,7 @@ var bodyParser = require('body-parser');
 var passport = require('passport'); //authentication
 var cors = require('cors');
 var config = require('config');
+// var ejwt = require('express-jwt');
 
 
 var app = express();
@@ -30,6 +31,9 @@ app.use(cors({origin: '*'}));
 var api = express.Router();
 require('./routes/API')(api);
 app.use('/api', api);
+
+// require JWT validation
+// app.use(ejwt({ secret: 'supersecret', credentialsRequired: true}).unless({path: ['/api/login/ltu']}));
 
 //Route not found.
 app.use(function(req, res, next) {

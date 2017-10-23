@@ -1,14 +1,11 @@
 var Assignment = require('../models/schemas').Assignment;
 var Test = require('../models/schemas').Test;
-
 var request = require('request');
-
 var queries = require('../lib/queries');
-
 var passport = require('passport');
 var CasStrategy = require('passport-cas').Strategy;
-
 var errors = require('../lib/errors.js');
+var jwt = require('jsonwebtoken');
 
 const TESTER_IP = 'http://130.240.5.118:9100'
 
@@ -112,13 +109,14 @@ router.post('/tester', function (req, res) {
  * /login/ Endpoings
  */
 
-passport.use(new (require('passport-cas').Strategy)({    
-    ssoBaseURL: 'https://weblogon.ltu.se/cas/login',
-    serverBaseURL: '127.0.0.1:8000/api/callback'
-    }, function(login, done) {
-        console.log("passport.use");
-        var login = profile.user;
-        console.log(login);
+passport.use(new (require('passport-cas').Strategy)({ 
+    version: 'CAS3.0',   
+    ssoBaseURL: 'https://weblogon.ltu.se/cas',
+    serverBaseURL: 'http://127.0.0.1:8000'
+    }, function(profile, done) {
+        var user = profile.user;
+        console.log(profile);
+        return done(null, user);
         // User.findOne({login: login}, function (err, user) {
         //     if (err) {
         //       return done(err);
@@ -131,39 +129,11 @@ passport.use(new (require('passport-cas').Strategy)({
         // });
 }));
 
-router.get('/login/ltu', passport.authenticate('cas', function (err, user, info) {
-
-        console.log("Callback in authenticate");
-   /*     if (err) {
-            console.log("err");
-            return res.send("Err");
-        }
-
-        if (!user) {
-            req.session.messages = info.message;
-            console.log("!user");
-            return res.send("!user");
-        }
-
-        req.logIn(user, function (err) {
-        if (err) {
-            console.log("err");
-            return res.send("err");
-        }
-
-        req.session.messages = '';
-        console.log("Success?");
-        return res.send("Success?");
-        });
-    */
-    }), function(req, res) {
-        console.log("Hej");
-        res.send("Hej");
-});
-
-router.get('/callback', function(req, res) {
-    console.log("CALLBACK");
-    res.send("CALLBACK");
+router.get('/login/ltu', passport.authenticate('cas', {session: false}), function (req, res) {
+    var token = jwt.sign({
+        user: req.user
+    }, 'supersecret', { expiresIn: '1h' });
+    res.json({ token: token});
 });
 
 
@@ -176,7 +146,7 @@ router.get('/users', function (req, res) {
         res.sendStatus(404);
         return
     }
-    res.send("/users?ids=" + ids + " GET Endpoint");
+    res.send("/users?ids=" + ids + " GET Endpoint " + req.user);
 });
 
 router.get('/users/:user_id', function (req, res) {
