@@ -12,7 +12,7 @@
     "cors": "^2.8.4",
     "debug": "~2.2.0",
     "express": "^4.16.1",
-    "express-jwt": "^5.3.0",
+    "express-jwt-token": "^0.1.5",
     "forever": "~0.15.3",
     "jsonwebtoken": "^8.1.0",
     "mongoose": "^4.12.1",

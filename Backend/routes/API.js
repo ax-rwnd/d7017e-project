@@ -6,6 +6,7 @@ var passport = require('passport');
 var CasStrategy = require('passport-cas').Strategy;
 var errors = require('../lib/errors.js');
 var jwt = require('jsonwebtoken');
+var auth = require('express-jwt-token');
 
 const TESTER_IP = 'http://130.240.5.118:9100'
 
@@ -106,17 +107,16 @@ router.post('/tester', function (req, res) {
 });*/
 
 /*
- * /login/ Endpoings
+ * /login/ Endpoints
  */
 
 passport.use(new (require('passport-cas').Strategy)({ 
     version: 'CAS3.0',   
     ssoBaseURL: 'https://weblogon.ltu.se/cas',
     serverBaseURL: 'http://127.0.0.1:8000'
-    }, function(profile, done) {
-        var user = profile.user;
+    }, function (profile, done) {
         console.log(profile);
-        return done(null, user);
+        return done(null, profile);
         // User.findOne({login: login}, function (err, user) {
         //     if (err) {
         //       return done(err);
@@ -130,12 +130,19 @@ passport.use(new (require('passport-cas').Strategy)({
 }));
 
 router.get('/login/ltu', passport.authenticate('cas', {session: false}), function (req, res) {
-    var token = jwt.sign({
-        user: req.user
+    var token; // the JWT API key
+    token = jwt.sign({
+        name: req.user.user,
+        roles: req.user.attributes.affiliation
     }, 'supersecret', { expiresIn: '1h' });
-    res.json({ token: token});
+    
+    res.json({ api_key: token });
 });
 
+/*
+ * Require JWT authorization for all routes below
+ */
+router.all('*', auth.jwtAuthProtected);
 
 /*
  * /users/ Endpoints
@@ -146,7 +153,7 @@ router.get('/users', function (req, res) {
         res.sendStatus(404);
         return
     }
-    res.send("/users?ids=" + ids + " GET Endpoint " + req.user);
+    res.send("/users?ids=" + ids + " GET Endpoint " + req.user.name + " " + req.user.roles);
 });
 
 router.get('/users/:user_id', function (req, res) {
