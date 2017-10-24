@@ -4,6 +4,7 @@ var bodyParser = require('body-parser');
 var passport = require('passport'); //authentication
 var cors = require('cors');
 var config = require('config');
+// var ejwt = require('express-jwt');
 
 
 var app = express();
@@ -12,9 +13,7 @@ var app = express();
 function initApp() {
     var dbConfig = config.get('Mongo.dbConfig'); //Get mongo database config
     console.log("Server running in "+app.get('env')+" mode.");
-    mongoose.connect(dbConfig.host+":"+dbConfig.port, { // Connect to development- or production database
-        useMongoClient: true //To get rid if depricationWarning for 'open() should be openURI()'
-    }); 
+    mongoose.connect(dbConfig.host+":"+dbConfig.port); // Connect to development- or production database); 
 }
 
 initApp();
@@ -31,6 +30,9 @@ var api = express.Router();
 require('./routes/API')(api);
 require('./routes/test_routes')(api);
 app.use('/api', api);
+
+// require JWT validation
+// app.use(ejwt({ secret: 'supersecret', credentialsRequired: true}).unless({path: ['/api/login/ltu']}));
 
 //Route not found.
 app.use(function(req, res, next) {

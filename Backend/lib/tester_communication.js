@@ -10,7 +10,7 @@ function validateCode(lang, code, assignment_id, res) {
 
     //Get tests from our database
     queries.getTestsFromAssignment(assignment_id, function(tests) {
-        console.log("hejasad")
+        //console.log("hejasad")
         testsNewFormat = []     //this will hold the tests in the format accepted by Tester.
 
         //The tests needs to match the format used by Tester.
