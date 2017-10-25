@@ -12,7 +12,7 @@
           <div [routerLink]="['/courses', course.code]" class="info">
             <h2 class="title">{{ course.code }}</h2>
             <p class="desc">{{ course.name }}</p>
-            <div *ngIf="course.rewards.progress != false" class="progress progress-margin">
+            <div *ngIf="course.rewards.progress !== false" class="progress progress-margin">
               <div class="progress-bar" role="progressbar" [attr.aria-valuenow]="course.rewards.progress" aria-valuemin="0" aria-valuemax ="100"
                    [style.width]="course.rewards.progress + '%'">
               </div>

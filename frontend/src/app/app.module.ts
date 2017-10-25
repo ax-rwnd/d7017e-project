@@ -7,6 +7,7 @@ import { AlertModule } from 'ngx-bootstrap';
 import { ButtonsModule } from 'ngx-bootstrap';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { CollapseModule } from 'ngx-bootstrap/collapse';
+import { ModalModule } from 'ngx-bootstrap';
 
 import { CodemirrorModule } from 'ng2-codemirror';
 
@@ -61,6 +62,7 @@ const appRoutes: Routes = [
     BsDropdownModule.forRoot(),
     CollapseModule.forRoot(),
     HttpClientModule,
+    ModalModule.forRoot(),
     RouterModule.forRoot(
       appRoutes
     )
@@ -70,7 +72,7 @@ const appRoutes: Routes = [
     BackendService,
     RewardService,
     UserService,
-    CourseService
+    CourseService,
   ],
   bootstrap: [AppComponent]
 })

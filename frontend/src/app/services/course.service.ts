@@ -13,7 +13,7 @@ export class CourseService {
     let lbEntry5 = {name: 'anonymous', score: 65};
     let leaderboard = [lbEntry1, lbEntry2, lbEntry3, lbEntry4, lbEntry5];
     const rewards1 = newRewards(50, 70, ['silver_medal_badge', 'bronze_trophy_badge'], leaderboard);
-    const course0 = newCourse('Introduktion till programmering', 'D0009E', 'Course info', rewards1);
+    const course0 = newCourse('Introduction to programming', 'D0009E', 'Course info', rewards1);
     lbEntry1 = {name: 'anonymous', score: 200};
     lbEntry2 = {name: 'anonymous', score: 190};
     lbEntry3 = {name: 'you', score: 180};
@@ -30,6 +30,14 @@ export class CourseService {
     this.courses[1] = course1;
     this.courses[2] = course2;
     this.courses[3] = course3;
+  }
+  CreateCourse(name, code, course_info, progress, score, badges, leaderboard) {
+    const progValue = progress ? 0 : false;
+    const scoreValue = score ? 0 : false;
+    const badgesArr = badges ? [] : false;
+    const lbArr = leaderboard ? [{name: 'anonymous', score: 20}, {name: 'anonymous', score: 10}, {name: 'you', score: 10},
+        {name: 'anonymous', score: 0}, {name: 'anonymous', score: 0}] : false;
+    this.courses[this.courses.length] = newCourse(name, code, course_info, newRewards(progValue, scoreValue, badgesArr, lbArr));
   }
   GetCourse(courseCode) {
     for (let i = 0; i < this.courses.length; i++) {
