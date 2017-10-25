@@ -1,0 +1,30 @@
+Frontend logga in via Cas. Får tillbaka Cas token.
+
+Skickar CAs token via route /Auth/Login
+
+Backend tar emot Cas token. Skickar Cas token till Cas för verifiering.
+
+Om verifierad Gör API Token (Json web token) Returnera till frontend.
+
+
+Vid anrop till API. API token i Authorization header. 
+
+(Refresh token 24h)
+Api token 1h
+
+
+(Logout funktion?)
+
+
+
+Route login
+
+Passport strategi
+
+Cas validering
+
+Json web token
+
+return webb token på vettigt sätt.
+
+
