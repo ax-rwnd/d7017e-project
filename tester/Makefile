@@ -4,13 +4,13 @@ PORT=8080
 
 CONFIGFILE="./config/languages.js"
 space=$(empty) $(empty)
-sub=\",\"
+sub=','
 
 .DEFAULT_GOAL := all
 
-all: python27 python3
+all: python27 python3 java
 	# Generate list of supported languages
-	echo "exports.languages=[\"$(subst $(space),$(sub),$^)\"];" > $(CONFIGFILE);
+	echo "exports.languages=['$(subst $(space),$(sub),$^)'];" > $(CONFIGFILE);
 
 pre:
 	# Set image environment
@@ -85,6 +85,19 @@ java:
 
 	# Java specific code
 	echo "RUN apk --update add openjdk8-jre">>"$(DOCKERFILE)"
+	echo "RUN rm -rf /var/cache/apk/*">>"$(DOCKERFILE)"
+
+	# Add language specific file and build image
+	make post DOCKERFILE=$(DOCKERFILE) LANG=$(LANG)
+
+haskell:
+	$(eval LANG="haskell")
+	$(eval DOCKERFILE="Dockerfile_Haskell")
+
+	make pre DOCKERFILE=$(DOCKERFILE)
+
+	# Haskell specific code
+	echo "RUN apk --update add ghc">>"$(DOCKERFILE)"
 	echo "RUN rm -rf /var/cache/apk/*">>"$(DOCKERFILE)"
 
 	# Add language specific file and build image

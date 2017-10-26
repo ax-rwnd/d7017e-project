@@ -22,7 +22,16 @@ async function runTests(request) {
 
     let res = {results: {io: []}};
     let langModule = resolveLanguage(request.lang);
-    let executable = langModule.prepare(codeFile.name);
+
+    //Prepare should return a list of two objects, the first being the filepath to an executable, the second being compiler/other errors.
+    let preparation = await langModule.prepare(codeFile.name);
+    let executable = preparation[0];
+    res.results.prepare = preparation[1];
+
+    //If there was a prepare error, stop here
+    if (res.results.prepare != '') {
+        return res;
+    }
 
     // Measure code size
     if (typeof(request.code) === 'string') {
@@ -121,7 +130,8 @@ function resolveLanguage(lang) {
         throw new Error('lang `' + lang + '`is not supported');
     }
     if (!langModule.hasOwnProperty('prepare')) {
-        langModule.prepare = (file) => {return file;};
+        let error = '';
+        langModule.prepare = (file) => {return [file, error];};
     }
     if (!langModule.hasOwnProperty('lint')) {
         langModule.lint = (file) => {return '';};
