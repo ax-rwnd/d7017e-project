@@ -8,7 +8,7 @@ sub=','
 
 .DEFAULT_GOAL := all
 
-all: python27 python3 java #haskell
+all: python27 python3 java c #haskell
 	# Generate list of supported languages
 	echo "exports.languages=['$(subst $(space),$(sub),$^)'];" > $(CONFIGFILE);
 
@@ -98,6 +98,19 @@ haskell:
 
 	# Haskell specific code
 	echo "RUN apk --update add ghc">>"$(DOCKERFILE)"
+	echo "RUN rm -rf /var/cache/apk/*">>"$(DOCKERFILE)"
+
+	# Add language specific file and build image
+	make post DOCKERFILE=$(DOCKERFILE) LANG=$(LANG)
+
+c:
+	$(eval LANG="c")
+	$(eval DOCKERFILE="Dockerfile_C")
+
+	make pre DOCKERFILE=$(DOCKERFILE)
+
+	# Haskell specific code
+	echo "RUN apk --update add gcc">>"$(DOCKERFILE)"
 	echo "RUN rm -rf /var/cache/apk/*">>"$(DOCKERFILE)"
 
 	# Add language specific file and build image
