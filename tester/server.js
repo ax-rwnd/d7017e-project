@@ -3,12 +3,8 @@
 
 // Configure and define winston logger
 var logger = require('./log.js');
-
 var express = require('express');
-var execFile = require('child_process').execFile;
-var uuidv4 = require('uuid/v4');
-var http = require('http');
-
+var bodyParser = require('body-parser');
 var config = require('config');
 var manager = require('./manager.js');
 
@@ -73,7 +69,9 @@ function formatContainer(lang, container) {
     return s;
 }
 
-const app = express();
+var app = express();
+//app.use(bodyParser.json({ limit: '5mb' }));
+
 app.get('/', (req, res) => {
 	// Presents the user with a stat page that details which containers
 	// are running.
@@ -126,18 +124,23 @@ process.on('SIGINT', function() {
     if(!exitMessage) {
         exitMessage = true;
 
+        logger.info('Stopped express. No more requests can be made.');
         server.close();
 
         logger.info("Empty container queue...");
         manager.emptyQueue();
 
+        logger.info('Waiting for half-started containers to prevent dangling containers...');
 
-        logger.info('Stopping all running containers... Shutting down shortly...');
+
         var cb = function() {
             logger.info('Containers stopped. Good bye');
             process.exit();
         };
-        manager.stopContainers(cb);
+        setTimeout(function () {
+            logger.info('Stopping all running containers... Shutting down shortly...');
+            manager.stopContainers(cb);
+        }, 5000);
     }
 });
 

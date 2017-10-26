@@ -13,6 +13,9 @@ module.exports = {
         MAX_CONTAINERS_PER_LANG : 6,
         MAX_GLOBAL_CONTAINERS : 8,
         START_PORT : 16000,
-        IDLE_TIMEOUT : 10000
+        IDLE_TIMEOUT : 10000,
+        CONTAINER_MEMORY: 100000000, // bytes
+        CONTAINER_CPU_PERIOD: 100000,
+        CONTAINER_CPU_QUOTA: 50000 // quota/period = 50% cpu
     }
 };

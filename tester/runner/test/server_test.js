@@ -41,6 +41,7 @@ describe('testing server for runner', function() {
                     {id: 0, ok: true, stderr: 'debug\n'},
                     {id: 1, ok: false, stderr: 'debug\n'}
                 ],
+                prepare: '',
                 code_size: 64,
                 lint: ''
             }

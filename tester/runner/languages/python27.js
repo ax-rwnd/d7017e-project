@@ -26,3 +26,4 @@ function lint(file) {
 }
 
 exports.run = run;
+exports.lint = lint;
