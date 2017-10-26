@@ -110,8 +110,7 @@ c:
 	make pre DOCKERFILE=$(DOCKERFILE)
 
 	# Haskell specific code
-	echo "RUN apk --update add gcc">>"$(DOCKERFILE)"
-	echo "RUN rm -rf /var/cache/apk/*">>"$(DOCKERFILE)"
+	echo "RUN apk --no-cache  add gcc musl-dev">>"$(DOCKERFILE)"
 
 	# Add language specific file and build image
 	make post DOCKERFILE=$(DOCKERFILE) LANG=$(LANG)
