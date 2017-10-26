@@ -3,8 +3,9 @@ import { Injectable } from '@angular/core';
 
 @Injectable()
 export class CourseService {
-  courses = [];
+  courses: Course[];
   constructor() {
+    this.courses = [];
     /***hardcoded info later gotten from database***/
     let lbEntry1 = {name: 'anonymous', score: 80};
     let lbEntry2 = {name: 'anonymous', score: 76};
@@ -37,7 +38,7 @@ export class CourseService {
     const badgesArr = badges ? [] : false;
     const lbArr = leaderboard ? [{name: 'anonymous', score: 20}, {name: 'anonymous', score: 10}, {name: 'you', score: 10},
         {name: 'anonymous', score: 0}, {name: 'anonymous', score: 0}] : false;
-    this.courses[this.courses.length] = newCourse(name, code, course_info, newRewards(progValue, scoreValue, badgesArr, lbArr));
+    return newCourse(name, code, course_info, newRewards(progValue, scoreValue, badgesArr, lbArr));
   }
   GetCourse(courseCode) {
     for (let i = 0; i < this.courses.length; i++) {
@@ -46,7 +47,13 @@ export class CourseService {
       }
     }
   }
+  AddCourse(course) {
+    this.courses[this.courses.length] = course;
+  }
+
 }
+
+
 
 function newCourse(name, code, course_info, rewards) {
   return {
@@ -64,4 +71,18 @@ function newRewards(progress, score, badges, leaderboard) {
     badges: badges,
     leaderboard: leaderboard
   };
+}
+
+interface Course {
+  name: string;
+  code: string;
+  course_info: string;
+  rewards: Rewards;
+}
+
+interface Rewards {
+  progress: any;
+  score: any;
+  badges: any;
+  leaderboard: any;
 }

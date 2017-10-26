@@ -50,7 +50,8 @@ export class UserComponent implements OnInit {
     const score = form.value.score === '' ? false : form.value.score;
     const badges = form.value.badges === '' ? false : form.value.badges;
     const leaderboard = form.value.leaderboard === '' ? false : form.value.leaderboard;
-    this.courseService.CreateCourse(form.value.name, form.value.code, form.value.info, progress, score, badges, leaderboard);
+    const course = this.courseService.CreateCourse(form.value.name, form.value.code, form.value.info, progress, score, badges, leaderboard);
+    this.courseService.AddCourse(course);
   }
 
 }
