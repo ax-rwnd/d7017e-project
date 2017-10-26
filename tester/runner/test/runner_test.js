@@ -138,6 +138,7 @@ describe('testing runner', () => {
 
     }).timeout(10000);
 
+    /*
     it('run haskell tests', (done) => {
         const req = {
             'lang':'haskell',
@@ -185,4 +186,5 @@ describe('testing runner', () => {
         });
 
     }).timeout(10000);
+    */
 });
