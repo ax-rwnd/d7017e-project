@@ -1,6 +1,7 @@
-var assert = require('assert');
-var docker = require('../docker.js');
-var { startRunner } = require('./run-container.js');
+const assert = require('assert');
+const docker = require('../docker.js');
+const request = require('request');
+const { startRunner } = require('./run-container.js');
 
 describe('tests docker integration', function() {
     it('gets from uninitialized docker', function(done) {
