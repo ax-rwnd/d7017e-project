@@ -15,7 +15,7 @@ var assignmentSchema = new Schema({
 });
 
 var courseSchema = new Schema({
-    name: {type: String, required: true}
+    name: {type: String, required: true},
     description: {type: String, required: true}
     //TDOD: More fields
 });
@@ -23,7 +23,7 @@ var courseSchema = new Schema({
 var userSchema = new Schema({
 	username: {type: String, required: true},
     email: {type: String, required: true},
-    admin: {type: boolean, required: true}
+    admin: {type: Boolean, required: true},
     courses: [{ type: Schema.Types.ObjectId, ref: 'Course', required: true }]
 });
 
