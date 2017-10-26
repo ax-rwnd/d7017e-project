@@ -42,19 +42,18 @@ describe('language tests', function() {
                 url: 'http://' + container.extra.address + '/',
                 headers: {'Content-Type': 'application/json'},
                 json: req
-            }, (error, response, expected) => {
-                console.log(response);
+            }, (error, response, body) => {
                 if(error) {
                     throw error;
                 }
 
-                response.results.io.forEach(iores => {
+                body.resp.results.io.forEach(iores => {
                     // just test that the type is correct since the time varies
                     assert.equal(typeof(iores.time), 'number');
                     // delete it so it's not checked later
                     delete iores.time;
                 });
-                assert.equal(JSON.stringify(response.results), JSON.stringify(expected.results));
+                assert.equal(JSON.stringify(expected.results), JSON.stringify(body.resp.results));
                 container.stop();
                 done();
             });
