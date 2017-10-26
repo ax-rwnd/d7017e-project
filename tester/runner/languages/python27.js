@@ -1,8 +1,11 @@
 const { execFile } = require('child_process');
+const config = require('config');
+
+const uid = config.get('uid');
 
 function run(file, test, timeout) {
     return new Promise((resolve, reject) => {
-        const child = execFile('python', [file].concat(test.args), {timeout: timeout}, (err, stdout, stderr) => {
+        const child = execFile('python', [file].concat(test.args), {uid: uid, timeout: timeout}, (err, stdout, stderr) => {
             if (err) {
                 reject(err);
             }
@@ -15,7 +18,7 @@ function run(file, test, timeout) {
 
 function lint(file) {
     return new Promise((resolve, reject) => {
-        const child = execFile('flake8', [file], (err, stdout, stderr) => {
+        const child = execFile('flake8', [file], {uid: uid}, (err, stdout, stderr) => {
             if (err && err.code !== 1) {
                 reject(err);
             }
@@ -26,3 +29,4 @@ function lint(file) {
 }
 
 exports.run = run;
+exports.lint = lint;

@@ -8,6 +8,7 @@ const container_queue = require('./container_queue.js');
 var config = require('config');
 
 container_queue.init(docker);
+docker.init();
 
 function newRequest(req, res) {
     // Handle request from network interface
@@ -88,8 +89,10 @@ function isValidInput(input) {
         valid = false;
     } else {
         // Check so langauge actually is supported by the system
-        if('lang' in input && config.get('docker.LANGS').indexOf(input.lang) == -1) {
-            logger.info('Langauge actually is not supported by the system. Got:', input.lang);
+        if('lang' in input &&
+                config.get('docker.LANGS').indexOf(input.lang) == -1) {
+            logger.info('Langauge actually is not supported by the system.',
+                'Got:', input.lang);
             valid = false;
         }
     }

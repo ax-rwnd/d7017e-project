@@ -9,6 +9,7 @@
   },
   "author": "",
   "dependencies": {
+    "config": "^1.27.0",
     "require-dir": "^0.3.2",
     "supertest": "^3.0.0",
     "tmp": "0.0.33"
