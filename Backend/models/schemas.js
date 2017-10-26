@@ -10,7 +10,7 @@ var testSchema = new Schema({
 });
 
 var assignmentSchema = new Schema({
-	assignmentName: {type: String, required: false},
+    assignmentName: {type: String, required: false},
     tests: [{ type: Schema.Types.ObjectId, ref: 'Test', required: true }]
 });
 
@@ -21,10 +21,9 @@ var userSchema = new Schema({
     courses: [{ type: Schema.Types.ObjectId, ref: 'Course', required: true }]
 });
 
-////
 var Test = mongoose.model('Test', testSchema);
 var Assignment = mongoose.model('Assignment', assignmentSchema);
 var User = mongoose.model('User', userSchema);
-var Models = {Assignment: Assignment, Test: Test, User: User};
+var models = {Assignment: Assignment, Test: Test, User: User};
 
-module.exports = Models;
+module.exports = models;

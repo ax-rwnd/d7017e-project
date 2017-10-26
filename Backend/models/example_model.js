@@ -1,4 +1,4 @@
-var mongoose = require('mongoose');
+/*var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var assignmentSchema = new Schema({
@@ -17,4 +17,4 @@ var Assignment = mongoose.model('Assignment', assignmentSchema);
 var Tests = mongoose.model('Tests', testsSchema);
 var Models = {Assignment: Assignment, Tests: Tests};
 
-module.exports = Models;
+module.exports = models;*/
