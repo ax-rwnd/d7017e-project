@@ -137,4 +137,52 @@ describe('testing runner', () => {
         });
 
     }).timeout(10000);
+
+    it('run haskell tests', (done) => {
+        const req = {
+            'lang':'haskell',
+            'code':'import System.Environment\nmain = do\n[a,b]<-getArgs\nputStrLn(a)',
+            'tests': {
+                'io': [
+                    {'stdin': '', 'args': ['Hello World','b'], 'stdout': 'Hello World\n', 'id': 0},
+                    {'stdin': '', 'args': ['Bad','Test'], 'stdout' :'bad test\n', 'id': 1}
+                ],
+                'lint': false
+            },
+            'optional_tests': []
+        };
+
+        const resp = {
+            results: {
+                io: [
+                    {id: 0, ok: true, stderr: ''},
+                    {id: 1, ok: false, stderr: ''}
+                ],
+                prepare: '',
+                code_size: 62,
+            }
+        };
+
+        var promise = new Promise(function(resolve, reject) {
+            setTimeout(() => {
+                resolve(runner.runTests(req));
+            }, 2000);
+        });
+
+        promise.then((result) => {
+            try {
+                result.results.io.forEach(iores => {
+                    // just test that the type is correct since the time varies
+                    assert.equal(typeof(iores.time), 'number');
+                    // delete it so it's not checked later
+                    delete iores.time;
+                });
+                assert.equal(JSON.stringify(result.results), JSON.stringify(resp.results));
+                done();
+            } catch (err) {
+                done(err);
+            }
+        });
+
+    }).timeout(10000);
 });
