@@ -14,6 +14,12 @@ var assignmentSchema = new Schema({
     tests: [{ type: Schema.Types.ObjectId, ref: 'Test', required: true }]
 });
 
+var courseSchema = new Schema({
+    name: {type: String, required: true}
+    description: {type: String, required: true}
+    //TDOD: More fields
+});
+
 var userSchema = new Schema({
 	username: {type: String, required: true},
     email: {type: String, required: true},
@@ -23,7 +29,8 @@ var userSchema = new Schema({
 
 var Test = mongoose.model('Test', testSchema);
 var Assignment = mongoose.model('Assignment', assignmentSchema);
+var Course = mongoose.model('Course', courseSchema);
 var User = mongoose.model('User', userSchema);
-var models = {Assignment: Assignment, Test: Test, User: User};
+var models = {Assignment: Assignment, Test: Test, User: User, Course: Course};
 
 module.exports = models;
