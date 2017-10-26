@@ -16,8 +16,30 @@ var assignmentSchema = new Schema({
 
 var courseSchema = new Schema({
     name: {type: String, required: true},
-    description: {type: String, required: true}
-    //TDOD: More fields
+    description: {type: String, required: true},
+    teachers: [{ type: Schema.Types.ObjectId, ref: 'User', required: true }],
+    students: [{ type: Schema.Types.ObjectId, ref: 'User', required: false }],
+    assignments: [{
+        name: {type: String, required: true},
+        description: String,
+        tests: {
+            io: [{
+                stdout: {type: String, required: true},
+                stdin: String,
+                args: [String]
+            }],
+            lint: Boolean
+        },
+        optional_tests: {
+            io: [{
+                stdout: {type: String, required: true},
+                stdin: String,
+                args: [String]
+            }],
+            lint: Boolean
+        },
+        languages: [String]
+    }]
 });
 
 var userSchema = new Schema({
