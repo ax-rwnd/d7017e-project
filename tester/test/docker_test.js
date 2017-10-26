@@ -14,7 +14,7 @@ describe('language tests', function() {
     it('python27 test', function(done) {
         const req = {
             'lang':'python27',
-            'code':'import sys\nprint("hello world")\nsyas.stderr.write("debug\\n")\n',
+            'code':'import sys\nprint("hello world")\nsys.stderr.write("debug\\n")\n',
             'tests': {
                 'io': [
                     {'stdin': '', 'stdout': 'hello world\n', 'id': 0},
