@@ -28,7 +28,7 @@ function prepare(file) {
         }
     });
     return new Promise((resolve, reject) => {
-        execFile('javac', [newfile], (err, stdout, stderr) => {
+        execFile('javac', [newfile], {uid: uid}, (err, stdout, stderr) => {
             if (err && err.code !== 1) {
                 reject(err);
             }

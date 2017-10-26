@@ -1,9 +1,11 @@
 const { execFile } = require('child_process');
 const fs = require('fs');
 
+const uid = config.get('uid');
+
 function run(file, test, timeout) {
     return new Promise((resolve, reject) => {
-        const child = execFile(file, test.args, {timeout: timeout}, (err, stdout, stderr) => {
+        const child = execFile(file, test.args, {uid: uid, timeout: timeout}, (err, stdout, stderr) => {
             if (err) {
                 reject(err);
                 return;
@@ -25,7 +27,7 @@ function prepare(file) {
         }
     });
     return new Promise((resolve, reject) => {
-        execFile('gcc', args, (err, stdout, stderr) => {
+        execFile('gcc', args, {uid: uid}, (err, stdout, stderr) => {
             if (err && err.code !== 1) {
                 reject(err);
             }
