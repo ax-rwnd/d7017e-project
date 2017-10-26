@@ -92,7 +92,7 @@ async function runTest(test, executable, langModule) {
         // SIGTERM is sent to the child process on timeout
         if (e.signal == 'SIGTERM') {
             console.log('Execution timed out on test:', test.id);
-            return new result(test.id, false, 'Test took too long', undefined);
+            return new result(test.id, false, 'Your test was aborted', undefined);
         } else {
             return new result(test.id, false, e.message, undefined);
             //throw e;

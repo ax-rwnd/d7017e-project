@@ -22,11 +22,12 @@ function init(d) {
                 while(queue[lang].length > 0) {
                     var container = docker.getContainer(lang);
                     var queueItem = queue[lang].shift(); // return [body, res]
-                    manager.handleRequest(container, queueItem[0], queueItem[1]);
+                    manager.handleRequest(container,
+                        queueItem[0], queueItem[1]);
                 }
             } catch (e) {
                 // Uncomment if you want wall of text. Mini matrix!
-                //console.error(e);
+                //logger.error(e);
             }
         });
     }, 250);
@@ -54,6 +55,9 @@ function getLengthForLanguage(lang) {
 
 function emptyQueue() {
     config.docker.LANGS.forEach(function(lang) {
+        for (var i = 0; i < queue[lang].length; i++) {
+            queue[lang][i][1].sendStatus(503);
+        }
         queue[lang] = [];
     });
 }
