@@ -20,36 +20,36 @@
       <span aria-hidden="true">&times;</span>
     </button>
   </div>
-  <form #f="ngForm" (ngSubmit)="createCourse(f)" novalidate>
+  <form (ngSubmit)="createCourse()" [formGroup]="form" novalidate>
   <div class="modal-body">
       <div class="form-group">
         <label for="name">Course name</label>
-        <input type="text" class="form-control" id="name" name="name" ngModel required>
+        <input type="text" class="form-control" id="name" formControlName="name" ngModel required>
       </div>
 
       <div class="form-group">
         <label for="code">Course code</label>
-        <input type="text" class="form-control" id="code" name="code" ngModel required>
+        <input type="text" class="form-control" id="code" formControlName="code" ngModel required>
       </div>
 
       <div class="form-group">
-        <label for="info">Course info</label>
-        <input type="text" class="form-control" id="info" name="info" ngModel required>
+        <label for="course_info">Course info</label>
+        <input type="text" class="form-control" id="course_info" formControlName="course_info" ngModel required>
       </div>
       <hr>
       <label>Gamification elements</label>
       <div class="form-group">
         <label class="checkbox-inline">
-          <input type="checkbox" name="progress" ngModel> Progress
+          <input type="checkbox" formControlName="progress" ngModel> Progress
         </label>
         <label class="checkbox-inline">
-          <input type="checkbox" name="score" ngModel> Score
+          <input type="checkbox" formControlName="score" ngModel> Score
         </label>
         <label class="checkbox-inline">
-          <input type="checkbox" name="badges" ngModel> Badges
+          <input type="checkbox" formControlName="badges" ngModel> Badges
         </label>
         <label class="checkbox-inline">
-          <input type="checkbox" name="leaderboard" ngModel> Leaderboard
+          <input type="checkbox" formControlName="leaderboard" ngModel> Leaderboard
         </label>
 
       </div>
