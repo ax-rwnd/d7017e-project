@@ -142,8 +142,6 @@ describe('language tests', function() {
             }, (error, response, body) => {
                 if(error) {
                     throw error;
-                } else {
-                    console.log(body);
                 }
 
                 body.resp.results.io.forEach(iores => {
