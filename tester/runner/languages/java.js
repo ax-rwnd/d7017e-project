@@ -21,13 +21,13 @@ function run(file, test, timeout) {
 }
 
 function prepare(file) {
-    let newfile = file.replace(/tmp-.*/,'main.java');
-    fs.copyFileSync(file, newfile, (err) => {
-        if (err) {
-            reject(err);
-        }
-    });
     return new Promise((resolve, reject) => {
+        let newfile = file.replace(/tmp-.*/,'main.java');
+        fs.copyFileSync(file, newfile, (err) => {
+            if (err) {
+                reject(err);
+            }
+        });
         execFile('javac', [newfile], {uid: uid}, (err, stdout, stderr) => {
             if (err && err.code !== 1) {
                 reject(err);

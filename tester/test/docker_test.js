@@ -142,6 +142,8 @@ describe('language tests', function() {
             }, (error, response, body) => {
                 if(error) {
                     throw error;
+                } else {
+                    console.log(body);
                 }
 
                 body.resp.results.io.forEach(iores => {
@@ -160,7 +162,7 @@ describe('language tests', function() {
     it('c test', function(done) {
         const req = {
             'lang':'c',
-            'code':'#include<stdio.h>\nint main(){\nprintf("Hello World");\nfflush(stdout);\nreturn 0;\n}',
+            'code':'#include<stdio.h>\nint main(){\nprintf("Hello World");\nreturn 0;\n}',
             'tests': {
                 'io': [
                     {'stdin': '', 'args': [], 'stdout': 'Hello World', 'id': 0},
@@ -178,7 +180,7 @@ describe('language tests', function() {
                     {id: 1, ok: false, stderr: ''}
                 ],
                 prepare: '',
-                code_size: 80
+                code_size: 64
             }
         };
 
@@ -198,7 +200,7 @@ describe('language tests', function() {
                     // delete it so it's not checked later
                     delete iores.time;
                 });
-                assert.equal(JSON.stringify(expected.results), JSON.stringify(body.resp.results));
+                assert.equal(JSON.stringify(body.resp.results), JSON.stringify(expected.results));
                 container.stop();
                 done();
             });
