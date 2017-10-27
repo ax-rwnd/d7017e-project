@@ -84,8 +84,9 @@ java:
 	make pre DOCKERFILE=$(DOCKERFILE)
 
 	# Java specific code
-	echo "RUN apk --update add openjdk8-jre">>"$(DOCKERFILE)"
-	echo "RUN rm -rf /var/cache/apk/*">>"$(DOCKERFILE)"
+	echo "RUN apk --no-cache add openjdk8">>"$(DOCKERFILE)"
+	echo "ENV JAVA_HOME=/usr/lib/jvm/default-jvm">>"$(DOCKERFILE)"
+	echo 'RUN ln -sf "$${JAVA_HOME}/bin/"* "/usr/bin" ' >>"$(DOCKERFILE)"
 
 	# Add language specific file and build image
 	make post DOCKERFILE=$(DOCKERFILE) LANG=$(LANG)
