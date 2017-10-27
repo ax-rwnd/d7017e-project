@@ -32,10 +32,16 @@ import { HeadService } from './services/head.service';
 import {UserService} from './services/user.service';
 import {CourseService} from './services/course.service';
 
+// AUTH
+import {AuthGuardService as AuthGuard} from './services/Auth/Auth-Guard.service';
+import {AuthGuardService as LoginGuard} from './services/Auth/Login-Guard.service';
+
+import {AuthService} from './services/Auth/Auth.service';
+
 const appRoutes: Routes = [
   { path: '', component: LoginComponent },
   { path: 'courses/:course/assignment', component: AssignmentComponent },
-  { path: 'user', component: UserComponent },
+  { path: 'user', component: UserComponent, canActivate: [AuthGuard]},
   { path: 'courses/:course', component: CoursesComponent }
 ];
 
@@ -73,6 +79,10 @@ const appRoutes: Routes = [
     RewardService,
     UserService,
     CourseService,
+    // AUTHS
+    AuthGuard,
+    LoginGuard,
+    AuthService,
   ],
   bootstrap: [AppComponent]
 })
