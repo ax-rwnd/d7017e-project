@@ -33,29 +33,42 @@ body {
   background-color: #133756;
   border-style: none;
   color: white;
+  transition: background-color 0.5s ease-out;
+  padding: 0.7em;
 }
 
 .btn:hover {
-  color: lightgrey;
+  color: white;
+  background-color: #0f2837;
 }
 
 /* Pills modification */
 .nav-pills > li > a {
   color: white;
+  transition: background-color 0.5s ease-out,
+              margin 0.2s ease-out,
+              border 0.5s ease-out;
+  border-style: solid;
+  border-color: #133756;
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
+  border-right: 0;
 }
 
 .nav-pills > li > a:hover {
-  color: lightgrey;
-  background-color: #133756;
+  color: white;
+  background-color: #0f2837;
+  margin-left: 0.4em;
+  border-style: solid;
+  border-color: #0f2837;
 }
 
 .nav-pills > li.active > a,
 .nav-pills > li.active > a:hover,
 .nav-pills > li.active > a:focus {
-  background-color: white;
-  color: black;
+  background-color: #133756;
+  border-style: solid;
+  border-color: white;
 }
 
 /* navbar Default modifications down below*/
@@ -78,16 +91,29 @@ body {
 /* navbar Link */
 .navbar-default .navbar-nav > li > a {
   color: white;
+  border-style: solid;
+  border-color: #133756;
+  border-top-left-radius: 0.5em;
+  border-top-right-radius: 0.5em;
+  border-bottom: 0;
+  transition: background-color 0.5s ease-out,
+              border 0.5s ease-out,
+              margin 0.2s ease-out;
 }
 .navbar-default .navbar-nav > li > a:hover,
 .navbar-default .navbar-nav > li > a:focus {
-  color: lightgrey;
+  background-color: #0f2837;
+  color: white;
+  border-style: solid;
+  border-color: #0f2837;
 }
 .navbar-default .navbar-nav > .active > a,
 .navbar-default .navbar-nav > .active > a:hover,
 .navbar-default .navbar-nav > .active > a:focus {
-  color: #1d1d1d;
-  background-color: white;
+  color: white;
+  background-color: #133756;
+  border-style: solid;
+  border-color: white;
 }
 .navbar-default .navbar-nav > .open > a,
 .navbar-default .navbar-nav > .open > a:hover,
