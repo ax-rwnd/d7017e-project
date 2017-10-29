@@ -1,6 +1,8 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { HeadComponent } from '../head/head.component';
 import { CodemirrorModule } from 'ng2-codemirror';
+import { AceEditorModule } from 'ng2-ace-editor';
+
 import { FormsModule } from '@angular/forms';
 import { BackendService } from '../services/backend.service';
 import { RewardService} from '../services/reward.service';
@@ -21,7 +23,7 @@ describe('AssignmentComponent', () => {
     TestBed.configureTestingModule({
       declarations: [ AssignmentComponent, HeadComponent ],
       providers: [ BackendService, HeadService, RewardService, HttpClient, HttpHandler, AppComponent, CourseService ],
-      imports: [ CodemirrorModule, FormsModule, RouterTestingModule, BrowserAnimationsModule ]
+      imports: [ AceEditorModule, CodemirrorModule, FormsModule, RouterTestingModule, BrowserAnimationsModule ]
     })
     .compileComponents();
   }));

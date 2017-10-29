@@ -10,6 +10,7 @@ import { CollapseModule } from 'ngx-bootstrap/collapse';
 import { ModalModule } from 'ngx-bootstrap';
 
 import { CodemirrorModule } from 'ng2-codemirror';
+import { AceEditorModule } from 'ng2-ace-editor';
 
 import { AppComponent } from './app.component';
 import { StatisticsComponent } from './statistics/statistics.component';
@@ -64,6 +65,7 @@ const appRoutes: Routes = [
     ReactiveFormsModule,
     BrowserAnimationsModule,
     CodemirrorModule,
+    AceEditorModule,
     AlertModule.forRoot(),
     ButtonsModule.forRoot(),
     BsDropdownModule.forRoot(),

@@ -23,7 +23,10 @@
         "../node_modules/bootstrap/dist/css/bootstrap.css",
         "styles.css"
       ],
-      "scripts": [],
+      "scripts": ["../node_modules/ace-builds/src-min/ace.js",
+        "../node_modules/ace-builds/src-min/theme-eclipse.js",
+        "../node_modules/ace-builds/src-min/theme-monokai.js",
+        "../node_modules/ace-builds/src-min/mode-python.js"],
       "environmentSource": "environments/environment.ts",
       "environments": {
         "dev": "environments/environment.ts",
