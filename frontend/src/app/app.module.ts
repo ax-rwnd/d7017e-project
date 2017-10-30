@@ -11,6 +11,7 @@ import { ModalModule } from 'ngx-bootstrap';
 
 import { CodemirrorModule } from 'ng2-codemirror';
 import { AceEditorModule } from 'ng2-ace-editor';
+import { MarkdownModule } from 'angular2-markdown';
 
 import { AppComponent } from './app.component';
 import { StatisticsComponent } from './statistics/statistics.component';
@@ -66,6 +67,7 @@ const appRoutes: Routes = [
     BrowserAnimationsModule,
     CodemirrorModule,
     AceEditorModule,
+    MarkdownModule.forRoot(),
     AlertModule.forRoot(),
     ButtonsModule.forRoot(),
     BsDropdownModule.forRoot(),
