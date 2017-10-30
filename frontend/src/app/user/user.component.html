@@ -7,9 +7,57 @@
   </h2>
   <p>{{user.id}}</p>
   <br>
+  <button class="btn" (click)="openModal(courseModal)">Create course</button>
   <p><a class="userlinks">Settings</a></p>
   <p><a class="userlinks" (click)="toggleStatistics()">Statistics</a></p>
   <app-statistics *ngIf="statistics"></app-statistics>
 </div>
 
+<ng-template #courseModal>
+  <div class="modal-header">
+    <h4 class="modal-title pull-left">Create course</h4>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <form (ngSubmit)="createCourse()" [formGroup]="form" novalidate>
+  <div class="modal-body">
+      <div class="form-group">
+        <label for="name">Course name</label>
+        <input type="text" class="form-control" id="name" formControlName="name" ngModel required>
+      </div>
+
+      <div class="form-group">
+        <label for="code">Course code</label>
+        <input type="text" class="form-control" id="code" formControlName="code" ngModel required>
+      </div>
+
+      <div class="form-group">
+        <label for="course_info">Course info</label>
+        <input type="text" class="form-control" id="course_info" formControlName="course_info" ngModel required>
+      </div>
+      <hr>
+      <label>Gamification elements</label>
+      <div class="form-group">
+        <label class="checkbox-inline">
+          <input type="checkbox" formControlName="progress" ngModel> Progress
+        </label>
+        <label class="checkbox-inline">
+          <input type="checkbox" formControlName="score" ngModel> Score
+        </label>
+        <label class="checkbox-inline">
+          <input type="checkbox" formControlName="badges" ngModel> Badges
+        </label>
+        <label class="checkbox-inline">
+          <input type="checkbox" formControlName="leaderboard" ngModel> Leaderboard
+        </label>
+
+      </div>
+
+  </div>
+  <div class="modal-footer">
+    <button type="submit" class="btn" (click)="modalRef.hide()">Submit</button>
+  </div>
+  </form>
+</ng-template>
 

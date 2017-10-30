@@ -10,7 +10,7 @@
     This will help you in this moment
     (Fetching ltu course page)
   </p>
-  <div *ngIf="currentCourse.rewards.progress != false">
+  <div *ngIf="currentCourse.rewards.progress !== false">
     <p>
       Progress:
     </p>
@@ -21,13 +21,13 @@
     </div>
   </div>
 
-  <div *ngIf="currentCourse.rewards.score != false">
+  <div *ngIf="currentCourse.rewards.score !== false">
     <p>
       Score: {{currentCourse.rewards.score}}
     </p>
   </div>
 
-  <div *ngIf="currentCourse.rewards.badges != false">
+  <div *ngIf="currentCourse.rewards.badges !== false">
     <p>
       Badges:
     </p>
@@ -38,7 +38,7 @@
     </div>
   </div>
 
-  <div *ngIf="currentCourse.rewards.leaderboard != false">
+  <div *ngIf="currentCourse.rewards.leaderboard !== false">
     <p>
       Leaderboard:
     </p>

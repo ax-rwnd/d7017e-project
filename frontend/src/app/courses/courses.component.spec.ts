@@ -1,6 +1,10 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
+import {async, ComponentFixture, inject, TestBed} from '@angular/core/testing';
+import { HeadComponent } from '../head/head.component';
+import { HeadService } from '../services/head.service';
+import { CourseService } from '../services/course.service';
 import { CoursesComponent } from './courses.component';
+import { RouterTestingModule } from '@angular/router/testing';
+import { AppComponent } from '../app.component';
 
 /*test routeroutlet*/
 
@@ -10,7 +14,9 @@ describe('CoursesComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ CoursesComponent ]
+      declarations: [ CoursesComponent, HeadComponent ],
+      providers: [ HeadService, CourseService, AppComponent ],
+      imports: [ RouterTestingModule ]
     })
     .compileComponents();
   }));
@@ -20,4 +26,11 @@ describe('CoursesComponent', () => {
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
+<<<<<<< HEAD
+=======
+
+  /*it('should create', ()  => {
+    expect(component).toBeTruthy();
+  });*/
+>>>>>>> 8901c285f2c3f06a82bc98b1df82606c6ed84191
 });

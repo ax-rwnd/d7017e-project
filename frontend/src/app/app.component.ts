@@ -16,6 +16,7 @@ class Course {
   { id: 'D1337E'}
 ]*/
 
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -30,7 +31,6 @@ class Course {
   ]
 })
 export class AppComponent implements OnInit {
-  title = 'app';
   sidebarState;
   courses: any;
 

@@ -1,14 +1,16 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 // NG-BOOTSTRAP
 import { AlertModule } from 'ngx-bootstrap';
 import { ButtonsModule } from 'ngx-bootstrap';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { CollapseModule } from 'ngx-bootstrap/collapse';
+import { ModalModule } from 'ngx-bootstrap';
 
 import { CodemirrorModule } from 'ng2-codemirror';
+import { AceEditorModule } from 'ng2-ace-editor';
 
 import { AppComponent } from './app.component';
 import { StatisticsComponent } from './statistics/statistics.component';
@@ -31,10 +33,16 @@ import { HeadService } from './services/head.service';
 import {UserService} from './services/user.service';
 import {CourseService} from './services/course.service';
 
+// AUTH
+import {AuthGuardService as AuthGuard} from './services/Auth/Auth-Guard.service';
+import {AuthGuardService as LoginGuard} from './services/Auth/Login-Guard.service';
+
+import {AuthService} from './services/Auth/Auth.service';
+
 const appRoutes: Routes = [
   { path: '', component: LoginComponent },
   { path: 'courses/:course/assignment', component: AssignmentComponent },
-  { path: 'user', component: UserComponent },
+  { path: 'user', component: UserComponent, canActivate: [AuthGuard]},
   { path: 'courses/:course', component: CoursesComponent }
 ];
 
@@ -54,13 +62,16 @@ const appRoutes: Routes = [
   imports: [
     BrowserModule,
     FormsModule,
+    ReactiveFormsModule,
     BrowserAnimationsModule,
     CodemirrorModule,
+    AceEditorModule,
     AlertModule.forRoot(),
     ButtonsModule.forRoot(),
     BsDropdownModule.forRoot(),
     CollapseModule.forRoot(),
     HttpClientModule,
+    ModalModule.forRoot(),
     RouterModule.forRoot(
       appRoutes
     )
@@ -70,7 +81,11 @@ const appRoutes: Routes = [
     BackendService,
     RewardService,
     UserService,
-    CourseService
+    CourseService,
+    // AUTHS
+    AuthGuard,
+    LoginGuard,
+    AuthService,
   ],
   bootstrap: [AppComponent]
 })

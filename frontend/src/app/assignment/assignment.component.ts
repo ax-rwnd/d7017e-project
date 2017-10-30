@@ -4,6 +4,8 @@ import {BackendService} from '../services/backend.service';
 import {RewardService} from '../services/reward.service';
 import { trigger, state, style, animate, transition } from '@angular/animations';
 import { HeadService } from '../services/head.service';
+import {CourseService} from '../services/course.service';
+
 
 @Component({
   selector: 'app-assignment',
@@ -23,6 +25,9 @@ export class AssignmentComponent implements OnInit {
   content: string;
   progress: any;
   assignmentScore: any;
+  theme: string;
+  language: string;
+  status; string;
   sidebarState; // state of sidebar
 
   constructor(private backendService: BackendService, private rewardService: RewardService, private headService: HeadService) {
@@ -31,12 +36,11 @@ export class AssignmentComponent implements OnInit {
 
   ngOnInit() {
     this.sidebarState = this.headService.getCurrentState();
-    this.assignment = 'print(\'Detta är ett program som räknar hur mycket kaffe du dricker.\');\n' +
-      'namn = \'Anna andersson\';\n' +
-      'print(\'Jag heter \' + namn);\n' +
-      'n = 2;\n' +
-      'print(\'Jag har druckit \' + str(n) + \' koppar kaffe idag.\');';
+    this.assignment = this.backendService.getAssignment();
+    this.language = 'python'; // hardcoded, should probably be read from getAssignment form backend?
+    this.theme = 'eclipse'; // default theme for now, could be saved on backend
     this.content = '';
+    this.status = 'Not Completed'; // hardcoded for now, endpoint to backend needed
     this.progress = this.rewardService.progress;
     this.assignmentScore = this.rewardService.assignmentScore;
   }
@@ -44,6 +48,10 @@ export class AssignmentComponent implements OnInit {
   submitCode() {
     this.backendService.SubmitAssignment(this.content)
       .then(value => this.rewardService.HandleResponse(value));
+  }
+
+  setTheme(th) {
+    this.theme = th;
   }
 
 
