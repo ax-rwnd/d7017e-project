@@ -39,6 +39,7 @@ import {AuthGuardService as AuthGuard} from './services/Auth/Auth-Guard.service'
 import {AuthGuardService as LoginGuard} from './services/Auth/Login-Guard.service';
 
 import {AuthService} from './services/Auth/Auth.service';
+import {Http, HttpModule} from "@angular/http";
 
 const appRoutes: Routes = [
   { path: '', component: LoginComponent },
@@ -73,6 +74,7 @@ const appRoutes: Routes = [
     BsDropdownModule.forRoot(),
     CollapseModule.forRoot(),
     HttpClientModule,
+    HttpModule,
     ModalModule.forRoot(),
     RouterModule.forRoot(
       appRoutes
