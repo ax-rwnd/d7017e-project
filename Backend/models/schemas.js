@@ -46,7 +46,8 @@ var userSchema = new Schema({
 	username: {type: String, required: true},
     email: {type: String, required: true},
     admin: {type: Boolean, required: true},
-    courses: [{ type: Schema.Types.ObjectId, ref: 'Course', required: true }]
+    courses: [{ type: Schema.Types.ObjectId, ref: 'Course', required: true }],
+    providers: [{type: String, required: true}]
 });
 
 var Test = mongoose.model('Test', testSchema);

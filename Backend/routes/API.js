@@ -36,31 +36,24 @@ module.exports = function(router) {
 passport.use(new (require('passport-cas').Strategy)({ 
     version: 'CAS3.0',   
     ssoBaseURL: 'https://weblogon.ltu.se/cas',
-    serverBaseURL: 'http://127.0.0.1:8000'
+    serverBaseURL: 'http://130.240.5.119:8000'
     }, function (profile, done) {
         console.log(profile);
-        return done(null, profile);
-        // User.findOne({login: login}, function (err, user) {
-        //     if (err) {
-        //       return done(err);
-        //     }
-        //     if (!user) {
-        //       return done(null, false, {message: 'Unknown user'});
-        //     }
-        //     user.attributes = profile.attributes;
-        //     return done(null, user);
-        // });
+        queries.findOrCreateUser(profile).then(function (user) {
+            return done(null, user);
+        }).catch(function (err) {
+            return done(err);
+        });
 }));
 
 
 router.get('/login/ltu', passport.authenticate('cas', {session: false}), function (req, res) {
     var token; // the JWT API key
     token = jwt.sign({
-        name: req.user.user,
-        roles: req.user.attributes.affiliation
+        id: req.user._id
     }, 'supersecret', { expiresIn: '1h' });
-    
-    res.json({ api_key: token });
+
+    res.json({ access_token: token });
 });
 
 /*
@@ -71,13 +64,19 @@ router.all('*', auth.jwtAuthProtected);
 /*
  * /users/ Endpoints
  */
-router.get('/users', function(req, res) {
+router.get('/users/me', function (req, res) {
+    queries.getUser(req.user.id).then(function (user) {
+        res.json(user);
+    })
+});
+
+router.get('/users', function (req, res) {
     var ids = req.query.ids;
     if(!ids) {
         res.sendStatus(404);
         return
     }
-    res.send("/users?ids=" + ids + " GET Endpoint " + req.user.name + " " + req.user.roles);
+    res.send("/users?ids=" + ids + " GET Endpoint " + req.user.id);
 });
 
 router.get('/users/:user_id', function(req, res) {
@@ -114,9 +113,6 @@ router.get('/users/:user_id/courses/:course_id/submissions', function(req, res) 
     var course_id = req.params.course_id;
     res.send("/users/" + user_id + "/courses/" + course_id + "/submissions GET Endpoint");
 });
-
-
-
 
 /*
  * /courses/ Endpoints
