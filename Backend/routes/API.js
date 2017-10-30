@@ -117,36 +117,47 @@ router.get('/users/:user_id/courses/:course_id/submissions', function(req, res) 
 /*
  * /courses/ Endpoints
  */
+
+router.get('/courses', function(req, res) {
+    res.send("/courses GET Endpoint");
+});
+
+router.post('/courses', function(req, res) {
+    res.send("/courses POST Endpoint");
+});
+
 router.get('/courses/:course_id/users', function(req, res) {
     var course_id = req.params.course_id;
     res.send("/courses/" + course_id + "/users GET Endpoint");
 });
 
-router.get('/courses/:course_id/submissions', function(req, res) {
+router.get('/courses/:course_id/assignments', function(req, res) {
     var course_id = req.params.course_id;
-    res.send("/courses/" + course_id + "/submissions GET Endpoint");
+    res.send("/courses/" + course_id + "/assignments GET Endpoint");
 });
 
-router.post('/courses/:course_id/submissions', function(req, res) {
+router.post('/courses/:course_id/assignments', function(req, res) {
     var course_id = req.params.course_id;
-    res.send("/courses/" + course_id + "/submissions POST Endpoint");
+    res.send("/courses/" + course_id + "/assignments POST Endpoint");
 });
 
-router.get('/courses/:course_id/submissions/:submission_id', function(req, res) {
+router.get('/courses/:course_id/assignments/:assignment_id', function(req, res) {
     var course_id = req.params.course_id;
-    var submission_id = req.params.submissions_id
-    res.send("/courses/" + course_id + "/submissions/" + submission_id + " GET Endpoint");
+    var submission_id = req.params.assignment_id
+    res.send("/courses/" + course_id + "/assignments/" + assignment_id + " GET Endpoint");
 });
 
-router.get('/courses/:course_id/tests', function(req, res) {
+router.get('/courses/:course_id/assignments/:assignment_id/tests', function(req, res) {
     var course_id = req.params.course_id;
-    res.send("/courses/" + course_id + "/tests GET Endpoint");
+    var assignment_id = req.params.assignment_id;
+    res.send("/courses/" + course_id + "/assignments/" + assignment_id + "/tests GET Endpoint");
 });
 
-router.get('/courses/:course_id/tests/:test_id', function(req, res) {
+router.get('/courses/:course_id/assignments/:assignment_id/tests/:test_id', function(req, res) {
     var course_id = req.params.course_id;
-    var test_id = req.params.test_id
-    res.send("/courses/" + course_id + "/tests/" + test_id + " GET Endpoint");
+    var assignment_id = req.params.assignment_id;
+    var test_id = req.params.test_id;
+    res.send("/courses/" + course_id + "/assignments/" + assignment_id + "/tests/" + test_id + "GET Endpoint");
 });
 
 };
