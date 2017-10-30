@@ -46,7 +46,6 @@ passport.use(new (require('passport-cas').Strategy)({
         });
 }));
 
-
 router.get('/login/ltu', passport.authenticate('cas', {session: false}), function (req, res) {
     var token; // the JWT API key
     token = jwt.sign({
@@ -57,20 +56,15 @@ router.get('/login/ltu', passport.authenticate('cas', {session: false}), functio
 });
 
 /*
- * Require JWT authorization for all routes below
- */
-router.all('*', auth.jwtAuthProtected);
-
-/*
  * /users/ Endpoints
  */
-router.get('/users/me', function (req, res) {
+router.get('/users/me', auth.jwtAuthProtected, function (req, res) {
     queries.getUser(req.user.id).then(function (user) {
         res.json(user);
     })
 });
 
-router.get('/users', function (req, res) {
+router.get('/users', auth.jwtAuthProtected, function (req, res) {
     var ids = req.query.ids;
     if(!ids) {
         res.sendStatus(404);
@@ -79,36 +73,36 @@ router.get('/users', function (req, res) {
     res.send("/users?ids=" + ids + " GET Endpoint " + req.user.id);
 });
 
-router.get('/users/:user_id', function(req, res) {
+router.get('/users/:user_id', auth.jwtAuthProtected, function(req, res) {
     var user_id = req.params.user_id;
     res.send("/users/" + user_id + " GET Endpoint");
 });
 
-router.delete('/users/:user_id', function(req, res) {
+router.delete('/users/:user_id', auth.jwtAuthProtected, function(req, res) {
     var user_id = req.params.user_id;
     res.send("/users/" + user_id + " DELETE Endpoint");
 });
 
-router.post('/users/register', function(req, res) {
+router.post('/users/register', auth.jwtAuthProtected, function(req, res) {
     res.send("/users/register POST Endpoint");
 });
 
-router.get('/users/:user_id/submissions', function(req, res) {
+router.get('/users/:user_id/submissions', auth.jwtAuthProtected, function(req, res) {
     var user_id = req.params.user_id;
     res.send("/users/" + user_id + "/submissions GET Endpoint");
 });
 
-router.get('/users/:user_id/courses', function(req, res) {
+router.get('/users/:user_id/courses', auth.jwtAuthProtected, function(req, res) {
     var user_id = req.params.user_id;
     res.send("/users/" + user_id + "/courses GET Endpoint");
 });
 
-router.post('/users/:user_id/courses', function(req, res) {
+router.post('/users/:user_id/courses', auth.jwtAuthProtected, function(req, res) {
     var user_id = req.params.user_id;
     res.send("/users/" + user_id + "/courses POST Endpoint");
 });
 
-router.get('/users/:user_id/courses/:course_id/submissions', function(req, res) {
+router.get('/users/:user_id/courses/:course_id/submissions', auth.jwtAuthProtected, function(req, res) {
     var user_id = req.params.user_id;
     var course_id = req.params.course_id;
     res.send("/users/" + user_id + "/courses/" + course_id + "/submissions GET Endpoint");
@@ -118,42 +112,42 @@ router.get('/users/:user_id/courses/:course_id/submissions', function(req, res) 
  * /courses/ Endpoints
  */
 
-router.get('/courses', function(req, res) {
+router.get('/courses', auth.jwtAuthProtected, function(req, res) {
     res.send("/courses GET Endpoint");
 });
 
-router.post('/courses', function(req, res) {
+router.post('/courses', auth.jwtAuthProtected, function(req, res) {
     res.send("/courses POST Endpoint");
 });
 
-router.get('/courses/:course_id/users', function(req, res) {
+router.get('/courses/:course_id/users', auth.jwtAuthProtected, function(req, res) {
     var course_id = req.params.course_id;
     res.send("/courses/" + course_id + "/users GET Endpoint");
 });
 
-router.get('/courses/:course_id/assignments', function(req, res) {
+router.get('/courses/:course_id/assignments', auth.jwtAuthProtected, function(req, res) {
     var course_id = req.params.course_id;
     res.send("/courses/" + course_id + "/assignments GET Endpoint");
 });
 
-router.post('/courses/:course_id/assignments', function(req, res) {
+router.post('/courses/:course_id/assignments', auth.jwtAuthProtected, function(req, res) {
     var course_id = req.params.course_id;
     res.send("/courses/" + course_id + "/assignments POST Endpoint");
 });
 
-router.get('/courses/:course_id/assignments/:assignment_id', function(req, res) {
+router.get('/courses/:course_id/assignments/:assignment_id', auth.jwtAuthProtected, function(req, res) {
     var course_id = req.params.course_id;
-    var submission_id = req.params.assignment_id
+    var assignment_id = req.params.assignment_id
     res.send("/courses/" + course_id + "/assignments/" + assignment_id + " GET Endpoint");
 });
 
-router.get('/courses/:course_id/assignments/:assignment_id/tests', function(req, res) {
+router.get('/courses/:course_id/assignments/:assignment_id/tests', auth.jwtAuthProtected, function(req, res) {
     var course_id = req.params.course_id;
     var assignment_id = req.params.assignment_id;
     res.send("/courses/" + course_id + "/assignments/" + assignment_id + "/tests GET Endpoint");
 });
 
-router.get('/courses/:course_id/assignments/:assignment_id/tests/:test_id', function(req, res) {
+router.get('/courses/:course_id/assignments/:assignment_id/tests/:test_id', auth.jwtAuthProtected, function(req, res) {
     var course_id = req.params.course_id;
     var assignment_id = req.params.assignment_id;
     var test_id = req.params.test_id;
