@@ -26,11 +26,4 @@ describe('CoursesComponent', () => {
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
-<<<<<<< HEAD
-=======
-
-  /*it('should create', ()  => {
-    expect(component).toBeTruthy();
-  });*/
->>>>>>> 8901c285f2c3f06a82bc98b1df82606c6ed84191
 });

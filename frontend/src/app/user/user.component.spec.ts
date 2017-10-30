@@ -34,9 +34,6 @@ describe('UserComponent', () => {
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
-<<<<<<< HEAD
-=======
-
   it('should create', () => {
     expect(component).toBeTruthy();
   });
@@ -53,5 +50,4 @@ describe('UserComponent', () => {
     component.form.controls['course_info'].setValue('course_info');
     // mock service, create course and see that the correct course is sent and stored
   });
->>>>>>> 8901c285f2c3f06a82bc98b1df82606c6ed84191
 });
