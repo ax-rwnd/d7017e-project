@@ -40,12 +40,14 @@ import {AuthGuardService as LoginGuard} from './services/Auth/Login-Guard.servic
 
 import {AuthService} from './services/Auth/Auth.service';
 import {Http, HttpModule} from "@angular/http";
+import { CreateassignmentComponent } from './createassignment/createassignment.component';
 
 const appRoutes: Routes = [
   { path: '', component: LoginComponent },
   { path: 'courses/:course/assignment', component: AssignmentComponent },
   { path: 'user', component: UserComponent, canActivate: [AuthGuard]},
-  { path: 'courses/:course', component: CoursesComponent }
+  { path: 'courses/:course', component: CoursesComponent},
+  { path: 'createAssignmentTest', component: CreateassignmentComponent}
 ];
 
 
@@ -60,6 +62,7 @@ const appRoutes: Routes = [
     LoginComponent,
     UserComponent,
     MainComponent,
+    CreateassignmentComponent,
   ],
   imports: [
     BrowserModule,

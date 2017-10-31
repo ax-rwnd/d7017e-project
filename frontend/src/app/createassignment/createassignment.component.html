@@ -1,0 +1,33 @@
+<app-head></app-head>
+
+<div id="cont" class="content" [@content]="sidebarState">
+  <div id="assignmentDescription">
+    <div ace-editor [(text)]="content" [mode]="'markdown'" [theme]="'eclipse'" [options]="{maxLines: 1000, printMargin: false}" [readOnly]="false" [autoUpdateContent]="true" [durationBeforeCallback]="1000"(textChanged)="onChange(content)"  style="min-height: 100%; width:100%; overflow: auto;">
+    </div>
+
+  </div>
+
+  <div id="preview">
+    <div Markdown [data]="content" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/themes/prism.min.css">
+
+    </div>
+  </div>
+
+  <div id="addTests">
+    <h4>Add tests</h4>
+
+    <div class="dropdown" style="float:left;">
+      <button class="dropbtn">Test type</button>
+      <div class="dropdown-content" style="left:0;">
+        <a>I/O</a>
+        <a>Lint</a>
+      </div>
+    </div>
+    <input type="text" name="input" value="input">
+    <input type="text" name="output" value="output">
+    <input type="points" name="points" value="points">
+
+  </div>
+
+
+</div>

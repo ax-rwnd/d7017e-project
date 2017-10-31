@@ -28,8 +28,9 @@ export class AssignmentComponent implements OnInit {
   assignmentScore: any;
   theme: string;
   language: string;
-  status; string;
+  status: string;
   sidebarState; // state of sidebar
+  result: string;
 
   assignmentTest: string; // for testing purposes
 
@@ -46,12 +47,12 @@ export class AssignmentComponent implements OnInit {
     this.status = 'Not Completed'; // hardcoded for now, endpoint to backend needed
     this.progress = this.rewardService.progress;
     this.assignmentScore = this.rewardService.assignmentScore;
-
+    this.result = '';
     this.course = 'D0009E - Introduktion till programmering'; // endpoint needed
     this.assignmentTest = '<h1>Assignment 1</h1> Detta är ett test av innerHTML för <b>lärare</b>' +
       '<img src="https://i.imgur.com/YKcVkXH.jpg" alt="lul" width="500" >' +
       '<iframe width="420" height="315"\n' +
-      'src="https://www.youtube.com/watch?v=X-X3Y53at5Y">\n' +
+      'src="asd">\n' +
       '</iframe>';
   }
 
@@ -62,6 +63,10 @@ export class AssignmentComponent implements OnInit {
 
   setTheme(th) {
     this.theme = th;
+  }
+
+  onChange(c) {
+    this.content = c;
   }
 
 
