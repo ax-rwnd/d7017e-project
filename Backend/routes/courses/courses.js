@@ -1,3 +1,5 @@
+'use strict';
+
 var request = require('request');
 var queries = require('../../lib/queries/queries');
 var errors = require('../../lib/errors.js');
