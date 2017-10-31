@@ -128,49 +128,6 @@ module.exports = function (router) {
     /*
      * /courses/ Endpoints
      */
-
-    router.get('/courses', auth.jwtAuthProtected, function (req, res) {
-        res.send("/courses GET Endpoint");
-    });
-
-    router.post('/courses', auth.jwtAuthProtected, function (req, res) {
-        res.send("/courses POST Endpoint");
-    });
-
-    router.get('/courses/:course_id/users', auth.jwtAuthProtected, function (req, res) {
-        var course_id = req.params.course_id;
-        res.send("/courses/" + course_id + "/users GET Endpoint");
-    });
-
-    router.get('/courses/:course_id/assignments', auth.jwtAuthProtected, function (req, res) {
-        var course_id = req.params.course_id;
-        res.send("/courses/" + course_id + "/assignments GET Endpoint");
-    });
-
-    router.post('/courses/:course_id/assignments', auth.jwtAuthProtected, function (req, res) {
-        var course_id = req.params.course_id;
-        res.send("/courses/" + course_id + "/assignments POST Endpoint");
-    });
-
-    router.get('/courses/:course_id/assignments/:assignment_id', auth.jwtAuthProtected, function (req, res) {
-        var course_id = req.params.course_id;
-        var assignment_id = req.params.assignment_id;
-        res.send("/courses/" + course_id + "/assignments/" + assignment_id + " GET Endpoint");
-    });
-
-    router.get('/courses/:course_id/assignments/:assignment_id/tests', auth.jwtAuthProtected, function (req, res) {
-        var course_id = req.params.course_id;
-        var assignment_id = req.params.assignment_id;
-        res.send("/courses/" + course_id + "/assignments/" + assignment_id + "/tests GET Endpoint");
-    });
-
-    router.get('/courses/:course_id/assignments/:assignment_id/tests/:test_id', auth.jwtAuthProtected, function (req, res) {
-        var course_id = req.params.course_id;
-        var assignment_id = req.params.assignment_id;
-        var test_id = req.params.test_id;
-        res.send("/courses/" + course_id + "/assignments/" + assignment_id + "/tests/" + test_id + "GET Endpoint");
-    });
-
     var courses = express.Router();
     require('./courses/courses')(courses);
     router.use('/courses', courses);
