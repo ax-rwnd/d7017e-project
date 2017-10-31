@@ -103,18 +103,4 @@ module.exports = function (router) {
             res.json({error:"Invalid Grant Type"});
         }
     });
-
-    /*
-     * /users/ Endpoints
-     */
-     var users = express.Router();
-     require('./users/users')(users);
-     router.use('/users', users);
-
-    /*
-     * /courses/ Endpoints
-     */
-    var courses = express.Router();
-    require('./courses/courses')(courses);
-    router.use('/courses', courses);
 };

@@ -25,10 +25,17 @@ app.use(passport.initialize());
 app.use(cors({origin: '*'}));
 
 //defining routes
-var api = express.Router();
-require('./routes/API')(api);
-require('./routes/test_routes')(api);
-app.use('/api', api);
+var auth = express.Router();
+require('./routes/auth')(auth);
+app.use('/auth', auth);
+
+var users = express.Router();
+require('./routes/api/users')(users);
+app.use('/api/users', users);
+
+var courses = express.Router();
+require('./routes/api/courses')(courses);
+app.use('/api/courses', courses);
 
 //Route not found.
 app.use(function (req, res, next) {
