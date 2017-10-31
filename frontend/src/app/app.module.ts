@@ -17,16 +17,16 @@ import { AppComponent } from './app.component';
 import { StatisticsComponent } from './statistics/statistics.component';
 import {RouterModule, Routes} from '@angular/router';
 import { LoginComponent } from './login/login.component';
+import { LoginHelperComponent} from './login-helper/login-helper.component';
 import {HeadComponent} from './head/head.component';
 import {UserComponent} from './user/user.component';
 import { AssignmentComponent } from './assignment/assignment.component';
 import { MainComponent } from './main/main.component';
 import { CoursesComponent } from './courses/courses.component';
+import { CreateassignmentComponent } from './createassignment/createassignment.component';
 
 import {BackendService} from './services/backend.service';
 import {RewardService} from './services/reward.service';
-
-import {HttpClientModule} from '@angular/common/http';
 
 // Animation
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -37,15 +37,20 @@ import {CourseService} from './services/course.service';
 // AUTH
 import {AuthGuardService as AuthGuard} from './services/Auth/Auth-Guard.service';
 import {AuthGuardService as LoginGuard} from './services/Auth/Login-Guard.service';
+import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
+import {NoopInterceptor} from './Interceptors/Auth.interceptor';
 
 import {AuthService} from './services/Auth/Auth.service';
-import {Http, HttpModule} from "@angular/http";
+import {Http, HttpModule} from '@angular/http';
+
 
 const appRoutes: Routes = [
   { path: '', component: LoginComponent },
+  { path: 'auth', component: LoginHelperComponent },
   { path: 'courses/:course/assignment', component: AssignmentComponent },
   { path: 'user', component: UserComponent, canActivate: [AuthGuard]},
-  { path: 'courses/:course', component: CoursesComponent }
+  { path: 'courses/:course', component: CoursesComponent},
+  { path: 'createAssignmentTest', component: CreateassignmentComponent}
 ];
 
 
@@ -58,8 +63,10 @@ const appRoutes: Routes = [
     StatisticsComponent,
     HeadComponent,
     LoginComponent,
+    LoginHelperComponent,
     UserComponent,
     MainComponent,
+    CreateassignmentComponent,
   ],
   imports: [
     BrowserModule,
@@ -81,6 +88,11 @@ const appRoutes: Routes = [
     )
   ],
   providers: [
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: NoopInterceptor,
+      multi: true,
+    },
     HeadService, // the state variable that head provides
     BackendService,
     RewardService,
