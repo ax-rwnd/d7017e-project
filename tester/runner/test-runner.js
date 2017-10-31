@@ -55,13 +55,12 @@ async function runTests(request) {
     }
 
     // Run optional tests if mandatory IO tests passed
-    if(testsPassed) {
+    if(testsPassed && request.hasOwnProperty('optional_tests')) {
         res.results.optional_tests = [];
-        if (!request.tests.hasOwnProperty('optional_tests')) {
-            request.tests.optional_tests = [];
-        }
-        for (const test of request.optional_tests.io) {
-            res.results.optional_tests.push(await runTest(test, executable, langModule));
+        if (request.optional_tests.hasOwnProperty('io')) {
+            for (const test of request.optional_tests.io) {
+                res.results.optional_tests.push(await runTest(test, executable, langModule));
+            }
         }
     }
 
