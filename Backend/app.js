@@ -1,3 +1,5 @@
+'use strict';
+
 var express = require('express'); //Routes package
 var mongoose = require('mongoose'); //Database communication
 var bodyParser = require('body-parser');

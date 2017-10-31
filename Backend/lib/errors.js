@@ -1,3 +1,4 @@
+'use strict';
 // This file defines enums for easy error handling
 
 module.exports = {
