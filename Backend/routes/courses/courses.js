@@ -4,6 +4,7 @@ var request = require('request');
 var queries = require('../../lib/queries/queries');
 var errors = require('../../lib/errors.js');
 var auth = require('express-jwt-token');
+var check_access = require('../../lib/access.js');
 
 var Assignment = require('../../models/schemas').Assignment;
 var Test = require('../../models/schemas').Test;
