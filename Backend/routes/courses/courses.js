@@ -16,12 +16,17 @@ module.exports = function(router) {
     });
     */
 
-    router.get('/', auth.jwtAuthProtected, function (req, res) {
+    router.get('/', function (req, res) {
         res.send("/courses GET Endpoint");
     });
 
     router.post('/', auth.jwtAuthProtected, function (req, res) {
         res.send("/courses POST Endpoint");
+    });
+
+    router.get('/:course_id', auth.jwtAuthProtected, function (req, res) {
+        var course_id = req.params.course_id;
+        res.send("/courses/" + course_id + " GET Endpoint");
     });
 
     router.get('/:course_id/users', auth.jwtAuthProtected, function (req, res) {
