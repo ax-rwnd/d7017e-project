@@ -3,4 +3,5 @@
 
 module.exports = {
     TEST: {code: 666, msg:"This is a test error"},
+    INVALID_TOKEN: new errors.CustomError("Invalid Token Error", "Invalid Token", 401, 7001)
 };
