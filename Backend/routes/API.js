@@ -1,7 +1,10 @@
+'use strict';
+
+var express = require('express');
+
 var Assignment = require('../models/schemas').Assignment;
-
-
 var Test = require('../models/schemas').Test;
+
 var request = require('request');
 var queries = require('../lib/queries/queries');
 var passport = require('passport');
@@ -11,146 +14,164 @@ var errors = require('../lib/errors.js');
 var jwt = require('jsonwebtoken');
 var auth = require('express-jwt-token');
 
-const TESTER_IP = 'http://130.240.5.118:9100'
+const TESTER_IP = 'http://130.240.5.118:9100';
+const SECRET = 'supersecret';
+const BACKEND_IP = 'http://130.240.5.119:8000';
 
-module.exports = function(router) {
+// Time-to-Live of Tokens
+const access_ttl = 15 * 60;
+const refresh_ttl = 24 * 60 * 60;
 
-/*
- * /ROUTE/TO/POST/CODE        THIS NEEDS A PROPER ROUTE
- */
+module.exports = function (router) {
 
-/*router.post('/ROUTE/TO/POST/CODE', function(req, res) {
-        var lang = req.body.lang;
-    var code = req.body.code;
-    var assignment_id = req.body.assignment_id;
+    /*
+     * /ROUTE/TO/POST/CODE        THIS NEEDS A PROPER ROUTE
+     */
 
-    testerCom.validateCode(lang, code, assignment_id);
-}*/
+    /*router.post('/ROUTE/TO/POST/CODE', function(req, res) {
+            var lang = req.body.lang;
+        var code = req.body.code;
+        var assignment_id = req.body.assignment_id;
 
-
-/*
- * /login/ Endpoints
- */
+        testerCom.validateCode(lang, code, assignment_id);
+    }*/
 
 
-passport.use(new (require('passport-cas').Strategy)({ 
-    version: 'CAS3.0',   
-    ssoBaseURL: 'https://weblogon.ltu.se/cas',
-    serverBaseURL: 'http://127.0.0.1:8000'
+    /*
+     * /login/ Endpoints
+     */
+
+
+    passport.use(new CasStrategy({
+        version: 'CAS3.0',
+        ssoBaseURL: 'https://weblogon.ltu.se/cas',
+        serverBaseURL: BACKEND_IP
     }, function (profile, done) {
         console.log(profile);
-        return done(null, profile);
-        // User.findOne({login: login}, function (err, user) {
-        //     if (err) {
-        //       return done(err);
-        //     }
-        //     if (!user) {
-        //       return done(null, false, {message: 'Unknown user'});
-        //     }
-        //     user.attributes = profile.attributes;
-        //     return done(null, user);
-        // });
-}));
+        queries.findOrCreateUser(profile).then(function (user) {
+            return done(null, user);
+        }).catch(function (err) {
+            return done(err);
+        });
+    }));
 
+    router.get('/login/ltu', passport.authenticate('cas', {session: false}), function (req, res) {
+        var access_token, refresh_token; // The JWT API keys
 
-router.get('/login/ltu', passport.authenticate('cas', {session: false}), function (req, res) {
-    var token; // the JWT API key
-    token = jwt.sign({
-        name: req.user.user,
-        roles: req.user.attributes.affiliation
-    }, 'supersecret', { expiresIn: '1h' });
-    
-    res.json({ api_key: token });
-});
+        refresh_token = jwt.sign({
+            id: req.user._id
+        }, SECRET, {expiresIn: refresh_ttl});
+        access_token = jwt.sign({
+            id: req.user._id
+        }, SECRET, {expiresIn: access_ttl});
 
-/*
- * Require JWT authorization for all routes below
- */
-router.all('*', auth.jwtAuthProtected);
+        res.json({access_token: access_token, token_type: process.env.jwtAuthHeaderPrefix, scope: '', expires_in: access_ttl, refresh_token: refresh_token});
+    });
 
-/*
- * /users/ Endpoints
- */
-router.get('/users', function(req, res) {
-    var ids = req.query.ids;
-    if(!ids) {
-        res.sendStatus(404);
-        return
-    }
-    res.send("/users?ids=" + ids + " GET Endpoint " + req.user.name + " " + req.user.roles);
-});
+    router.post('token', function (req, res) {
+        res.send('token endpoint');
+    });
 
-router.get('/users/:user_id', function(req, res) {
-    var user_id = req.params.user_id;
-    res.send("/users/" + user_id + " GET Endpoint");
-});
+    /*
+     * /users/ Endpoints
+     */
+    router.get('/users/me', auth.jwtAuthProtected, function (req, res) {
+        queries.getUser(req.user.id).then(function (user) {
+            res.json(user);
+        });
+    });
 
-router.delete('/users/:user_id', function(req, res) {
-    var user_id = req.params.user_id;
-    res.send("/users/" + user_id + " DELETE Endpoint");
-});
+    router.get('/users', auth.jwtAuthProtected, function (req, res) {
+        var ids = req.query.ids;
+        if (!ids) {
+            res.sendStatus(404);
+            return;
+        }
+        res.send("/users?ids=" + ids + " GET Endpoint " + req.user.id);
+    });
 
-router.post('/users/register', function(req, res) {
-    res.send("/users/register POST Endpoint");
-});
+    router.get('/users/:user_id', auth.jwtAuthProtected, function (req, res) {
+        var user_id = req.params.user_id;
+        res.send("/users/" + user_id + " GET Endpoint");
+    });
 
-router.get('/users/:user_id/submissions', function(req, res) {
-    var user_id = req.params.user_id;
-    res.send("/users/" + user_id + "/submissions GET Endpoint");
-});
+    router.delete('/users/:user_id', auth.jwtAuthProtected, function (req, res) {
+        var user_id = req.params.user_id;
+        res.send("/users/" + user_id + " DELETE Endpoint");
+    });
 
-router.get('/users/:user_id/courses', function(req, res) {
-    var user_id = req.params.user_id;
-    res.send("/users/" + user_id + "/courses GET Endpoint");
-});
+    router.post('/users/register', auth.jwtAuthProtected, function (req, res) {
+        res.send("/users/register POST Endpoint");
+    });
 
-router.post('/users/:user_id/courses', function(req, res) {
-    var user_id = req.params.user_id;
-    res.send("/users/" + user_id + "/courses POST Endpoint");
-});
+    router.get('/users/:user_id/submissions', auth.jwtAuthProtected, function (req, res) {
+        var user_id = req.params.user_id;
+        res.send("/users/" + user_id + "/submissions GET Endpoint");
+    });
 
-router.get('/users/:user_id/courses/:course_id/submissions', function(req, res) {
-    var user_id = req.params.user_id;
-    var course_id = req.params.course_id;
-    res.send("/users/" + user_id + "/courses/" + course_id + "/submissions GET Endpoint");
-});
+    router.get('/users/:user_id/courses', auth.jwtAuthProtected, function (req, res) {
+        var user_id = req.params.user_id;
+        res.send("/users/" + user_id + "/courses GET Endpoint");
+    });
 
+    router.post('/users/:user_id/courses', auth.jwtAuthProtected, function (req, res) {
+        var user_id = req.params.user_id;
+        res.send("/users/" + user_id + "/courses POST Endpoint");
+    });
 
+    router.get('/users/:user_id/courses/:course_id/submissions', auth.jwtAuthProtected, function (req, res) {
+        var user_id = req.params.user_id;
+        var course_id = req.params.course_id;
+        res.send("/users/" + user_id + "/courses/" + course_id + "/submissions GET Endpoint");
+    });
 
+    /*
+     * /courses/ Endpoints
+     */
 
-/*
- * /courses/ Endpoints
- */
-router.get('/courses/:course_id/users', function(req, res) {
-    var course_id = req.params.course_id;
-    res.send("/courses/" + course_id + "/users GET Endpoint");
-});
+    router.get('/courses', auth.jwtAuthProtected, function (req, res) {
+        res.send("/courses GET Endpoint");
+    });
 
-router.get('/courses/:course_id/submissions', function(req, res) {
-    var course_id = req.params.course_id;
-    res.send("/courses/" + course_id + "/submissions GET Endpoint");
-});
+    router.post('/courses', auth.jwtAuthProtected, function (req, res) {
+        res.send("/courses POST Endpoint");
+    });
 
-router.post('/courses/:course_id/submissions', function(req, res) {
-    var course_id = req.params.course_id;
-    res.send("/courses/" + course_id + "/submissions POST Endpoint");
-});
+    router.get('/courses/:course_id/users', auth.jwtAuthProtected, function (req, res) {
+        var course_id = req.params.course_id;
+        res.send("/courses/" + course_id + "/users GET Endpoint");
+    });
 
-router.get('/courses/:course_id/submissions/:submission_id', function(req, res) {
-    var course_id = req.params.course_id;
-    var submission_id = req.params.submissions_id
-    res.send("/courses/" + course_id + "/submissions/" + submission_id + " GET Endpoint");
-});
+    router.get('/courses/:course_id/assignments', auth.jwtAuthProtected, function (req, res) {
+        var course_id = req.params.course_id;
+        res.send("/courses/" + course_id + "/assignments GET Endpoint");
+    });
 
-router.get('/courses/:course_id/tests', function(req, res) {
-    var course_id = req.params.course_id;
-    res.send("/courses/" + course_id + "/tests GET Endpoint");
-});
+    router.post('/courses/:course_id/assignments', auth.jwtAuthProtected, function (req, res) {
+        var course_id = req.params.course_id;
+        res.send("/courses/" + course_id + "/assignments POST Endpoint");
+    });
 
-router.get('/courses/:course_id/tests/:test_id', function(req, res) {
-    var course_id = req.params.course_id;
-    var test_id = req.params.test_id
-    res.send("/courses/" + course_id + "/tests/" + test_id + " GET Endpoint");
-});
+    router.get('/courses/:course_id/assignments/:assignment_id', auth.jwtAuthProtected, function (req, res) {
+        var course_id = req.params.course_id;
+        var assignment_id = req.params.assignment_id;
+        res.send("/courses/" + course_id + "/assignments/" + assignment_id + " GET Endpoint");
+    });
 
+    router.get('/courses/:course_id/assignments/:assignment_id/tests', auth.jwtAuthProtected, function (req, res) {
+        var course_id = req.params.course_id;
+        var assignment_id = req.params.assignment_id;
+        res.send("/courses/" + course_id + "/assignments/" + assignment_id + "/tests GET Endpoint");
+    });
+
+    router.get('/courses/:course_id/assignments/:assignment_id/tests/:test_id', auth.jwtAuthProtected, function (req, res) {
+        var course_id = req.params.course_id;
+        var assignment_id = req.params.assignment_id;
+        var test_id = req.params.test_id;
+        res.send("/courses/" + course_id + "/assignments/" + assignment_id + "/tests/" + test_id + "GET Endpoint");
+    });
+
+    var courses = express.Router();
+    require('./courses/courses')(courses);
+    router.use('/courses', courses);
 };

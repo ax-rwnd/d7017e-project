@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
+    "test": "mocha",
     "start": "forever start ./bin/www",
     "stop": "forever stopall"
   },
@@ -18,6 +19,8 @@
     "mongoose": "^4.12.1",
     "passport": "^0.4.0",
     "passport-cas": "^0.1.1",
-    "request": "^2.83.0"
+    "request": "^2.83.0",
+    "winston": "^2.4.0",
+    "require-dir": "^0.3.2"
   }
 }
