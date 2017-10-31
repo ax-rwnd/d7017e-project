@@ -37,7 +37,7 @@ import {CourseService} from './services/course.service';
 import {AuthGuardService as AuthGuard} from './services/Auth/Auth-Guard.service';
 import {AuthGuardService as LoginGuard} from './services/Auth/Login-Guard.service';
 import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
-import {AuthInterceptor} from './Interceptors/Auth.interceptor';
+import {NoopInterceptor} from './Interceptors/Auth.interceptor';
 
 import {AuthService} from './services/Auth/Auth.service';
 import {Http, HttpModule} from '@angular/http';
@@ -87,7 +87,7 @@ const appRoutes: Routes = [
   providers: [
     {
       provide: HTTP_INTERCEPTORS,
-      useClass: AuthInterceptor,
+      useClass: NoopInterceptor,
       multi: true,
     },
     HeadService, // the state variable that head provides

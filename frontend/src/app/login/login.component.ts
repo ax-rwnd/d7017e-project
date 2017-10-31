@@ -35,12 +35,5 @@ export class LoginComponent implements OnInit {
     );
   }
 
-  public ping() {
-    this.http.get('https://example.com/api/things')
-      .subscribe(
-        data => console.log(data),
-        err => console.log(err)
-      );
-  }
 
 }
