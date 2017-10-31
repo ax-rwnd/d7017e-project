@@ -11,7 +11,13 @@ var errors = require('../lib/errors.js');
 var jwt = require('jsonwebtoken');
 var auth = require('express-jwt-token');
 
-const TESTER_IP = 'http://130.240.5.118:9100'
+const TESTER_IP = 'http://130.240.5.118:9100';
+const SECRET = 'supersecret';
+const BACKEND_IP = 'http://130.240.5.119:8000';
+
+// Time-to-Live of Tokens
+const access_ttl = 15 * 60;
+const refresh_ttl = 24 * 60 * 60;
 
 module.exports = function(router) {
 
@@ -36,7 +42,7 @@ module.exports = function(router) {
 passport.use(new (require('passport-cas').Strategy)({ 
     version: 'CAS3.0',   
     ssoBaseURL: 'https://weblogon.ltu.se/cas',
-    serverBaseURL: 'http://130.240.5.119:8000'
+    serverBaseURL: BACKEND_IP
     }, function (profile, done) {
         console.log(profile);
         queries.findOrCreateUser(profile).then(function (user) {
@@ -47,12 +53,24 @@ passport.use(new (require('passport-cas').Strategy)({
 }));
 
 router.get('/login/ltu', passport.authenticate('cas', {session: false}), function (req, res) {
-    var token; // the JWT API key
-    token = jwt.sign({
-        id: req.user._id
-    }, 'supersecret', { expiresIn: '1h' });
+    var access_token, refresh_token; // The JWT API keys
+    var access_ttl, refresh_ttl; // Time-to-Live for the tokens
 
-    res.json({ access_token: token });
+    access_ttl = 15 * 60;
+    refresh_ttl = 24 * 60 * 60;
+
+    refresh_token = jwt.sign({
+        id: req.user._id
+    }, SECRET, { expiresIn: refresh_ttl });
+    access_token = jwt.sign({
+        id: req.user._id
+    }, SECRET, { expiresIn: access_ttl });
+
+    res.json({ access_token: access_token, token_type: process.env.jwtAuthHeaderPrefix, scope: '', expires_in: access_ttl, refresh_token: refresh_token });
+});
+
+router.post('token', function (req, res) {
+    res.send('token endpoint');
 });
 
 /*
