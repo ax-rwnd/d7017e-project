@@ -1,3 +1,4 @@
+'use strict';
 //Mongoose schemas.
 
 var mongoose = require('mongoose');

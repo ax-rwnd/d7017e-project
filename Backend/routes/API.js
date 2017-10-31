@@ -1,3 +1,4 @@
+'use strict';
 var Assignment = require('../models/schemas').Assignment;
 
 
@@ -79,14 +80,14 @@ router.post('token', function (req, res) {
 router.get('/users/me', auth.jwtAuthProtected, function (req, res) {
     queries.getUser(req.user.id).then(function (user) {
         res.json(user);
-    })
+    });
 });
 
 router.get('/users', auth.jwtAuthProtected, function (req, res) {
     var ids = req.query.ids;
     if(!ids) {
         res.sendStatus(404);
-        return
+        return;
     }
     res.send("/users?ids=" + ids + " GET Endpoint " + req.user.id);
 });
@@ -155,7 +156,7 @@ router.post('/courses/:course_id/assignments', auth.jwtAuthProtected, function(r
 
 router.get('/courses/:course_id/assignments/:assignment_id', auth.jwtAuthProtected, function(req, res) {
     var course_id = req.params.course_id;
-    var assignment_id = req.params.assignment_id
+    var assignment_id = req.params.assignment_id;
     res.send("/courses/" + course_id + "/assignments/" + assignment_id + " GET Endpoint");
 });
 

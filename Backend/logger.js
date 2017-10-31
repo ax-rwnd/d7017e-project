@@ -1,3 +1,5 @@
+'use strict';
+
  var winston = require('winston'); //Logging 
  var config = require('config');
  

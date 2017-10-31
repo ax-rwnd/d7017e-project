@@ -1,4 +1,6 @@
-var schemas = require('../../models/schemas.js')
+'use strict';
+
+var schemas = require('../../models/schemas.js');
 var Assignment = require('../../models/schemas').Assignment;
 var Test = require('../../models/schemas').Test;
 var User = require('../../models/schemas').User;
@@ -7,7 +9,7 @@ var User = require('../../models/schemas').User;
 
 //get all tests related to a specific assignment. 
 function getTestsFromAssignment(assignmentID, callback) {
-    console.log(assignmentID)
+    console.log(assignmentID);
     Assignment.findById(assignmentID)
     .populate({
         path: 'tests',
@@ -15,7 +17,7 @@ function getTestsFromAssignment(assignmentID, callback) {
     })
     
     .exec(function(err, assignmentObject) {
-        callback(assignmentObject.tests)    
+        callback(assignmentObject.tests);
     });
 }
 
@@ -36,7 +38,7 @@ function findOrCreateUser(profile) {
         User.findOne({username: username}, function (err, user) {
             console.log("findOne");
             if (err) {
-              console.log(err)
+              console.log(err);
               reject(err);
             }
             if (!user) {
@@ -76,6 +78,3 @@ function getUser(id) {
 exports.getTestsFromAssignment = getTestsFromAssignment;
 exports.findOrCreateUser = findOrCreateUser;
 exports.getUser = getUser;
-
-
-
