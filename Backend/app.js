@@ -13,7 +13,7 @@ initApp();
 //mongoose.set('debug', true);
 process.title = 'd7017e-backend';
 process.env.JWT_SECRET_KEY = 'supersecret';
-process.env.jwtAuthHeaderPrefix = 'JWT';
+process.env.jwtAuthHeaderPrefix = 'Bearer';
 
 app.use(bodyParser.json());
 app.use(passport.initialize());
