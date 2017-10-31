@@ -26,7 +26,9 @@ export class AssignmentComponent implements OnInit {
   content: string;
   progress: any;
   assignmentScore: any;
+  themes: [string];
   theme: string;
+  languages: [string];
   language: string;
   status; string;
   sidebarState; // state of sidebar
@@ -40,7 +42,9 @@ export class AssignmentComponent implements OnInit {
   ngOnInit() {
     this.sidebarState = this.headService.getCurrentState();
     this.assignment = this.backendService.getAssignment();
-    this.language = 'python'; // hardcoded, should probably be read from getAssignment from backend?
+    this.languages = ['python', 'javascript']; // hardcoded, should probably be read from getAssignment from backend?
+    this.language = this.languages[0];
+    this.themes = ['eclipse', 'monokai'];
     this.theme = 'eclipse'; // default theme for now, could be saved on backend
     this.content = '';
     this.status = 'Not Completed'; // hardcoded for now, endpoint to backend needed
@@ -64,6 +68,8 @@ export class AssignmentComponent implements OnInit {
     this.theme = th;
   }
 
-
+  setMode(th) {
+    this.language = th;
+  }
 
 }

@@ -37,22 +37,25 @@
 
 
       <!--<codemirror [(ngModel)]="content" [config]="{lineNumbers: true}"></codemirror>-->
-    <div ace-editor [(text)]="content" [mode]="'python'" [theme]="theme" [options]="{maxLines: 1000, printMargin: false}" [readOnly]="false" [autoUpdateContent]="true" [durationBeforeCallback]="1000"  style="min-height: 100%; width:100%; overflow: auto;"> </div>
+    <div ace-editor [(text)]="content" [mode]="mode" [theme]="theme" [options]="{maxLines: 1000, printMargin: false}" [readOnly]="false" [autoUpdateContent]="true" [durationBeforeCallback]="1000"  style="min-height: 100%; width:100%; overflow: auto;"> </div>
 
     <div id="submitBar">
 
       <div class="dropdown" style="float:left;">
         <button class="dropbtn">Language: {{language}}</button>
         <div class="dropdown-content" style="left:0;">
-          <a>python</a>
+          <a *ngFor="let language of languages" (click)="setMode(language)">
+            {{language}}
+          </a>
         </div>
       </div>
 
       <div class="dropdown" style="float:left;">
         <button class="dropbtn">Theme: {{theme}}</button>
         <div class="dropdown-content" style="left:0;">
-          <a (click)="setTheme('eclipse')" >eclipse</a>
-          <a (click)="setTheme('monokai')">monokai</a>
+          <a *ngFor="let theme of themes" (click)="setTheme(theme)">
+            {{theme}}
+          </a>
         </div>
       </div>
 
