@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { UserService } from '../services/user.service';
 
-import {RequestOptions, Http, Headers} from '@angular/http';
+import {RequestOptions, Headers} from '@angular/http';
+import { HttpClient } from '@angular/common/http';
 
 
 @Component({
@@ -11,7 +12,7 @@ import {RequestOptions, Http, Headers} from '@angular/http';
 })
 export class LoginComponent implements OnInit {
   user: any;
-  constructor(private userService: UserService, private http: Http) {
+  constructor(private userService: UserService, public http: HttpClient) {
 
   }
   results: string[];
@@ -23,13 +24,7 @@ export class LoginComponent implements OnInit {
 
   requestToken() {
     console.log('clicked');
-    const headers = new Headers();
-    headers.append('Content-Type', 'application/json');
-    headers.append('Accept', 'application/json');
-    headers.append('Access-Control-Allow-Origin', 'https://weblogon.ltu.se');
-    const options = new RequestOptions({headers: headers});
-
-    this.http.get('https://weblogon.ltu.se/cas/login?service=http://130.240.5.119:8000/api/login/ltu', options ).subscribe(
+    this.http.get('https://weblogon.ltu.se/cas/login?service=http://127.0.0.1:4200/auth').subscribe(
       data => {
         this.results = data['results'];
         console.log(this.results);
@@ -38,6 +33,14 @@ export class LoginComponent implements OnInit {
         localStorage.setItem('token', 'ERROR_TOKEN');
       }
     );
+  }
+
+  public ping() {
+    this.http.get('https://example.com/api/things')
+      .subscribe(
+        data => console.log(data),
+        err => console.log(err)
+      );
   }
 
 }

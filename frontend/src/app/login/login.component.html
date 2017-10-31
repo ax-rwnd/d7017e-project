@@ -11,8 +11,10 @@
       </div>
       <div class="form-group">
         <button routerLink='/user' type="submit" class="btn">Login</button>
-        <!-- service= Länk till sidan CAS redirectar till efter LTU login, ska vara till vår backend för att få token -->
+        <!-- service= Länk till sidan CAS redirectar till efter LTU login, ska vara till vår backend för att få token-->
           <button (click)="requestToken()" class="btn glyphicon glyphicon-user"> CAS</button>
+        <button (click)="ping()" class="btn glyphicon glyphicon-user"> ping </button>
+        <a href="https://weblogon.ltu.se/cas/login?service=http://127.0.0.1:4200/auth"> CAS </a>
       </div>
     </form>
   </div>
