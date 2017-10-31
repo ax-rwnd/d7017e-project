@@ -1,7 +1,8 @@
+var express = require('express');
+
 var Assignment = require('../models/schemas').Assignment;
-
-
 var Test = require('../models/schemas').Test;
+
 var request = require('request');
 var queries = require('../lib/queries/queries');
 var passport = require('passport');
@@ -172,4 +173,7 @@ router.get('/courses/:course_id/assignments/:assignment_id/tests/:test_id', auth
     res.send("/courses/" + course_id + "/assignments/" + assignment_id + "/tests/" + test_id + "GET Endpoint");
 });
 
+var courses = express.Router();
+require('./courses/courses')(courses);
+router.use('/courses', courses);
 };
