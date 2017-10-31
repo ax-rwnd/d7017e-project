@@ -37,10 +37,12 @@ import {CourseService} from './services/course.service';
 // AUTH
 import {AuthGuardService as AuthGuard} from './services/Auth/Auth-Guard.service';
 import {AuthGuardService as LoginGuard} from './services/Auth/Login-Guard.service';
+import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
+import {AuthInterceptor} from './Interceptors/Auth.interceptor';
 
 import {AuthService} from './services/Auth/Auth.service';
-import {Http, HttpModule} from "@angular/http";
-import { CreateassignmentComponent } from './createassignment/createassignment.component';
+import {Http, HttpModule} from '@angular/http';
+
 
 const appRoutes: Routes = [
   { path: '', component: LoginComponent },
@@ -84,6 +86,11 @@ const appRoutes: Routes = [
     )
   ],
   providers: [
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptor,
+      multi: true,
+    },
     HeadService, // the state variable that head provides
     BackendService,
     RewardService,
