@@ -70,14 +70,12 @@ module.exports = function (router) {
         });
     }));
 
-    router.get('/login/ltu/:successurl', passport.authenticate('cas', {session: false}), function (req, res) {
+    router.get('/login/ltu/', passport.authenticate('cas', {session: false}), function (req, res) {
         var access_token, refresh_token; // The JWT API keys
-        var redirectUrl = req.params.successurl;
 
         refresh_token = create_refresh_token(req.user._id);
         access_token = create_access_token(req.user._id);
-        res.render('loginRedirect.hbs', {token: access_token, redirectURL: redirectUrl, layout: 'loginLayout'});   
-        //res.json({access_token: access_token, token_type: process.env.jwtAuthHeaderPrefix, scope: '', expires_in: access_ttl, refresh_token: refresh_token});
+        res.json({access_token: access_token, token_type: process.env.jwtAuthHeaderPrefix, scope: '', expires_in: access_ttl, refresh_token: refresh_token});
     });
 
     router.post('/token', function (req, res, next) {

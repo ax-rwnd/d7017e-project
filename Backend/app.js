@@ -7,7 +7,6 @@ var passport = require('passport'); //authentication
 var cors = require('cors');
 var config = require('config');
 var logger = require('./logger'); //Use Logger
-var expressHbs = require('express-handlebars');
 
 var app = express();
 
@@ -18,8 +17,6 @@ process.title = 'd7017e-backend';
 process.env.JWT_SECRET_KEY = 'supersecret';
 process.env.JWT_AUTH_HEADER_PREFIX = 'bearer';
 
-app.engine('.hbs', expressHbs({defaultLayout: 'layout', extname: '.hbs'}));
-app.set('view engine', '.hbs');
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
