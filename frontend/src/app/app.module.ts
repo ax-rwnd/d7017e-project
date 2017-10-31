@@ -22,10 +22,10 @@ import {UserComponent} from './user/user.component';
 import { AssignmentComponent } from './assignment/assignment.component';
 import { MainComponent } from './main/main.component';
 import { CoursesComponent } from './courses/courses.component';
+import { CreateassignmentComponent } from './createassignment/createassignment.component';
 
 import {BackendService} from './services/backend.service';
 import {RewardService} from './services/reward.service';
-
 
 // Animation
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -47,7 +47,8 @@ const appRoutes: Routes = [
   { path: '', component: LoginComponent },
   { path: 'courses/:course/assignment', component: AssignmentComponent },
   { path: 'user', component: UserComponent, canActivate: [AuthGuard]},
-  { path: 'courses/:course', component: CoursesComponent }
+  { path: 'courses/:course', component: CoursesComponent},
+  { path: 'createAssignmentTest', component: CreateassignmentComponent}
 ];
 
 
@@ -62,6 +63,7 @@ const appRoutes: Routes = [
     LoginComponent,
     UserComponent,
     MainComponent,
+    CreateassignmentComponent,
   ],
   imports: [
     BrowserModule,
