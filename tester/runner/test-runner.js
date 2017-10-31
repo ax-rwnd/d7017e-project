@@ -16,7 +16,7 @@ function result(id, ok, stderr, time) {
 async function runTests(request) {
     // Run some tests on the tester
 
-    const codeFile = tmp.fileSync();
+    const codeFile = tmp.fileSync({mode: 0o444});
     fs.writeFileSync(codeFile.fd, request.code);
     fs.closeSync(codeFile.fd);
 

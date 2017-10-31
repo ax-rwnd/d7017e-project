@@ -8,7 +8,7 @@ sub=','
 
 .DEFAULT_GOAL := all
 
-all: python27 python3 java #haskell
+all: python27 python3 java c #haskell
 	# Generate list of supported languages
 	echo "exports.languages=['$(subst $(space),$(sub),$^)'];" > $(CONFIGFILE);
 
@@ -84,8 +84,9 @@ java:
 	make pre DOCKERFILE=$(DOCKERFILE)
 
 	# Java specific code
-	echo "RUN apk --update add openjdk8-jre">>"$(DOCKERFILE)"
-	echo "RUN rm -rf /var/cache/apk/*">>"$(DOCKERFILE)"
+	echo "RUN apk --no-cache add openjdk8">>"$(DOCKERFILE)"
+	echo "ENV JAVA_HOME=/usr/lib/jvm/default-jvm">>"$(DOCKERFILE)"
+	echo 'RUN ln -sf "$${JAVA_HOME}/bin/"* "/usr/bin" ' >>"$(DOCKERFILE)"
 
 	# Add language specific file and build image
 	make post DOCKERFILE=$(DOCKERFILE) LANG=$(LANG)
@@ -99,6 +100,18 @@ haskell:
 	# Haskell specific code
 	echo "RUN apk --update add ghc">>"$(DOCKERFILE)"
 	echo "RUN rm -rf /var/cache/apk/*">>"$(DOCKERFILE)"
+
+	# Add language specific file and build image
+	make post DOCKERFILE=$(DOCKERFILE) LANG=$(LANG)
+
+c:
+	$(eval LANG="c")
+	$(eval DOCKERFILE="Dockerfile_C")
+
+	make pre DOCKERFILE=$(DOCKERFILE)
+
+	# Haskell specific code
+	echo "RUN apk --no-cache  add gcc musl-dev">>"$(DOCKERFILE)"
 
 	# Add language specific file and build image
 	make post DOCKERFILE=$(DOCKERFILE) LANG=$(LANG)
