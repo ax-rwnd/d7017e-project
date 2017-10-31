@@ -12,7 +12,6 @@ import {RequestOptions, Http, Headers} from '@angular/http';
 export class LoginComponent implements OnInit {
   user: any;
   constructor(private userService: UserService, private http: Http) {
-
   }
   results: string[];
 
@@ -39,5 +38,4 @@ export class LoginComponent implements OnInit {
       }
     );
   }
-
 }
