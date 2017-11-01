@@ -5,6 +5,7 @@ var mongoose = require('mongoose'); //Database communication
 mongoose.Promise = require('bluebird');
 var bodyParser = require('body-parser');
 var passport = require('passport'); //authentication
+var expressHbs = require('express-handlebars');
 var cors = require('cors');
 var config = require('config');
 var logger = require('./logger'); //Use Logger
@@ -12,6 +13,9 @@ var logger = require('./logger'); //Use Logger
 var app = express();
 
 initApp();
+
+app.engine('.hbs', expressHbs({defaultLayout: 'loginLayout', extname: '.hbs'}));
+app.set('view engine', '.hbs');
 
 //mongoose.set('debug', true);
 process.title = 'd7017e-backend';
@@ -42,9 +46,11 @@ var courses = express.Router();
 require('./routes/api/courses')(courses);
 app.use('/api/courses', courses);
 
+/*
 var test_routes = express.Router();
 require('./routes/test_routes')(test_routes);
 app.use('/api/', test_routes);
+*/
 
 //Route not found.
 app.use(function (req, res, next) {
