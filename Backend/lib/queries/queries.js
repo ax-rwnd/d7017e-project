@@ -4,6 +4,7 @@ var schemas = require('../../models/schemas.js');
 var Assignment = require('../../models/schemas').Assignment;
 var Test = require('../../models/schemas').Test;
 var User = require('../../models/schemas').User;
+var errors = require('../errors.js');
 
 // var Assignment, User, Test = require('../../models/schemas.js');
 
@@ -60,6 +61,17 @@ function findOrCreateUser(profile) {
 }
 
 function getUser(id) {
+    return User.findById(id).then(function(user) {
+        if (!user) {
+            console.log("User not found");
+            throw errors.TOKEN_USER_NOT_FOUND;
+        }
+        return user;
+    });
+}
+
+/*
+function getUser(id) {
     return new Promise(function (resolve, reject) {
         User.findById(id, "username email courses admin", function (err, user) {
             if (err) {
@@ -74,6 +86,7 @@ function getUser(id) {
         });
     });
 }
+*/
 
 exports.getTestsFromAssignment = getTestsFromAssignment;
 exports.findOrCreateUser = findOrCreateUser;
