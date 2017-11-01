@@ -2,7 +2,7 @@
 
 function passAllMandatoryTests(data) {
 
-    // TODO: hejasad
+    
 
     return true;
 }

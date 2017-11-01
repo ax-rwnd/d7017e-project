@@ -102,13 +102,6 @@ function getUserCourses(id, fields) {
     });
 }
 
-//get assignments from a course
-function getAssignmentsCourse(courseID, callback) {
-    getCourse(courseID, function(course) {
-        callback(course.assignments);
-    });
-}
-
 //Field argument needs a check. If i don't want teacher, will it still be populated?!
 function getCourse(id, fields) {
     var wantedFields = fields || "name description hidden teachers students assignments";
@@ -124,11 +117,9 @@ function getCourse(id, fields) {
 }
 
 /*
->>>>>>> c80784858f6a045a1c8f9523402c865c05b9af7b
 function findOrCreateUser(profile) {
     return new Promise(function (resolve, reject) {
         console.log("findUser");
->>>>>>> 5495243359baaa2eb857d6b21f8aa3c5dfbc9839
 
         var username;
         var email;
