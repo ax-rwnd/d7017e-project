@@ -19,7 +19,10 @@ import { HeadService } from '../services/head.service';
   ]
 })
 export class CoursesComponent implements OnInit {
-  courseCode: string;
+  show = {
+    assignments: true,
+    exercises: true
+  };
   assignments: string[];
   exercises: string[];
   sidebarState; // state of sidebar
