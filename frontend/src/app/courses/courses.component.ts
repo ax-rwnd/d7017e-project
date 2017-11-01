@@ -19,8 +19,12 @@ import { HeadService } from '../services/head.service';
   ]
 })
 export class CoursesComponent implements OnInit {
-  courseCode: string;
-  available: string[];
+  show = {
+    assignments: true,
+    exercises: true
+  };
+  assignments: string[];
+  exercises: string[];
   sidebarState; // state of sidebar
   progress: any;
   currentCourse: any;
@@ -32,7 +36,7 @@ export class CoursesComponent implements OnInit {
 
   ngOnInit() {
     this.sidebarState = this.headService.getCurrentState();
-    this.available = ['assignment 1', 'assignment 2', 'assignment 3', 'laboration 1', 'laboration 2'];
+    this.assignments = ['Assignment 1', 'Assignment 2', 'Assignment 3', 'Assignment 4', 'Assignment 5'];
+    this.exercises = ['Exercise 1', 'Exercise 2', 'Exercise 3', 'Exercise 4', 'Exercise 5'];
   }
-
 }

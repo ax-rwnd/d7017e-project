@@ -1,8 +1,18 @@
 import { Component, OnInit } from '@angular/core';
 import { UserService } from '../services/user.service';
 
-import {RequestOptions, Http, Headers} from '@angular/http';
+import { HttpClient } from '@angular/common/http';
+import {Observable} from 'rxjs/Observable';
 
+
+class User {
+  id: string;
+  username: string;
+  email: string;
+  admin: boolean;
+  courses: [string];
+  constructor() {}
+}
 
 @Component({
   selector: 'app-login',
@@ -11,10 +21,13 @@ import {RequestOptions, Http, Headers} from '@angular/http';
 })
 export class LoginComponent implements OnInit {
   user: any;
-  constructor(private userService: UserService, private http: Http) {
-
+  data;
+  constructor(private userService: UserService, public http: HttpClient) {
   }
-  results: string[];
+  results: string;
+  userMe: User[];
+  observableUser: Observable<User[]>;
+  errorMessage: String;
 
 
   ngOnInit() {
@@ -23,16 +36,12 @@ export class LoginComponent implements OnInit {
 
   requestToken() {
     console.log('clicked');
-    const headers = new Headers();
-    headers.append('Content-Type', 'application/json');
-    headers.append('Accept', 'application/json');
-    headers.append('Access-Control-Allow-Origin', 'https://weblogon.ltu.se');
-    const options = new RequestOptions({headers: headers});
-
-    this.http.get('https://weblogon.ltu.se/cas/login?service=http://130.240.5.119:8000/api/login/ltu', options ).subscribe(
+    // this.http.get('http://130.240.5.119:8000/api/users/me').subscribe(
+    this.http.get<User>('http://130.240.5.119:8000/api/users/me', {observe: 'response'}).subscribe(
       data => {
-        this.results = data['results'];
-        console.log(this.results);
+
+        this.data = data;
+        console.log(this.data);
       },
       err => {
         localStorage.setItem('token', 'ERROR_TOKEN');
@@ -40,4 +49,25 @@ export class LoginComponent implements OnInit {
     );
   }
 
+
+  getToken() {
+    this.http.get<User>('http://130.240.5.119:8000/api/login/ltu', {observe: 'response'}).subscribe(
+      data => {
+
+        this.data = data;
+        console.log(this.data);
+      },
+      err => {
+        localStorage.setItem('token', 'ERROR_TOKEN');
+      }
+    );
+      }
+
+
 }
+
+
+
+/*
+
+ */

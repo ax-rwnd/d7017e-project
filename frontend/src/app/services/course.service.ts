@@ -25,7 +25,8 @@ export class CourseService {
     const course1 = newCourse('Course name 2', 'D0010E', 'Course info', rewards2);
     const rewards3 = newRewards(40, 50, false, false);
     const course2 = newCourse('Course name 3', 'D0011E', 'Course info', rewards3);
-    const rewards4 = newRewards(false, false, ['gold_medal_badge', 'gold_trophy_badge', 'computer_badge'], false);
+    const rewards4 = newRewards(false, false, ['gold_medal_badge', 'gold_trophy_badge', 'computer_badge',
+      'bronze_medal_badge', 'silver_trophy_badge', 'bronze_trophy_badge'], false);
     const course3 = newCourse('Course name 4', 'D0012E', 'Course info', rewards4);
     this.courses[0] = course0;
     this.courses[1] = course1;
@@ -50,10 +51,7 @@ export class CourseService {
   AddCourse(course) {
     this.courses[this.courses.length] = course;
   }
-
 }
-
-
 
 function newCourse(name, code, course_info, rewards) {
   return {

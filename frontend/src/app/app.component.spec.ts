@@ -16,7 +16,6 @@ describe('AppComponent', () => {
     //fixture = TestBed.creatComponent(AppComponent);
   }));
   it('1+1=2', async() => {
-    //service = new AppComponent(new HeadService)
     expect(1+1).toBe(2);
   })
   it('should create the app', async(() => {
