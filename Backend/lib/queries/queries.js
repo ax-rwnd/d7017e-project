@@ -2,6 +2,7 @@
 
 var schemas = require('../../models/schemas.js');
 var Assignment = require('../../models/schemas').Assignment;
+var Course = require('../../models/schemas').Course;
 var Test = require('../../models/schemas').Test;
 var User = require('../../models/schemas').User;
 var errors = require('../errors.js');
@@ -25,6 +26,97 @@ function getTestsFromAssignment(assignmentID, callback) {
     });
 }
 
+
+
+
+function getUser(id, fields) {
+    var wantedFields = fields || "username email admin courses providers";
+    return User.findById(id, wantedFields).then(function (user) {
+        if (!user) {
+            console.log("User not found");
+            throw errors.TOKEN_USER_NOT_FOUND;
+        }
+        return user;
+    });
+}
+
+/*
+function getUser(id) {
+    return new Promise(function (resolve, reject) {
+        User.findById(id, "username email courses admin", function (err, user) {
+            if (err) {
+                reject(err);
+            }
+            if (!user) {
+                reject("User doesn't exist");
+            } else {
+                console.log("Found user " + user);
+                resolve(user);
+            }
+        });
+    });
+}
+*/
+
+function findOrCreateUser(profile) {
+    return User.findOne({username: profile.user}).then(function (user) {
+        if (!user) {
+            var newUser = new User({username: profile.user, email: profile.email, admin: false, courses: []});
+            return newUser.save().then(function (createdUser) {
+                return createdUser;
+            });
+        }
+        return user;
+    });
+}
+
+function getCourses(fields, admin) {
+    var wantedFields = fields || "name description hidden teachers students assignments";
+
+    if (admin) {
+        return Course.find({}, wantedFields).then(function (courseList) {
+            if (!courseList) {
+                throw errors.NO_COURSES_EXISTS;
+            }
+            return courseList;
+        });
+    }
+    return Course.find({'hidden': false}, wantedFields).then(function (courseList) {
+        if (!courseList) {
+            throw errors.NO_COURSES_EXISTS;
+        }
+        return courseList;
+    });
+    
+}
+
+function getUserCourses(id, fields) {
+    var wantedFields = fields || "name description hidden teachers students assignments";
+
+    return User.findById(id, "courses").populate("courses", wantedFields).then(function (courseList) {
+        if (!courseList) {
+            throw errors.NO_COURSES_EXISTS;
+        }
+        return courseList;
+    });
+}
+
+
+//Field argument needs a check. If i don't want teacher, will it still be populated?!
+function getCourse(id, fields) {
+    var wantedFields = fields || "name description hidden teachers students assignments";
+
+    return Course.findById(id, wantedFields)
+    .populate("teachers", "username email")
+    .populate("assignments", "name description").then(function (course) {
+        if (!course) {
+            throw errors.COURSE_DO_NOT_EXIST;
+        }
+        return course;
+    });
+}
+
+/*
 function findOrCreateUser(profile) {
     return new Promise(function (resolve, reject) {
         console.log("findUser");
@@ -62,35 +154,12 @@ function findOrCreateUser(profile) {
         });
     });
 }
-
-function getUser(id) {
-    return User.findById(id).then(function(user) {
-        if (!user) {
-            console.log("User not found");
-            throw errors.TOKEN_USER_NOT_FOUND;
-        }
-        return user;
-    });
-}
-
-/*
-function getUser(id) {
-    return new Promise(function (resolve, reject) {
-        User.findById(id, "username email courses admin", function (err, user) {
-            if (err) {
-                reject(err);
-            }
-            if (!user) {
-                reject("User doesn't exist");
-            } else {
-                console.log("Found user " + user);
-                resolve(user);
-            }
-        });
-    });
-}
 */
 
 exports.getTestsFromAssignment = getTestsFromAssignment;
 exports.findOrCreateUser = findOrCreateUser;
 exports.getUser = getUser;
+exports.getCourses = getCourses;
+exports.getUserCourses = getUserCourses;
+exports.getCourse = getCourse;
+

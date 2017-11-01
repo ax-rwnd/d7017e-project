@@ -28,6 +28,7 @@ var assignmentSchema = new Schema({
 var courseSchema = new Schema({
     name: {type: String, required: true},
     description: {type: String, required: false},
+    hidden: {type: Boolean, required: true},
     teachers: [{ type: Schema.Types.ObjectId, ref: 'User', required: false }],
     students: [{ type: Schema.Types.ObjectId, ref: 'User', required: false }],
     assignments: [{ type: Schema.Types.ObjectId, ref: 'Assignment', required: false }]

@@ -19,7 +19,7 @@ module.exports = function (router) {
 
 
     router.get('/me', auth.jwtAuthProtected, check_access, function (req, res, next) {
-        queries.getUser(req.user.id).then(function (user) {
+        queries.getUser(req.user.id, "username email courses admin").then(function (user) {
             res.json(user);
         })
         .catch(function(err) {
