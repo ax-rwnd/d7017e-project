@@ -70,12 +70,11 @@ module.exports = function (router) {
         });
     }));
 
-    router.get('/login/ltu', passport.authenticate('cas', {session: false}), function (req, res) {
+    router.get('/login/ltu/', passport.authenticate('cas', {session: false}), function (req, res) {
         var access_token, refresh_token; // The JWT API keys
 
         refresh_token = create_refresh_token(req.user._id);
         access_token = create_access_token(req.user._id);
-
         res.json({access_token: access_token, token_type: process.env.jwtAuthHeaderPrefix, scope: '', expires_in: access_ttl, refresh_token: refresh_token});
     });
 
@@ -103,18 +102,4 @@ module.exports = function (router) {
             res.json({error:"Invalid Grant Type"});
         }
     });
-
-    /*
-     * /users/ Endpoints
-     */
-     var users = express.Router();
-     require('./users/users')(users);
-     router.use('/users', users);
-
-    /*
-     * /courses/ Endpoints
-     */
-    var courses = express.Router();
-    require('./courses/courses')(courses);
-    router.use('/courses', courses);
 };

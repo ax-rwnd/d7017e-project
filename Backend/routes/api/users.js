@@ -17,9 +17,13 @@ module.exports = function (router) {
         res.send("/users?ids=" + ids + " GET Endpoint " + req.user.id);
     });
 
-    router.get('/me', auth.jwtAuthProtected, check_access, function (req, res) {
+
+    router.get('/me', auth.jwtAuthProtected, check_access, function (req, res, next) {
         queries.getUser(req.user.id).then(function (user) {
             res.json(user);
+        })
+        .catch(function(err) {
+            next(err);
         });
     });
 
