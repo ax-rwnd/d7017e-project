@@ -7,17 +7,21 @@ var User = require('../../models/schemas').User;
 
 // var Assignment, User, Test = require('../../models/schemas.js');
 
-//get all tests related to a specific assignment. 
+//get all tests related to a specific assignment.
 function getTestsFromAssignment(assignmentID, callback) {
     console.log(assignmentID);
     Assignment.findById(assignmentID)
     .populate({
-        path: 'tests',
+        path: 'tests.io',
         model: 'Test'
-    })
-    
-    .exec(function(err, assignmentObject) {
-        callback(assignmentObject.tests);
+    }).populate({
+        path: 'optional_tests.io',
+        model: 'Test'
+    }).lean().exec(function(err, assignmentObject) {
+        let json = {};
+        json.tests = assignmentObject.tests;
+        json.optional_tests = assignmentObject.optional_tests;
+        callback(json);
     });
 }
 
