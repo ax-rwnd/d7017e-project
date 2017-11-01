@@ -4,10 +4,16 @@ const request = require('supertest');
 const assert = require('assert');
 
 let runner = require('../bin/www');
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 after(() => {
     console.log('afterafter');
-    runner.server.close();
+    runner.server.close(() => {
+        // for some reason the program doesn't terminate
+        // even after all tests are done
+        // TODO: solve the termination problem with a less dirty hack
+        process.exit(0);
+    });
 });
 
 describe('api', () => {
@@ -15,9 +21,6 @@ describe('api', () => {
     let access_token;
 
     beforeEach(() => {
-        //runner = require('../app');
-        //runner.listen();
-        //runner = require('../bin/www');
         access_token = undefined;
         return request(runner.server)
         .get('/auth/login/fake')
@@ -29,10 +32,6 @@ describe('api', () => {
     });
 
     afterEach((done) => {
-        //runner.server.close(() => {
-        //    console.log('in the callback');
-        //    done();
-        //});
         done();
         console.log('after');
     });
@@ -41,7 +40,7 @@ describe('api', () => {
         it('fails when not provided with an access token', () => {
             request(runner.server)
             .get('/api/courses/me')
-            .then(403);
+            .expect(403);
         });
 
         it('gets courses for the fake user', () => {
