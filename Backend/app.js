@@ -18,6 +18,9 @@ process.title = 'd7017e-backend';
 process.env.JWT_SECRET_KEY = 'supersecret';
 process.env.JWT_AUTH_HEADER_PREFIX = 'bearer';
 
+// Make sure NODE_ENV matches express env to make env accessible
+// to the routers as well
+process.env.NODE_ENV = app.get('env');
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
