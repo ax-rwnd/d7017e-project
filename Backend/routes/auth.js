@@ -13,6 +13,7 @@ var CasStrategy = require('passport-cas').Strategy;
 var errors = require('../lib/errors.js');
 var jwt = require('jsonwebtoken');
 var auth = require('express-jwt-token');
+var check_access = require('../lib/access.js');
 
 const TESTER_IP = 'http://130.240.5.118:9100';
 const SECRET = 'supersecret';
@@ -35,14 +36,6 @@ function create_access_token(id) {
         access: true
     }, SECRET, {expiresIn: access_ttl});
 }
-
-var check_access = function (req, res, next) {
-    if (req.user.access) {
-        next();
-    } else {
-        res.json({error: 'Unauthorized', message: 'Not an access token'});
-    }
-};
 
 module.exports = function (router) {
 
@@ -77,12 +70,11 @@ module.exports = function (router) {
         });
     }));
 
-    router.get('/login/ltu', passport.authenticate('cas', {session: false}), function (req, res) {
+    router.get('/login/ltu/', passport.authenticate('cas', {session: false}), function (req, res) {
         var access_token, refresh_token; // The JWT API keys
 
         refresh_token = create_refresh_token(req.user._id);
         access_token = create_access_token(req.user._id);
-
         res.json({access_token: access_token, token_type: process.env.jwtAuthHeaderPrefix, scope: '', expires_in: access_ttl, refresh_token: refresh_token});
     });
 
@@ -110,64 +102,4 @@ module.exports = function (router) {
             res.json({error:"Invalid Grant Type"});
         }
     });
-
-    /*
-     * /users/ Endpoints
-     */
-    router.get('/users/me', auth.jwtAuthProtected, check_access, function (req, res) {
-        queries.getUser(req.user.id).then(function (user) {
-            res.json(user);
-        });
-    });
-
-    router.get('/users', auth.jwtAuthProtected, check_access, function (req, res) {
-        var ids = req.query.ids;
-        if (!ids) {
-            res.sendStatus(404);
-            return;
-        }
-        res.send("/users?ids=" + ids + " GET Endpoint " + req.user.id);
-    });
-
-    router.get('/users/:user_id', auth.jwtAuthProtected, check_access, function (req, res) {
-        var user_id = req.params.user_id;
-        res.send("/users/" + user_id + " GET Endpoint");
-    });
-
-    router.delete('/users/:user_id', auth.jwtAuthProtected, check_access, function (req, res) {
-        var user_id = req.params.user_id;
-        res.send("/users/" + user_id + " DELETE Endpoint");
-    });
-
-    router.post('/users/register', auth.jwtAuthProtected, check_access, function (req, res) {
-        res.send("/users/register POST Endpoint");
-    });
-
-    router.get('/users/:user_id/submissions', auth.jwtAuthProtected, check_access, function (req, res) {
-        var user_id = req.params.user_id;
-        res.send("/users/" + user_id + "/submissions GET Endpoint");
-    });
-
-    router.get('/users/:user_id/courses', auth.jwtAuthProtected, check_access, function (req, res) {
-        var user_id = req.params.user_id;
-        res.send("/users/" + user_id + "/courses GET Endpoint");
-    });
-
-    router.post('/users/:user_id/courses', auth.jwtAuthProtected, check_access, function (req, res) {
-        var user_id = req.params.user_id;
-        res.send("/users/" + user_id + "/courses POST Endpoint");
-    });
-
-    router.get('/users/:user_id/courses/:course_id/submissions', auth.jwtAuthProtected, check_access, function (req, res) {
-        var user_id = req.params.user_id;
-        var course_id = req.params.course_id;
-        res.send("/users/" + user_id + "/courses/" + course_id + "/submissions GET Endpoint");
-    });
-
-    /*
-     * /courses/ Endpoints
-     */
-    var courses = express.Router();
-    require('./courses/courses')(courses);
-    router.use('/courses', courses);
 };

@@ -4,11 +4,10 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
-//Old schema, don't use for new stuff.
 var testSchema = new Schema({
-    stdin: {type: String, required: false},
-    args: [{type: String, required: false}],
-    stdout: {type: String, required: true} 
+    stdout: {type: String, required: true},
+    stdin: String,
+    args: [String]
 });
 
 var assignmentSchema = new Schema({
@@ -16,19 +15,11 @@ var assignmentSchema = new Schema({
     description: String,
     hidden: { type: Boolean, required: true },
     tests: {
-        io: [{
-            stdout: {type: String, required: true},
-            stdin: String,
-            args: [String]
-        }],
+        io: [{ type: Schema.Types.ObjectId, ref: 'Test', required: true }],
         lint: Boolean
     },
     optional_tests: {
-        io: [{
-            stdout: {type: String, required: true},
-            stdin: String,
-            args: [String]
-        }],
+        io: [{ type: Schema.Types.ObjectId, ref: 'Test', required: false }],
         lint: Boolean
     },
     languages: [String]
@@ -37,6 +28,7 @@ var assignmentSchema = new Schema({
 var courseSchema = new Schema({
     name: {type: String, required: true},
     description: {type: String, required: false},
+    hidden: {type: Boolean, required: true},
     teachers: [{ type: Schema.Types.ObjectId, ref: 'User', required: false }],
     students: [{ type: Schema.Types.ObjectId, ref: 'User', required: false }],
     assignments: [{ type: Schema.Types.ObjectId, ref: 'Assignment', required: false }]

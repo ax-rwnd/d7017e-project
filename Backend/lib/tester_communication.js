@@ -4,6 +4,8 @@ var Assignment = require('../models/schemas').Assignment;
 var Test = require('../models/schemas').Test;
 var request = require('request');
 var queries = require('../lib/queries/queries');
+var features = require('../features/features');
+var logger = require('../logger'); //Use Logger
 
 const TESTER_IP = 'http://130.240.5.118:9100';
 
@@ -12,17 +14,14 @@ function validateCode(lang, code, assignment_id, res) {
 
     //Get tests from our database
     queries.getTestsFromAssignment(assignment_id, function(tests) {
-        //console.log("hejasad")
-        var testsNewFormat = [];     //this will hold the tests in the format accepted by Tester.
-
-        //The tests needs to match the format used by Tester.
-        for (var i = 0; i < tests.length; i ++) { 
-            testsNewFormat.push( {stdin: tests[i].stdin, 
-                args: tests[i].args, 
-                stdout: tests[i].stdout,
-                id: tests[i]._id
-            } );
-        }
+        tests.tests.io.forEach(function(test) {
+            test.id = test._id;
+            delete test._id;
+        });
+        tests.optional_tests.io.forEach(function(test) {
+            test.id = test._id;
+            delete test._id;
+        });
 
         //Send the data to Tester
         request.post(
@@ -30,14 +29,23 @@ function validateCode(lang, code, assignment_id, res) {
             { json: {
             'lang' : lang,
             'code' : code,
-            'tests' : tests
+            'tests' : tests.tests,
+            'optional_tests': tests.optional_tests
         }},
 
         //send the response back to front end.
         function(error, response, body) {
-            console.log(body);
-            res.set('Content-Type', 'application/json');
-            res.send(body);
+            if(response.statusCode != 200) {
+                logger.error('Response from tester was bad');
+                res.sendStatus(500);
+            } else {
+
+                // Do checks of result, like syntax errors, mandatory tests and so on...
+                features.emitEvent(body).then(function(result) {
+                    res.set('Content-Type', 'application/json');
+                    res.send(result);
+                });
+            }
         });
     });
 }

@@ -8,6 +8,7 @@
     "stop": "forever stopall"
   },
   "dependencies": {
+    "bluebird": "^3.5.1",
     "body-parser": "^1.18.2",
     "config": "^1.27.0",
     "cors": "^2.8.4",
@@ -20,7 +21,9 @@
     "passport": "^0.4.0",
     "passport-cas": "^0.1.1",
     "request": "^2.83.0",
+    "require-dir": "^0.3.2",
+    "throw.js": "^3.0.1",
     "winston": "^2.4.0",
-    "require-dir": "^0.3.2"
+    "events-async": "^1.1.0"
   }
 }
