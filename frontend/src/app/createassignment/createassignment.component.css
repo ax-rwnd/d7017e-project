@@ -1,7 +1,7 @@
-#description {
+#assignmentDescription {
   margin: 1%;
   padding: 0;
-  height: 100%;
+  height: 500px;
   background-color: lightgray;
   float: left;
   width: 48%;
@@ -10,76 +10,30 @@
   box-shadow: 1px 1px 3px rgba(180, 180, 180, 1);
 }
 
-#codeExample {
+#preview {
   margin: 1%;
   padding: 0;
   height: 100%;
   text-align: left;
   background-color: lightgray;
   float: left;
-  width: 90%;
-  border-radius: 15px;
-  background-color: rgba(255, 255, 255, 0.8);
-  box-shadow: 1px 1px 3px rgba(180, 180, 180, 1);
-}
-
-#inputField {
-  margin: 1%;
-  padding: 0;
-  height: 500px;
-  background-color: lightgray;
-  float: right;
   width: 48%;
   border-radius: 15px;
   background-color: rgba(255, 255, 255, 0.8);
   box-shadow: 1px 1px 3px rgba(180, 180, 180, 1);
 }
 
-#feedback {
+#addTests {
   margin: 1%;
   padding: 0;
   height: 100%;
+  text-align: left;
   background-color: lightgray;
   float: left;
-  width: 48%;
+  width: 78%;
   border-radius: 15px;
   background-color: rgba(255, 255, 255, 0.8);
   box-shadow: 1px 1px 3px rgba(180, 180, 180, 1);
-}
-
-
-#submitBar{
-  border-radius: 15px;
-  background-color: rgba(255, 255, 255, 0.8);
-  box-shadow: 1px 1px 3px rgba(180, 180, 180, 1);
-  text-align: right;
-}
-
-#inputField input[type="submit"] {
-  border: none;
-  padding: 10px 32px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 12px;
-  cursor: pointer;
-}
-
-#header, #footer {
-  text-align: center;
-  padding: 1em;
-  color: white;
-  background-color: darkgray;
-  clear: left;
-  text-align: center;
-}
-
-#login {
-
-  width: 400px;
-  height: 300px;
-  position: absolute;
-
 }
 
 .dropbtn {

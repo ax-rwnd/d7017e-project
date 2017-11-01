@@ -11,6 +11,7 @@ import { ModalModule } from 'ngx-bootstrap';
 
 import { CodemirrorModule } from 'ng2-codemirror';
 import { AceEditorModule } from 'ng2-ace-editor';
+import { MarkdownModule } from 'angular2-markdown';
 
 import { AppComponent } from './app.component';
 import { StatisticsComponent } from './statistics/statistics.component';
@@ -21,11 +22,10 @@ import {UserComponent} from './user/user.component';
 import { AssignmentComponent } from './assignment/assignment.component';
 import { MainComponent } from './main/main.component';
 import { CoursesComponent } from './courses/courses.component';
+import { CreateassignmentComponent } from './createassignment/createassignment.component';
 
 import {BackendService} from './services/backend.service';
 import {RewardService} from './services/reward.service';
-
-import {HttpClientModule} from '@angular/common/http';
 
 // Animation
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -36,14 +36,19 @@ import {CourseService} from './services/course.service';
 // AUTH
 import {AuthGuardService as AuthGuard} from './services/Auth/Auth-Guard.service';
 import {AuthGuardService as LoginGuard} from './services/Auth/Login-Guard.service';
+import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
+import {AuthInterceptor} from './Interceptors/Auth.interceptor';
 
 import {AuthService} from './services/Auth/Auth.service';
+import {Http, HttpModule} from '@angular/http';
+
 
 const appRoutes: Routes = [
   { path: '', component: LoginComponent },
   { path: 'courses/:course/assignment', component: AssignmentComponent },
   { path: 'user', component: UserComponent, canActivate: [AuthGuard]},
-  { path: 'courses/:course', component: CoursesComponent }
+  { path: 'courses/:course', component: CoursesComponent},
+  { path: 'createAssignmentTest', component: CreateassignmentComponent}
 ];
 
 
@@ -58,6 +63,7 @@ const appRoutes: Routes = [
     LoginComponent,
     UserComponent,
     MainComponent,
+    CreateassignmentComponent,
   ],
   imports: [
     BrowserModule,
@@ -66,17 +72,24 @@ const appRoutes: Routes = [
     BrowserAnimationsModule,
     CodemirrorModule,
     AceEditorModule,
+    MarkdownModule.forRoot(),
     AlertModule.forRoot(),
     ButtonsModule.forRoot(),
     BsDropdownModule.forRoot(),
     CollapseModule.forRoot(),
     HttpClientModule,
+    HttpModule,
     ModalModule.forRoot(),
     RouterModule.forRoot(
       appRoutes
     )
   ],
   providers: [
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptor,
+      multi: true,
+    },
     HeadService, // the state variable that head provides
     BackendService,
     RewardService,

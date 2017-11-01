@@ -11,8 +11,8 @@
       </div>
       <div class="form-group">
         <button routerLink='/user' type="submit" class="btn">Login</button>
-        <!-- service= Länk till sidan CAS redirectar till efter LTU login, ska vara till vår backend för att få token-->
-        <a href="https://weblogon.ltu.se/cas/login?service=http://localhost:4200/user">     <span class="glyphicon glyphicon-user"></span> CAS  </a>
+        <!-- service= Länk till sidan CAS redirectar till efter LTU login, ska vara till vår backend för att få token -->
+          <button (click)="requestToken()" class="btn glyphicon glyphicon-user"> CAS</button>
       </div>
     </form>
   </div>
