@@ -70,6 +70,10 @@
       </div>
     </div>
     <div class="col-lg-6">
+      <div *ngFor="let g of assignmentGroups">
+        <app-assignment-group [assignmentGroup]="g" [courseCode]="currentCourse.code"></app-assignment-group>
+      </div>
+      <!--
       <div class="gamification-block panel panel-default">
         <div class="panel-heading assignment-header" (click)="show.assignments = !show.assignments">
           Assignments
@@ -89,7 +93,7 @@
             {{n}}
           </div>
         </div>
-      </div>
+      </div>-->
     </div>
   </div>
 
