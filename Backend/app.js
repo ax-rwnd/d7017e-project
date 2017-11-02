@@ -68,10 +68,12 @@ app.use(function (err, req, res, next) {
     Needs fix. Logging of different levels. Make sure to return right HTTP and message to user.
     500 Internal server error should be sent for errors "inside the server". HTTP code + message for user faults?
     */
-    logger.error(err);
-
-    if (req.app.get('env') !== 'development') {
-        delete err.stack;
+    if (err instanceof ValidationError) {
+        console.log("MONGOOSEERROR");
+    }
+    if (err instanceof APIError) {
+        //logger.info?! LOGGA API ERROR TYP ANVÄNDARE + ERROR KOD
+        next(err);
     }
 
     var httpStatusCode = err.statusCode || 500;
@@ -80,6 +82,17 @@ app.use(function (err, req, res, next) {
     }
     res.status(httpStatusCode).send("HTTP error: " + httpStatusCode + " " + err.message);
 });
+
+app.use(function (err, req, res, next) {
+    //logger.log('error', err.);
+
+
+    if (req.app.get('env') !== 'development') {
+        delete err.stack;
+    }
+
+    res.status(500).send("HTTP error: 500 Internal server error")
+})
 
 // Function to initiate the app/server into development- or production mode. (depends on NODE_ENV)
 function initApp() {

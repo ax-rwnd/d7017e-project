@@ -14,17 +14,19 @@ module.exports = function (router) {
             res.sendStatus(404);
             return;
         }
-        res.send("/users?ids=" + ids + " GET Endpoint " + req.user.id);
+        res.send("/users?ids=" + ids + " GET Endpoint");
     });
 
 
     router.get('/me', auth.jwtAuthProtected, check_access, function (req, res, next) {
-        queries.getUser(req.user.id, "username email courses admin").then(function (user) {
-            res.json(user);
-        })
-        .catch(function(err) {
-            next(err);
-        });
+        // queries.getUser(req.user._id, "username email courses admin").then(function (user) {
+        //     res.json(user);
+        // })
+        // .catch(function(err) {
+        //     next(err);
+        // });
+
+        res.json(req.user);
     });
 
     router.get('/:user_id', auth.jwtAuthProtected, check_access, function (req, res) {

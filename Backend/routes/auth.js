@@ -7,8 +7,8 @@ var Test = require('../models/schemas').Test;
 
 var request = require('request');
 var queries = require('../lib/queries/queries');
-var passport = require('passport');
-var CasStrategy = require('passport-cas').Strategy;
+//var passport = require('passport');
+//var CasStrategy = require('passport-cas').Strategy;
 
 var errors = require('../lib/errors.js');
 var jwt = require('jsonwebtoken');
@@ -59,20 +59,20 @@ module.exports = function (router) {
      */
 
 
-    passport.use(new CasStrategy({
-        version: 'CAS3.0',
-        ssoBaseURL: 'https://weblogon.ltu.se/cas',
-        serverBaseURL: 'http://127.0.0.1:8000'//BACKEND_IP
-    }, function (profile, done) {
-        console.log(profile);
-        queries.findOrCreateUser(profile).then(function (user) {
-            return done(null, user);
-        }).catch(function (err) {
-            return done(err);
-        });
-    }));
+    // passport.use(new CasStrategy({
+    //     version: 'CAS3.0',
+    //     ssoBaseURL: 'https://weblogon.ltu.se/cas',
+    //     serverBaseURL: 'http://127.0.0.1:8000'//BACKEND_IP
+    // }, function (profile, done) {
+    //     console.log(profile);
+    //     queries.findOrCreateUser(profile).then(function (user) {
+    //         return done(null, user);
+    //     }).catch(function (err) {
+    //         return done(err);
+    //     });
+    // }));
 
-    router.get('/login/ltu', function (req, res){
+    router.get('/login/ltu', function (req, res, next){
         var ticket = req.query.ticket;
         var service = req.query.service;
 
@@ -84,7 +84,6 @@ module.exports = function (router) {
 
         var requ = https.get(url, function (resu) {
             var output = '';
-            //resu.setEncoding('utf8');
 
             resu.on('data', function (chunk) {
                 output += chunk;
@@ -94,25 +93,31 @@ module.exports = function (router) {
                 parseXml(output, function (err, result){
                     // Parse the CAS XML response
                     var success = result['cas:serviceResponse']['cas:authenticationSuccess'];
-                    var return_obj;
 
                     if (success) {
+                        // Extract the username from the XML parse
                         var username = success[0]['cas:user'][0];
-                        console.log("user = " + username);
-                        var user = queries.findOrCreateUser(username);
 
-                        // The JWT API tokens
-                        var refresh_token = create_refresh_token(user._id);
-                        var access_token = create_access_token(user._id);
+                        queries.findOrCreateUser(username)
+                        .then(user => {
+                            res.json({
+                                access_token: create_access_token(user._id),
+                                token_type: process.env.jwtAuthHeaderPrefix,
+                                scope: '',
+                                expires_in: access_ttl,
+                                refresh_token: create_refresh_token(user._id)
+                            });
+                        })
+                        .catch(function (err) {
+                            next(err);
+                        });
 
-                        return_obj = {access_token: access_token, token_type: process.env.jwtAuthHeaderPrefix, scope: '', expires_in: access_ttl, refresh_token: refresh_token};
                     } else {
-                        var error = result['cas:serviceResponse']['cas:authenticationFailure'][0]['$']['code'];
-                        console.log("error = " + error);
+                        // Extract the error code from the XML parse
+                        var error = result['cas:serviceResponse']['cas:authenticationFailure'][0].$.code;
 
-                        return_obj = {error: error};
+                        res.json({error: error});
                     }
-                    res.json(return_obj);
                 });
             });
         });
