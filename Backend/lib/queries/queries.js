@@ -64,6 +64,9 @@ function findOrCreateUser(username) {
         if (!user) {
             var newUser = new User({username: username, admin: false, courses: []});
             return newUser.save().then(function (createdUser) {
+                if (!createdUser) {
+                    console.log("Error: User not created");
+                }
                 return createdUser;
             });
         }
