@@ -1,6 +1,19 @@
 <app-head></app-head>
 
 <div id="cont" class="content" [@content]="sidebarState">
+
+  <div id="difficulty">
+    Assignment difficulty
+    <div class="dropdown" style="float:right;">
+      <button class="dropbtn">Grouping</button>
+      <div class="dropdown-content" style="right:0;">
+        <a>Easy</a>
+        <a>Medium</a>
+        <a>Hard</a>
+      </div>
+    </div>
+  </div>
+
   <div id="assignmentDescription">
     <div ace-editor [(text)]="content" [mode]="'markdown'" [theme]="'eclipse'" [options]="{maxLines: 1000, printMargin: false}" [readOnly]="false" [autoUpdateContent]="true" [durationBeforeCallback]="1000"(textChanged)="onChange(content)"  style="min-height: 100%; width:100%; overflow: auto;">
     </div>
@@ -8,26 +21,110 @@
   </div>
 
   <div id="preview">
-    <div Markdown [data]="content" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/themes/prism.min.css">
-
-    </div>
+    <div Markdown [data]="content" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/themes/prism.min.css"></div>
   </div>
 
   <div id="addTests">
-    <h4>Add tests</h4>
-
-    <div class="dropdown" style="float:left;">
-      <button class="dropbtn">Test type</button>
-      <div class="dropdown-content" style="left:0;">
-        <a>I/O</a>
-        <a>Lint</a>
-      </div>
-    </div>
-    <input type="text" name="input" value="input">
-    <input type="text" name="output" value="output">
-    <input type="points" name="points" value="points">
-
+    <button class="btn" (click)="openModal(testModal)">Add Test</button>
   </div>
 
+  <div *ngFor='let fb of unitTests' id="test">
+    <div id="testInfo">
+      <h4>{{fb[0]}} Test</h4>
+      <div *ngIf="fb[1]"> {{fb[1]}} </div>
+      <div *ngIf="fb[2]"> {{fb[2]}} </div>
+    </div>
+    <div id="testEdit">
+      <div style="align:right">
+        <button class="btn" (click)="openModal(editTest)">Edit test</button>
+      </div>
+    </div>
+  </div>
+  <!--
+     <h4>{{fb}} test</h4>
+
+<div class="dropdown" style="float:left;">
+      <button class="dropbtn">Add tests</button>
+      <div class="dropdown-content" style="left:0;">
+        <a (click)="addTest('io')">I/O test</a>
+        <a (click)="addTest('lint')">Lint test</a>
+        <a (click)="addTest('codeSize')">CodeSize test</a>
+      </div>
+    </div>
+  -->
 
 </div>
+<div id="footer">
+  <button class="btn">Submit Assignment</button>
+</div>
+
+
+<ng-template #testModal>
+  <div class="modal-header">
+    <h4 class="modal-title pull-left">Add Test to assignment</h4>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <form (ngSubmit)="createTest()" [formGroup]="form" novalidate>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="radio-inline">
+          <input type="radio" name="type" (click)="testType = 'io'"> I/O test
+        </label>
+        <label class="radio-inline">
+          <input type="radio" name="type" (click)="testType = 'lint'"> Lint test
+        </label>
+        <label class="radio-inline">
+          <input type="radio" name="type" (click)="testType = 'codeSize'"> CodeSize test
+        </label>
+      </div>
+
+      <div class="form-group" *ngIf="testIo()">
+        <h4>Input</h4>
+        <input type="text" class="form-control" id="ioInput" formControlName="ioInput" ngModel required>
+      </div>
+
+      <div class="form-group" *ngIf="testIo()">
+        <h4>Output</h4>
+        <input type="text" class="form-control" id="ioOutput" formControlName="ioOutput" ngModel required>
+      </div>
+      <hr>
+
+
+    </div>
+    <div class="modal-footer">
+      <button type="submit" class="btn" (click)="modalRef.hide()">Submit</button>
+    </div>
+
+  </form>
+</ng-template>
+
+<ng-template #editTest>
+  <div class="modal-header">
+    <h4 class="modal-title pull-left">Edit Test</h4>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <form (ngSubmit)="createTest()" [formGroup]="form" novalidate>
+    <div class="modal-body">
+      <div class="form-group" *ngIf="testIo()">
+        <h4>Input</h4>
+        <input type="text" class="form-control" id="ioInput2" formControlName="ioInput" ngModel required>
+      </div>
+
+      <div class="form-group" *ngIf="testIo()">
+        <h4>Output</h4>
+        <input type="text" class="form-control" id="ioOutput2" formControlName="ioOutput" ngModel required>
+      </div>
+      <hr>
+
+
+    </div>
+    <div class="modal-footer">
+      <button type="submit" class="btn" (click)="modalRef.hide()">Submit</button>
+    </div>
+
+  </form>
+</ng-template>
