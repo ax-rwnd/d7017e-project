@@ -16,15 +16,17 @@ export class ScrollerDirective {
           if (element.scrollTop + element.offsetHeight > element.scrollHeight) {
             if (e.deltaY > 0) {
               e = e || window.event;
+              if (e.preventDefault) {
+                e.preventDefault();
+              }
+              e.returnValue = false;
+            }
+          } else if (element.scrollTop === 0 && e.deltaY < 0) {
+            e = e || window.event;
             if (e.preventDefault) {
               e.preventDefault();
             }
             e.returnValue = false;
-            }
-          } else if (element.scrollTop === 0 && e.deltaY < 0) {
-            if (e.preventDefault) {
-              e.preventDefault();
-            }
           }
         }
     });
