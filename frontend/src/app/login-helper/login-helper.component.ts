@@ -17,7 +17,6 @@ export class LoginHelperComponent implements OnInit {
     this.activatedRoute.queryParams.subscribe((params: Params) => {
       this.ticket = params['ticket'];
       console.log(this.ticket);
-      localStorage.setItem('ticket', this.ticket);
     });
     // this.http.get('http://130.240.5.119:8000/api/login/ltu?ticket=' + this.ticket).subscribe(
     this.http.get('http://130.240.5.119:8000/api/login/ltu?ticket=' + this.ticket).subscribe(
