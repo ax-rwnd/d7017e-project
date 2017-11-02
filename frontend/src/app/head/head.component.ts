@@ -1,4 +1,4 @@
-import {Component, forwardRef, OnInit, Inject} from '@angular/core';
+import {Component, forwardRef, OnInit, Inject, HostListener, ViewChild} from '@angular/core';
 import { trigger, state, style, animate, transition } from '@angular/animations';
 import { HeadService } from '../services/head.service';
 import {AppComponent} from '../app.component';
@@ -34,17 +34,30 @@ export class HeadComponent implements OnInit {
     // shouldn't be inactive, should only get state from app component
   }
 
-  toggleState() { // send to the sidebar in app component that it should toggle state
+  toggleState($event) { // send to the sidebar in app component that it should toggle state
+    $event.preventDefault();
+    $event.stopPropagation();
     this.sidebarState = this.sidebarState === 'active' ? 'inactive' : 'active';
     this.headService.setState(this.sidebarState);
   }
 
-  toggleUserDropDown() {
+  @HostListener('document:click', ['$event'])
+  outsideDropDownClick($event) {
+    this.stateDropDown = false;
+  }
+
+  toggleUserDropDown($event) {
+    $event.preventDefault();
+    $event.stopPropagation();
     this.stateDropDown = !this.stateDropDown;
   }
 
   isDropDown() {
     return this.stateDropDown;
+  }
+
+  resetSidebar() {
+    this.headService.setState('inactive');
   }
 
   ngOnInit() {
