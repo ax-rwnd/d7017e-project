@@ -28,6 +28,9 @@
     </div>
 
     <!-- Should contain the results of test/feedback -->
+    <div *ngFor='let fb of feedback'>
+      {{fb}}
+    </div>
 
   </div>
 
@@ -37,8 +40,10 @@
 
 
       <!--<codemirror [(ngModel)]="content" [config]="{lineNumbers: true}"></codemirror>-->
-    <div ace-editor [(text)]="content" [mode]="mode" [theme]="theme" [options]="{maxLines: 1000, printMargin: false}" [readOnly]="false" [autoUpdateContent]="true" [durationBeforeCallback]="1000"(textChanged)="onChange(content)"  style="min-height: 100%; width:100%; overflow: auto;"> </div>
-
+    <div id="editor">
+      <div ace-editor [(text)]="content" [mode]="mode" [theme]="theme" [options]="{maxLines: 1000, printMargin: false}" [readOnly]="false" [autoUpdateContent]="true" [durationBeforeCallback]="1000"(textChanged)="onChange(content)"  style="min-height: 100%; width:100%; overflow: auto;"> </div>
+    </div>
+    
     <div id="submitBar">
 
       <div class="dropdown" style="float:left;">
@@ -57,6 +62,10 @@
             {{theme}}
           </a>
         </div>
+      </div>
+
+      <div id="codesize" style="float:left;">
+        Size: {{content.length}}
       </div>
 
       <input (click)="submitCode()" type="submit" value="submit" class="btn">
