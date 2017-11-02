@@ -100,20 +100,16 @@ body {
               border 0.5s ease-out,
               margin 0.2s ease-out;
 }
-.navbar-default .navbar-nav > li > a:hover,
-.navbar-default .navbar-nav > li > a:focus {
+.navbar-default .navbar-nav > li > a:hover {
   background-color: #0f2837;
   color: white;
-  border-style: solid;
-  border-color: #0f2837;
 }
+.navbar-default .navbar-nav > li > a:focus,
 .navbar-default .navbar-nav > .active > a,
 .navbar-default .navbar-nav > .active > a:hover,
 .navbar-default .navbar-nav > .active > a:focus {
   color: white;
   background-color: #133756;
-  border-style: solid;
-  border-color: white;
 }
 .navbar-default .navbar-nav > .open > a,
 .navbar-default .navbar-nav > .open > a:hover,
