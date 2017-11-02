@@ -98,10 +98,10 @@ module.exports = function (router) {
                     scope: '',
                     expires_in: access_ttl
                 });
-            });
+            })
             .catch(function (err) {
                 next(err);
-            })
+            });
         });
     }
 
