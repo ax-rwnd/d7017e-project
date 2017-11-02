@@ -72,7 +72,7 @@ module.exports = function (router) {
     //     });
     // }));
 
-    router.get('/login/ltu', function (req, res){
+    router.get('/login/ltu', function (req, res, next){
         var ticket = req.query.ticket;
         var service = req.query.service;
 
@@ -84,7 +84,6 @@ module.exports = function (router) {
 
         var requ = https.get(url, function (resu) {
             var output = '';
-            //resu.setEncoding('utf8');
 
             resu.on('data', function (chunk) {
                 output += chunk;
@@ -96,8 +95,8 @@ module.exports = function (router) {
                     var success = result['cas:serviceResponse']['cas:authenticationSuccess'];
 
                     if (success) {
+                        // Extract the username from the XML parse
                         var username = success[0]['cas:user'][0];
-                        console.log("user = " + username);
 
                         queries.findOrCreateUser(username)
                         .then(user => {
@@ -114,8 +113,8 @@ module.exports = function (router) {
                         });
 
                     } else {
+                        // Extract the error code from the XML parse
                         var error = result['cas:serviceResponse']['cas:authenticationFailure'][0].$.code;
-                        console.log("error = " + error);
 
                         res.json({error: error});
                     }
