@@ -40,6 +40,8 @@ function validateCode(lang, code, assignment_id, res) {
                 res.sendStatus(500);
             } else {
 
+                body.assignment_id = assignment_id;
+
                 // Do checks of result, like syntax errors, mandatory tests and so on...
                 features.emitEvent(body).then(function(result) {
                     res.set('Content-Type', 'application/json');

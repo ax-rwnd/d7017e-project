@@ -42,59 +42,35 @@ var courseSchema = new Schema({
     features: { type: Schema.Types.ObjectId, ref: 'Features', required: true }
 });
 
-var badgesSchema = new Schema([{
+var badgeSchema = new Schema({
+    assignment_id: { type: Schema.Types.ObjectId, ref: 'Assignment', required: true},
     icon: {type: String, required: true},
     title: {type: String, required: true},
     description: {type: String, required: true},
-    tests: [{ type: Schema.Types.ObjectId, ref: 'Test', required: true}]
-}]);
-
-var featuresSchema = new Schema({
-    progress: [{ type: Schema.Types.ObjectId, ref: 'FeaturesProgress', required: true }],
-    timing: [{ type: Schema.Types.ObjectId, ref: 'FeaturesTiming', required: true }],
-    performance: [{ type: Schema.Types.ObjectId, ref: 'FeaturesPerformance', required: true }],
-    badges: [{ type: Schema.Types.ObjectId, ref: 'FeaturesBadges', required: true }]
+    goals: {
+        tests: [{ type: Schema.Types.ObjectId, ref: 'Test', required: false}],
+        code_size: Number
+    }
 });
 
-var featuresProgressSchema = new Schema([{
+var featuresSchema = new Schema({
     user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-    assignment: [{ type: Schema.Types.ObjectId, ref: 'Assignment'}]
-}]);
-
-var featuresTimingSchema = new Schema([{
-    user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-    timing: [{
+    progress: [{ type: Schema.Types.ObjectId, ref: 'Assignment', required: false}],
+    performance: [{
         assignment: { type: Schema.Types.ObjectId, ref: 'Assignment', required: true},
         timing: {type: Number, required: true},
-    }]
-}]);
-
-var featuresPerformanceSchema = new Schema([{
-    user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-    performances: [{
-        assignment: { type: Schema.Types.ObjectId, ref: 'Assignment', required: true},
-        performance: {type: Number, required: true}
-    }]
-}]);
-
-var featuresBadgesSchema = new Schema([{
-    user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+        score: {type: Number, required: true}
+    }],
     badges: [{ type: Schema.Types.ObjectId, ref: 'Badges'}]
-}]);
+});
 
 var Assignment = mongoose.model('Assignment', assignmentSchema);
 var Test = mongoose.model('Test', testSchema);
 var User = mongoose.model('User', userSchema);
 var Course = mongoose.model('Course', courseSchema);
-var Badges = mongoose.model('Badges', badgesSchema);
+var Badge = mongoose.model('Badge', badgeSchema);
 var Features = mongoose.model('Features', featuresSchema);
-var FeaturesProgress = mongoose.model('FeaturesProgress', featuresProgressSchema);
-var FeaturesTiming = mongoose.model('FeaturesTiming', featuresTimingSchema);
-var FeaturesPerformance = mongoose.model('FeaturesPerformance', featuresPerformanceSchema);
-var FeaturesBadges = mongoose.model('FeaturesBadges', featuresBadgesSchema);
 var models = {Assignment: Assignment, Test: Test, User: User, Course: Course,
-    Badges: Badges, Features: Features, FeaturesProgress: FeaturesProgress,
-    FeaturesTiming: FeaturesTiming, FeaturesPerformance: FeaturesPerformance,
-    FeaturesBadges: FeaturesBadges};
+    Badge: Badge, Features: Features};
 
 module.exports = models;
