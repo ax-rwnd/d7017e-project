@@ -138,7 +138,16 @@ module.exports = function (router) {
 
     if (process.env.NODE_ENV === 'development') {
         router.get('/login/fake', (req, res, next) => {
-            queries.findOrCreateUser('test-student-00')
+            let admin = req.query.admin === 'true';
+            let role = admin ? 'admin' : 'student';
+            if (req.query.suffix !== 'string') {
+                req.query.suffix = '00';
+            }
+            let profile = {
+                username: `fake-$(role)-$(req.query.suffix)`,
+                admin: admin
+            };
+            queries.findOrCreateUser(profile)
             .then(user => {
                 res.json({
                     access_token: create_access_token(user._id),
