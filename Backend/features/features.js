@@ -29,35 +29,35 @@ function initFeatures() {
 }
 
 function emitEvent(result) {
-
     return new Promise(function (resolve, reject){
-        emitter.emit('handleFeature', result).then(function(data) {
-
-            console.log(data);
-
-            let json = {};
-            data.forEach(function(item) {
-
-                console.log(item);
-
-                if(Object.keys(item).length != 1) {
-                    reject('Result was too long');
-                }
-
-                let key = Object.keys(item)[0];
-
-                if(feature_names.indexOf(key) === -1) {
-                    reject('Feature not supported');
-                }
-
-                json[key] = item[key];
+        emitter.emit('handleTests', result).then(function(data1) {
+            emitter.emit('handleBadges', result).then(function(data2) {
+                result.features = createResultjson(data1.concat(data2));
+                resolve(result);
             });
-
-            result.features = json;
-            resolve(result);
-
         });
     });
+}
+
+function createResultjson(data) {
+    let json = {};
+    data.forEach(function(item) {
+
+        console.log(item);
+
+        if(Object.keys(item).length != 1) {
+            throw new Error('Result was too long');
+        }
+
+        let key = Object.keys(item)[0];
+
+        if(feature_names.indexOf(key) === -1) {
+            throw new Error('Feature not supported');
+        }
+
+        json[key] = item[key];
+    });
+    return json;
 }
 
 // Should be moved. But to where?
