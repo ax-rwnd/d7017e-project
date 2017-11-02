@@ -99,6 +99,9 @@ module.exports = function (router) {
                     expires_in: access_ttl
                 });
             });
+            .catch(function (err) {
+                next(err);
+            })
         });
     }
 
