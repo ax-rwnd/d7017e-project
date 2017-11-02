@@ -18,6 +18,7 @@ export class AssignmentGroupComponent implements OnInit {
 interface AssignmentGroup {
   name: string;
   collapse: boolean;
+  availability: any;
   assignments: Assignment[];
   groups: AssignmentGroup[];
 }

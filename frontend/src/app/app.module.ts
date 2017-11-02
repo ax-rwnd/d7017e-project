@@ -8,6 +8,7 @@ import { ButtonsModule } from 'ngx-bootstrap';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { CollapseModule } from 'ngx-bootstrap/collapse';
 import { ModalModule } from 'ngx-bootstrap';
+import { AngularFontAwesomeModule } from 'angular-font-awesome/angular-font-awesome';
 
 import { CodemirrorModule } from 'ng2-codemirror';
 import { AceEditorModule } from 'ng2-ace-editor';
@@ -33,6 +34,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HeadService } from './services/head.service';
 import {UserService} from './services/user.service';
 import {CourseService} from './services/course.service';
+import { AssignmentService } from './services/assignment.service';
 
 // AUTH
 import {AuthGuardService as AuthGuard} from './services/Auth/Auth-Guard.service';
@@ -84,6 +86,7 @@ const appRoutes: Routes = [
     CollapseModule.forRoot(),
     HttpClientModule,
     HttpModule,
+    AngularFontAwesomeModule,
     ModalModule.forRoot(),
     RouterModule.forRoot(
       appRoutes
@@ -100,6 +103,7 @@ const appRoutes: Routes = [
     RewardService,
     UserService,
     CourseService,
+    AssignmentService,
     // AUTHS
     AuthGuard,
     LoginGuard,
