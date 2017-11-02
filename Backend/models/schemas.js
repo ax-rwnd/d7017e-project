@@ -4,6 +4,9 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
+/*
+* Base schemas
+*/
 var assignmentSchema = new Schema({
     name: {type: String, required: true},
     description: String,
@@ -33,6 +36,12 @@ var userSchema = new Schema({
     providers: [{type: String, required: true}]
 });
 
+var submissionSchema = new Schema({
+    user: { type: Schema.Types.ObjectId, ref: 'User', required: true},
+    assignment: { type: Schema.Types.ObjectId, ref: 'Assignment', required: true},
+    args: { type: String, required: true }
+});
+
 var courseSchema = new Schema({
     name: {type: String, required: true},
     description: {type: String, required: false},
@@ -42,6 +51,9 @@ var courseSchema = new Schema({
     features: { type: Schema.Types.ObjectId, ref: 'Features', required: true }
 });
 
+/*
+* Feature schemas
+*/
 var badgesSchema = new Schema([{
     icon: {type: String, required: true},
     title: {type: String, required: true},
@@ -85,6 +97,7 @@ var featuresBadgesSchema = new Schema([{
 var Assignment = mongoose.model('Assignment', assignmentSchema);
 var Test = mongoose.model('Test', testSchema);
 var User = mongoose.model('User', userSchema);
+var Submission = mongoose.model('Submission', submissionSchema);
 var Course = mongoose.model('Course', courseSchema);
 var Badges = mongoose.model('Badges', badgesSchema);
 var Features = mongoose.model('Features', featuresSchema);
@@ -92,7 +105,7 @@ var FeaturesProgress = mongoose.model('FeaturesProgress', featuresProgressSchema
 var FeaturesTiming = mongoose.model('FeaturesTiming', featuresTimingSchema);
 var FeaturesPerformance = mongoose.model('FeaturesPerformance', featuresPerformanceSchema);
 var FeaturesBadges = mongoose.model('FeaturesBadges', featuresBadgesSchema);
-var models = {Assignment: Assignment, Test: Test, User: User, Course: Course,
+var models = {Assignment: Assignment, Test: Test, User: User, Submission: Submission, Course: Course,
     Badges: Badges, Features: Features, FeaturesProgress: FeaturesProgress,
     FeaturesTiming: FeaturesTiming, FeaturesPerformance: FeaturesPerformance,
     FeaturesBadges: FeaturesBadges};
