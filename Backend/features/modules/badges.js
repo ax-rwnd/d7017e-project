@@ -4,7 +4,7 @@ var queries = require('../../lib/queries/queries');
 var helper = require('../features_helper');
 
 function init(emitter, name) {
-    emitter.on('handleFeature', function(data) {
+    emitter.on('handleBadges', function(data) {
         return new Promise(function (resolve, reject){
             run(data).then(function(result) {
                 let json = {};
