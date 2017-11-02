@@ -5,6 +5,7 @@ var mongoose = require('mongoose'); //Database communication
 mongoose.Promise = require('bluebird');
 var bodyParser = require('body-parser');
 var passport = require('passport'); //authentication
+var expressHbs = require('express-handlebars');
 var cors = require('cors');
 var config = require('config');
 var logger = require('./logger'); //Use Logger
@@ -13,11 +14,17 @@ var app = express();
 
 initApp();
 
+app.engine('.hbs', expressHbs({defaultLayout: 'loginLayout', extname: '.hbs'}));
+app.set('view engine', '.hbs');
+
 //mongoose.set('debug', true);
 process.title = 'd7017e-backend';
 process.env.JWT_SECRET_KEY = 'supersecret';
 process.env.JWT_AUTH_HEADER_PREFIX = 'bearer';
 
+// Make sure NODE_ENV matches express env to make env accessible
+// to the routers as well
+process.env.NODE_ENV = app.get('env');
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
@@ -46,6 +53,7 @@ app.use('/api/features', features);
 var test_routes = express.Router();
 require('./routes/test_routes')(test_routes);
 app.use('/api/', test_routes);
+
 
 //Route not found.
 app.use(function (req, res, next) {
