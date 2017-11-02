@@ -101,7 +101,7 @@ module.exports = function (router) {
             })
             .catch(function (err) {
                 next(err);
-            })
+            });
         });
     }
 
