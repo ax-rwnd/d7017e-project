@@ -53,7 +53,12 @@ module.exports = function (router) {
 
     router.get('/:user_id/courses', auth.jwtAuthProtected, check_access, function (req, res) {
         var user_id = req.params.user_id;
-        res.send("/users/" + user_id + "/courses GET Endpoint");
+        queries.getUserCourses(user_id, "name description").then(function (courses) {
+            return res.json(courses);
+        })
+        .catch(function (err) {
+            next(err);
+        });
     });
 
     router.post('/:user_id/courses', auth.jwtAuthProtected, check_access, function (req, res) {
