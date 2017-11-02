@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {ActivatedRoute, Params, Router} from '@angular/router';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-login-helper',
@@ -19,7 +20,7 @@ export class LoginHelperComponent implements OnInit {
       console.log(this.ticket);
     });
     // this.http.get('http://130.240.5.119:8000/api/login/ltu?ticket=' + this.ticket).subscribe(
-    this.http.get('https://130.240.5.118:8000/auth/login/ltu?ticket=' + this.ticket + '&service=http://130.240.5.118/auth').subscribe(
+    this.http.get(environment.backend_ip + '/auth/login/ltu?ticket=' + this.ticket + '&service=' + environment.frontend_ip + '/auth').subscribe(
       data => {
         localStorage.setItem('token', data['access_token']);
         this.router.navigate(['/user']);
