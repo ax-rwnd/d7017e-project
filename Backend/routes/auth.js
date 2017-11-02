@@ -133,11 +133,7 @@ module.exports = function (router) {
 
     if (process.env.NODE_ENV === 'development') {
         router.get('/login/fake', (req, res, next) => {
-            let profile = {
-                user: 'test-student-00',
-                email: 'test-student-00@example.com',
-            };
-            queries.findOrCreateUser(profile)
+            queries.findOrCreateUser('test-student-00')
             .then(user => {
                 res.json({
                     access_token: create_access_token(user._id),
