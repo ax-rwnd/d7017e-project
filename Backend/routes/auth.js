@@ -70,14 +70,32 @@ module.exports = function (router) {
         });
     }));
 
-    router.get('/login/ltu/', passport.authenticate('cas', {session: false}), function (req, res) {
+
+    router.get('/login/ltu/:successurl', passport.authenticate('cas', {session: false}), function (req, res) {
+        console.log("Hej");
+        var redirectUrl = req.params.successurl; 
         var access_token, refresh_token; // The JWT API keys
 
         refresh_token = create_refresh_token(req.user._id);
         access_token = create_access_token(req.user._id);
-        res.json({access_token: access_token, token_type: process.env.jwtAuthHeaderPrefix, scope: '', expires_in: access_ttl, refresh_token: refresh_token});
+        return res.render('loginRedirect.hbs', {token: access_token, redirectURL: redirectUrl, layout: 'loginLayout'});
+
+
+        //res.json({access_token: access_token, token_type: process.env.jwtAuthHeaderPrefix, scope: '', expires_in: access_ttl, refresh_token: refresh_token});
     });
 
+/*
+    if (process.env.NODE_ENV === 'development') {
+        router.get('/login/fake', (req, res, next) => {
+            res.json({
+                access_token: create_access_token('fake'),
+                token_type: process.env.jwtAuthHeaderPrefix,
+                scope: '',
+                expires_in: access_ttl
+            });
+        });
+    }
+*/
     router.post('/token', function (req, res, next) {
         var grant_type = req.body.grant_type;
 

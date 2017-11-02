@@ -63,40 +63,5 @@ function emitEvent(result) {
 // Should be moved. But to where?
 initFeatures();
 
-// TODO: REMOVE this after code is done
-let t = {
-    "results": {
-        "io": [
-            {
-                "id": "59f8a1401ac36c0762eb46ab",
-                "ok": true,
-                "stderr": "",
-                "time": 81440918
-            },
-            {
-                "id": "59f8a1541ac36c0762eb46ac",
-                "ok": true,
-                "stderr": "",
-                "time": 65636960
-            }
-        ],
-        "prepare": "",
-        "code_size": 20,
-        "optional_tests": [
-            {
-                "id": "59f8a1621ac36c0762eb46ad",
-                "ok": true,
-                "stderr": "",
-                "time": 23770657
-            }
-        ],
-        "lint": "/tmp/tmp-21okZiNRuZOCOu.tmp:1:21: W292 no newline at end of file\n"
-    }
-};
-//emitEvent(t).then(function(result) {
-//    console.log(result);
-//});
-// END REMOVE
-
 exports.initFeatures = initFeatures;
 exports.emitEvent = emitEvent;
