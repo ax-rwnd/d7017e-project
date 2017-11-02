@@ -33,6 +33,7 @@
 
 .userOption:hover {
   background-color: #0f2837;
+  cursor: pointer;
 }
 
 a.linkDropbox {

@@ -103,6 +103,7 @@ body {
 .navbar-default .navbar-nav > li > a:hover {
   background-color: #0f2837;
   color: white;
+  cursor: pointer;
 }
 .navbar-default .navbar-nav > li > a:focus,
 .navbar-default .navbar-nav > .active > a,

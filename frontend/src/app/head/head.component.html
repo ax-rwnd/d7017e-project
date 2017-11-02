@@ -11,15 +11,15 @@
       <li><a>
         <span class="glyphicon glyphicon-bell"></span>
       </a></li>
-      <li (click)="toggleUserDropDown()"><a routerLink="./"> <!-- [routerLinkActive]="['active']" -->
+      <li (click)="toggleUserDropDown()"><a> <!-- [routerLinkActive]="['active']" -->
         <span class="glyphicon glyphicon-user"></span>
         {{user.firstName}} {{user.lastName}}
         <label *ngIf="isDropDown()"><span class="glyphicon glyphicon-menu-up"></span></label>
         <label *ngIf="!isDropDown()"><span class="glyphicon glyphicon-menu-down"></span></label>
         <div class="userDropBox" [@userDropBox]="stateDropDown"> <!-- [style.display]="isDropDown() ? 'block': 'none'" -->
-          <div class="userOption" [@userOption]="stateDropDown">
+          <div class="userOption" [@userOption]="stateDropDown" routerLink="/user">
             <span class="glyphicon glyphicon-user"></span> <span style="display:inline-block; width: 0.5em;"></span>
-            <a class="linkDropbox" routerLink="/user">Profile</a> <!-- (click)="profileModal.show()" -->
+            <a class="linkDropbox">Profile</a> <!-- (click)="profileModal.show()" -->
           </div>
           <div class="userOption" [@userOption]="stateDropDown">
             <span class="glyphicon glyphicon-edit"></span> <span style="display:inline-block; width: 0.5em;"></span> Statistics
@@ -27,9 +27,9 @@
           <div class="userOption" [@userOption]="stateDropDown">
             <span class="glyphicon glyphicon-cog"></span> <span style="display:inline-block; width: 0.5em;"></span> Settings
           </div>
-          <div class="userOption" [@userOption]="stateDropDown">
+          <div class="userOption" [@userOption]="stateDropDown" routerLink="/">
             <span class="glyphicon glyphicon-log-out"></span> <span style="display:inline-block; width: 0.5em;"></span>
-            <a class="linkDropbox" routerLink="/">Log out</a>
+            <a class="linkDropbox">Log out</a>
           </div>
         </div>
       </a></li>
