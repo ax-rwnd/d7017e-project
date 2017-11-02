@@ -42,6 +42,7 @@ import {NoopInterceptor} from './Interceptors/Auth.interceptor';
 
 import {AuthService} from './services/Auth/Auth.service';
 import {Http, HttpModule} from '@angular/http';
+import { AssignmentGroupComponent } from './assignment-group/assignment-group.component';
 
 
 const appRoutes: Routes = [
@@ -67,6 +68,7 @@ const appRoutes: Routes = [
     UserComponent,
     MainComponent,
     CreateassignmentComponent,
+    AssignmentGroupComponent,
   ],
   imports: [
     BrowserModule,

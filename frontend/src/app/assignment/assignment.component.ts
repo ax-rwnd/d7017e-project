@@ -26,11 +26,15 @@ export class AssignmentComponent implements OnInit {
   content: string;
   progress: any;
   assignmentScore: any;
+  themes: [string];
   theme: string;
+  languages: [string];
   language: string;
   status: string;
   sidebarState; // state of sidebar
   result: string;
+
+  feedback: any;
 
   assignmentTest: string; // for testing purposes
 
@@ -41,12 +45,15 @@ export class AssignmentComponent implements OnInit {
   ngOnInit() {
     this.sidebarState = this.headService.getCurrentState();
     this.assignment = this.backendService.getAssignment();
-    this.language = 'python'; // hardcoded, should probably be read from getAssignment from backend?
+    this.languages = ['python', 'javascript']; // hardcoded, should probably be read from getAssignment from backend?
+    this.language = this.languages[0];
+    this.themes = ['eclipse', 'monokai'];
     this.theme = 'eclipse'; // default theme for now, could be saved on backend
     this.content = '';
     this.status = 'Not Completed'; // hardcoded for now, endpoint to backend needed
     this.progress = this.rewardService.progress;
     this.assignmentScore = this.rewardService.assignmentScore;
+    this.feedback = this.rewardService.feedback;
     this.result = '';
     this.course = 'D0009E - Introduktion till programmering'; // endpoint needed
     this.assignmentTest = '<h1>Assignment 1</h1> Detta är ett test av innerHTML för <b>lärare</b>' +
@@ -58,17 +65,20 @@ export class AssignmentComponent implements OnInit {
 
   submitCode() {
     this.backendService.SubmitAssignment(this.content)
-      .then(value => this.rewardService.HandleResponse(value));
+      .then(value => this.feedback = this.rewardService.HandleResponse(value));
   }
 
   setTheme(th) {
     this.theme = th;
   }
 
+  setMode(th) {
+    this.language = th;
+  }
+
   onChange(c) {
     this.content = c;
   }
-
 
 
 }
