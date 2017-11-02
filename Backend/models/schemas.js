@@ -30,7 +30,7 @@ var testSchema = new Schema({
 
 var userSchema = new Schema({
 	username: {type: String, required: true},
-    email: {type: String, required: true},
+    email: {type: String, required: false},
     admin: {type: Boolean, required: true},
     courses: [{ type: Schema.Types.ObjectId, ref: 'Course', required: false}],
     providers: [{type: String, required: true}]

@@ -61,7 +61,7 @@ function getUser(id) {
 function findOrCreateUser(username) {
     return User.findOne({username: username}).then(function (user) {
         if (!user) {
-            var newUser = new User({username: username, email: "", admin: false, courses: []});
+            var newUser = new User({username: username, admin: false, courses: []});
             return newUser.save().then(function (createdUser) {
                 return createdUser;
             });
