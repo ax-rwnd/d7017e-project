@@ -13,7 +13,7 @@ import {UserService} from '../services/user.service';
       state('false', style({display: 'none', border: 'none', overflow: 'hidden', opacity: '0'})),
       state('true', style({display: 'block', opacity: '1'})),
       transition('0 => 1', animate('80ms 200ms ease-in')),
-      transition('1 => 0', animate('80ms 200ms ease-out'))
+      transition('1 => 0', animate('150ms ease-out'))
     ]),
     trigger('userDropBox', [
       state('false', style({display: 'none', height: '0'})),
