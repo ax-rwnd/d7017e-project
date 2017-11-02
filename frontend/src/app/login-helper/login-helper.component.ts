@@ -19,7 +19,7 @@ export class LoginHelperComponent implements OnInit {
       console.log(this.ticket);
     });
     // this.http.get('http://130.240.5.119:8000/api/login/ltu?ticket=' + this.ticket).subscribe(
-    this.http.get('https://127.0.0.1:8000/auth/login/ltu?ticket=' + this.ticket + '&service=http://127.0.0.1:4200/auth').subscribe(
+    this.http.get('https://130.240.5.118:8000/auth/login/ltu?ticket=' + this.ticket + '&service=http://130.240.5.118/auth').subscribe(
       data => {
         localStorage.setItem('token', data['access_token']);
         this.router.navigate(['/user']);

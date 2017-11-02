@@ -64,7 +64,7 @@ export class UserComponent implements OnInit {
     this.courseService.AddCourse(course);
   }
   getMe() {
-    this.http.get('https://127.0.0.1:8000/api/users/me').subscribe(
+    this.http.get('https://130.240.5.118:8000/api/users/me').subscribe(
       data => {
         console.log(data);
       },
