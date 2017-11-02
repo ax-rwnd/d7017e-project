@@ -29,7 +29,12 @@ module.exports = function (router) {
 
     router.get('/:user_id', auth.jwtAuthProtected, check_access, function (req, res) {
         var user_id = req.params.user_id;
-        res.send("/users/" + user_id + " GET Endpoint");
+        queries.getUser(user_id, "username email").then(function (user) {
+            return res.json(user);
+        })
+        .catch(function (err) {
+            next(err)
+        });
     });
 
     router.delete('/:user_id', auth.jwtAuthProtected, check_access, function (req, res) {
