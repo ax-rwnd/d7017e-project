@@ -70,25 +70,8 @@
       </div>
     </div>
     <div class="col-lg-6">
-      <div class="gamification-block panel panel-default">
-        <div class="panel-heading assignment-header" (click)="show.assignments = !show.assignments">
-          Assignments
-        </div>
-        <div class="panel-body" [collapse]="show.assignments">
-          <div [routerLink]="['/courses', currentCourse.code, 'assignment']" *ngFor="let n of assignments" class="assignment well">
-            {{n}}
-          </div>
-        </div>
-      </div>
-      <div class="gamification-block panel panel-default" (click)="show.exercises = !show.exercises">
-        <div class="panel-heading assignment-header">
-          Exercises
-        </div>
-        <div class="panel-body" [collapse]="show.exercises">
-          <div [routerLink]="['/courses', currentCourse.code, 'assignment']" class="assignment well" *ngFor="let n of exercises">
-            {{n}}
-          </div>
-        </div>
+      <div *ngFor="let g of assignmentGroups">
+        <app-assignment-group [assignmentGroup]="g" [courseCode]="currentCourse.code"></app-assignment-group>
       </div>
     </div>
   </div>

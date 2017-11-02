@@ -21,12 +21,14 @@
       "styles": [
         "../node_modules/codemirror/lib/codemirror.css",
         "../node_modules/bootstrap/dist/css/bootstrap.css",
+        "../node_modules/font-awesome/css/font-awesome.css",
         "styles.css"
       ],
       "scripts": ["../node_modules/ace-builds/src-min/ace.js",
         "../node_modules/ace-builds/src-min/theme-eclipse.js",
         "../node_modules/ace-builds/src-min/theme-monokai.js",
         "../node_modules/ace-builds/src-min/mode-python.js",
+        "../node_modules/ace-builds/src-min/mode-javascript.js",
         "../node_modules/ace-builds/src-min/mode-markdown.js"],
       "environmentSource": "environments/environment.ts",
       "environments": {

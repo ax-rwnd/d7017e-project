@@ -1,6 +1,6 @@
 #description {
   margin: 1%;
-  padding: 0;
+  padding: 1%;
   height: 100%;
   background-color: lightgray;
   float: left;
@@ -23,6 +23,12 @@
   box-shadow: 1px 1px 3px rgba(180, 180, 180, 1);
 }
 
+#editor {
+  height: 500px;
+  max-height: 500px;
+  overflow: scroll;
+}
+
 #inputField {
   margin: 1%;
   padding: 0;
@@ -37,7 +43,7 @@
 
 #feedback {
   margin: 1%;
-  padding: 0;
+  padding: 1%;
   height: 100%;
   background-color: lightgray;
   float: left;
@@ -80,6 +86,13 @@
   height: 300px;
   position: absolute;
 
+}
+
+#codesize {
+  padding: 10px;
+  font-size: 12px;
+  border: none;
+  cursor: pointer;
 }
 
 .dropbtn {
