@@ -16,13 +16,13 @@ after(() => {
 });
 
 describe('api', () => {
-    //let runner;
     let access_token;
 
-    beforeEach(() => {
+    before(() => {
         access_token = undefined;
         return request(runner.server)
         .get('/auth/login/fake')
+        .query({admin: 'true'})
         .expect(200)
         .then(res => {
             access_token = res.body.access_token;

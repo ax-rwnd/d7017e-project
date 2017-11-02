@@ -144,7 +144,7 @@ module.exports = function (router) {
                 req.query.suffix = '00';
             }
             let profile = {
-                username: `fake-$(role)-$(req.query.suffix)`,
+                username: `fake-${role}-${req.query.suffix}`,
                 admin: admin
             };
             queries.findOrCreateUser(profile)
