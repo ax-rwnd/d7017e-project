@@ -7,13 +7,15 @@ var Test = require('../models/schemas').Test;
 
 var request = require('request');
 var queries = require('../lib/queries/queries');
-var passport = require('passport');
-var CasStrategy = require('passport-cas').Strategy;
+//var passport = require('passport');
+//var CasStrategy = require('passport-cas').Strategy;
 
 var errors = require('../lib/errors.js');
 var jwt = require('jsonwebtoken');
 var auth = require('express-jwt-token');
+var parseXml = require('xml2js').parseString;
 var check_access = require('../lib/access.js');
+var https = require('https');
 
 const TESTER_IP = 'http://130.240.5.118:9100';
 const SECRET = 'supersecret';
@@ -57,40 +59,87 @@ module.exports = function (router) {
      */
 
 
-    passport.use(new CasStrategy({
-        version: 'CAS3.0',
-        ssoBaseURL: 'https://weblogon.ltu.se/cas',
-        serverBaseURL: 'http://127.0.0.1:8000'//BACKEND_IP
-    }, function (profile, done) {
-        console.log(profile);
-        queries.findOrCreateUser(profile).then(function (user) {
-            return done(null, user);
-        }).catch(function (err) {
-            return done(err);
+    // passport.use(new CasStrategy({
+    //     version: 'CAS3.0',
+    //     ssoBaseURL: 'https://weblogon.ltu.se/cas',
+    //     serverBaseURL: 'http://127.0.0.1:8000'//BACKEND_IP
+    // }, function (profile, done) {
+    //     console.log(profile);
+    //     queries.findOrCreateUser(profile).then(function (user) {
+    //         return done(null, user);
+    //     }).catch(function (err) {
+    //         return done(err);
+    //     });
+    // }));
+
+    router.get('/login/ltu', function (req, res){
+        var ticket = req.query.ticket;
+        var service = req.query.service;
+
+        console.log(ticket);
+        console.log(service);
+
+        var url = 'https://weblogon.ltu.se/cas/serviceValidate?service=' + service + '&ticket=' + ticket;
+        console.log(url);
+
+        var requ = https.get(url, function (resu) {
+            var output = '';
+            //resu.setEncoding('utf8');
+
+            resu.on('data', function (chunk) {
+                output += chunk;
+            });
+
+            resu.on('end', function() {
+                parseXml(output, function (err, result){
+                    // Parse the CAS XML response
+                    var success = result['cas:serviceResponse']['cas:authenticationSuccess'];
+
+                    if (success) {
+                        var username = success[0]['cas:user'][0];
+                        console.log("user = " + username);
+
+                        queries.findOrCreateUser(username)
+                        .then(user => {
+                            res.json({
+                                access_token: create_access_token(user._id),
+                                token_type: process.env.jwtAuthHeaderPrefix,
+                                scope: '',
+                                expires_in: access_ttl,
+                                refresh_token: create_refresh_token(user._id)
+                            });
+                        })
+                        .catch(function (err) {
+                            next(err);
+                        });
+
+                    } else {
+                        var error = result['cas:serviceResponse']['cas:authenticationFailure'][0].$.code;
+                        console.log("error = " + error);
+
+                        res.json({error: error});
+                    }
+                });
+            });
         });
-    }));
-
-
-    router.get('/login/ltu/:successurl', passport.authenticate('cas', {session: false}), function (req, res) {
-        console.log("Hej");
-        var redirectUrl = req.params.successurl; 
-        var access_token, refresh_token; // The JWT API keys
-
-        refresh_token = create_refresh_token(req.user._id);
-        access_token = create_access_token(req.user._id);
-        return res.render('loginRedirect.hbs', {token: access_token, redirectURL: redirectUrl, layout: 'loginLayout'});
-
-
-        //res.json({access_token: access_token, token_type: process.env.jwtAuthHeaderPrefix, scope: '', expires_in: access_ttl, refresh_token: refresh_token});
     });
+
+    // router.get('/login/ltu/:successurl', passport.authenticate('cas', {session: false}), function (req, res) {
+    //     console.log("Hej");
+    //     var redirectUrl = req.params.successurl; 
+    //     var access_token, refresh_token; // The JWT API keys
+
+    //     refresh_token = create_refresh_token(req.user._id);
+    //     access_token = create_access_token(req.user._id);
+    //     return res.render('loginRedirect.hbs', {token: access_token, redirectURL: redirectUrl, layout: 'loginLayout'});
+
+
+    //     //res.json({access_token: access_token, token_type: process.env.jwtAuthHeaderPrefix, scope: '', expires_in: access_ttl, refresh_token: refresh_token});
+    // });
 
     if (process.env.NODE_ENV === 'development') {
         router.get('/login/fake', (req, res, next) => {
-            let profile = {
-                user: 'test-student-00',
-                email: 'test-student-00@example.com',
-            };
-            queries.findOrCreateUser(profile)
+            queries.findOrCreateUser('test-student-00')
             .then(user => {
                 res.json({
                     access_token: create_access_token(user._id),

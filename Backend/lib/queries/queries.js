@@ -11,6 +11,7 @@ var errors = require('../errors.js');
 
 //get all tests related to a specific assignment.
 function getTestsFromAssignment(assignmentID, callback) {
+
     Assignment.findById(assignmentID)
     .populate({
         path: 'tests.io',
@@ -58,11 +59,14 @@ function getUser(id) {
 }
 */
 
-function findOrCreateUser(profile) {
-    return User.findOne({username: profile.user}).then(function (user) {
+function findOrCreateUser(username) {
+    return User.findOne({username: username}).then(function (user) {
         if (!user) {
-            var newUser = new User({username: profile.user, email: profile.email, admin: false, courses: []});
+            var newUser = new User({username: username, admin: false, courses: []});
             return newUser.save().then(function (createdUser) {
+                if (!createdUser) {
+                    console.log("Error: User not created");
+                }
                 return createdUser;
             });
         }
@@ -100,7 +104,6 @@ function getUserCourses(id, fields) {
         return courseList;
     });
 }
-
 
 //Field argument needs a check. If i don't want teacher, will it still be populated?!
 function getCourse(id, fields) {

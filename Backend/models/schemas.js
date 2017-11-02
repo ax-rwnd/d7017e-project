@@ -30,7 +30,7 @@ var testSchema = new Schema({
 
 var userSchema = new Schema({
 	username: {type: String, required: true},
-    email: {type: String, required: true},
+    email: {type: String, required: false},
     admin: {type: Boolean, required: true},
     courses: [{ type: Schema.Types.ObjectId, ref: 'Course', required: false}],
     providers: [{type: String, required: true}]
@@ -54,13 +54,20 @@ var courseSchema = new Schema({
 /*
 * Feature schemas
 */
+
 var badgeSchema = new Schema({
-    assignment_id: { type: Schema.Types.ObjectId, ref: 'Assignment', required: true},
     icon: {type: String, required: true},
     title: {type: String, required: true},
-    description: {type: String, required: true},
+    description: {type: String, required: true}
+});
+
+var courseBadgeSchema = new Schema({
+    course_id: { type: Schema.Types.ObjectId, ref: 'Course', required: true},
+    badge_id: { type: Schema.Types.ObjectId, ref: 'Badge', required: true},
     goals: {
+        badges: [{ type: Schema.Types.ObjectId, ref: 'Badge', required: false}],
         tests: [{ type: Schema.Types.ObjectId, ref: 'Test', required: false}],
+        assignments: [{ type: Schema.Types.ObjectId, ref: 'Assignment', required: false}],
         code_size: Number
     }
 });
@@ -82,8 +89,9 @@ var User = mongoose.model('User', userSchema);
 var Submission = mongoose.model('Submission', submissionSchema);
 var Course = mongoose.model('Course', courseSchema);
 var Badge = mongoose.model('Badge', badgeSchema);
+var CourseBadge = mongoose.model('CourseBadge', courseBadgeSchema);
 var Features = mongoose.model('Features', featuresSchema);
 var models = {Assignment: Assignment, Test: Test, User: User, Submission: Submission, Course: Course,
-    Badge: Badge, Features: Features};
+    Badge: Badge, CourseBadge: CourseBadge, Features: Features};
 
 module.exports = models;
