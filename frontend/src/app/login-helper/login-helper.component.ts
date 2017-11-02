@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import {HttpClient, HttpParams} from '@angular/common/http';
-import {ActivatedRoute, Params} from '@angular/router';
+import {ActivatedRoute, Params, Router} from '@angular/router';
 
 @Component({
   selector: 'app-login-helper',
@@ -8,10 +8,10 @@ import {ActivatedRoute, Params} from '@angular/router';
   styleUrls: ['./login-helper.component.css']
 })
 export class LoginHelperComponent implements OnInit {
-  results: string[];
+  token: string;
   ticket: string;
 
-  constructor(private http: HttpClient, private activatedRoute: ActivatedRoute) { }
+  constructor(private http: HttpClient, private activatedRoute: ActivatedRoute, private router: Router) { }
 
   ngOnInit() {
     this.activatedRoute.queryParams.subscribe((params: Params) => {
@@ -19,13 +19,15 @@ export class LoginHelperComponent implements OnInit {
       console.log(this.ticket);
     });
     // this.http.get('http://130.240.5.119:8000/api/login/ltu?ticket=' + this.ticket).subscribe(
-    this.http.get('http://130.240.5.119:8000/api/login/ltu?ticket=' + this.ticket).subscribe(
+    this.http.get('https://127.0.0.1:8000/auth/login/ltu?ticket=' + this.ticket + '&service=http://127.0.0.1:4200/auth').subscribe(
       data => {
-        this.results = data['results'];
-        console.log(this.results);
+        localStorage.setItem('token', data['access_token']);
+        this.router.navigate(['/user']);
       },
       err => {
-        localStorage.setItem('token', 'ERROR_TOKEN');
+        console.log(err);
+        console.log('something went shit');
+        this.router.navigate(['/']);
       }
     );
   }

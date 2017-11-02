@@ -36,7 +36,6 @@ import {CourseService} from './services/course.service';
 
 // AUTH
 import {AuthGuardService as AuthGuard} from './services/Auth/Auth-Guard.service';
-import {AuthGuardService as LoginGuard} from './services/Auth/Login-Guard.service';
 import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
 import {NoopInterceptor} from './Interceptors/Auth.interceptor';
 
@@ -100,7 +99,6 @@ const appRoutes: Routes = [
     CourseService,
     // AUTHS
     AuthGuard,
-    LoginGuard,
     AuthService,
   ],
   bootstrap: [AppComponent]
