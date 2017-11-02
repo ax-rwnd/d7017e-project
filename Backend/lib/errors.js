@@ -17,5 +17,6 @@ module.exports = {
     TOKEN_USER_NOT_FOUND: new APIError("Internal Server Error", 500, 7000),
     INVALID_TOKEN: new APIError("Invalid Token", 401, 7001),
     NO_COURSES_EXIST: new APIError("No courses exists", 404, 7002),
-    COURSE_DO_NOT_EXIST: new APIError("Course doesn't exist", 404, 7003)
+    COURSE_DO_NOT_EXIST: new APIError("Course doesn't exist", 404, 7003),
+    BAD_INPUT: new APIError("Wrong input. Read documentation.", 400, 7004)
 };
