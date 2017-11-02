@@ -23,6 +23,12 @@
   box-shadow: 1px 1px 3px rgba(180, 180, 180, 1);
 }
 
+#editor {
+  height: 500px;
+  max-height: 500px;
+  overflow: scroll;
+}
+
 #inputField {
   margin: 1%;
   padding: 0;

@@ -40,7 +40,9 @@
 
 
       <!--<codemirror [(ngModel)]="content" [config]="{lineNumbers: true}"></codemirror>-->
-    <div ace-editor [(text)]="content" [mode]="mode" [theme]="theme" [options]="{maxLines: 1000, printMargin: false}" [readOnly]="false" [autoUpdateContent]="true" [durationBeforeCallback]="1000"(textChanged)="onChange(content)"  style="min-height: 100%; width:100%; overflow: auto;"> </div>
+    <div id="editor">
+      <div ace-editor [(text)]="content" [mode]="mode" [theme]="theme" [options]="{maxLines: 1000, printMargin: false}" [readOnly]="false" [autoUpdateContent]="true" [durationBeforeCallback]="1000"(textChanged)="onChange(content)"  style="min-height: 100%; width:100%; overflow: auto;"> </div>
+    </div>
     
     <div id="submitBar">
 
