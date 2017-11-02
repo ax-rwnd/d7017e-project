@@ -34,6 +34,8 @@ export class AssignmentComponent implements OnInit {
   sidebarState; // state of sidebar
   result: string;
 
+  feedback: any;
+
   assignmentTest: string; // for testing purposes
 
   constructor(private backendService: BackendService, private rewardService: RewardService, private headService: HeadService) {
@@ -51,6 +53,7 @@ export class AssignmentComponent implements OnInit {
     this.status = 'Not Completed'; // hardcoded for now, endpoint to backend needed
     this.progress = this.rewardService.progress;
     this.assignmentScore = this.rewardService.assignmentScore;
+    this.feedback = this.rewardService.feedback;
     this.result = '';
     this.course = 'D0009E - Introduktion till programmering'; // endpoint needed
     this.assignmentTest = '<h1>Assignment 1</h1> Detta är ett test av innerHTML för <b>lärare</b>' +
@@ -62,7 +65,7 @@ export class AssignmentComponent implements OnInit {
 
   submitCode() {
     this.backendService.SubmitAssignment(this.content)
-      .then(value => this.rewardService.HandleResponse(value));
+      .then(value => this.feedback = this.rewardService.HandleResponse(value));
   }
 
   setTheme(th) {

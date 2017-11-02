@@ -4,6 +4,20 @@ import { HttpClient } from '@angular/common/http';
 @Injectable()
 export class BackendService {
   constructor(private http: HttpClient) { }
+  SubmitAssignment(code) { // Returns hardcoded response, remove later
+    return new Promise(resolve => {
+      resolve(
+        {
+          'results': {
+            'io': [{'id': 0, 'time': 45, 'stderr': '', 'ok': true}, {'id': 0, 'time': 58, 'stderr': 'Wrong output', 'ok': false}],
+            'lint': 'Lint error: Fix your indentation at ...',
+            'prepare': ''
+          }
+        }
+      );
+    });
+  }
+  /*
   SubmitAssignment(code) {
     return new Promise(resolve => {
       const body = {
@@ -20,6 +34,7 @@ export class BackendService {
       }
     );
   }
+  */
   /*
   getAssignment() {
     return new Promise(resolve => {
