@@ -1,12 +1,3 @@
-.progress-margin {
-  margin-left: 10px;
-  margin-right: 10px;
-}
-.fillBadge {
-  margin-right: 5px;
-  margin-bottom: 10px;
-}
-
 .gamification-header {
   background-color: #133756;
   color: white;
@@ -22,10 +13,15 @@
 
 .gamification-block {
   background-color: rgba(29, 117, 175, 0.27);
-  width: 95%;
+  margin-right: 5%;
+  margin-left: 5%;
 }
 
 .assignment {
   cursor: pointer;
   font-weight: bold;
+}
+
+.right-margin {
+  margin-right: 1%;
 }

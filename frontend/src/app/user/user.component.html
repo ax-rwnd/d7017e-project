@@ -10,6 +10,7 @@
   <button class="btn" (click)="openModal(courseModal)">Create course</button>
   <p><a class="userlinks">Settings</a></p>
   <p><a class="userlinks" (click)="toggleStatistics()">Statistics</a></p>
+  <button type="button" class="btn" (click)="getMe()">test getMe</button>
   <app-statistics *ngIf="statistics"></app-statistics>
 </div>
 
@@ -57,6 +58,7 @@
   </div>
   <div class="modal-footer">
     <button type="submit" class="btn" (click)="modalRef.hide()">Submit</button>
+
   </div>
   </form>
 </ng-template>
