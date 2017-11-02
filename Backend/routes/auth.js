@@ -84,18 +84,24 @@ module.exports = function (router) {
         //res.json({access_token: access_token, token_type: process.env.jwtAuthHeaderPrefix, scope: '', expires_in: access_ttl, refresh_token: refresh_token});
     });
 
-/*
     if (process.env.NODE_ENV === 'development') {
         router.get('/login/fake', (req, res, next) => {
-            res.json({
-                access_token: create_access_token('fake'),
-                token_type: process.env.jwtAuthHeaderPrefix,
-                scope: '',
-                expires_in: access_ttl
+            let profile = {
+                user: 'test-student-00',
+                email: 'test-student-00@example.com',
+            };
+            queries.findOrCreateUser(profile)
+            .then(user => {
+                res.json({
+                    access_token: create_access_token(user._id),
+                    token_type: process.env.jwtAuthHeaderPrefix,
+                    scope: '',
+                    expires_in: access_ttl
+                });
             });
         });
     }
-*/
+
     router.post('/token', function (req, res, next) {
         var grant_type = req.body.grant_type;
 

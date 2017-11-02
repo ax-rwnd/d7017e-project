@@ -7,7 +7,6 @@ let runner = require('../bin/www');
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 after(() => {
-    console.log('afterafter');
     runner.server.close(() => {
         // for some reason the program doesn't terminate
         // even after all tests are done
@@ -27,27 +26,25 @@ describe('api', () => {
         .expect(200)
         .then(res => {
             access_token = res.body.access_token;
-            console.log('authed');
         });
-    });
-
-    afterEach((done) => {
-        done();
-        console.log('after');
     });
 
     describe('GET /api/courses/me', () => {
         it('fails when not provided with an access token', () => {
-            request(runner.server)
+            return request(runner.server)
             .get('/api/courses/me')
-            .expect(403);
+            .expect(401);
         });
 
         it('gets courses for the fake user', () => {
-            request(runner.server)
+            return request(runner.server)
             .get('/api/courses/me')
             .set('Authorization', 'Bearer ' + access_token)
-            .expect(200);
+            .expect(200)
+            .then(res => {
+                console.log(res.body.courses);
+                // TODO: make assertions about the courses returned
+            });
         });
     });
 
