@@ -60,9 +60,9 @@ function getUser(id) {
 */
 
 function findOrCreateUser(profile) {
-    username = profile.username;
-    email = profile.email || "";
-    admin = profile.admin || false;
+    var username = profile.username;
+    var email = profile.email || "";
+    var admin = profile.admin || false;
     return User.findOne({username: username}).then(function (user) {
         if (!user) {
             var newUser = new User({username: username, email: email, admin: admin, courses: []});
