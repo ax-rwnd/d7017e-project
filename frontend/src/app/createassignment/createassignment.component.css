@@ -1,3 +1,12 @@
+#difficulty {
+  background-color: #133756;
+  color: white;
+  font-weight: bold;
+  width: 100%;
+  padding: 12px 16px;
+  box-shadow: 1px 1px 3px rgba(180, 180, 180, 1);
+}
+
 #assignmentDescription {
   margin: 1%;
   padding: 0;
@@ -28,12 +37,29 @@
   padding: 0;
   height: 100%;
   text-align: left;
+  float: left;
+  width: 78%;
+}
+
+#test {
+  margin: 1%;
+  height: 100%;
+  text-align: left;
+  padding: 12px 16px;
   background-color: lightgray;
   float: left;
   width: 78%;
   border-radius: 15px;
   background-color: rgba(255, 255, 255, 0.8);
   box-shadow: 1px 1px 3px rgba(180, 180, 180, 1);
+}
+
+#testInfo {
+  float: left;
+}
+
+#testEdit {
+  float: right;
 }
 
 .dropbtn {
@@ -71,4 +97,13 @@
 
 .dropdown:hover .dropdown-content {
   display: block;
+}
+
+#header, #footer {
+  text-align: center;
+  padding: 1em;
+  color: white;
+  background-color: #133756;
+  clear: left;
+  text-align: center;
 }

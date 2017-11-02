@@ -11,108 +11,50 @@
       <li><a>
         <span class="glyphicon glyphicon-bell"></span>
       </a></li>
-      <li [routerLinkActive]="['active']"><a routerLink="/user">
-        <span class="	glyphicon glyphicon-user"></span>
-        Profile
-      </a></li>
-      <li><a href="#">
-        <span class="glyphicon glyphicon-log-out"></span>
-        Log out
+      <li (click)="toggleUserDropDown()"><a> <!-- [routerLinkActive]="['active']" -->
+        <span class="glyphicon glyphicon-user"></span>
+        {{user.firstName}} {{user.lastName}}
+        <label *ngIf="isDropDown()"><span class="glyphicon glyphicon-menu-up"></span></label>
+        <label *ngIf="!isDropDown()"><span class="glyphicon glyphicon-menu-down"></span></label>
+        <div class="userDropBox" [@userDropBox]="stateDropDown"> <!-- [style.display]="isDropDown() ? 'block': 'none'" -->
+          <div class="userOption" [@userOption]="stateDropDown" routerLink="/user">
+            <span class="glyphicon glyphicon-user"></span> <span style="display:inline-block; width: 0.5em;"></span>
+            <a class="linkDropbox">Profile</a> <!-- (click)="profileModal.show()" -->
+          </div>
+          <div class="userOption" [@userOption]="stateDropDown">
+            <span class="glyphicon glyphicon-edit"></span> <span style="display:inline-block; width: 0.5em;"></span> Statistics
+          </div>
+          <div class="userOption" [@userOption]="stateDropDown">
+            <span class="glyphicon glyphicon-cog"></span> <span style="display:inline-block; width: 0.5em;"></span> Settings
+          </div>
+          <div class="userOption" [@userOption]="stateDropDown" routerLink="/">
+            <span class="glyphicon glyphicon-log-out"></span> <span style="display:inline-block; width: 0.5em;"></span>
+            <a class="linkDropbox">Log out</a>
+          </div>
+        </div>
       </a></li>
     </ul>
   </div>
 </nav>
 
-<!--
-<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
-
-<div id="throbber" style="display:none; min-height:120px;"></div>
-<div id="noty-holder"></div>
-<div id="wrapper">
-  &lt;!&ndash; Navigation &ndash;&gt;
-  <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-    &lt;!&ndash; Brand and toggle get grouped for better mobile display &ndash;&gt;
-    <div class="navbar-header">
-      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse" (click)="mobileCollapse = !mobileCollapse">
-        <span class="sr-only">Toggle navigation</span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-      </button>
-      &lt;!&ndash;<button type="button" class="btn btn-primary"
-
-      </button>&ndash;&gt;
-    </div>
-    &lt;!&ndash; Top Menu Items &ndash;&gt;
-    <ul class="nav navbar-left top-nav" >
-      <li><a data-placement="bottom" data-toggle="tooltip" data-original-title="Stats" (click)="isCollapsed = !isCollapsed">
-        Menu
-      </a>
-      </li>
-    </ul>
-    <ul class="nav navbar-right top-nav">
-      <li><a href="#" data-placement="bottom" data-toggle="tooltip" href="#" data-original-title="Stats"><i class="fa fa-bell-o"></i>
-      </a>
-      </li>
-      <li class="dropdown">
-        <a (click)="toggleProfile()">Profile <i class="fa fa-user"></i> <b class="fa fa-angle-{{angleProfile}}"></b></a>
-        <ul class="dropdown-menu"
-            (collapsed)="collapsed($event)"
-            (expanded)="expanded($event)"
-            [collapse]="profileCollapse">
-          <li [routerLink]="['/user', 'defaultUser']"><a><i class="fa fa-fw fa-user"></i> Edit Profile</a></li>
-          <li><a><i class="fa fa-fw fa-cog"></i> Change Password</a></li>
-          <li class="divider"></li>
-          <li routerLink=""><a><i class="fa fa-fw fa-power-off"></i> Logout</a></li>
-        </ul>
-      </li>
-    </ul>
-    &lt;!&ndash; Sidebar Menu Items - These collapse to the responsive navigation menu on small screens &ndash;&gt;
-    <div *ngIf="isCollapsed" class="collapse navbar-collapse navbar-ex1-collapse" (collapsed)="collapsed($event)"
-         (expanded)="expanded($event)"
-         [collapse]="mobileCollapse">
-      <ul class="nav navbar-nav side-nav">
-        <li routerLink="/courses/D0009E">
-          &lt;!&ndash;<a href="/head" data-toggle="collapse" data-target="#submenu-1"><i class="fa fa-fw fa-search"></i> MENU 1 <i class="fa fa-fw fa-angle-down pull-right"></i></a>&ndash;&gt;
-          <a (click)="toggleMenu1()"> <i class="fa fa-fw fa-leanpub"></i> D0009E <i  class="fa fa-fw fa-angle-{{angle}} pull-right"></i> </a>
-          <ul id="submenu-1" class="collapse"
-              (collapsed)="collapsed($event)"
-              (expanded)="expanded($event)"
-              [collapse]="subMenu1Collapsed" >
-            <li routerLink="/courses/D0009E/assignment"><a><i class="fa fa-angle-double-right"></i> Assignment 1</a></li>
-            <li routerLink="/assignment"><a><i class="fa fa-angle-double-right"></i> Assingment 2</a></li>
-            <li routerLink="/assignment"><a><i class="fa fa-angle-double-right"></i> Assingment 3</a></li>
-          </ul>
-        </li>
-        <li routerLink="/courses/D0010E">
-          <a><i class="fa fa-fw fa-leanpub"></i> D0010E</a>
-        </li>
-        <li routerLink="/courses/D0011E">
-          <a><i class="fa fa-fw fa-leanpub"></i> D0011E</a>
-        </li>
-        <li routerLink="/courses/D0012E">
-          <a><i class="fa fa-fw fa-leanpub"></i> D0012E</a>
-        </li>
-      </ul>
-    </div>
-    &lt;!&ndash; /.navbar-collapse &ndash;&gt;
-  </nav>
-
-  <div id="page-wrapper">
-    <div class="container-fluid">
-      &lt;!&ndash; Page Heading &ndash;&gt;
-      <div class="row" id="main" >
-        <div class="col-sm-12 col-md-12 well" id="content">
-
-        </div>
+<div class="modal fade" bsModal #profileModal="bs-modal" [config]="{backdrop: 'static'}"
+     tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title pull-left">Profile</h4>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="profileModal.hide()">
+          <span aria-hidden="true">&times;</span>
+        </button>
       </div>
-      &lt;!&ndash; /.row &ndash;&gt;
+      <div class="modal-body">
+        Some profile information might be needed here
+        Or something.
+      </div>
     </div>
-    &lt;!&ndash; /.container-fluid &ndash;&gt;
   </div>
-  &lt;!&ndash; /#page-wrapper &ndash;&gt;
-</div>&lt;!&ndash; /#wrapper &ndash;&gt;
--->
+</div>
+
 
 
 
