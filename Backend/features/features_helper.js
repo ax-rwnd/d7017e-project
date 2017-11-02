@@ -9,7 +9,6 @@ function passAllMandatoryTests(data) {
             return false;
         }
     }
-
     return true;
 }
 
