@@ -2,11 +2,10 @@
 
 //see if all mandatory tests are passed
 function passAllMandatoryTests(data) {
+    var mandatoryTests = data.results.io;
 
-    mandatoryTests = data.results.io;
-
-    for (i = 0; i < mandatoryTests.length; i++) {
-        if mandatoryTests[i].ok == false {
+    for (var i = 0; i < mandatoryTests.length; i++) {
+        if (mandatoryTests[i].ok == false) {
             return false;
         }
     }
