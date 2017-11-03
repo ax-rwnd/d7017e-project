@@ -1,5 +1,5 @@
 <div class="gamification-block panel panel-default">
-  <div class="panel-heading assignment-header" (click)="assignmentGroup.collapse = !assignmentGroup.collapse">
+  <div class="panel-heading assignment-header" (click)="groupCollapse()">
     {{assignmentGroup.name}}
     <fa class="navbar-right right-margin" *ngIf="assignmentGroup.availability === 'locked'" name="lock"></fa>
     <fa class="navbar-right right-margin" *ngIf="assignmentGroup.availability === 'unlocked'" name="unlock"></fa>
