@@ -44,6 +44,7 @@ import {AuthService} from './services/Auth/Auth.service';
 import {Http, HttpModule} from '@angular/http';
 import { ScrollerDirective } from './scroller.directive';
 import { AssignmentGroupComponent } from './assignment-group/assignment-group.component';
+import { GameelementComponent } from './gameelement/gameelement.component';
 
 
 const appRoutes: Routes = [
@@ -71,6 +72,7 @@ const appRoutes: Routes = [
     CreateassignmentComponent,
     ScrollerDirective,
     AssignmentGroupComponent,
+    GameelementComponent,
   ],
   imports: [
     BrowserModule,
