@@ -11,10 +11,10 @@ export class AssignmentService {
     const special = {name: 'Special exercises', collapse: true, availability: 'locked', assignments: e, groups: []};
     const aLvl1 = {name: 'Level 1', collapse: false, availability: false, assignments: a, groups: []};
     const aLvl2 = {name: 'Level 2', collapse: true, availability: 'unlocked', assignments: a, groups: []};
-    const aLvl3 = {name: 'Level 3', collapse: true, availability: 'locked', assignments: a, groups: []};
+    const aLvl3 = {name: 'Level 3', collapse: true, availability: 'unlocked', assignments: a, groups: []};
     const eLvl1 = {name: 'Level 1', collapse: false, availability: false, assignments: e, groups: []};
     const eLvl2 = {name: 'Level 2', collapse: true, availability: 'unlocked', assignments: e, groups: []};
-    const eLvl3 = {name: 'Level 3', collapse: true, availability: 'locked', assignments: e, groups: [special]};
+    const eLvl3 = {name: 'Level 3', collapse: true, availability: 'unlocked', assignments: e, groups: [special]};
     this.assignmentGroups = [];
     this.assignmentGroups[0] = {name: 'Assignments', collapse: true, availability: false, assignments: [], groups: [aLvl1, aLvl2, aLvl3]};
     this.assignmentGroups[1] = {name: 'Exercises', collapse: true, availability: false, assignments: [], groups: [eLvl1, eLvl2, eLvl3]};

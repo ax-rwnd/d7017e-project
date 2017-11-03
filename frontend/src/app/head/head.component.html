@@ -2,7 +2,7 @@
   <div class="container-fluid">
     <div class="navbar-header">
       <a class="navbar-brand">
-        <button type="button" class="menubtn" (click)="toggleState()">
+        <button type="button" class="menubtn" (click)="toggleState($event)">
           <span class="glyphicon glyphicon-menu-hamburger" ></span></button>
       </a>
       <span class="navbar-brand">Frontend</span>
@@ -11,7 +11,7 @@
       <li><a>
         <span class="glyphicon glyphicon-bell"></span>
       </a></li>
-      <li (click)="toggleUserDropDown()"><a> <!-- [routerLinkActive]="['active']" -->
+      <li (click)="toggleUserDropDown($event)"><a> <!-- [routerLinkActive]="['active']" -->
         <span class="glyphicon glyphicon-user"></span>
         {{user.firstName}} {{user.lastName}}
         <label *ngIf="isDropDown()"><span class="glyphicon glyphicon-menu-up"></span></label>
@@ -29,7 +29,7 @@
           </div>
           <div class="userOption" [@userOption]="stateDropDown" routerLink="/">
             <span class="glyphicon glyphicon-log-out"></span> <span style="display:inline-block; width: 0.5em;"></span>
-            <a class="linkDropbox">Log out</a>
+            <a class="linkDropbox" (click)="resetSidebar()">Log out</a>
           </div>
         </div>
       </a></li>
