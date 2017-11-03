@@ -2,7 +2,7 @@
 var util = require('util');
 // This file defines enums for easy error handling
 
-function APIError(message, httpCode, errorCode,) {
+function APIError(message, httpCode, errorCode) {
             this.name = this.constructor.name;
             this.message = message;
             this. httpCode = httpCode;
