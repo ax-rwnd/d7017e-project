@@ -10,7 +10,7 @@ var logger = require('../logger'); //Use Logger
 const TESTER_IP = 'http://130.240.5.118:9100';
 
 //Retrieve tests from db and send them to Tester with the format accepted by Tester.
-function validateCode(lang, code, assignment_id, res) {
+function validateCode(user_id, lang, code, assignment_id, res) {
 
     //Get tests from our database
     queries.getTestsFromAssignment(assignment_id, function(tests) {
@@ -40,6 +40,7 @@ function validateCode(lang, code, assignment_id, res) {
                 res.sendStatus(500);
             } else {
 
+                body.user_id = user_id;
                 body.assignment_id = assignment_id;
 
                 // Do checks of result, like syntax errors, mandatory tests and so on...

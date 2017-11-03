@@ -1,6 +1,6 @@
 'use strict';
 
-var queries = require('../../lib/queries/queries');
+var queries = require('../../lib/queries/features');
 var helper = require('../features_helper');
 
 function init(emitter, name) {

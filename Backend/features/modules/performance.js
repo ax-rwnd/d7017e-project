@@ -1,6 +1,6 @@
 'use strict';
 
-var queries = require('../../lib/queries/queries');
+var queries = require('../../lib/queries/features');
 var helper = require('../features_helper');
 
 function init(emitter, name) {
@@ -17,11 +17,16 @@ function init(emitter, name) {
 
 async function run(data) {
 
-    // Specific code for timing
+    // Specific code for score and timing
 
     // All mandatory tests must pass
 
-    return 'result of timing';
+    // Performance calculate on both mandatory, optional tests and lint
+    // ((4+3)/7)*0.9 + 0.1*0
+    // ((Mandatory tests + optional tests) / total numer of tests) * 0.9 +
+    // lint bool*0.1
+
+    return 'result of score and timing';
 }
 
 exports.init = init;
