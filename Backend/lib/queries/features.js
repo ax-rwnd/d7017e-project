@@ -21,7 +21,6 @@ var logger = require('../../logger.js');
 }*/
 
 function createBadge(data, res) {
-    console.log(data);
     let badge = new Badge(data);
 
     return badge.save(function(err) {
@@ -35,4 +34,14 @@ function createBadge(data, res) {
     });
 }
 
+function getFeatureOfUser(user_id, assignment_id) {
+
+    console.log("user_id",user_id);
+    console.log("assignment_id",assignment_id);
+    return Course.find({assignments: assignment_id }).then(function(course) {
+        console.log(course);
+    });
+}
+
 exports.createBadge = createBadge;
+exports.getFeatureOfUser = getFeatureOfUser;
