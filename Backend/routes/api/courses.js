@@ -55,14 +55,37 @@ module.exports = function(router) {
         });
     });
 
-    router.get('/:course_id/users', auth.jwtAuthProtected, function (req, res) {
+    router.get('/:course_id/students', auth.jwtAuthProtected, function (req, res, next) {
         var course_id = req.params.course_id;
-        res.send("/courses/" + course_id + "/users GET Endpoint");
+
+        queries.getCourseStudents(course_id, "username email").then(function (students) {
+            return res.json(students);
+        })
+        .catch(function (err) {
+            next(err);
+        });
     });
 
-    router.get('/:course_id/assignments', auth.jwtAuthProtected, function (req, res) {
+    router.get('/:course_id/teachers', auth.jwtAuthProtected, function (req, res, next) {
         var course_id = req.params.course_id;
-        res.send("/courses/" + course_id + "/assignments GET Endpoint");
+
+        queries.getCourseTeachers(course_id, "username email").then(function (teachers) {
+            return res.json(teachers);
+        })
+        .catch(function (err) {
+            next(err);
+        });
+    });
+
+    router.get('/:course_id/assignments', auth.jwtAuthProtected, function (req, res, next) {
+        var course_id = req.params.course_id;
+        
+        queries.getCourseAssignments(course_id, "name description hidden languages").then(function (assignments) {
+            return res.json(assignments);
+        })
+        .catch(function (err) {
+            next(err);
+        });
     });
 
     router.post('/:course_id/assignments', auth.jwtAuthProtected, function (req, res) {

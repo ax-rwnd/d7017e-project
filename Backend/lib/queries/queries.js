@@ -108,6 +108,39 @@ function getUserCourses(id, fields) {
     });
 }
 
+function getCourseStudents(id, fields) {
+    var wantedFields = fields || "username email admin courses providers";
+
+    return Course.findById(id, "students").populate("students", wantedFields).then(function (studentList) {
+        if (!studentList) {
+            throw errors.NO_STUDENTS_EXISTS;
+        }
+        return studentList;
+    });
+}
+
+function getCourseTeachers(id, fields) {
+    var wantedFields = fields || "username email admin courses providers";
+
+    return Course.findById(id, "teachers").populate("teachers", wantedFields).then(function (teacherList) {
+        if (!teacherList) {
+            throw errors.NO_TEACHERS_EXISTS;
+        }
+        return teacherList;
+    });
+}
+
+function getCourseAssignments(id, fields) {
+    var wantedFields = fields || "name description hidden tests optional_tests languages";
+
+    return Course.findById(id, "assignments").populate("assignments", wantedFields).then(function (assignmentList) {
+        if (!assignmentList) {
+            throw errors.NO_ASSINGMENTS_EXISTS;
+        }
+        return assignmentList;
+    });
+}
+
 //Field argument needs a check. If i don't want teacher, will it still be populated?!
 function getCourse(id, fields) {
     var wantedFields = fields || "name description hidden teachers students assignments";
