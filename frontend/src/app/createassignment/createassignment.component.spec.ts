@@ -3,7 +3,6 @@ import { AceEditorModule } from 'ng2-ace-editor';
 
 import { FormsModule } from '@angular/forms';
 import { BackendService } from '../services/backend.service';
-import { RewardService} from '../services/reward.service';
 import { HeadService } from '../services/head.service';
 import { CourseService } from '../services/course.service';
 import { HttpClient, HttpHandler } from '@angular/common/http';

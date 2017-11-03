@@ -27,7 +27,6 @@ import { CoursesComponent } from './courses/courses.component';
 import { CreateassignmentComponent } from './createassignment/createassignment.component';
 
 import {BackendService} from './services/backend.service';
-import {RewardService} from './services/reward.service';
 
 // Animation
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -101,7 +100,6 @@ const appRoutes: Routes = [
     },
     HeadService, // the state variable that head provides
     BackendService,
-    RewardService,
     UserService,
     CourseService,
     AssignmentService,
