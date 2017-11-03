@@ -1,10 +1,11 @@
 {   //Development environment config
     // MongoDB config module
     "Mongo": {
-      "dbConfig": {
-        "host": "130.240.5.132",
-        "port": 27018
-      }
+        "dbConfig": {
+            "host": "mongodb://130.240.5.132",
+            "port": 27018,
+            "database_name": "test"
+        }
     },
     //Tester config module
     "Tester": {
@@ -12,16 +13,16 @@
     },
     //Winston Logging configuration module
     "Logger": {
-      "combined":{ //Log settings for logging all logs in a combined.log file
-        "filename": "combined.log",
-        "name": "combined",
-        "json": false
-      },
-      "error":{ //Log settings for logging ONLY error logs in a errors.log file
-        "filename": "errors.log",
-        "name": "error",
-        "level": "error",
-        "json": false
-      }
+        "combined":{ //Log settings for logging all logs in a combined.log file
+            "filename": "combined.log",
+            "name": "combined",
+            "json": false
+        },
+        "error":{ //Log settings for logging ONLY error logs in a errors.log file
+            "filename": "errors.log",
+            "name": "error",
+            "level": "error",
+            "json": false
+        }
     }
-  }
+}

@@ -2,6 +2,7 @@
 
 var requireDir = require('require-dir');
 var EventEmitter = require('events-async');
+var helper = require('./features_helper');
 
 var emitter = new EventEmitter();
 
@@ -29,8 +30,18 @@ function initFeatures() {
 }
 
 function emitEvent(result) {
-    return new Promise(function (resolve, reject){
+    return new Promise(function (resolve, reject) {
+
+        result.passed = helper.passAllMandatoryTests(result);
+
+        if(!result.passed) {
+            resolve(result);
+            return;
+        }
+
         emitter.emit('handleFeatures', result).then(function(data) {
+
+            // TODO: Does it work to run every feature independent of order?
             /*if(data1.constructor !== Array) {
                 data1 = [data1];
             }
