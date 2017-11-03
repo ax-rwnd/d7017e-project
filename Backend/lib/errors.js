@@ -3,12 +3,12 @@ var util = require('util');
 // This file defines enums for easy error handling
 
 function APIError(message, httpCode, errorCode) {
-            this.name = this.constructor.name;
-            this.message = message;
-            this. httpCode = httpCode;
-            this.errorCode = errorCode;
+    this.name = this.constructor.name;
+    this.message = message;
+    this. httpCode = httpCode;
+    this.errorCode = errorCode;
 
-            //include stack trace in error object
+    //include stack trace in error object
 }
 util.inherits(APIError, Error);
 
