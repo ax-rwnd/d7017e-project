@@ -18,10 +18,11 @@ function init(emitter, name) {
 async function run(data) {
 
     // Specific code for badges
+    
+    let t = await helper.getFeature(data.user_id, data.assignment_id);
 
-    // All mandatory tests must pass
+    console.log(t);
 
-    //await queries.getFeatureOfUser(data.user_id, data.assignment_id);
 
     return 'result of badges';
 }

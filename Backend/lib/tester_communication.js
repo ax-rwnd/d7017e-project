@@ -4,6 +4,7 @@ var Assignment = require('../models/schemas').Assignment;
 var Test = require('../models/schemas').Test;
 var request = require('request');
 var queries = require('../lib/queries/queries');
+var queries_features = require('../lib/queries/features');
 var features = require('../features/features');
 var logger = require('../logger'); //Use Logger
 
@@ -50,11 +51,14 @@ function validateCode(user_id, lang, code, assignment_id, res) {
 
                 body.user_id = user_id;
                 body.assignment_id = assignment_id;
+                queries_features.getCourseByAssignmentID(assignment_id).then(function(data) {
+                    body.course_id = data._id;
 
-                // Do checks of result, like syntax errors, mandatory tests and so on...
-                features.emitEvent(body).then(function(result) {
-                    res.set('Content-Type', 'application/json');
-                    res.send(result);
+                    // Do checks of result, like syntax errors, mandatory tests and so on...
+                    features.emitEvent(body).then(function(result) {
+                        res.set('Content-Type', 'application/json');
+                        res.send(result);
+                    });
                 });
             }
         });

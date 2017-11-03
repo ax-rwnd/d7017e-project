@@ -19,8 +19,6 @@ async function run(data) {
 
     // Specific code for dumping result data into the db
 
-    // All mandatory tests must pass
-
     return 'result of this data';
 }
 
