@@ -29,13 +29,13 @@ module.exports = function (router) {
         res.json(req.user);
     });
 
-    router.get('/:user_id', auth.jwtAuthProtected, check_access, function (req, res) {
+    router.get('/:user_id', auth.jwtAuthProtected, check_access, function (req, res, next) {
         var user_id = req.params.user_id;
         queries.getUser(user_id, "username email").then(function (user) {
             return res.json(user);
         })
         .catch(function (err) {
-            next(err)
+            next(err);
         });
     });
 
@@ -53,7 +53,7 @@ module.exports = function (router) {
         res.send("/users/" + user_id + "/submissions GET Endpoint");
     });
 
-    router.get('/:user_id/courses', auth.jwtAuthProtected, check_access, function (req, res) {
+    router.get('/:user_id/courses', auth.jwtAuthProtected, check_access, function (req, res, next) {
         var user_id = req.params.user_id;
         queries.getUserCourses(user_id, "name description").then(function (courses) {
             return res.json(courses);
