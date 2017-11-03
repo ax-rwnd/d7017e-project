@@ -14,6 +14,7 @@ module.exports = function (req, res, next) {
             next(err);
         });
     } else {
+    	//Should be a API error. lib/errors.js. next(err);
         res.json({error: 'Unauthorized', message: 'Not an access token'});
     }
 };
