@@ -14,9 +14,6 @@ var app = express();
 
 initApp();
 
-app.engine('.hbs', expressHbs({defaultLayout: 'loginLayout', extname: '.hbs'}));
-app.set('view engine', '.hbs');
-
 //mongoose.set('debug', true);
 process.title = 'd7017e-backend';
 process.env.JWT_SECRET_KEY = 'supersecret';
