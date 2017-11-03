@@ -97,6 +97,16 @@ function getCourses(fields, admin) {
     
 }
 
+function createCourse(name, description, hidden) {
+    var newCourse = new Course({name: name, description: description, hidden: hidden, teachers: [], students: [], assignments: [], features: []});
+    return newCourse.save().then(function (createdCourse) {
+        if (!createdCourse) {
+            console.log("Error: Course not created");
+        }
+        return createdCourse;
+    });
+}
+
 function getUserCourses(id, fields) {
     var wantedFields = fields || "name description hidden teachers students assignments";
 
@@ -199,6 +209,10 @@ exports.getTestsFromAssignment = getTestsFromAssignment;
 exports.findOrCreateUser = findOrCreateUser;
 exports.getUser = getUser;
 exports.getCourses = getCourses;
+exports.createCourse = createCourse;
 exports.getUserCourses = getUserCourses;
+exports.getCourseStudents = getCourseStudents;
+exports.getCourseTeachers = getCourseTeachers;
+exports.getCourseAssignments = getCourseAssignments;
 exports.getCourse = getCourse;
 

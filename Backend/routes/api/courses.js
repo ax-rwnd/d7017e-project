@@ -31,8 +31,17 @@ module.exports = function(router) {
         });
     });
 
-    router.post('/', auth.jwtAuthProtected, function (req, res) {
-        res.send("/courses POST Endpoint");
+    router.post('/', auth.jwtAuthProtected, function (req, res, next) {
+        var name = req.body.name;
+        var desc = req.body.description;
+        var hidden = req.body.hidden;
+
+        queries.createCourse(name, desc, hidden).then(function (course) {
+            return res.json(course);
+        })
+        .catch(function (err) {
+            next(err);
+        });
     });
 
     router.get('/me', auth.jwtAuthProtected, check_access, function (req, res, next) {
