@@ -27,6 +27,7 @@ function newRequest(req, res) {
         } catch (e) {
             logger.warn('Could not parse json data.',
                 'Could be because of single quotes or no quotes at all');
+                logger.warn('Indata was', chunks);
             res.sendStatus(400);
             return;
         }
