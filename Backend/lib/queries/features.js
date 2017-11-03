@@ -6,6 +6,7 @@ var Course = require('../../models/schemas').Course;
 var Test = require('../../models/schemas').Test;
 var User = require('../../models/schemas').User;
 var Badge = require('../../models/schemas').Badge;
+var Features = require('../../models/schemas').Features;
 var errors = require('../errors.js');
 var logger = require('../../logger.js');
 
@@ -22,7 +23,6 @@ var logger = require('../../logger.js');
 
 function createBadge(data, res) {
     let badge = new Badge(data);
-
     return badge.save(function(err) {
         if (err) {
             // you could avoid http status if you want. I put error 500
@@ -34,14 +34,19 @@ function createBadge(data, res) {
     });
 }
 
-function getFeatureOfUser(user_id, assignment_id) {
+function getBadgesByCourseID(course_id) {
 
-    console.log("user_id",user_id);
-    console.log("assignment_id",assignment_id);
-    return Course.find({assignments: assignment_id }).then(function(course) {
-        console.log(course);
-    });
+}
+
+function getCourseByAssignmentID(assignment_id) {
+    return Course.findOne({"assignments": assignment_id});
+}
+
+function getFeatureByID(features_id) {
+    return Features.findById(features_id);
 }
 
 exports.createBadge = createBadge;
-exports.getFeatureOfUser = getFeatureOfUser;
+exports.getBadgesByCourseID = getBadgesByCourseID;
+exports.getCourseByAssignmentID = getCourseByAssignmentID;
+exports.getFeatureByID = getFeatureByID;
