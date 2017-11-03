@@ -4,7 +4,7 @@ var queries = require('../../lib/queries/features');
 var helper = require('../features_helper');
 
 function init(emitter, name) {
-    emitter.on('handleTests', function(data) {
+    emitter.on('handleFeatures', function(data) {
         return new Promise(function (resolve, reject){
             run(data).then(function(result) {
                 let json = {};
@@ -17,11 +17,11 @@ function init(emitter, name) {
 
 async function run(data) {
 
-    // Specific code for progress
+    // Specific code for dumping result data into the db
 
     // All mandatory tests must pass
 
-    return 'result of timing';
+    return 'result of this data';
 }
 
 exports.init = init;
