@@ -12,7 +12,6 @@ var queries = require('../lib/queries/queries');
 
 var errors = require('../lib/errors.js');
 var jwt = require('jsonwebtoken');
-var auth = require('express-jwt-token');
 var parseXml = require('xml2js').parseString;
 var https = require('https');
 

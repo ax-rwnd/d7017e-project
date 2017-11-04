@@ -21,5 +21,6 @@ module.exports = {
     BAD_INPUT: new APIError("Wrong input. Read documentation.", 400, 7004),
     NO_STUDENTS_EXIST: new APIError("No students exists", 404, 7005),
     NO_TEACHERS_EXIST: new APIError("No teachers exists", 404, 7006),
-    NO_ASSIGNMENTS_EXIST: new APIError("No assignments exists", 404, 7007)
+    NO_ASSIGNMENTS_EXIST: new APIError("No assignments exists", 404, 7007),
+    NOT_FOUND: new APIError("Resource not found", 404, 7008)
 };

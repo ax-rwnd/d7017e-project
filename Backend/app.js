@@ -10,6 +10,7 @@ var cors = require('cors');
 var config = require('config');
 var logger = require('./logger'); //Use Logger
 var errors = require('./lib/errors.js');
+var morgan = require('morgan');
 
 var app = express();
 
@@ -24,12 +25,14 @@ process.env.JWT_AUTH_HEADER_PREFIX = 'bearer';
 // to the routers as well
 process.env.NODE_ENV = app.get('env');
 
+app.use(morgan('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
     extended: true
 }));
 app.use(passport.initialize());
 app.use(cors({origin: '*'}));
+
 
 //defining routes
 var auth = express.Router();
@@ -55,36 +58,32 @@ app.use('/api/', test_routes);
 
 //Route not found.
 app.use(function (req, res, next) {
-    var err = new Error('Not Found');
-    err.status = 404;
-    next(err);
+    console.log("Not found");
+    next(errors.NOT_FOUND);
 });
 
 app.use(function (err, req, res, next) {
-    if (err.name != "AuthorizationError") {
-        return next(err);
-    }
-
-    console.log(err);
-    res.status(err.httpCode).send("HTTP error: " + err.httpCode + " " + err.message);
-});
-
-app.use(function (err, req, res, next) {
-    if (err.name == "CastError") {
-        err = errors.BAD_INPUT;
-    }
-    
-
     if (err.name != "APIError") {
         return next(err);
     }
 
-    //logger.log('')
     console.log(err);
     res.status(err.httpCode).send("HTTP error: " + err.httpCode + " " + err.message);
 });
 
 app.use(function (err, req, res, next) {
+    if (err.name !== "AuthorizationError") {
+        return next(err);
+    }
+
+    console.log(err);
+    res.status(err.httpCode).send("HTTP error: " + err.httpCode + " " + err.message);
+});
+
+app.use(function (err, req, res, next) {
+    if (err.name === "CastError") {
+        res.status(400).send("HTTP error: 400 Bad Input");
+    }
     //logger.log('error', err.);
 
 /*

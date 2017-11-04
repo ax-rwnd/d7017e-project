@@ -39,14 +39,13 @@ exports.validateJWTtoken = function (req, res, next) {
         var jwtToken = auth[1];
         jwt.verify(jwtToken, process.env.JWT_SECRET_KEY, function(err, payload) {
             if (err) {
-                if (err.name == "TokenExpiredError") { 
+                if (err.name === "TokenExpiredError") { 
                     throw new AuthorizationError("Token expired", 401, 6004);
                 }
-                if (err.name == "JsonWebTokenError") {
+                if (err.name === "JsonWebTokenError") {
                     throw new AuthorizationError("Invalid token", 401, 6005);
                 }
             }
-            console.log(payload);
             if (!payload.hasOwnProperty('admin')) {
                 throw new AuthorizationError("Expect access token. Recieved refresh token.", 401, 6006);
             }
