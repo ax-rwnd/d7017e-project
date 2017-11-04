@@ -9,6 +9,7 @@ var expressHbs = require('express-handlebars');
 var cors = require('cors');
 var config = require('config');
 var logger = require('./logger'); //Use Logger
+var errors = require('./lib/errors.js');
 
 var app = express();
 
@@ -59,37 +60,41 @@ app.use(function (req, res, next) {
     next(err);
 });
 
-//Error in server. Basically http error 500, internal server error.
 app.use(function (err, req, res, next) {
-    /*
-    Needs fix. Logging of different levels. Make sure to return right HTTP and message to user.
-    500 Internal server error should be sent for errors "inside the server". HTTP code + message for user faults?
-    */
-    if (err instanceof ValidationError) {
-        console.log("MONGOOSEERROR");
-    }
-    if (err instanceof APIError) {
-        //logger.info?! LOGGA API ERROR TYP ANVÄNDARE + ERROR KOD
-        next(err);
+    if (err.name != "AuthorizationError") {
+        return next(err);
     }
 
-    var httpStatusCode = err.statusCode || 500;
-    if (!err.errorCode) {
-        err.message = "Internal server error.";
+    console.log(err);
+    res.status(err.httpCode).send("HTTP error: " + err.httpCode + " " + err.message);
+});
+
+app.use(function (err, req, res, next) {
+    if (err.name == "CastError") {
+        err = errors.BAD_INPUT;
     }
-    res.status(httpStatusCode).send("HTTP error: " + httpStatusCode + " " + err.message);
+    
+
+    if (err.name != "APIError") {
+        return next(err);
+    }
+
+    //logger.log('')
+    console.log(err);
+    res.status(err.httpCode).send("HTTP error: " + err.httpCode + " " + err.message);
 });
 
 app.use(function (err, req, res, next) {
     //logger.log('error', err.);
 
-
+/*
     if (req.app.get('env') !== 'development') {
         delete err.stack;
     }
-
-    res.status(500).send("HTTP error: 500 Internal server error")
-})
+*/
+    console.log(err);
+    res.status(500).send("HTTP error: 500 Internal server error");
+});
 
 // Function to initiate the app/server into development- or production mode. (depends on NODE_ENV)
 function initApp() {
