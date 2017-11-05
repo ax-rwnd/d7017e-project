@@ -25,9 +25,39 @@ async function getFeature(user_id, assignment_id) {
             return feature;
         }
     }
-    throw new Error('User did not have a Feature for that course. Create one');
+
+    return await queries.createFeature(user_id, course._id);
+}
+
+function arrayContainsArray (superset, subset) {
+  return subset.every(function (value) {
+    return (superset.indexOf(value) >= 0);
+  });
+}
+
+function prepareProgressData(result) {
+
+    let timing = 0;
+    let tests = [];
+
+    for(let test of result.results.io) {
+        tests.push({test: test.id, result: test.ok, optional_test: false});
+        timing += test.time;
+    }
+    for(let test of result.results.optional_tests) {
+        tests.push({test: test.id, result: test.ok, optional_test: true});
+    }
+
+    return {
+        assignment: result.assignment_id,
+        tests: tests,
+        timing: timing,
+        code_size: result.results.code_size
+    };
 }
 
 
 exports.passAllMandatoryTests = passAllMandatoryTests;
 exports.getFeature = getFeature;
+exports.arrayContainsArray = arrayContainsArray;
+exports.prepareProgressData = prepareProgressData;

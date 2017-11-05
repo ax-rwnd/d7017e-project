@@ -82,9 +82,9 @@ var featuresSchema = new Schema({
         assignment: { type: Schema.Types.ObjectId, ref: 'Assignment', required: true},
         tests: [{test: { type: Schema.Types.ObjectId, ref: 'Test', required: true}, result: Boolean, optional_test: Boolean}],
         timing: {type: Number, required: true},
-        code_size: Number
+        code_size: {type: Number, required: true}
     }],
-    badges: [{ type: Schema.Types.ObjectId, ref: 'Badges'}]
+    badges: [{ type: Schema.Types.ObjectId, ref: 'Badge', required: false}]
 });
 
 var Assignment = mongoose.model('Assignment', assignmentSchema);
