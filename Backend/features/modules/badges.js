@@ -57,7 +57,7 @@ function mergeResultWithProgress(result, progress) {
             assignmentExists = true;
 
             progress.splice(i, 1);
-            progress.push(prepareProgressData(result));
+            progress.push(helper.prepareProgressData(result));
         }
     });
 
