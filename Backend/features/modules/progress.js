@@ -22,19 +22,13 @@ async function run(data) {
 
     let progress = {};
 
-    let total = await queries.getNumberOfAssignments(data.course_id);
-    progress.total = total[0].total;
-    
-    let completed = await queries.getNumberOfCompletedAssignments(data.course_id, data.user_id);
-    progress.completed = completed[0].completed;
+    progress.total = await queries.getNumberOfAssignments(data.course_id);
+    progress.completed = await queries.getNumberOfCompletedAssignments(data.course_id, data.user_id);
 
     return progress;
 }
 
 function updateProgress(progress, feature_progress={}) {
-    console.log(progress);
-    console.log(feature_progress);
-
     progress.tests.forEach(function(test) {
         let foundTestInFeatureProgress = false;
         feature_progress.tests.forEach(function(feature_test) {
@@ -51,10 +45,7 @@ function updateProgress(progress, feature_progress={}) {
             feature_progress.tests.push(test);
         }
     });
-
-
-
-    console.log(feature_progress);
+    
     return feature_progress;
 }
 

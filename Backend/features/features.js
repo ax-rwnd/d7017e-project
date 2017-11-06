@@ -62,8 +62,6 @@ function createResultjson(data) {
     let json = {};
     data.forEach(function(item) {
 
-        console.log(item);
-
         if(Object.keys(item).length != 1) {
             throw new Error('Result was too long');
         }
