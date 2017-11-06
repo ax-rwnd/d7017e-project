@@ -93,24 +93,22 @@ exports.validateRefToken = function (req, res, next) {
                 }
             }
             if (payload.hasOwnProperty('admin')) {
-                throw new AuthorizationError("Expect refresh token. Recieved access token.", 401, 6006);
+                throw new AuthorizationError("Expected refresh token. Received access token.", 401, 6006);
             }
 
-            queries.getUser(payload.id, "token").then(function (tokenList) {
-                console.log(tokenList);
-                if (!tokenList.include(jwtToken)) {
+            queries.getUser(payload.id, "tokens").then(function (user) {
+                console.log("tokenList = " + user.tokens);
+                if (!user.tokens.includes(jwtToken)) {
                     throw new AuthorizationError("Invalid token", 401, 6005);
                 }
+                req.user = payload;
+                next();
             })
             .catch(function (err) {
                 next(err);
             });
-
-            req.user = payload;
-            next();
         });
-
     } catch (err) {
-        next(err);
+        return next(err);
     }
 };
