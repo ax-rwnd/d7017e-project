@@ -32,6 +32,7 @@ var userSchema = new Schema({
 	username: {type: String, required: true},
     email: {type: String, required: false},
     admin: {type: Boolean, required: true},
+    tokens: [{type: String, required: false}],
     courses: [{ type: Schema.Types.ObjectId, ref: 'Course', required: false}],
     providers: [{type: String, required: true}] //LTU, KTH etc.
 });

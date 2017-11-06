@@ -100,7 +100,6 @@ module.exports = function (router) {
                         queries.findOrCreateUser(user).then(function (userObject) {
                             console.log("User found");
                             var refToken = create_refresh_token(userObject._id);
-                            console.log(refToken);
                             queries.setRefreshToken(userObject, refToken); 
                             console.log("Efter Ref token save");
                             res.json({
