@@ -20,6 +20,7 @@ var https = require('https');
 const TESTER_IP = 'http://130.240.5.118:9100';
 const SECRET = 'supersecret';
 const BACKEND_IP = 'http://130.240.5.119:8000';
+const CAS_URL = 'https://weblogon.ltu.se/cas/';
 
 // Time-to-Live of Tokens
 const access_ttl = 15 * 60;
@@ -76,7 +77,7 @@ module.exports = function (router) {
         var ticket = req.query.ticket;
         var service = req.query.service;
 
-        var url = 'https://weblogon.ltu.se/cas/serviceValidate?service=' + service + '&ticket=' + ticket;
+        var url = CAS_URL + 'serviceValidate?service=' + service + '&ticket=' + ticket;
 
         var requ = https.get(url, function (resu) {
             var output = '';
@@ -96,17 +97,17 @@ module.exports = function (router) {
                         //var user.username = success[0]['cas:user'][0];
 
                         console.log("Hitta eller gör användare");
-                        queries.findOrCreateUser(user).then(function(userObject) {
-                            console.log("User found")
+                        queries.findOrCreateUser(user).then(function (userObject) {
+                            console.log("User found");
                             var refToken = create_refresh_token(userObject._id);
                             console.log(refToken);
                             queries.setRefreshToken(userObject, refToken); 
                             console.log("Efter Ref token save");
                             res.json({
                                 access_token: create_access_token(userObject._id, userObject.admin),
-                                accesexpires_in: access_ttl,
+                                access_expires_in: access_ttl,
                                 refresh_token: refToken,
-                                refreshexpires_in: refresh_ttl,
+                                refresh_expires_in: refresh_ttl,
                                 token_type: process.env.jwtAuthHeaderPrefix 
                             });                        
                         })
@@ -155,29 +156,15 @@ module.exports = function (router) {
 
     router.post('/accesstoken', auth.validateRefToken, function (req, res, next) {
 
-
-
-        var grant_type = req.body.grant_type;
-
-        if (grant_type == 'refresh_token') {
-            var refresh_token = req.body.refresh_token;
-
-            try {
-                var decoded = jwt.verify(refresh_token, SECRET);
-
-                if (!decoded.access){
-                    var access_token = create_access_token(decoded.id);
-                    res.json({access_token: access_token, token_type: process.env.jwtAuthHeaderPrefix, scope: '', expires_in: access_ttl});
-                } else {
-                    res.json({error:"Invalid Token Type"});
-                    //next(errors.INVALID_TOKEN);
-                }
-            } catch(err) {
-                res.json(err);
-                //next(errors.INVALID_TOKEN);
-            }
-        } else {
-            res.json({error:"Invalid Grant Type"});
-        }
+        queries.getUser(req.user.id, "username email courses admin").then(function (user) {
+            res.json({
+                access_token: create_access_token(user.id, user.admin),
+                expires_in: access_ttl,
+                token_type: process.env.jwtAuthHeaderPrefix 
+            });
+        })
+        .catch(function (err) {
+            next(err);
+        });
     });
 };
