@@ -153,7 +153,7 @@ module.exports = function (router) {
         });
     }
 
-    router.post('/accesstoken', auth.validateRefToken, function (req, res, next) {
+    router.get('/accesstoken', auth.validateRefToken, function (req, res, next) {
 
         queries.getUser(req.user.id, "username email courses admin").then(function (user) {
             res.json({
