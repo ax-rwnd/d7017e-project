@@ -9,6 +9,7 @@ var config = require('config');
 var manager = require('./manager.js');
 var https = require('https');
 var fs = require('fs');
+var languages = require('./config/languages');
 
 const HOST = '0.0.0.0';
 var port;
@@ -116,6 +117,11 @@ app.get('/', (req, res) => {
 
 app.post('/', (req, res) => {
     manager.newRequest(req, res);
+});
+
+app.get('/languages', (req, res) => {
+    console.log();
+    res.send(languages.languages);
 });
 
 /**
