@@ -2,6 +2,11 @@
 var features_helper = require('../features/features_helper');
 var assert = require('assert');
 
+// performs a deep copy assuming a is simple (no functions or circular references)
+function clone(a) {
+   return JSON.parse(JSON.stringify(a));
+}
+
 describe('Test passAllMandatoryTests', () => {
 
     const input = {
@@ -39,18 +44,21 @@ describe('Test passAllMandatoryTests', () => {
     });
 
     it('should pass even if optional tests fail', () => {
-        let i = input;
+        let i = clone(input);
         i.results.optional_tests[0].ok = false;
         assert(features_helper.passAllMandatoryTests(i));
     });
 
+    let fail_one_test = (n) => {
+        let i = clone(input);
+        i.results.io[n].ok = false;
+        console.log(i.results);
+        assert(!features_helper.passAllMandatoryTests(i));
+    };
+
     for (let n = 0; n < input.results.io.length; n++) {
-        it(`should fail if mandatory test ${n} fails`, () => {
-            let i = input;
-            i.results.io[n].ok = false;
-            assert(!features_helper.passAllMandatoryTests(i));
-        });    
+        it(`should fail if mandatory test ${n} fails`, fail_one_test.bind(null, n));
     }
     
-})
+});
 
