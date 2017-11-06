@@ -45,6 +45,7 @@ import {Http, HttpModule} from '@angular/http';
 import { ScrollerDirective } from './scroller.directive';
 import { AssignmentGroupComponent } from './assignment-group/assignment-group.component';
 import { GameelementComponent } from './gameelement/gameelement.component';
+import { ModLeaderboardComponent } from './mod-leaderboard/mod-leaderboard.component';
 
 
 const appRoutes: Routes = [
@@ -73,6 +74,7 @@ const appRoutes: Routes = [
     ScrollerDirective,
     AssignmentGroupComponent,
     GameelementComponent,
+    ModLeaderboardComponent,
   ],
   imports: [
     BrowserModule,
