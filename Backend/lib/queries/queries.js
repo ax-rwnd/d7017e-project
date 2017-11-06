@@ -224,5 +224,5 @@ exports.getCourseStudents = getCourseStudents;
 exports.getCourseTeachers = getCourseTeachers;
 exports.getCourseAssignments = getCourseAssignments;
 exports.getCourse = getCourse;
-exports.SetRefreshToken = setRefreshToken;
+exports.setRefreshToken = setRefreshToken;
 
