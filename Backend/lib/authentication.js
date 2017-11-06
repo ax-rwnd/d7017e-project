@@ -63,10 +63,10 @@ exports.validateJWTtoken = function (req, res, next) {
 };
 
 exports.validateRefToken = function (req, res, next) {
+    console.log("Validera");
     try {
         if (!(req.headers && req.headers.authorization)){
-            var err = new AuthorizationError("No Authorization header included", 401, 6000);
-            throw err;
+            throw new AuthorizationError("No Authorization header included", 401, 6000);
         }
         var auth = req.headers.authorization.split(' ');
 
@@ -109,6 +109,6 @@ exports.validateRefToken = function (req, res, next) {
             });
         });
     } catch (err) {
-        return next(err);
+        next(err);
     }
 };

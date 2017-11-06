@@ -100,6 +100,7 @@ module.exports = function (router) {
                         queries.findOrCreateUser(user).then(function (userObject) {
                             console.log("User found");
                             var refToken = create_refresh_token(userObject._id);
+                            console.log(refToken);
                             queries.setRefreshToken(userObject, refToken); 
                             console.log("Efter Ref token save");
                             res.json({
@@ -107,7 +108,7 @@ module.exports = function (router) {
                                 access_expires_in: access_ttl,
                                 refresh_token: refToken,
                                 refresh_expires_in: refresh_ttl,
-                                token_type: process.env.jwtAuthHeaderPrefix 
+                                token_type: process.env.JWT_AUTH_HEADER_PREFIX 
                             });                        
                         })
                         .catch(function (err) {
@@ -142,7 +143,7 @@ module.exports = function (router) {
             .then(user => {
                 res.json({
                     access_token: create_access_token(user._id, user.admin),
-                    token_type: process.env.jwtAuthHeaderPrefix,
+                    token_type: process.env.JWT_AUTH_HEADER_PREFIX,
                     scope: '',
                     expires_in: access_ttl
                 });
@@ -152,6 +153,14 @@ module.exports = function (router) {
             });
         });
     }
+
+    router.get('/logout', auth.validateRefToken, function (req, res, next) {
+        console.log("Logout");
+        var headerArray = req.headers.authorization.split(' ');
+        var token = headerArray[1];
+        queries.removeRefreshToken(req.user.id, token);
+        res.status(200).send("Token invalidated");
+    });
 
     router.get('/accesstoken', auth.validateRefToken, function (req, res, next) {
 

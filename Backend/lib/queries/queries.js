@@ -31,7 +31,7 @@ function getTestsFromAssignment(assignmentID, callback) {
 
 
 function getUser(id, fields) {
-    var wantedFields = fields || "username email admin token courses providers";
+    var wantedFields = fields || "username email admin tokens courses providers";
     return User.findById(id, wantedFields).then(function (user) {
         if (!user) {
             console.log("User not found");
@@ -46,6 +46,21 @@ function setRefreshToken(userObject, token) {
     userObject.save().then(function (updatedUser) {
         console.log("Ref token saved");
     });
+}
+
+function removeRefreshToken(userid, token) {
+    getUser(userid, "tokens").then(function(userObject) {
+        var index = userObject.tokens.indexOf(token);
+        if (index > -1) {
+            userObject.tokens.splice(index, 1);
+            userObject.save().then(function (updatedUser) {
+                console.log("Token removed");
+            })
+        }
+    })
+    .catch(function(err) {
+        next(err);
+    })
 }
 
 /*
@@ -224,4 +239,5 @@ exports.getCourseTeachers = getCourseTeachers;
 exports.getCourseAssignments = getCourseAssignments;
 exports.getCourse = getCourse;
 exports.setRefreshToken = setRefreshToken;
+exports.removeRefreshToken = removeRefreshToken;
 
