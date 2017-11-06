@@ -94,9 +94,10 @@ module.exports = function (router) {
 
                     if (success) {
                         // Extract the username from the XML parse
-                        var username = success[0]['cas:user'][0];
+                        var user = {username: success[0]['cas:user'][0]};
+                        //var user.username = success[0]['cas:user'][0];
 
-                        queries.findOrCreateUser(username)
+                        queries.findOrCreateUser(user)
                         .then(user => {
                             res.json({
                                 access_token: create_access_token(user._id, user.admin),
