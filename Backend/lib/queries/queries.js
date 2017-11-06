@@ -74,7 +74,7 @@ function findOrCreateUser(profile) {
     var admin = profile.admin || false;
     return User.findOne({username: username}).then(function (user) {
         if (!user) {
-            var newUser = new User({username: username, email: email, admin: admin, courses: []});
+            var newUser = new User({username: username, email: email, admin: admin, courses: [], tokens: []});
             return newUser.save().then(function (createdUser) {
                 if (!createdUser) {
                     console.log("Error: User not created");
