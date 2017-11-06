@@ -45,6 +45,7 @@ var submissionSchema = new Schema({
 var courseSchema = new Schema({
     name: {type: String, required: true},
     description: {type: String, required: false},
+    hidden: { type: Boolean, required: true },
     teachers: [{ type: Schema.Types.ObjectId, ref: 'User', required: false }],
     students: [{ type: Schema.Types.ObjectId, ref: 'User', required: false }],
     assignments: [{ type: Schema.Types.ObjectId, ref: 'Assignment', required: false }],
@@ -66,21 +67,24 @@ var courseBadgeSchema = new Schema({
     badge_id: { type: Schema.Types.ObjectId, ref: 'Badge', required: true},
     goals: {
         badges: [{ type: Schema.Types.ObjectId, ref: 'Badge', required: false}],
-        tests: [{ type: Schema.Types.ObjectId, ref: 'Test', required: false}],
-        assignments: [{ type: Schema.Types.ObjectId, ref: 'Assignment', required: false}],
-        code_size: Number
+        assignments:
+        [{
+            assignment: { type: Schema.Types.ObjectId, ref: 'Assignment', required: true},
+            tests: [{ type: Schema.Types.ObjectId, ref: 'Test', required: false}],
+            code_size: Number
+        }]
     }
 });
 
 var featuresSchema = new Schema({
     user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-    progress: [{ type: Schema.Types.ObjectId, ref: 'Assignment', required: false}],
-    performance: [{
+    progress: [{
         assignment: { type: Schema.Types.ObjectId, ref: 'Assignment', required: true},
+        tests: [{test: { type: Schema.Types.ObjectId, ref: 'Test', required: true}, result: Boolean, optional_test: Boolean}],
         timing: {type: Number, required: true},
-        score: {type: Number, required: true}
+        code_size: {type: Number, required: true}
     }],
-    badges: [{ type: Schema.Types.ObjectId, ref: 'Badges'}]
+    badges: [{ type: Schema.Types.ObjectId, ref: 'Badge', required: false}]
 });
 
 var Assignment = mongoose.model('Assignment', assignmentSchema);

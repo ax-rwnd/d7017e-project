@@ -12,9 +12,7 @@ var queries = require('../lib/queries/queries');
 
 var errors = require('../lib/errors.js');
 var jwt = require('jsonwebtoken');
-var auth = require('express-jwt-token');
 var parseXml = require('xml2js').parseString;
-var check_access = require('../lib/access.js');
 var https = require('https');
 
 const TESTER_IP = 'http://130.240.5.118:9100';
@@ -32,10 +30,10 @@ function create_refresh_token(id) {
     }, SECRET, {expiresIn: refresh_ttl});
 }
 
-function create_access_token(id) {
+function create_access_token(id, admin) {
     return jwt.sign({
         id: id,
-        access: true
+        admin: admin
     }, SECRET, {expiresIn: access_ttl});
 }
 
@@ -101,7 +99,7 @@ module.exports = function (router) {
                         queries.findOrCreateUser(username)
                         .then(user => {
                             res.json({
-                                access_token: create_access_token(user._id),
+                                access_token: create_access_token(user._id, user.admin),
                                 token_type: process.env.jwtAuthHeaderPrefix,
                                 scope: '',
                                 expires_in: access_ttl,
@@ -138,7 +136,7 @@ module.exports = function (router) {
             queries.findOrCreateUser(profile)
             .then(user => {
                 res.json({
-                    access_token: create_access_token(user._id),
+                    access_token: create_access_token(user._id, user.admin),
                     token_type: process.env.jwtAuthHeaderPrefix,
                     scope: '',
                     expires_in: access_ttl

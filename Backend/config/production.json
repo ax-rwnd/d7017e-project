@@ -1,13 +1,14 @@
 {
     // MongoDB config module
     "Mongo": {
-      "dbConfig": {
-        "host": "130.240.5.132",
-        "port": 27019
-      }
+        "dbConfig": {
+            "host": "mongodb://130.240.5.132",
+            "port": 27018,
+            "database_name": "???"
+        }
     },
     //Tester config module
     "Tester": {
 
     }
-  }
+}

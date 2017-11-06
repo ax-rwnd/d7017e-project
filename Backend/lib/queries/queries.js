@@ -97,6 +97,16 @@ function getCourses(fields, admin) {
     
 }
 
+function createCourse(name, description, hidden) {
+    var newCourse = new Course({name: name, description: description, hidden: hidden, teachers: [], students: [], assignments: [], features: []});
+    return newCourse.save().then(function (createdCourse) {
+        if (!createdCourse) {
+            console.log("Error: Course not created");
+        }
+        return createdCourse;
+    });
+}
+
 function getUserCourses(id, fields) {
     var wantedFields = fields || "name description hidden teachers students assignments";
 
@@ -105,6 +115,39 @@ function getUserCourses(id, fields) {
             throw errors.NO_COURSES_EXISTS;
         }
         return courseList;
+    });
+}
+
+function getCourseStudents(id, fields) {
+    var wantedFields = fields || "username email admin courses providers";
+
+    return Course.findById(id, "students").populate("students", wantedFields).then(function (studentList) {
+        if (!studentList) {
+            throw errors.NO_STUDENTS_EXISTS;
+        }
+        return studentList;
+    });
+}
+
+function getCourseTeachers(id, fields) {
+    var wantedFields = fields || "username email admin courses providers";
+
+    return Course.findById(id, "teachers").populate("teachers", wantedFields).then(function (teacherList) {
+        if (!teacherList) {
+            throw errors.NO_TEACHERS_EXISTS;
+        }
+        return teacherList;
+    });
+}
+
+function getCourseAssignments(id, fields) {
+    var wantedFields = fields || "name description hidden tests optional_tests languages";
+
+    return Course.findById(id, "assignments").populate("assignments", wantedFields).then(function (assignmentList) {
+        if (!assignmentList) {
+            throw errors.NO_ASSINGMENTS_EXISTS;
+        }
+        return assignmentList;
     });
 }
 
@@ -166,6 +209,10 @@ exports.getTestsFromAssignment = getTestsFromAssignment;
 exports.findOrCreateUser = findOrCreateUser;
 exports.getUser = getUser;
 exports.getCourses = getCourses;
+exports.createCourse = createCourse;
 exports.getUserCourses = getUserCourses;
+exports.getCourseStudents = getCourseStudents;
+exports.getCourseTeachers = getCourseTeachers;
+exports.getCourseAssignments = getCourseAssignments;
 exports.getCourse = getCourse;
 
