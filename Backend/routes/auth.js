@@ -6,7 +6,9 @@ var Assignment = require('../models/schemas').Assignment;
 var Test = require('../models/schemas').Test;
 
 var request = require('request');
-var queries = require('../lib/queries/queries');
+var queries = require('../lib/queries/queries.js');
+var auth = require('../lib/authentication.js');
+
 //var passport = require('passport');
 //var CasStrategy = require('passport-cas').Strategy;
 
@@ -25,8 +27,7 @@ const refresh_ttl = 24 * 60 * 60;
 
 function create_refresh_token(id) {
     return jwt.sign({
-        id: id,
-        access: false
+        id: id
     }, SECRET, {expiresIn: refresh_ttl});
 }
 
@@ -71,14 +72,11 @@ module.exports = function (router) {
     // }));
 
     router.get('/login/ltu', function (req, res, next){
+        console.log("Login route");
         var ticket = req.query.ticket;
         var service = req.query.service;
 
-        console.log(ticket);
-        console.log(service);
-
         var url = 'https://weblogon.ltu.se/cas/serviceValidate?service=' + service + '&ticket=' + ticket;
-        console.log(url);
 
         var requ = https.get(url, function (resu) {
             var output = '';
@@ -94,27 +92,34 @@ module.exports = function (router) {
 
                     if (success) {
                         // Extract the username from the XML parse
-                        var username = success[0]['cas:user'][0];
+                        var user = {username: success[0]['cas:user'][0]};
+                        //var user.username = success[0]['cas:user'][0];
 
-                        queries.findOrCreateUser(username)
-                        .then(user => {
+                        console.log("Hitta eller gör användare");
+                        queries.findOrCreateUser(user).then(function(userObject) {
+                            console.log("User found")
+                            var refToken = create_refresh_token(userObject._id);
+                            console.log(refToken);
+                            queries.setRefreshToken(userObject, refToken); 
+                            console.log("Efter Ref token save");
                             res.json({
-                                access_token: create_access_token(user._id, user.admin),
-                                token_type: process.env.jwtAuthHeaderPrefix,
-                                scope: '',
-                                expires_in: access_ttl,
-                                refresh_token: create_refresh_token(user._id)
-                            });
+                                access_token: create_access_token(userObject._id, userObject.admin),
+                                accesexpires_in: access_ttl,
+                                refresh_token: refToken,
+                                refreshexpires_in: refresh_ttl,
+                                token_type: process.env.jwtAuthHeaderPrefix 
+                            });                        
                         })
                         .catch(function (err) {
+                            console.log("Error");
                             next(err);
                         });
 
                     } else {
                         // Extract the error code from the XML parse
                         var error = result['cas:serviceResponse']['cas:authenticationFailure'][0].$.code;
-
-                        res.json({error: error});
+                        next(error);
+                        //res.json({error: error});
                     }
                 });
             });
@@ -148,7 +153,10 @@ module.exports = function (router) {
         });
     }
 
-    router.post('/token', function (req, res, next) {
+    router.post('/accesstoken', auth.validateRefToken, function (req, res, next) {
+
+
+
         var grant_type = req.body.grant_type;
 
         if (grant_type == 'refresh_token') {

@@ -31,13 +31,22 @@ function getTestsFromAssignment(assignmentID, callback) {
 
 
 function getUser(id, fields) {
-    var wantedFields = fields || "username email admin courses providers";
+    var wantedFields = fields || "username email admin token courses providers";
     return User.findById(id, wantedFields).then(function (user) {
         if (!user) {
             console.log("User not found");
             throw errors.TOKEN_USER_NOT_FOUND;
         }
         return user;
+    });
+}
+
+function setRefreshToken(userObject, token) {
+    console.log("Setting Ref token");
+    console.log(token);
+    userObject.tokens.push(token);
+    userObject.save().then(function (updatedUser) {
+        console.log("Ref token saved");
     });
 }
 
@@ -102,6 +111,7 @@ function createCourse(name, description, hidden) {
     return newCourse.save().then(function (createdCourse) {
         if (!createdCourse) {
             console.log("Error: Course not created");
+            //ERROR?!
         }
         return createdCourse;
     });
@@ -215,4 +225,5 @@ exports.getCourseStudents = getCourseStudents;
 exports.getCourseTeachers = getCourseTeachers;
 exports.getCourseAssignments = getCourseAssignments;
 exports.getCourse = getCourse;
+exports.setRefreshToken = setRefreshToken;
 

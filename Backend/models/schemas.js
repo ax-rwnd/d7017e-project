@@ -56,15 +56,18 @@ var courseSchema = new Schema({
 * Feature schemas
 */
 
+//a general gamification badge
 var badgeSchema = new Schema({
-    icon: {type: String, required: true},
+    icon: {type: String, required: true},   //path to an icon image file
     title: {type: String, required: true},
     description: {type: String, required: true}
 });
 
+//a course-specific badge. Needs reference to a course, badge and goals that "unlocks" it.
 var courseBadgeSchema = new Schema({
     course_id: { type: Schema.Types.ObjectId, ref: 'Course', required: true},
     badge_id: { type: Schema.Types.ObjectId, ref: 'Badge', required: true},
+    //Goals that "unlocks" the badge. This can be other badge(s), assignment(s) etc.
     goals: {
         badges: [{ type: Schema.Types.ObjectId, ref: 'Badge', required: false}],
         assignments:
@@ -84,7 +87,8 @@ var featuresSchema = new Schema({
         timing: {type: Number, required: true},
         code_size: {type: Number, required: true}
     }],
-    badges: [{ type: Schema.Types.ObjectId, ref: 'Badge', required: false}]
+    badges: [{ type: Schema.Types.ObjectId, ref: 'Badge', required: false}],
+    custom: {}
 });
 
 var Assignment = mongoose.model('Assignment', assignmentSchema);

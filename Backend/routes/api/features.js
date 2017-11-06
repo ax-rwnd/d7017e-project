@@ -55,4 +55,16 @@ module.exports = function(router) {
             res.sendStatus(500);
         });
     });
+
+    router.get('/features/:course_id', auth.validateJWTtoken, function(req, res) {
+        features.getFeaturesOfCourse(req.params.course_id).then(function(progress) {
+            res.send(progress);
+        });
+    });
+
+    router.get('/feature/:course_id/:user_id', auth.validateJWTtoken, function(req, res) {
+        features.getFeatureOfUserID(req.params.course_id, req.params.user_id).then(function(progress) {
+            res.send(progress);
+        });
+    });
 };
