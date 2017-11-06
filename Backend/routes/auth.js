@@ -99,13 +99,14 @@ module.exports = function (router) {
                         queries.findOrCreateUser(user).then(function(userObject) {
                             console.log("User found")
                             var refToken = create_refresh_token(userObject._id);
+                            console.log(refToken);
                             queries.setRefreshToken(userObject, refToken); 
                             console.log("Efter Ref token save");
                             res.json({
                                 access_token: create_access_token(userObject._id, userObject.admin),
-                                accesexpires_in: access_tt1,
+                                accesexpires_in: access_ttl,
                                 refresh_token: refToken,
-                                refreshexpires_in: refresh_tt1,
+                                refreshexpires_in: refresh_ttl,
                                 token_type: process.env.jwtAuthHeaderPrefix 
                             });                        
                         })
