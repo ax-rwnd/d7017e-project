@@ -42,6 +42,7 @@ function getUser(id, fields) {
 }
 
 function setRefreshToken(userObject, token) {
+    console.log("Setting Ref token");
     userObject.tokens = userObject.tokens.push(token);
     userObject.save().then(function (updatedUser) {
         console.log("Ref token saved");
