@@ -9,7 +9,7 @@ import {UserService} from '../services/user.service';
   templateUrl: './head.component.html',
   styleUrls: ['./head.component.css'],
   animations: [
-    trigger('userOption', [
+    trigger('userOption', [ // animation for the user dropdown
       state('false', style({display: 'none', border: 'none', overflow: 'hidden', opacity: '0'})),
       state('true', style({display: 'block', opacity: '1'})),
       transition('0 => 1', animate('80ms 200ms ease-in')),
@@ -25,29 +25,28 @@ import {UserService} from '../services/user.service';
 })
 
 export class HeadComponent implements OnInit {
-  sidebarState;
+  sidebarState: any; // state of the sidebar
   user: any;
   stateDropDown: boolean;
 
   constructor(@Inject(forwardRef(() => AppComponent)) private appComponent: AppComponent, private headService: HeadService,
               private userService: UserService) {
-    // shouldn't be inactive, should only get state from app component
   }
 
   toggleState($event) { // send to the sidebar in app component that it should toggle state
     $event.preventDefault();
     $event.stopPropagation();
     this.sidebarState = this.sidebarState === 'active' ? 'inactive' : 'active';
-    this.headService.setState(this.sidebarState);
+    this.headService.setState(this.sidebarState); // send to the service that the state is updated
   }
 
   @HostListener('document:click', ['$event'])
-  outsideDropDownClick($event) {
+  outsideDropDownClick($event) { // have click in web outside the user dropdown, should then hide
     this.stateDropDown = false;
   }
 
-  toggleUserDropDown($event) {
-    $event.preventDefault();
+  toggleUserDropDown($event) { // toggle function for the userdropbox
+    $event.preventDefault(); // so it isn't affected by the outsideDropDownClick
     $event.stopPropagation();
     this.stateDropDown = !this.stateDropDown;
   }
@@ -56,7 +55,7 @@ export class HeadComponent implements OnInit {
     return this.stateDropDown;
   }
 
-  resetSidebar() {
+  resetSidebar() { // this is used when log out so the sidebar doesn't stay active
     this.headService.setState('inactive');
   }
 
