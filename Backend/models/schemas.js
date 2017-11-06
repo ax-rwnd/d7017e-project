@@ -85,7 +85,8 @@ var featuresSchema = new Schema({
         timing: {type: Number, required: true},
         code_size: {type: Number, required: true}
     }],
-    badges: [{ type: Schema.Types.ObjectId, ref: 'Badge', required: false}]
+    badges: [{ type: Schema.Types.ObjectId, ref: 'Badge', required: false}],
+    custom: {}
 });
 
 var Assignment = mongoose.model('Assignment', assignmentSchema);

@@ -65,4 +65,27 @@ function validateCode(user_id, lang, code, assignment_id, res) {
     });
 }
 
+function getTesterLanguages() {
+    return new Promise(function (resolve, reject){
+
+        if(process.env.NODE_ENV != 'development') {
+            throw new Error('Remove `rejectUnauthorized` for production in '+ module.filename);
+        }
+        request({
+            url: TESTER_IP+'/languages',
+            method: 'GET',
+            agentOptions: {
+                rejectUnauthorized: false
+            }
+        }, function (error, response, body) {
+            if(error || response.statusCode != 200) {
+                reject(error);
+            } else {
+            resolve(body);
+            }
+        });
+    });
+}
+
 exports.validateCode = validateCode;
+exports.getTesterLanguages = getTesterLanguages;
