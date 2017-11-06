@@ -19,21 +19,21 @@ util.inherits(AuthorizationError, Error);
 exports.validateJWTtoken = function (req, res, next) {
     try {
         if (!(req.headers && req.headers.authorization)){
-            var err = new AuthorizationError("No Authorization header included", 400, 6000);   
+            var err = new AuthorizationError("No Authorization header included", 401, 6000);
             throw err;
         }
         var auth = req.headers.authorization.split(' ');
 
         if (auth.length === 1) {
-            throw new AuthorizationError("Authorization header invalid format", 400, 6001);
+            throw new AuthorizationError("Authorization header invalid format", 401, 6001);
         }
 
         if (auth.length > 2) {
-            throw new AuthorizationError("Authorization header invalid format", 400, 6002);   
+            throw new AuthorizationError("Authorization header invalid format", 401, 6002);
         }
 
         if (auth[0].toLowerCase() !== process.env.JWT_AUTH_HEADER_PREFIX.toLowerCase()) {
-            throw new AuthorizationError("Authorization header invalid format", 400, 6003);
+            throw new AuthorizationError("Authorization header invalid format", 401, 6003);
         }
 
         var jwtToken = auth[1];
