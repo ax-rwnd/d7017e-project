@@ -21,6 +21,8 @@ function getBadge(badge_id) {
 }
 
 function updateBadge(badge_id, data) {
+    console.log(badge_id);
+    console.log(data);
     return Badge.findOneAndUpdate({"_id": badge_id}, data);
 }
 

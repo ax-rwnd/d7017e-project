@@ -63,12 +63,13 @@ var badgeSchema = new Schema({
 });
 
 var courseBadgeSchema = new Schema({
-    course_id: { type: Schema.Types.ObjectId, ref: 'Course', required: true},
+    course_id: { type: Schema.Types.ObjectId, ref: 'Course', required: true},  
     badge_id: { type: Schema.Types.ObjectId, ref: 'Badge', required: true},
-    goals: {
+    //Goals that "unlocks" the badge. This can be other badge(s), assignment(s) etc.
+    goals: {    
         badges: [{ type: Schema.Types.ObjectId, ref: 'Badge', required: false}],
         assignments:
-        [{
+        [{    
             assignment: { type: Schema.Types.ObjectId, ref: 'Assignment', required: true},
             tests: [{ type: Schema.Types.ObjectId, ref: 'Test', required: false}],
             code_size: Number
