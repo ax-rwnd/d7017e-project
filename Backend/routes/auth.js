@@ -72,6 +72,7 @@ module.exports = function (router) {
     // }));
 
     router.get('/login/ltu', function (req, res, next){
+        console.log("Login route");
         var ticket = req.query.ticket;
         var service = req.query.service;
 
@@ -94,21 +95,23 @@ module.exports = function (router) {
                         var user = {username: success[0]['cas:user'][0]};
                         //var user.username = success[0]['cas:user'][0];
 
-                        queries.findOrCreateUser(user)
-                        .then(function(userObject) {
+                        console.log("Hitta eller gör användare");
+                        queries.findOrCreateUser(user).then(function(userObject) {
+                            console.log("User found")
                             var refToken = create_refresh_token(userObject._id);
-                        })
-                        .then(queries.setRefreshToken(userObject, refToken))
-                        .then(function (refToken) {
+                            console.log(refToken);
+                            queries.setRefreshToken(userObject, refToken); 
+                            console.log("Efter Ref token save");
                             res.json({
-                                access_token: create_access_token(user._id, user.admin),
-                                accesexpires_in: access_tt1,
+                                access_token: create_access_token(userObject._id, userObject.admin),
+                                accesexpires_in: access_ttl,
                                 refresh_token: refToken,
-                                refreshexpires_in: refresh_tt1,
+                                refreshexpires_in: refresh_ttl,
                                 token_type: process.env.jwtAuthHeaderPrefix 
                             });                        
                         })
                         .catch(function (err) {
+                            console.log("Error");
                             next(err);
                         });
 
