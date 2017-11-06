@@ -120,7 +120,6 @@ app.post('/', (req, res) => {
 });
 
 app.get('/languages', (req, res) => {
-    console.log();
     res.send(languages.languages);
 });
 
