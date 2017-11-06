@@ -17,10 +17,6 @@
       <h2>Status: {{status}}</h2>
     </div>
 
-    <div>
-      {{progress.current}}
-    </div>
-
     <div class="progress progress-margin">
       <div class="progress-bar" role="progressbar" [attr.aria-valuenow]="progress['current']" aria-valuemin="0" aria-valuemax ="10"
            [style.width]="progress['current']*10 + '%'">

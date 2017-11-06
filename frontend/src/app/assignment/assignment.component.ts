@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import 'codemirror/mode/go/go';
-import {BackendService} from '../services/backend.service';
-import {RewardService} from '../services/reward.service';
+import { BackendService } from '../services/backend.service';
+import { AssignmentService } from '../services/assignment.service';
 import { trigger, state, style, animate, transition } from '@angular/animations';
 import { HeadService } from '../services/head.service';
-import {CourseService} from '../services/course.service';
+import { CourseService } from '../services/course.service';
 
 
 @Component({
@@ -21,51 +21,40 @@ import {CourseService} from '../services/course.service';
   ]
 })
 export class AssignmentComponent implements OnInit {
-  assignment: string;
+  assignment: any;
   course: string;
   content: string;
   progress: any;
-  assignmentScore: any;
-  themes: [string];
+  themes: string[];
   theme: string;
-  languages: [string];
+  languages: string[];
   language: string;
   status: string;
   sidebarState; // state of sidebar
-  result: string;
+  feedback: string[];
 
-  feedback: any;
-
-  assignmentTest: string; // for testing purposes
-
-  constructor(private backendService: BackendService, private rewardService: RewardService, private headService: HeadService) {
+  constructor(private backendService: BackendService, private assignmentService: AssignmentService, private headService: HeadService) {
     this.headService.stateChange.subscribe(sidebarState => { this.sidebarState = sidebarState; });
   }
 
   ngOnInit() {
     this.sidebarState = this.headService.getCurrentState();
     this.assignment = this.backendService.getAssignment();
-    this.languages = ['python', 'javascript']; // hardcoded, should probably be read from getAssignment from backend?
+    this.languages = this.assignment['languages'];
     this.language = this.languages[0];
     this.themes = ['eclipse', 'monokai'];
     this.theme = 'eclipse'; // default theme for now, could be saved on backend
     this.content = '';
     this.status = 'Not Completed'; // hardcoded for now, endpoint to backend needed
-    this.progress = this.rewardService.progress;
-    this.assignmentScore = this.rewardService.assignmentScore;
-    this.feedback = this.rewardService.feedback;
-    this.result = '';
+    this.progress = { current: 0}; // this.assignmentService.progress; what even is this
     this.course = 'D0009E - Introduktion till programmering'; // endpoint needed
-    this.assignmentTest = '<h1>Assignment 1</h1> Detta är ett test av innerHTML för <b>lärare</b>' +
-      '<img src="https://i.imgur.com/YKcVkXH.jpg" alt="lul" width="500" >' +
-      '<iframe width="420" height="315"\n' +
-      'src="asd">\n' +
-      '</iframe>';
   }
 
+  // SubmitCode should update status/progress.
+  // Does submitAssignment give me that status or should i fetch the assignment again?
   submitCode() {
     this.backendService.SubmitAssignment(this.content)
-      .then(value => this.feedback = this.rewardService.HandleResponse(value));
+      .then(value => this.HandleResponse(value));
   }
 
   setTheme(th) {
@@ -80,5 +69,43 @@ export class AssignmentComponent implements OnInit {
     this.content = c;
   }
 
+  setFeedback(fb) {
+    this.feedback = fb;
+  }
+
+  // Update the feedback array
+  HandleResponse(value) {
+    const feedback = [];
+    const results = value['results'];
+
+    let passTests = true;
+    // Check the IO tests
+    for (let i = 0; i < results['io'].length; i++) {
+      const test = results['io'][i];
+      const testindex = i + 1;
+      if (!test['ok']) {
+        feedback.push('Test ' + testindex + ' failure: ' + test['stderr']);
+        passTests = false;
+      } else {
+        feedback.push('Test ' + testindex + ' ok');
+      }
+    }
+    if (passTests) {
+      feedback.push('All I/O tests passed');
+    }
+
+    // Check lint test
+    if (results['lint'] !== '') {
+      feedback.push(results['lint']);
+      passTests = false;
+    }
+
+    // Check prepare/compile step
+    if (results['prepare'] !== '') {
+      feedback.push(results['prepare']);
+      passTests = false;
+    }
+    this.setFeedback(feedback);
+  }
 
 }

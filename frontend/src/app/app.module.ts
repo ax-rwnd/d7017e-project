@@ -27,7 +27,6 @@ import { CoursesComponent } from './courses/courses.component';
 import { CreateassignmentComponent } from './createassignment/createassignment.component';
 
 import {BackendService} from './services/backend.service';
-import {RewardService} from './services/reward.service';
 
 // Animation
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -45,6 +44,8 @@ import {AuthService} from './services/Auth/Auth.service';
 import {Http, HttpModule} from '@angular/http';
 import { ScrollerDirective } from './scroller.directive';
 import { AssignmentGroupComponent } from './assignment-group/assignment-group.component';
+import { GameelementComponent } from './gameelement/gameelement.component';
+import { ModLeaderboardComponent } from './mod-leaderboard/mod-leaderboard.component';
 
 
 const appRoutes: Routes = [
@@ -72,6 +73,8 @@ const appRoutes: Routes = [
     CreateassignmentComponent,
     ScrollerDirective,
     AssignmentGroupComponent,
+    GameelementComponent,
+    ModLeaderboardComponent,
   ],
   imports: [
     BrowserModule,
@@ -101,7 +104,6 @@ const appRoutes: Routes = [
     },
     HeadService, // the state variable that head provides
     BackendService,
-    RewardService,
     UserService,
     CourseService,
     AssignmentService,

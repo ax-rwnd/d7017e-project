@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import {BackendService} from '../services/backend.service';
-import {RewardService} from '../services/reward.service';
 import { trigger, state, style, animate, transition } from '@angular/animations';
 import { HeadService } from '../services/head.service';
 import {until} from 'selenium-webdriver';
@@ -36,7 +35,7 @@ export class CreateassignmentComponent implements OnInit {
     ioOutput: String,
   };
 
-  constructor(private backendService: BackendService, private rewardService: RewardService, private headService: HeadService,
+  constructor(private backendService: BackendService, private headService: HeadService,
               private modalService: BsModalService, private fb: FormBuilder) {
     this.headService.stateChange.subscribe(sidebarState => { this.sidebarState = sidebarState; });
   }
