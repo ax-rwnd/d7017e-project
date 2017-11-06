@@ -3,6 +3,7 @@ import { trigger, state, style, animate, transition } from '@angular/animations'
 import { HeadService } from '../services/head.service';
 import {AppComponent} from '../app.component';
 import {UserService} from '../services/user.service';
+import {AuthService} from '../services/Auth/Auth.service';
 
 @Component({
   selector: 'app-head',
@@ -30,7 +31,7 @@ export class HeadComponent implements OnInit {
   stateDropDown: boolean;
 
   constructor(@Inject(forwardRef(() => AppComponent)) private appComponent: AppComponent, private headService: HeadService,
-              private userService: UserService) {
+              private userService: UserService, private auth: AuthService) {
   }
 
   toggleState($event) { // send to the sidebar in app component that it should toggle state
@@ -55,8 +56,9 @@ export class HeadComponent implements OnInit {
     return this.stateDropDown;
   }
 
-  resetSidebar() { // this is used when log out so the sidebar doesn't stay active
+  logout() { // this is used when log out so the sidebar doesn't stay active & to log out
     this.headService.setState('inactive');
+    this.auth.logout();
   }
 
   ngOnInit() {
