@@ -81,7 +81,8 @@ function getTesterLanguages() {
             if(error || response.statusCode != 200) {
                 reject(error);
             } else {
-            resolve(body);
+                console.log(body);
+                resolve(body);
             }
         });
     });
