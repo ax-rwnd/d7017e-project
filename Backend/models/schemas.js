@@ -65,13 +65,13 @@ var badgeSchema = new Schema({
 
 //a course-specific badge. Needs reference to a course, badge and goals that "unlocks" it.
 var courseBadgeSchema = new Schema({
-    course_id: { type: Schema.Types.ObjectId, ref: 'Course', required: true},  
+    course_id: { type: Schema.Types.ObjectId, ref: 'Course', required: true},
     badge_id: { type: Schema.Types.ObjectId, ref: 'Badge', required: true},
     //Goals that "unlocks" the badge. This can be other badge(s), assignment(s) etc.
-    goals: {    
+    goals: {
         badges: [{ type: Schema.Types.ObjectId, ref: 'Badge', required: false}],
         assignments:
-        [{    
+        [{
             assignment: { type: Schema.Types.ObjectId, ref: 'Assignment', required: true},
             tests: [{ type: Schema.Types.ObjectId, ref: 'Test', required: false}],
             code_size: Number
@@ -87,7 +87,8 @@ var featuresSchema = new Schema({
         timing: {type: Number, required: true},
         code_size: {type: Number, required: true}
     }],
-    badges: [{ type: Schema.Types.ObjectId, ref: 'Badge', required: false}]
+    badges: [{ type: Schema.Types.ObjectId, ref: 'Badge', required: false}],
+    custom: {}
 });
 
 var Assignment = mongoose.model('Assignment', assignmentSchema);
