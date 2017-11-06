@@ -31,13 +31,25 @@ function getTestsFromAssignment(assignmentID, callback) {
 
 
 function getUser(id, fields) {
-    var wantedFields = fields || "username email admin courses providers";
+    var wantedFields = fields || "username email admin token courses providers";
     return User.findById(id, wantedFields).then(function (user) {
         if (!user) {
             console.log("User not found");
             throw errors.TOKEN_USER_NOT_FOUND;
         }
         return user;
+    });
+}
+
+function setRefreshToken(userObject, token) {
+    userObject.tokens = userObject.tokens.push(token);
+    return userObject.save().then(function (updatedUser) {
+        if (!updatedUser) {
+            console.log("Reftoken not updated");
+            //ERRORS?
+            return false;
+        }
+        return token;
     });
 }
 
@@ -102,6 +114,7 @@ function createCourse(name, description, hidden) {
     return newCourse.save().then(function (createdCourse) {
         if (!createdCourse) {
             console.log("Error: Course not created");
+            //ERROR?!
         }
         return createdCourse;
     });

@@ -3,6 +3,8 @@
 var jwt = require('jsonwebtoken');
 var errors = require('./errors.js');
 var util = require('util');
+var queries = require('./queries/queries');
+
 
 
 function AuthorizationError(message, httpCode, errorCode) {
@@ -58,4 +60,57 @@ exports.validateJWTtoken = function (req, res, next) {
         next(err);
     }
 
+};
+
+exports.validateRefToken = function (req, res, next) {
+    try {
+        if (!(req.headers && req.headers.authorization)){
+            var err = new AuthorizationError("No Authorization header included", 401, 6000);
+            throw err;
+        }
+        var auth = req.headers.authorization.split(' ');
+
+        if (auth.length === 1) {
+            throw new AuthorizationError("Authorization header invalid format", 401, 6001);
+        }
+
+        if (auth.length > 2) {
+            throw new AuthorizationError("Authorization header invalid format", 401, 6002);
+        }
+
+        if (auth[0].toLowerCase() !== process.env.JWT_AUTH_HEADER_PREFIX.toLowerCase()) {
+            throw new AuthorizationError("Authorization header invalid format", 401, 6003);
+        }
+
+        var jwtToken = auth[1];
+        jwt.verify(jwtToken, process.env.JWT_SECRET_KEY, function(err, payload) {
+            if (err) {
+                if (err.name === "TokenExpiredError") { 
+                    throw new AuthorizationError("Token expired", 401, 6004);
+                }
+                if (err.name === "JsonWebTokenError") {
+                    throw new AuthorizationError("Invalid token", 401, 6005);
+                }
+            }
+            if (payload.hasOwnProperty('admin')) {
+                throw new AuthorizationError("Expect refresh token. Recieved access token.", 401, 6006);
+            }
+
+            queries.getUser(payload.id, "token").then(function (tokenList) {
+                console.log(tokenList);
+                if (!tokenList.include(jwtToken)) {
+                    throw new AuthorizationError("Invalid token", 401, 6005);
+                }
+            })
+            .catch(function (err) {
+                next(err);
+            });
+
+            req.user = payload;
+            next();
+        });
+
+    } catch (err) {
+        next(err);
+    }
 };
