@@ -34,11 +34,11 @@ function getCourseBadge(coursebadge_id) {
 }
 
 function updateCourseBadge(coursebadge_id, data) {
-    return CourseBadge.findOneAndUpdate({"_id": coursebadge_id}, data);
+    return CourseBadge.findOneAndUpdate({'_id': coursebadge_id}, data);
 }
 
 function getCourseBadgeByCourseID(course_id) {
-    return CourseBadge.find({});
+    return CourseBadge.find({'course_id': course_id});
 }
 
 function getCourseByID(course_id) {
@@ -46,14 +46,14 @@ function getCourseByID(course_id) {
 }
 
 function getCourseByAssignmentID(assignment_id) {
-    return Course.findOne({"assignments": assignment_id});
+    return Course.findOne({'assignments': assignment_id});
 }
 
 function getNumberOfAssignments(course_id) {
-    return Course.aggregate()
-        .match({_id: course_id})
-        .project({
-            total: {$size:"$assignments"}
+    return new Promise((resolve, reject) => {
+        getCourseByID(course_id).then(function(course) {
+            resolve(course.assignments.length);
+        });
     });
 }
 
@@ -94,28 +94,53 @@ function addBadgeToFeature(badge_id, features_id) {
     });
 }
 
-function getFeaturesByCourseID(course_id) {
-
-}
-
 function getNumberOfCompletedAssignments(course_id, user_id) {
-    return new Promise((resolve, reject) => {
-        Course.findById(course_id).then(function(course) {
-            course.features.forEach(function(feature_id) {
-                getFeatureByID(feature_id).then(function(feature) {
-                    if(feature.user.equals(user_id)) {
-                        Features.aggregate()
-                            .match({_id: feature._id})
-                            .project({
-                                completed: {$size:"$progress"}
-                        }).then(function(completed) {
-                            resolve(completed);
-                        });
-                    }
+    return new Promise(async (resolve, reject) => {
+        let course = await Course.findById(course_id);
+        course.features.forEach(async function(feature_id) {
+            let feature = await getFeatureByID(feature_id);
+            if(feature.user.equals(user_id)) {
+                Features.aggregate()
+                .match({_id: feature._id})
+                .project({
+                    completed: {$size:'$progress'}
+                }).then(function(completed) {
+                    resolve(completed[0].completed);
                 });
-            });
+            }
         });
     });
+}
+
+async function getFeaturesOfCourse(course_id) {
+    let json = {};
+
+    json.total_assignments = await getNumberOfAssignments(course_id);
+
+    let course = await Course.findById(course_id);
+
+    json.features = [];
+    for(let feature_id of course.features) {
+        json.features.push(await getFeatureByID(feature_id));
+    }
+
+    return json;
+}
+
+async function getFeatureOfUserID(course_id, user_id) {
+    let course = await Course.findById(course_id);
+
+    for(let feature_id of course.features) {
+
+        let feature = await getFeatureByID(feature_id);
+        if(feature.user.equals(user_id)) {
+            return await getFeatureByID(feature_id);
+        }
+    }
+
+    // User had no feature in that course create it
+    let feature = await createFeature(user_id, course_id);
+    return await getFeatureByID(feature._id);
 }
 
 exports.createBadge = createBadge;
@@ -133,3 +158,5 @@ exports.getFeatureByID = getFeatureByID;
 exports.updateFeatureProgress = updateFeatureProgress;
 exports.addBadgeToFeature = addBadgeToFeature;
 exports.getNumberOfCompletedAssignments = getNumberOfCompletedAssignments;
+exports.getFeaturesOfCourse = getFeaturesOfCourse;
+exports.getFeatureOfUserID = getFeatureOfUserID;

@@ -40,18 +40,6 @@ function emitEvent(result) {
         }
 
         emitter.emit('handleFeatures', result).then(function(data) {
-
-            // TODO: Does it work to run every feature independent of order?
-            /*if(data1.constructor !== Array) {
-                data1 = [data1];
-            }
-            emitter.emit('handleBadges', result).then(function(data2) {
-                if(data2.constructor !== Array) {
-                    data2 = [data2];
-                }
-                result.features = createResultjson(data1.concat(data2));
-                resolve(result);
-            });*/
             result.features = data;
             resolve(result);
         });
@@ -61,8 +49,6 @@ function emitEvent(result) {
 function createResultjson(data) {
     let json = {};
     data.forEach(function(item) {
-
-        console.log(item);
 
         if(Object.keys(item).length != 1) {
             throw new Error('Result was too long');

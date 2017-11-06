@@ -52,8 +52,8 @@ require('./routes/api/features')(features);
 app.use('/api/features', features);
 
 var test_routes = express.Router();
-require('./routes/test_routes')(test_routes);
-app.use('/api/', test_routes);
+require('./routes/api/tests')(test_routes);
+app.use('/api/tests', test_routes);
 
 
 //Route not found.
