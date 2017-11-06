@@ -8,12 +8,7 @@ var logger = require('../../logger.js');
 
 module.exports = function(router) {
 
-    router.get('/:course_id/assignments', auth.validateJWTtoken, function (req, res, next) {
-        var course_id = req.params.course_id;
-        res.send("/courses/" + course_id + "/assignments GET Endpoint");
-    });
-
-    router.post('/badge', function (req, res) {
+    router.post('/badge', auth.validateJWTtoken, function (req, res) {
         features.createBadge(req.body).then(function() {
             res.sendStatus(200);
         }).catch(function(err) {
@@ -22,13 +17,13 @@ module.exports = function(router) {
         });
     });
 
-    router.get('/badge/:badge_id', function (req, res) {
+    router.get('/badge/:badge_id', auth.validateJWTtoken, function (req, res) {
         features.getBadge(req.params.badge_id).then(function(badge) {
             res.send(badge);
         });
     });
 
-    router.put('/badge/:badge_id', function(req, res) {
+    router.put('/badge/:badge_id', auth.validateJWTtoken, function(req, res) {
         features.updateBadge(req.params.badge_id, req.body).then(function() {
             res.sendStatus(200);
         }).catch(function(err) {
@@ -37,7 +32,7 @@ module.exports = function(router) {
         });
     });
 
-    router.post('/coursebadge', function(req, res) {
+    router.post('/coursebadge', auth.validateJWTtoken, function(req, res) {
         features.createCourseBadge(req.body).then(function() {
             res.sendStatus(200);
         }).catch(function(err) {
@@ -46,13 +41,13 @@ module.exports = function(router) {
         });
     });
 
-    router.get('/coursebadge/:coursebadge_id', function(req, res) {
+    router.get('/coursebadge/:coursebadge_id', auth.validateJWTtoken, function(req, res) {
         features.getCourseBadge(req.params.coursebadge_id).then(function(courseBadge) {
             res.send(courseBadge);
         });
     });
 
-    router.put('/coursebadge/:coursebadge_id', function(req, res) {
+    router.put('/coursebadge/:coursebadge_id', auth.validateJWTtoken, function(req, res) {
         features.updateCourseBadge(req.params.coursebadge_id, req.body).then(function() {
             res.sendStatus(200);
         }).catch(function(err) {
