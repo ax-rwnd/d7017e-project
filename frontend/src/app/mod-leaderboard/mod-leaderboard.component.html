@@ -1,0 +1,21 @@
+<div class="gamification-block panel panel-default" *ngIf="isEnabled() !== false">
+<div class="gamification-header panel-heading">
+Leaderboard
+</div>
+<div class="panel-body">
+<table class="table table-striped">
+<thead>
+<tr>
+<th>Name</th>
+<th>Score</th>
+</tr>
+</thead>
+<tbody *ngFor="let n of generateBoard()">
+<tr>
+<td> {{n.name}} </td>
+<td> {{n.score}} </td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>

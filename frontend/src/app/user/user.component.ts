@@ -8,6 +8,7 @@ import {FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
 
 import {UserService} from '../services/user.service';
 import {CourseService} from '../services/course.service';
+import {HttpClient} from '@angular/common/http';
 
 @Component({
   selector: 'app-user',
@@ -39,7 +40,7 @@ export class UserComponent implements OnInit {
     leaderboard: [false, []],
   };
 
-  constructor(private route: ActivatedRoute, private headService: HeadService, private userService: UserService,
+  constructor(private http: HttpClient, private route: ActivatedRoute, private headService: HeadService, private userService: UserService,
               private modalService: BsModalService, private courseService: CourseService, private fb: FormBuilder) {
     this.headService.stateChange.subscribe(sidebarState => { this.sidebarState = sidebarState; }); // subscribe to the state value head provides
   }
@@ -61,6 +62,17 @@ export class UserComponent implements OnInit {
     const course = this.courseService.CreateCourse(this.form.value.name, this.form.value.code,
       this.form.value.info, this.form.value.progress, this.form.value.score, this.form.value.badges, this.form.value.leaderboard);
     this.courseService.AddCourse(course);
+  }
+  getMe() {
+    this.http.get('https://130.240.5.118:8000/api/users/me').subscribe(
+      data => {
+        console.log(data);
+      },
+      err => {
+        console.log(err);
+        console.log('something went shit in getMe');
+      }
+    );
   }
 
 }

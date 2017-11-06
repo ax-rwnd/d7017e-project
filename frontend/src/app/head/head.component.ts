@@ -1,96 +1,70 @@
-import {Component, forwardRef, OnInit, Inject} from '@angular/core';
+import {Component, forwardRef, OnInit, Inject, HostListener, ViewChild} from '@angular/core';
 import { trigger, state, style, animate, transition } from '@angular/animations';
 import { HeadService } from '../services/head.service';
 import {AppComponent} from '../app.component';
+import {UserService} from '../services/user.service';
 
 @Component({
   selector: 'app-head',
   templateUrl: './head.component.html',
   styleUrls: ['./head.component.css'],
   animations: [
-    trigger('sidebar', [
-      state('inactive', style({display: 'none', transform: 'translateX(-100%)'})),
-      state('active', style({display: 'block', transform: 'translateX(0)'})),
-      transition('inactive => active', animate('300ms')),
-      transition('active => inactive', animate('300ms'))
+    trigger('userOption', [
+      state('false', style({display: 'none', border: 'none', overflow: 'hidden', opacity: '0'})),
+      state('true', style({display: 'block', opacity: '1'})),
+      transition('0 => 1', animate('80ms 200ms ease-in')),
+      transition('1 => 0', animate('150ms ease-out'))
+    ]),
+    trigger('userDropBox', [
+      state('false', style({display: 'none', height: '0'})),
+      state('true', style({display: 'block', height: 'auto'})),
+      transition('0 => 1', animate('200ms ease-in')),
+      transition('1 => 0', animate('200ms ease-out'))
     ])
   ]
 })
 
 export class HeadComponent implements OnInit {
   sidebarState;
+  user: any;
+  stateDropDown: boolean;
 
-  constructor(@Inject(forwardRef(() => AppComponent)) private appComponent: AppComponent, private headService: HeadService) {
-     // shouldn't be inactive, should only get state from app component
+  constructor(@Inject(forwardRef(() => AppComponent)) private appComponent: AppComponent, private headService: HeadService,
+              private userService: UserService) {
+    // shouldn't be inactive, should only get state from app component
   }
 
-  toggleState() { // send to the sidebar in app component that it should toggle state
+  toggleState($event) { // send to the sidebar in app component that it should toggle state
+    $event.preventDefault();
+    $event.stopPropagation();
     this.sidebarState = this.sidebarState === 'active' ? 'inactive' : 'active';
     this.headService.setState(this.sidebarState);
   }
 
-   ngOnInit() {
-     this.sidebarState = this.appComponent.sidebarState;
-     this.headService.setState(this.sidebarState);
-   }
-}
-
-/*export class HeadComponent implements OnInit {
-
-  //Det här är retarded. temporär lösning
-  public isCollapsed:boolean = false;
-  public subMenu1Collapsed:boolean = true;
-  public mobileCollapse:boolean = false;
-  public profileCollapse:boolean = true;
-
-  public downArrow:string = "fa fa-fw fa-angle-down pull-right";
-  public rightArrow:string = "fa fa-fw fa-angle-right pull-right";
-
-  public angle:string = "down";
-  public angleProfile:string = "down";
-
-  public toggleMenu1(){
-    if (this.subMenu1Collapsed == true) {
-      this.subMenu1Collapsed = false;
-    } else {
-      this.subMenu1Collapsed = true;
-    }
-    this.toggleAngle();
+  @HostListener('document:click', ['$event'])
+  outsideDropDownClick($event) {
+    this.stateDropDown = false;
   }
 
-  public toggleProfile(){
-    if (this.profileCollapse == true) {
-      this.profileCollapse = false;
-      this.angleProfile = "up"
-    } else {
-      this.profileCollapse = true;
-      this.angleProfile = "down"
-    }
+  toggleUserDropDown($event) {
+    $event.preventDefault();
+    $event.stopPropagation();
+    this.stateDropDown = !this.stateDropDown;
   }
 
-  public toggleAngle(){
-    if (this.angle == 'down') {
-      this.angle = "right"
-    } else {
-      this.angle = "down"
-    }
+  isDropDown() {
+    return this.stateDropDown;
   }
 
-
-  public collapsed(event:any):void {
-    console.log(event);
-  }
-
-  public expanded(event:any):void {
-    console.log(event);
-  }
-
-  constructor() {
-
+  resetSidebar() {
+    this.headService.setState('inactive');
   }
 
   ngOnInit() {
+    this.stateDropDown = false;
+    this.user = this.userService.userInfo;
+    this.sidebarState = this.appComponent.sidebarState;
+    this.headService.setState(this.sidebarState);
+   }
+}
 
-  }
-
-}*/

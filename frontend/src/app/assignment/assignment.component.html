@@ -17,10 +17,6 @@
       <h2>Status: {{status}}</h2>
     </div>
 
-    <div>
-      {{progress.current}}
-    </div>
-
     <div class="progress progress-margin">
       <div class="progress-bar" role="progressbar" [attr.aria-valuenow]="progress['current']" aria-valuemin="0" aria-valuemax ="10"
            [style.width]="progress['current']*10 + '%'">
@@ -40,7 +36,7 @@
 
 
       <!--<codemirror [(ngModel)]="content" [config]="{lineNumbers: true}"></codemirror>-->
-    <div id="editor">
+    <div id="editor" appScroller>
       <div ace-editor [(text)]="content" [mode]="language" [theme]="theme" [options]="{maxLines: 1000, printMargin: false}" [readOnly]="false" [autoUpdateContent]="true" [durationBeforeCallback]="1000"(textChanged)="onChange(content)"  style="min-height: 100%; width:100%; overflow: auto;"> </div>
     </div>
 
@@ -73,7 +69,7 @@
 
   </div>
 
-  <div id="description">
+  <div id="description" appScroller>
     <!-- Description of the assignment -->
     <!-- Blog entry
 

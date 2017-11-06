@@ -55,10 +55,10 @@ export class BackendService {
   }
   */
   getAssignment() {
-    return 'print(\'Detta är ett program som räknar hur mycket kaffe du dricker.\');\n' +
-      'namn = \'Anna andersson\';\n' +
-      'print(\'Jag heter \' + namn);\n' +
-      'n = 2;\n' +
-      'print(\'Jag har druckit \' + str(n) + \' koppar kaffe idag.\');';
+    return {
+      name: 'Assignment 1',
+      description: 'This is the first assignment', // Description should be markdown
+      languages: ['python', 'javascript']
+    };
   }
 }

@@ -8,6 +8,7 @@ import { ButtonsModule } from 'ngx-bootstrap';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { CollapseModule } from 'ngx-bootstrap/collapse';
 import { ModalModule } from 'ngx-bootstrap';
+import { AngularFontAwesomeModule } from 'angular-font-awesome/angular-font-awesome';
 
 import { CodemirrorModule } from 'ng2-codemirror';
 import { AceEditorModule } from 'ng2-ace-editor';
@@ -26,23 +27,25 @@ import { CoursesComponent } from './courses/courses.component';
 import { CreateassignmentComponent } from './createassignment/createassignment.component';
 
 import {BackendService} from './services/backend.service';
-import {RewardService} from './services/reward.service';
 
 // Animation
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HeadService } from './services/head.service';
 import {UserService} from './services/user.service';
 import {CourseService} from './services/course.service';
+import { AssignmentService } from './services/assignment.service';
 
 // AUTH
 import {AuthGuardService as AuthGuard} from './services/Auth/Auth-Guard.service';
-import {AuthGuardService as LoginGuard} from './services/Auth/Login-Guard.service';
 import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
 import {NoopInterceptor} from './Interceptors/Auth.interceptor';
 
 import {AuthService} from './services/Auth/Auth.service';
 import {Http, HttpModule} from '@angular/http';
+import { ScrollerDirective } from './scroller.directive';
 import { AssignmentGroupComponent } from './assignment-group/assignment-group.component';
+import { GameelementComponent } from './gameelement/gameelement.component';
+import { ModLeaderboardComponent } from './mod-leaderboard/mod-leaderboard.component';
 
 
 const appRoutes: Routes = [
@@ -68,7 +71,10 @@ const appRoutes: Routes = [
     UserComponent,
     MainComponent,
     CreateassignmentComponent,
+    ScrollerDirective,
     AssignmentGroupComponent,
+    GameelementComponent,
+    ModLeaderboardComponent,
   ],
   imports: [
     BrowserModule,
@@ -84,6 +90,7 @@ const appRoutes: Routes = [
     CollapseModule.forRoot(),
     HttpClientModule,
     HttpModule,
+    AngularFontAwesomeModule,
     ModalModule.forRoot(),
     RouterModule.forRoot(
       appRoutes
@@ -97,12 +104,11 @@ const appRoutes: Routes = [
     },
     HeadService, // the state variable that head provides
     BackendService,
-    RewardService,
     UserService,
     CourseService,
+    AssignmentService,
     // AUTHS
     AuthGuard,
-    LoginGuard,
     AuthService,
   ],
   bootstrap: [AppComponent]

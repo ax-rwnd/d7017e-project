@@ -4,5 +4,7 @@
 // The list of which env maps to which file can be found in `.angular-cli.json`.
 
 export const environment = {
-  production: false
+  production: false,
+  backend_ip: 'https://130.240.5.119:8000',
+  frontend_ip: 'https://130.240.5.119:4200'
 };
