@@ -16,27 +16,19 @@ var errors = require('../lib/errors.js');
 var jwt = require('jsonwebtoken');
 var parseXml = require('xml2js').parseString;
 var https = require('https');
-
-const TESTER_IP = 'http://130.240.5.118:9100';
-const SECRET = 'supersecret';
-const BACKEND_IP = 'http://130.240.5.119:8000';
-const CAS_URL = 'https://weblogon.ltu.se/cas/';
-
-// Time-to-Live of Tokens
-const access_ttl = 15 * 60;
-const refresh_ttl = 24 * 60 * 60;
+var config = require('config');
 
 function create_refresh_token(id) {
     return jwt.sign({
         id: id
-    }, SECRET, {expiresIn: refresh_ttl});
+    }, process.env.JWT_SECRET_KEY, {expiresIn: config.get('Auth.refresh_ttl')});
 }
 
 function create_access_token(id, admin) {
     return jwt.sign({
         id: id,
         admin: admin
-    }, SECRET, {expiresIn: access_ttl});
+    }, process.env.JWT_SECRET_KEY, {expiresIn: config.get('Auth.access_ttl')});
 }
 
 module.exports = function (router) {
@@ -77,7 +69,7 @@ module.exports = function (router) {
         var ticket = req.query.ticket;
         var service = req.query.service;
 
-        var url = CAS_URL + 'serviceValidate?service=' + service + '&ticket=' + ticket;
+        var url = config.get('Auth.cas_url') + 'serviceValidate?service=' + service + '&ticket=' + ticket;
 
         var requ = https.get(url, function (resu) {
             var output = '';
@@ -101,15 +93,15 @@ module.exports = function (router) {
                             console.log("User found");
                             var refToken = create_refresh_token(userObject._id);
                             console.log(refToken);
-                            queries.setRefreshToken(userObject, refToken); 
+                            queries.setRefreshToken(userObject, refToken);
                             console.log("Efter Ref token save");
                             res.json({
                                 access_token: create_access_token(userObject._id, userObject.admin),
-                                access_expires_in: access_ttl,
+                                access_expires_in: config.get('Auth.access_ttl'),
                                 refresh_token: refToken,
-                                refresh_expires_in: refresh_ttl,
-                                token_type: process.env.JWT_AUTH_HEADER_PREFIX 
-                            });                        
+                                refresh_expires_in: config.get('Auth.refresh_ttl'),
+                                token_type: process.env.JWT_AUTH_HEADER_PREFIX
+                            });
                         })
                         .catch(function (err) {
                             console.log("Error");
@@ -145,7 +137,7 @@ module.exports = function (router) {
                     access_token: create_access_token(user._id, user.admin),
                     token_type: process.env.JWT_AUTH_HEADER_PREFIX,
                     scope: '',
-                    expires_in: access_ttl
+                    expires_in: config.get('Auth.access_ttl')
                 });
             })
             .catch(function (err) {
@@ -167,8 +159,8 @@ module.exports = function (router) {
         queries.getUser(req.user.id, "username email courses admin").then(function (user) {
             res.json({
                 access_token: create_access_token(user.id, user.admin),
-                expires_in: access_ttl,
-                token_type: process.env.jwtAuthHeaderPrefix 
+                expires_in: config.get('Auth.access_ttl'),
+                token_type: process.env.jwtAuthHeaderPrefix
             });
         })
         .catch(function (err) {

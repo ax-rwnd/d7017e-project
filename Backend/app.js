@@ -11,19 +11,47 @@ var config = require('config');
 var logger = require('./logger'); //Use Logger
 var errors = require('./lib/errors.js');
 var morgan = require('morgan');
+var fs = require('fs');
+var crypto = require('crypto');
 
 var app = express();
 
-initApp();
+let secret;
+try {
+    secret = fs.readFileSync('.secret', 'utf8');
+} catch (e) {
+    secret = crypto.randomBytes(64).toString('hex');
+    fs.writeFileSync('.secret', secret, 'utf8');
+} finally {
+    process.env.JWT_SECRET_KEY = secret;
+}
 
-//mongoose.set('debug', true);
-process.title = 'd7017e-backend';
-process.env.JWT_SECRET_KEY = 'supersecret';
-process.env.JWT_AUTH_HEADER_PREFIX = 'bearer';
+/*
+    if (err) {
+        require('crypto').randomBytes(48, function(err, buffer) {
+            var token = buffer.toString('hex');
+            fs.writeFile(".secret", token, function(err) {
+                if(err) {
+                    throw new Error(err);
+                }
+                logger.info("File for secret did not exist. Created one!");
+                process.env.JWT_SECRET_KEY = token;
+            });
+        });
+    } else {
+        process.env.JWT_SECRET_KEY = secret;
+    }
+*/
+    //mongoose.set('debug', true);
+    process.title = config.get('App.title');
+    process.env.JWT_AUTH_HEADER_PREFIX = config.get('Auth.auth_header_prefix');
 
-// Make sure NODE_ENV matches express env to make env accessible
-// to the routers as well
-process.env.NODE_ENV = app.get('env');
+    // Make sure NODE_ENV matches express env to make env accessible
+    // to the routers as well
+    process.env.NODE_ENV = app.get('env');
+
+    initApp();
+//});
 
 app.use(morgan('dev'));
 app.use(bodyParser.json());
@@ -32,7 +60,6 @@ app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
 }));
 app.use(passport.initialize());
 app.use(cors({origin: '*'}));
-
 
 //defining routes
 var auth = express.Router();
@@ -97,7 +124,7 @@ app.use(function (err, req, res, next) {
 
 // Function to initiate the app/server into development- or production mode. (depends on NODE_ENV)
 function initApp() {
-    var dbConfig = config.get('Mongo.dbConfig'); //Get mongo database config
+    let dbConfig = config.get('Mongo.dbConfig'); //Get mongo database config
     console.log("Server running in " + app.get('env') + " mode.");
     mongoose.connect(dbConfig.host+":"+dbConfig.port+'/'+dbConfig.database_name, { useMongoClient: true }); // Connect to development- or production database);
 }

@@ -2,3 +2,4 @@ node_modules
 npm-debug.log
 encryption/*.key
 encryption/*.crt
+.secret

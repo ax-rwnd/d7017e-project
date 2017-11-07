@@ -6,7 +6,7 @@ var helper = require('./features_helper');
 
 var emitter = new EventEmitter();
 
-var feature_names = [];
+let feature_names = [];
 
 function initFeatures() {
 
