@@ -7,13 +7,13 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['../gameelement/gameelement.component.css']
 })
 
-export class ModLeaderboardComponent extends GameelementComponent {
-  constructor() {
-    super();
-  }
+export class ModLeaderboardComponent extends GameelementComponent implements OnInit {
+  public leaderList: any[];
 
-  generateBoard() {
-    // TODO: replace this with a call to the backend
-    return [{name: 'asd', score: 0}, {name: 'asd', score: 1}, {name: 'asd', score: 2}, {name: 'asd', score: 3}, {name: 'asd', score: 4}];
+  ngOnInit() {
+    this.leaderList = [{name: 'asd', score: 10}];
+    /*this.backendService.getMyCourses().then(data => {
+      this.leaderList = data;
+    });*/
   }
 }

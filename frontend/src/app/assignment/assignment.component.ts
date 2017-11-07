@@ -33,13 +33,18 @@ export class AssignmentComponent implements OnInit {
   sidebarState; // state of sidebar
   feedback: string[];
 
-  constructor(private backendService: BackendService, private assignmentService: AssignmentService, private headService: HeadService) {
-    this.headService.stateChange.subscribe(sidebarState => { this.sidebarState = sidebarState; });
+  constructor(private backendService: BackendService,
+              private assignmentService: AssignmentService,
+              private headService: HeadService) {
+    this.headService.stateChange.subscribe(sidebarState => {
+        this.sidebarState = sidebarState;
+    });
   }
 
   ngOnInit() {
     this.sidebarState = this.headService.getCurrentState();
-    this.assignment = this.backendService.getAssignment();
+    // TODO: reimplement when new code arrives in backend
+    // this.assignment = this.backendService.getAssignment();
     this.languages = this.assignment['languages'];
     this.language = this.languages[0];
     this.themes = ['eclipse', 'monokai'];
@@ -53,8 +58,9 @@ export class AssignmentComponent implements OnInit {
   // SubmitCode should update status/progress.
   // Does submitAssignment give me that status or should i fetch the assignment again?
   submitCode() {
-    this.backendService.SubmitAssignment(this.content)
-      .then(value => this.HandleResponse(value));
+    // TODO: reimplement when new code arrives in backend
+    // this.backendService.submitAssignment(this.content)
+    //  .then(value => this.HandleResponse(value));
   }
 
   setTheme(th) {

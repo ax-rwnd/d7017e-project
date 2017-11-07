@@ -11,8 +11,7 @@ import { BackendService } from '../services/backend.service';
 })
 
 export class GameelementComponent implements OnInit {
-
-  constructor() { }
+  constructor(public backendService: BackendService) {}
 
   ngOnInit() {
   }
