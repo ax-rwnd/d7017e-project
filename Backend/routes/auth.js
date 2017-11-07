@@ -21,14 +21,14 @@ var config = require('config');
 function create_refresh_token(id) {
     return jwt.sign({
         id: id
-    }, process.env.JWT_SECRET_KEY, {expiresIn: config.get('Auth.refresh_ttl')});
+    }, config.get('App.secret'), {expiresIn: config.get('Auth.refresh_ttl')});
 }
 
 function create_access_token(id, admin) {
     return jwt.sign({
         id: id,
         admin: admin
-    }, process.env.JWT_SECRET_KEY, {expiresIn: config.get('Auth.access_ttl')});
+    }, config.get('App.secret'), {expiresIn: config.get('Auth.access_ttl')});
 }
 
 module.exports = function (router) {
@@ -100,7 +100,7 @@ module.exports = function (router) {
                                 access_expires_in: config.get('Auth.access_ttl'),
                                 refresh_token: refToken,
                                 refresh_expires_in: config.get('Auth.refresh_ttl'),
-                                token_type: process.env.JWT_AUTH_HEADER_PREFIX
+                                token_type: config.get('Auth.auth_header_prefix')
                             });
                         })
                         .catch(function (err) {
@@ -120,7 +120,7 @@ module.exports = function (router) {
     });
 
 
-    if (process.env.NODE_ENV === 'development') {
+    if (config.get('App.environment') === 'development') {
         router.get('/login/fake', (req, res, next) => {
             let admin = req.query.admin === 'true';
             let role = admin ? 'admin' : 'student';
@@ -135,7 +135,7 @@ module.exports = function (router) {
             .then(user => {
                 res.json({
                     access_token: create_access_token(user._id, user.admin),
-                    token_type: process.env.JWT_AUTH_HEADER_PREFIX,
+                    token_type: config.get('Auth.auth_header_prefix'),
                     scope: '',
                     expires_in: config.get('Auth.access_ttl')
                 });

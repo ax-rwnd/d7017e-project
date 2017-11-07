@@ -23,35 +23,17 @@ try {
     secret = crypto.randomBytes(64).toString('hex');
     fs.writeFileSync('.secret', secret, 'utf8');
 } finally {
-    process.env.JWT_SECRET_KEY = secret;
+    config.App.secret = secret;
 }
 
-/*
-    if (err) {
-        require('crypto').randomBytes(48, function(err, buffer) {
-            var token = buffer.toString('hex');
-            fs.writeFile(".secret", token, function(err) {
-                if(err) {
-                    throw new Error(err);
-                }
-                logger.info("File for secret did not exist. Created one!");
-                process.env.JWT_SECRET_KEY = token;
-            });
-        });
-    } else {
-        process.env.JWT_SECRET_KEY = secret;
-    }
-*/
-    //mongoose.set('debug', true);
-    process.title = config.get('App.title');
-    process.env.JWT_AUTH_HEADER_PREFIX = config.get('Auth.auth_header_prefix');
+process.title = config.get('App.title');
 
-    // Make sure NODE_ENV matches express env to make env accessible
-    // to the routers as well
-    process.env.NODE_ENV = app.get('env');
+// Make sure NODE_ENV matches express env to make env accessible
+// to the routers as well
+// process.env.NODE_ENV = app.get('env');
+config.App.environment = app.get('env');
 
-    initApp();
-//});
+initApp();
 
 app.use(morgan('dev'));
 app.use(bodyParser.json());

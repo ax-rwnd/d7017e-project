@@ -43,7 +43,7 @@ function validateCode(user_id, lang, code, assignment_id, res) {
             }
         }
 
-        if(process.env.NODE_ENV != 'development') {
+        if(config.get('App.environment') != 'development') {
             throw new Error('Remove `rejectUnauthorized` for production in '+ module.filename);
         }
 
@@ -87,7 +87,7 @@ function validateCode(user_id, lang, code, assignment_id, res) {
 function getTesterLanguages() {
     return new Promise(function (resolve, reject){
 
-        if(process.env.NODE_ENV != 'development') {
+        if(config.get('App.environment') != 'development') {
             throw new Error('Remove `rejectUnauthorized` for production in '+ module.filename);
         }
         request({
