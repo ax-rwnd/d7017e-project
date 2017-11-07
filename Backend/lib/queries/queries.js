@@ -55,12 +55,9 @@ function removeRefreshToken(userid, token) {
             userObject.tokens.splice(index, 1);
             userObject.save().then(function (updatedUser) {
                 console.log("Token removed");
-            })
+            });
         }
-    })
-    .catch(function(err) {
-        next(err);
-    })
+    });
 }
 
 /*
