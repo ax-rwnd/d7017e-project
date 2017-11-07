@@ -10,6 +10,8 @@ import { environment } from '../../environments/environment';
 })
 export class LoginHelperComponent implements OnInit {
   token: string;
+  refresh_token: string;
+  token_type: string;
   ticket: string;
 
   constructor(private http: HttpClient, private activatedRoute: ActivatedRoute, private router: Router) { }
@@ -23,11 +25,13 @@ export class LoginHelperComponent implements OnInit {
     this.http.get(environment.backend_ip + '/auth/login/ltu?ticket=' + this.ticket + '&service=' + environment.frontend_ip + '/auth').subscribe(
       data => {
         console.log(data);
+        // TOKEN
         this.token = (data['token_type'] + ' ' + data['access_token']);
         localStorage.setItem('token', this.token);
-        console.log(this.token);
-        localStorage.setItem('refresh_token', data['refresh_token']);
-        localStorage.setItem('token_type', data['token_type']);
+        // REFRESH TOKEN
+        this.refresh_token = (data['token_type'] + ' ' + data['refresh_token']);
+        localStorage.setItem('refresh_token', this.refresh_token);
+        // FIX THIS SHIT TO NAVIGATE CORRECTLY
         this.router.navigate(['/user']);
       },
       err => {

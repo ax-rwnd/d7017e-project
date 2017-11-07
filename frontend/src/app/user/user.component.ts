@@ -9,6 +9,8 @@ import {FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
 import {UserService} from '../services/user.service';
 import {CourseService} from '../services/course.service';
 import {HttpClient} from '@angular/common/http';
+import { environment } from '../../environments/environment';
+import {AuthService} from "../services/Auth/Auth.service";
 
 @Component({
   selector: 'app-user',
@@ -42,7 +44,7 @@ export class UserComponent implements OnInit {
   };
 
   constructor(private http: HttpClient, private route: ActivatedRoute, private headService: HeadService, private userService: UserService,
-              private modalService: BsModalService, private courseService: CourseService, private fb: FormBuilder) {
+              private modalService: BsModalService, private courseService: CourseService, private fb: FormBuilder, public auth: AuthService) {
     this.headService.stateChange.subscribe(sidebarState => { this.sidebarState = sidebarState; }); // subscribe to the state value head provides
   }
 
@@ -66,7 +68,7 @@ export class UserComponent implements OnInit {
     this.courseService.AddCourse(course);
   }
   getMe() {
-    this.http.get('https://130.240.5.118:8000/api/users/me').subscribe(
+    this.http.get(environment.backend_ip + '/api/courses/me').subscribe(
       data => {
         console.log(data);
       },
@@ -76,5 +78,4 @@ export class UserComponent implements OnInit {
       }
     );
   }
-
 }
