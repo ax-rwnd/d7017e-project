@@ -32,10 +32,12 @@ var userSchema = new Schema({
 	username: {type: String, required: true},
     email: {type: String, required: false},
     admin: {type: Boolean, required: true},
+    tokens: [{type: String, required: false}],
     courses: [{ type: Schema.Types.ObjectId, ref: 'Course', required: false}],
-    providers: [{type: String, required: true}]
+    providers: [{type: String, required: true}] //LTU, KTH etc.
 });
 
+//user code submissions
 var submissionSchema = new Schema({
     user: { type: Schema.Types.ObjectId, ref: 'User', required: true},
     assignment: { type: Schema.Types.ObjectId, ref: 'Assignment', required: true},
@@ -46,11 +48,11 @@ var courseSchema = new Schema({
     course_code: {type: String, required: true},
     name: {type: String, required: true},
     description: {type: String, required: false},
-    hidden: { type: Boolean, required: true },
+    hidden: { type: Boolean, required: true },  //public or private course
     teachers: [{ type: Schema.Types.ObjectId, ref: 'User', required: false }],
     students: [{ type: Schema.Types.ObjectId, ref: 'User', required: false }],
     assignments: [{ type: Schema.Types.ObjectId, ref: 'Assignment', required: false }],
-    features: [{ type: Schema.Types.ObjectId, ref: 'Features', required: true }],
+    features: [{ type: Schema.Types.ObjectId, ref: 'Features', required: true }], //progress, badges etc.
     enabled_features: {
         badges: Boolean,
         progress: Boolean

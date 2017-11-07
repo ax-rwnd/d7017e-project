@@ -14,6 +14,11 @@ after(() => {
     });
 });
 
+// performs a deep copy assuming a is simple (no functions or circular references)
+function clone(a) {
+   return JSON.parse(JSON.stringify(a));
+}
+
 describe('Test passAllMandatoryTests', () => {
 
     const input = {
@@ -51,33 +56,30 @@ describe('Test passAllMandatoryTests', () => {
     });
 
     it('should pass even if optional tests fail', () => {
-        let i = input;
+        let i = clone(input);
         i.results.optional_tests[0].ok = false;
         assert(features_helper.passAllMandatoryTests(i));
     });
 
-    for (let n = 0; n < input.results.io.length; n++) {
-        it(`should fail if mandatory test ${n} fails`, () => {
-            let i = input;
-            i.results.io[n].ok = false;
-            assert(!features_helper.passAllMandatoryTests(i));
-        });
-    }
+    let fail_one_test = (n) => {
+        let i = clone(input);
+        i.results.io[n].ok = false;
+        assert(!features_helper.passAllMandatoryTests(i));
+    };
 
-})
+    for (let n = 0; n < input.results.io.length; n++) {
+        it(`should fail if mandatory test ${n} fails`, fail_one_test.bind(null, n));
+    }
+});
 
 function auth() {
-    return new Promise((resolve, reject) => {
-        return request(runner.server)
+    return request(runner.server)
         .get('/auth/login/fake')
         .query({admin: 'false'})
         .expect(200)
         .then(res => {
-            resolve(res.body.access_token);
-        }).catch(function(err) {
-            logger.error(err);
+            return res.body.access_token;
         });
-    });
 }
 
 
@@ -85,8 +87,8 @@ describe('Features routes', () => {
 
     let access_token;
 
-    before(async () => {
-        access_token = await auth();
+    before(() => {
+        return auth().then(at => access_token = at);
     });
 
     it('GET /api/features/features/:course_id', () => {
@@ -124,8 +126,8 @@ describe('Features routes', () => {
 describe('Tester', () => {
     let access_token;
 
-    before(async () => {
-        access_token = await auth();
+    before(() => {
+        return auth().then(at => access_token = at);
     });
 
     it('GET /api/tests/languages', () => {

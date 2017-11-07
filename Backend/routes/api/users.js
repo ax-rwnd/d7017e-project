@@ -18,14 +18,12 @@ module.exports = function (router) {
 
 
     router.get('/me', auth.validateJWTtoken, function (req, res, next) {
-        // queries.getUser(req.user._id, "username email courses admin").then(function (user) {
-        //     res.json(user);
-        // })
-        // .catch(function(err) {
-        //     next(err);
-        // });
-
-        res.json(req.user);
+        queries.getUser(req.user.id, "username email courses admin").then(function (user) {
+            res.json(user);
+        })
+        .catch(function(err) {
+            next(err);
+        });
     });
 
     router.get('/:user_id', auth.validateJWTtoken, function (req, res, next) {

@@ -31,7 +31,7 @@ function getTestsFromAssignment(assignmentID, callback) {
 
 
 function getUser(id, fields) {
-    var wantedFields = fields || "username email admin token courses providers";
+    var wantedFields = fields || "username email admin tokens courses providers";
     return User.findById(id, wantedFields).then(function (user) {
         if (!user) {
             console.log("User not found");
@@ -42,11 +42,21 @@ function getUser(id, fields) {
 }
 
 function setRefreshToken(userObject, token) {
-    console.log("Setting Ref token");
-    console.log(token);
     userObject.tokens.push(token);
     userObject.save().then(function (updatedUser) {
         console.log("Ref token saved");
+    });
+}
+
+function removeRefreshToken(userid, token) {
+    getUser(userid, "tokens").then(function(userObject) {
+        var index = userObject.tokens.indexOf(token);
+        if (index > -1) {
+            userObject.tokens.splice(index, 1);
+            userObject.save().then(function (updatedUser) {
+                console.log("Token removed");
+            });
+        }
     });
 }
 
@@ -74,7 +84,7 @@ function findOrCreateUser(profile) {
     var admin = profile.admin || false;
     return User.findOne({username: username}).then(function (user) {
         if (!user) {
-            var newUser = new User({username: username, email: email, admin: admin, courses: []});
+            var newUser = new User({username: username, email: email, admin: admin, courses: [], tokens: []});
             return newUser.save().then(function (createdUser) {
                 if (!createdUser) {
                     console.log("Error: User not created");
@@ -226,4 +236,5 @@ exports.getCourseTeachers = getCourseTeachers;
 exports.getCourseAssignments = getCourseAssignments;
 exports.getCourse = getCourse;
 exports.setRefreshToken = setRefreshToken;
+exports.removeRefreshToken = removeRefreshToken;
 
