@@ -27,7 +27,8 @@ import {HttpClient} from '@angular/common/http';
 export class UserComponent implements OnInit {
   user: any;
   statistics: boolean;
-  sidebarState; // get current state
+  sidebarState: any; // get current state
+  courses: any;
   modalRef: BsModalRef;
   form: FormGroup;
   defaultForm = {
@@ -46,6 +47,7 @@ export class UserComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.courses = this.courseService.courses;
     this.sidebarState = this.headService.getCurrentState();
     this.user = this.userService.userInfo;
     this.statistics = false;

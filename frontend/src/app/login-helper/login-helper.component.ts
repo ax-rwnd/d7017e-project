@@ -22,12 +22,17 @@ export class LoginHelperComponent implements OnInit {
     // this.http.get('http://130.240.5.119:8000/api/login/ltu?ticket=' + this.ticket).subscribe(
     this.http.get(environment.backend_ip + '/auth/login/ltu?ticket=' + this.ticket + '&service=' + environment.frontend_ip + '/auth').subscribe(
       data => {
-        localStorage.setItem('token', data['access_token']);
+        console.log(data);
+        this.token = (data['token_type'] + ' ' + data['access_token']);
+        localStorage.setItem('token', this.token);
+        console.log(this.token);
+        localStorage.setItem('refresh_token', data['refresh_token']);
+        localStorage.setItem('token_type', data['token_type']);
         this.router.navigate(['/user']);
       },
       err => {
         console.log(err);
-        console.log('something went shit');
+        console.log('something went shit in login-helper');
         this.router.navigate(['/']);
       }
     );

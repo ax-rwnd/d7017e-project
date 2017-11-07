@@ -1,17 +1,75 @@
 <app-head></app-head>
 
-<div id="cont" class="content" [@content]="sidebarState"><!-- [@content]="state" -->
-  <img width="200" class="img-circle" src="../../assets/images/default-user.png">
-  <h2>
-    {{user.firstName}} {{user.lastName}}
-  </h2>
-  <p>{{user.id}}</p>
-  <br>
+<div id="cont" class="content" [@content]="sidebarState">
   <button class="btn" (click)="openModal(courseModal)">Create course</button>
-  <p><a class="userlinks">Settings</a></p>
-  <p><a class="userlinks" (click)="toggleStatistics()">Statistics</a></p>
+  <!--<p><a class="userlinks" (click)="toggleStatistics()">Statistics</a></p>-->
   <button type="button" class="btn" (click)="getMe()">test getMe</button>
+
+  <div class="container">
+    <div class="row">
+      <div class="container">
+        <!-- Title -->
+        <h2>Latest</h2>
+        <!-- The head panel -->
+        <div class="gamification-block shadow panel panel-default" *ngFor="let course of courses">
+          <div class="panel-heading gamification-header">
+            <!-- Course panel title -->
+            <div [routerLink]="['/courses', course.code]" class="pointer"><h4>{{course.code}} - {{course.name}}</h4></div>
+          </div>
+          <!-- 'Main' body panel -->
+          <div class="panel-body">
+            <div *ngIf="course.rewards.badges != false" class="col-md-3" style="padding-left: 2em;">
+              <!-- Panel for badge start -->
+              <div class="gamification-block panel panel-default">
+                <div class="panel-heading gamification-header">
+                  Badge
+                </div>
+                <div class="panel-body">
+                  <img class="img-center" src="../../assets/images/{{course.rewards.badges[course.rewards.badges.length - 1]}}.png">
+                </div>
+              </div>
+              <!-- Panel for badge end -->
+            </div>
+            <div class="col-md-5">
+              <div *ngIf="course.rewards.progress !== false">
+                <!-- Panel for progress start -->
+                <div class="gamification-block panel panel-default">
+                  <div class="panel-heading gamification-header">
+                    Current Progress
+                  </div>
+                  <div class="panel-body">
+                    <div class="progress progress-margin">
+                      <div class="progress-bar" role="progressbar" [attr.aria-valuenow]="course.rewards.progress" aria-valuemin="0" aria-valuemax ="100"
+                           [style.width]="course.rewards.progress + '%'">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!-- Panel for progress end -->
+              </div>
+              <!-- Assignment panel start -->
+              <div class="gamification-block panel panel-default">
+                <div class="panel-heading gamification-header">
+                  Current Assignment
+                </div>
+                <div class="panel-body">
+                  <div class="assignment">Assignment 1</div>
+                </div>
+              </div>
+              <!-- Assignment panel start -->
+            </div>
+            <!-- column for progress and assignment end -->
+            <div class="col-md-4">
+              <app-mod-leaderboard></app-mod-leaderboard> <!-- this should be related to the assignment, so should probably have some kind of input -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <app-statistics *ngIf="statistics"></app-statistics>
+
 </div>
 
 <ng-template #courseModal>
@@ -22,7 +80,7 @@
     </button>
   </div>
   <form (ngSubmit)="createCourse()" [formGroup]="form" novalidate>
-  <div class="modal-body">
+    <div class="modal-body">
       <div class="form-group">
         <label for="name">Course name</label>
         <input type="text" class="form-control" id="name" formControlName="name" ngModel required>
@@ -55,11 +113,10 @@
 
       </div>
 
-  </div>
-  <div class="modal-footer">
-    <button type="submit" class="btn" (click)="modalRef.hide()">Submit</button>
+    </div>
+    <div class="modal-footer">
+      <button type="submit" class="btn" (click)="modalRef.hide()">Submit</button>
 
-  </div>
+    </div>
   </form>
 </ng-template>
-
