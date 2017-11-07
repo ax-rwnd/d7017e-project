@@ -43,13 +43,18 @@ var submissionSchema = new Schema({
 });
 
 var courseSchema = new Schema({
+    course_code: {type: String, required: true},
     name: {type: String, required: true},
     description: {type: String, required: false},
     hidden: { type: Boolean, required: true },
     teachers: [{ type: Schema.Types.ObjectId, ref: 'User', required: false }],
     students: [{ type: Schema.Types.ObjectId, ref: 'User', required: false }],
     assignments: [{ type: Schema.Types.ObjectId, ref: 'Assignment', required: false }],
-    features: [{ type: Schema.Types.ObjectId, ref: 'Features', required: true }]
+    features: [{ type: Schema.Types.ObjectId, ref: 'Features', required: true }],
+    enabled_features: {
+        badges: Boolean,
+        progress: Boolean
+    }
 });
 
 /*
