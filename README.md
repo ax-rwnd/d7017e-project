@@ -1,7 +1,7 @@
-# Learning As A Service *d7017e-project*
+# Learning As A Service
 Learning as a service is a project that intends to help university students learn programming. The idea is to provide a platform for introducing gamified elements into their education, so that tools for external motivation can be added, used and evaluated against learning results.
 
-# Installationsanvisningar
+# Installing
 Learning as a service was built and tested on debian linux 9 (stretch) with node 8.6.0 and npm 5.3.0.
 
 ## Tester [![Tester Build Status](http://130.240.5.119:8080/job/GPP-Tester-CI/badge/icon)](http://130.240.5.119:8080/job/GPP-Tester-CI/)
