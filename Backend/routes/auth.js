@@ -160,7 +160,7 @@ module.exports = function (router) {
             res.json({
                 access_token: create_access_token(user.id, user.admin),
                 expires_in: config.get('Auth.access_ttl'),
-                token_type: process.env.jwtAuthHeaderPrefix
+                token_type: config.get('Auth.auth_header_prefix')
             });
         })
         .catch(function (err) {
