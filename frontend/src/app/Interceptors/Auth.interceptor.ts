@@ -9,14 +9,15 @@ import {Router} from '@angular/router';
 import 'rxjs/add/operator/do';
 import { environment } from '../../environments/environment';
 import {Http, RequestOptions, Headers} from '@angular/http';
+import {forEach} from "@angular/router/src/utils/collection";
 
 @Injectable()
 export class NoopInterceptor implements HttpInterceptor {
   access_token: string;
 
-  constructor(public auth: AuthService, private router: Router, private http: Http) {}
+  constructor(private auth: AuthService, private router: Router, private http: Http) {}
 
-
+/*
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     console.log('interceptor running');
     const authHeader = this.auth.getToken();
@@ -25,9 +26,9 @@ export class NoopInterceptor implements HttpInterceptor {
     const authReq = req.clone({headers: req.headers.set('Authorization', authHeader)});
     return next.handle(authReq);
   }
+*/
 
 
-  /*
     intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
       const authHeader = this.auth.getToken();
       console.log('interceptet token: ' + authHeader);
@@ -39,33 +40,22 @@ export class NoopInterceptor implements HttpInterceptor {
       }, (err: any) => {
         if (err instanceof HttpErrorResponse) {
           if (err.status === 401) {
-            // set refresh token header
-
-            const headers = new Headers();
-            headers.append('Authorization', this.auth.getRefreshToken());
-            console.log(this.auth.getRefreshToken());
-            const options = new RequestOptions({ headers: headers });
-
-            this.http.get(environment.backend_ip + '/auth/accesstoken', options).subscribe(
-              data => {
-                console.log('THIS IS DATA');
-                console.log(data);
-                this.access_token = data['access_token'];
-                console.log('access_token: ' + this.access_token);
-                localStorage.setItem('token', this.access_token);
-
-              },
-              err => {
-                console.log(err);
-
+            // caching 401 request
+            this.auth.collectFailedRequest(authReq);
+            // requesting new token from backend
+            this.auth.requestNewToken().subscribe( resp => {
+              if (!resp) {
+                console.log('no response');
+              } else {
+                // retry failed requests
+                this.auth.retryFailedRequests();
               }
-
-            );
+            });
 
         }
       }
     });
   }
-  */
+
 
 }
