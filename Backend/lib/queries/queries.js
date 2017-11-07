@@ -19,7 +19,7 @@ function getTestsFromAssignment(assignmentID, callback) {
     }).populate({
         path: 'optional_tests.io',
         model: 'Test'
-    }).lean().exec(function(err, assignmentObject) {
+    }).lean().exec(function (err, assignmentObject) {
         let json = {};
         json.tests = assignmentObject.tests;
         json.optional_tests = assignmentObject.optional_tests;
@@ -41,6 +41,18 @@ function getUser(id, fields) {
     });
 }
 
+function deleteUser(id) {
+    return User.findById(id).then(function (user) {
+        if (!user) {
+            console.log("deleteUser: User not found");
+            throw errors.TOKEN_USER_NOT_FOUND;
+        }
+        User.deleteOne(user, function (err) {
+            return err;
+        });
+    });
+}
+
 function setRefreshToken(userObject, token) {
     userObject.tokens.push(token);
     userObject.save().then(function (updatedUser) {
@@ -49,7 +61,7 @@ function setRefreshToken(userObject, token) {
 }
 
 function removeRefreshToken(userid, token) {
-    getUser(userid, "tokens").then(function(userObject) {
+    getUser(userid, "tokens").then(function (userObject) {
         var index = userObject.tokens.indexOf(token);
         if (index > -1) {
             userObject.tokens.splice(index, 1);
@@ -228,6 +240,7 @@ function findOrCreateUser(profile) {
 exports.getTestsFromAssignment = getTestsFromAssignment;
 exports.findOrCreateUser = findOrCreateUser;
 exports.getUser = getUser;
+exports.deleteUser = deleteUser;
 exports.getCourses = getCourses;
 exports.createCourse = createCourse;
 exports.getUserCourses = getUserCourses;

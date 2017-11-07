@@ -38,7 +38,21 @@ module.exports = function (router) {
 
     router.delete('/:user_id', auth.validateJWTtoken, function (req, res, next) {
         var user_id = req.params.user_id;
-        res.send("/users/" + user_id + " DELETE Endpoint");
+        console.log(req.user.admin);
+        if (req.user.admin === true){
+            queries.deleteUser(user_id).then(function (err) {
+                if (err) {
+                    next(err);
+                } else {
+                    res.status(200).send("User deleted successfully");
+                }
+            })
+            .catch(function (err) {
+                next(err);
+            });
+        } else {
+            res.status(401).send("ERROR: Unauthorized, admin only");
+        }
     });
 
     router.post('/register', auth.validateJWTtoken, function (req, res, next) {
