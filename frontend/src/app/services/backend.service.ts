@@ -1,64 +1,84 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../../environments/environment';
 
 @Injectable()
 export class BackendService {
+  // Defines the endpoints for backend integration
+
+  // USAGE
+  // `
+  // this.backendService.getMyCourses().then(data => {
+  //   this.leaderList = data;
+  //  }
+  // `
+
   constructor(private http: HttpClient) { }
-  SubmitAssignment(code) { // Returns hardcoded response, remove later
-    return new Promise(resolve => {
-      resolve(
-        {
-          'results': {
-            'io': [{'id': 0, 'time': 45, 'stderr': '', 'ok': true}, {'id': 0, 'time': 58, 'stderr': 'Wrong output', 'ok': false}],
-            'lint': 'Lint error: Fix your indentation at ...',
-            'prepare': ''
-          }
-        }
-      );
-    });
+
+  getMe() {
+    // Get information for the currently logged in user
+
+    return this.http.get(environment.backend_ip + '/api/users/me')
+                .toPromise()
+                .then(response => response);
   }
-  /*
-  SubmitAssignment(code) {
-    return new Promise(resolve => {
-      const body = {
-        lang: 'python3',
-        code: code,
-        assignment_id: '59e47512d6bcdd1110d20f40'
-      };
-      // resolve([{'id': 0, 'time': 45, 'ok': true}]);
-      this.http.post('http://130.240.5.119:8000/api/test/', body)
-        .subscribe(data => {
-          console.log(data);
-          resolve(data['results']);
-        });
-      }
-    );
+
+  getUser(id: string) {
+    // Get info for the user with some ID
+
+    return this.http.get(environment.backend_ip + '/api/users/' + id)
+                .toPromise()
+                .then(response => response);
   }
-  */
-  /*
-  getAssignment() {
-    return new Promise(resolve => {
-        const body = {
-          assignment_id: '59e47512d6bcdd1110d20f40',
-          name: 'Assignment name',
-          text: 'Assignment text',
-          rewards: [{score: 0}]
-        };
-        // resolve([{'id': 0, 'time': 45, 'ok': true}]);
-        this.http.get('http://130.240.5.119:8000/api/test/', body)
-          .subscribe(data => {
-            console.log(data);
-            resolve(data['results']);
-          });
-      }
-    );
+
+  getCourses() {
+    // Get all courses for display on frontend
+    // TODO: this is not yet implemented according to wiki
+
+    return this.http.get(environment.backend_ip + '/api/courses')
+                .toPromise()
+                .then(response => response);
   }
-  */
-  getAssignment() {
-    return {
-      name: 'Assignment 1',
-      description: 'This is the first assignment', // Description should be markdown
-      languages: ['python', 'javascript']
-    };
+
+  getMyCourses() {
+    // Get courses for the logged in user
+
+    return this.http.get(environment.backend_ip + '/api/courses/me')
+                .toPromise()
+                .then(response => response);
+  }
+
+  getUserCourses(id: string) {
+    // Get courses for some user
+
+    return this.http.get(environment.backend_ip + '/api/users/' + id + '/courses')
+                .toPromise()
+                .then(response => response);
+  }
+
+  getCourse(id: string) {
+    // Get details for a specific course
+
+    return this.http.get(environment.backend_ip + '/api/courses/' + id)
+                .toPromise()
+                .then(response => response);
+  }
+
+  submitAssignment(assignment_id: number, lang: string, code: string) {
+    // Submis code for testing
+
+    // stub
+  }
+
+  createAssignment(description: string, tests: any) {
+    // Creates an assignment with some tests
+
+    // stub
+  }
+
+  getAssignment(id: string) {
+    // Get an assignment with name desc., langs.
+
+    // stub
   }
 }

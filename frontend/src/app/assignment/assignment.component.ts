@@ -33,13 +33,21 @@ export class AssignmentComponent implements OnInit {
   sidebarState; // state of sidebar
   feedback: string[];
 
-  constructor(private backendService: BackendService, private assignmentService: AssignmentService, private headService: HeadService) {
-    this.headService.stateChange.subscribe(sidebarState => { this.sidebarState = sidebarState; });
+  constructor(private backendService: BackendService,
+              private assignmentService: AssignmentService,
+              private headService: HeadService) {
+    this.headService.stateChange.subscribe(sidebarState => {
+        this.sidebarState = sidebarState;
+    });
   }
 
   ngOnInit() {
     this.sidebarState = this.headService.getCurrentState();
-    this.assignment = this.backendService.getAssignment();
+    // TODO: reimplement when new code arrives in backend
+    // this.backendService.getAssignment(id).then(data => {
+    //   this.assignment = data;
+    // });
+    this.assignment = { name: 'Assignment1', description: 'this is the first assignment', languages: ['python', 'javascript']}; // temp
     this.languages = this.assignment['languages'];
     this.language = this.languages[0];
     this.themes = ['eclipse', 'monokai'];
@@ -47,14 +55,16 @@ export class AssignmentComponent implements OnInit {
     this.content = '';
     this.status = 'Not Completed'; // hardcoded for now, endpoint to backend needed
     this.progress = { current: 0}; // this.assignmentService.progress; what even is this
-    this.course = 'D0009E - Introduktion till programmering'; // endpoint needed
+    this.course = 'D0009E - Introduktion till programmering'; // endpoint needed, not used anymore
   }
 
   // SubmitCode should update status/progress.
   // Does submitAssignment give me that status or should i fetch the assignment again?
   submitCode() {
-    this.backendService.SubmitAssignment(this.content)
-      .then(value => this.HandleResponse(value));
+    // TODO: reimplement when new code arrives in backend
+    // this.backendService.submitAssignment(assignment['id], this.language, this.content).then(data => {
+    //   this.handleResponse(data);
+    // });
   }
 
   setTheme(th) {
