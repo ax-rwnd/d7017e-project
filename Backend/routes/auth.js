@@ -24,7 +24,7 @@ const CAS_URL = 'https://weblogon.ltu.se/cas/';
 
 // Time-to-Live of Tokens
 const access_ttl = 15 * 60;
-const refresh_ttl = 24 * 60 * 60;
+const refresh_ttl = 24 * 60 * 60 * 7;
 
 function create_refresh_token(id) {
     return jwt.sign({
@@ -168,7 +168,7 @@ module.exports = function (router) {
             res.json({
                 access_token: create_access_token(user.id, user.admin),
                 expires_in: access_ttl,
-                token_type: process.env.jwtAuthHeaderPrefix 
+                token_type: process.env.JWT_AUTH_HEADER_PREFIX 
             });
         })
         .catch(function (err) {
