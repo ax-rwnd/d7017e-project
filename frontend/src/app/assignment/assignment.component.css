@@ -1,7 +1,7 @@
 #description {
   margin: 1%;
   padding: 1%;
-  height: 500px;
+  height: 50vh;
   background-color: lightgray;
   float: left;
   width: 48%;
@@ -25,15 +25,15 @@
 }
 
 #editor {
-  height: 500px;
-  max-height: 500px;
+  height: 70vh;
+  max-height:70vh;
   overflow: scroll;
 }
 
 #inputField {
   margin: 1%;
   padding: 0;
-  height: 500px;
+  height: 70vh;
   background-color: lightgray;
   float: right;
   width: 48%;
@@ -45,7 +45,8 @@
 #feedback {
   margin: 1%;
   padding: 1%;
-  height: 100%;
+  height: 20vh;
+  overflow: auto;
   background-color: lightgray;
   float: left;
   width: 48%;
@@ -72,11 +73,11 @@
   cursor: pointer;
 }
 
-#header, #footer {
+#footer {
   text-align: center;
   padding: 1em;
   color: white;
-  background-color: darkgray;
+  /*background-color: darkgray;*/
   clear: left;
   text-align: center;
 }
@@ -127,8 +128,11 @@
   display: block;
 }
 
-.dropdown-content a:hover {background-color: #f1f1f1}
+.dropdown-content a:hover {
+  background-color: #f1f1f1;
+}
 
 .dropdown:hover .dropdown-content {
   display: block;
+  bottom: 100%;
 }

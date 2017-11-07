@@ -6,9 +6,6 @@
 
 
 <app-head></app-head>
-<div id="header">
-  <h1>{{course}}</h1>
-</div>
 <div id="cont" class="content" [@content]="sidebarState">
 <div id="main-wrap">
   <div id="feedback">
@@ -17,11 +14,13 @@
       <h2>Status: {{status}}</h2>
     </div>
 
+    <!--
     <div class="progress progress-margin">
       <div class="progress-bar" role="progressbar" [attr.aria-valuenow]="progress['current']" aria-valuemin="0" aria-valuemax ="10"
            [style.width]="progress['current']*10 + '%'">
       </div>
     </div>
+    -->
 
     <!-- Should contain the results of test/feedback -->
     <div *ngFor='let fb of feedback'>
@@ -37,7 +36,7 @@
 
       <!--<codemirror [(ngModel)]="content" [config]="{lineNumbers: true}"></codemirror>-->
     <div id="editor" appScroller>
-      <div ace-editor [(text)]="content" [mode]="mode" [theme]="theme" [options]="{maxLines: 1000, printMargin: false}" [readOnly]="false" [autoUpdateContent]="true" [durationBeforeCallback]="1000"(textChanged)="onChange(content)"  style="min-height: 100%; width:100%; overflow: auto;"> </div>
+      <div ace-editor [(text)]="content" [mode]="language" [theme]="theme" [options]="{maxLines: 1000, printMargin: false}" [readOnly]="false" [autoUpdateContent]="true" [durationBeforeCallback]="1000"(textChanged)="onChange(content)"  style="min-height: 100%; width:100%; overflow: auto;"> </div>
     </div>
     
     <div id="submitBar">
@@ -253,6 +252,5 @@
 
 
 </div>
-
-</div>
 <div id="footer"> <input type="submit" value="Next Assignment" class="btn"></div>
+</div>
