@@ -44,7 +44,10 @@ export class AssignmentComponent implements OnInit {
   ngOnInit() {
     this.sidebarState = this.headService.getCurrentState();
     // TODO: reimplement when new code arrives in backend
-    // this.assignment = this.backendService.getAssignment();
+    // this.backendService.getAssignment(id).then(data => {
+    //   this.assignment = data;
+    // });
+    this.assignment = { name: 'Assignment1', description: 'this is the first assignment', languages: ['python', 'javascript']}; // temp
     this.languages = this.assignment['languages'];
     this.language = this.languages[0];
     this.themes = ['eclipse', 'monokai'];
@@ -52,15 +55,16 @@ export class AssignmentComponent implements OnInit {
     this.content = '';
     this.status = 'Not Completed'; // hardcoded for now, endpoint to backend needed
     this.progress = { current: 0}; // this.assignmentService.progress; what even is this
-    this.course = 'D0009E - Introduktion till programmering'; // endpoint needed
+    this.course = 'D0009E - Introduktion till programmering'; // endpoint needed, not used anymore
   }
 
   // SubmitCode should update status/progress.
   // Does submitAssignment give me that status or should i fetch the assignment again?
   submitCode() {
     // TODO: reimplement when new code arrives in backend
-    // this.backendService.submitAssignment(this.content)
-    //  .then(value => this.HandleResponse(value));
+    // this.backendService.submitAssignment(assignment['id], this.language, this.content).then(data => {
+    //   this.handleResponse(data);
+    // });
   }
 
   setTheme(th) {
