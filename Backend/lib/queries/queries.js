@@ -208,6 +208,28 @@ function getCourseAssignments(id, fields) {
     });
 }
 
+function getAssignment(id, fields) {
+    var wantedFields = fields || "name description hidden tests optional_tests languages";
+
+    return Assignment.findById(id, fields).then(function (assignment) {
+        if (!assignment) {
+            throw errors.ASSIGNMENT_DOES_NOT_EXIST;
+        }
+        return assignment;
+    });
+}
+
+function getTest(id, fields) {
+    var wantedFields = fields || "stdout stdin args";
+
+    return Test.findById(id, fields).then(function (test) {
+        if (!test) {
+            throw errors.TEST_DOES_NOT_EXIST;
+        }
+        return test;
+    });
+}
+
 function createAssignment(name, description, hidden, languages, course_id) {
     var newAssignment = new Assignment({name: name, description: description, hidden: hidden, tests: {io: [], lint: false}, optionaal_tests: {io: [], lint: false}, languages: languages});
     return newAssignment.save().then(function (createdAssignment) {
@@ -300,4 +322,6 @@ exports.getCourse = getCourse;
 exports.setRefreshToken = setRefreshToken;
 exports.removeRefreshToken = removeRefreshToken;
 exports.createAssignment = createAssignment;
+exports.getAssignment = getAssignment;
+exports.getTest = getTest;
 

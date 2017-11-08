@@ -111,10 +111,17 @@ module.exports = function(router) {
         });
     });
 
+    //TODO: It is currently not checked if the requested assignment actually belongs to the specified course
     router.get('/:course_id/assignments/:assignment_id', auth.validateJWTtoken, function (req, res, next) {
         var course_id = req.params.course_id;
         var assignment_id = req.params.assignment_id;
-        res.send("/courses/" + course_id + "/assignments/" + assignment_id + " GET Endpoint");
+        
+        queries.getAssignment(assignment_id, "name description hidden languages").then(function (assignment) {
+            return res.json(assignment);
+        })
+        .catch(function (err) {
+            next(err);
+        });
     });
 
     router.get('/:course_id/assignments/:assignment_id/tests', auth.validateJWTtoken, function (req, res, next) {
@@ -127,6 +134,12 @@ module.exports = function(router) {
         var course_id = req.params.course_id;
         var assignment_id = req.params.assignment_id;
         var test_id = req.params.test_id;
-        res.send("/courses/" + course_id + "/assignments/" + assignment_id + "/tests/" + test_id + "GET Endpoint");
+
+        queries.getTest(test_id, "stdout stdin args").then(function (test) {
+            return res.json(test);
+        })
+        .catch(function (err) {
+            next(err);
+        });
     });
 };
