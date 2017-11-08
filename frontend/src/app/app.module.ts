@@ -46,6 +46,7 @@ import { ScrollerDirective } from './scroller.directive';
 import { AssignmentGroupComponent } from './assignment-group/assignment-group.component';
 import { GameelementComponent } from './gameelement/gameelement.component';
 import { ModLeaderboardComponent } from './mod-leaderboard/mod-leaderboard.component';
+import { ModProgressbarComponent } from './mod-progressbar/mod-progressbar.component';
 
 
 const appRoutes: Routes = [
@@ -75,6 +76,7 @@ const appRoutes: Routes = [
     AssignmentGroupComponent,
     GameelementComponent,
     ModLeaderboardComponent,
+    ModProgressbarComponent,
   ],
   imports: [
     BrowserModule,

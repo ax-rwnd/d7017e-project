@@ -9,21 +9,10 @@
         Course Description
       </h2>
       <p>
-        This will help you in this moment
-        (Fetching ltu course page)
+      This will help you in this moment
+      (Fetching ltu course page)
       </p>
-      <div class="gamification-block panel panel-default" *ngIf="currentCourse.rewards.progress !== false">
-        <div class="panel-heading gamification-header">
-          Progress
-        </div>
-        <div class="panel-body">
-          <div class="progress progress-margin">
-            <div class="progress-bar" role="progressbar" [attr.aria-valuenow]="currentCourse.rewards.progress" aria-valuemin="0" aria-valuemax ="100"
-                 [style.width]="currentCourse.rewards.progress + '%'">
-            </div>
-          </div>
-        </div>
-      </div>
+      <app-mod-progressbar [progress]="currentCourse.rewards.progress"></app-mod-progressbar>
 
       <div class="gamification-block panel panel-default" *ngIf="currentCourse.rewards.score !== false">
         <div class="panel-heading gamification-header">
@@ -47,7 +36,7 @@
         </div>
       </div>
 
-    <app-mod-leaderboard [courseCode]="currentCourse.code"></app-mod-leaderboard>
+      <app-mod-leaderboard [courseCode]="currentCourse.code"></app-mod-leaderboard>
     </div>
     <div class="col-lg-6">
       <div *ngFor="let g of assignmentGroups">
