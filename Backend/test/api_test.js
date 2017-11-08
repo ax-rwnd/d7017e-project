@@ -34,6 +34,9 @@ function it_rejects_unauthorized_post(route) {
 
 describe('/api', () => {
     let access_tokens;
+    let fake_admin_id = '59fb4afa453dd62c44b07d29';
+    // skattedeklaration
+    let course_id = '59f6f88b1ac36c0762eb46a9';
 
     before(() => {
         access_tokens = {};
@@ -42,14 +45,14 @@ describe('/api', () => {
             .get('/auth/login/fake')
             .expect(200)
             .then(res => {
-                access_tokens.admin = res.body.access_token;
+                access_tokens.user = res.body.access_token;
             });
         let admin_promise = request(runner.server)
             .get('/auth/login/fake')
             .query({admin: 'true'})
             .expect(200)
             .then(res => {
-                access_tokens.user = res.body.access_token;
+                access_tokens.admin = res.body.access_token;
             });
         return Promise.all([user_promise, admin_promise]);
     });
@@ -57,7 +60,7 @@ describe('/api', () => {
     function it_rejects_non_admin_post(route) {
         it('rejects non-admin users', () => {
             return request(runner.server)
-                .get(route)
+                .post(route)
                 .set('Authorization', 'Bearer ' + access_tokens.user)
                 .expect(401);
         });
@@ -80,7 +83,7 @@ describe('/api', () => {
             });
         });
 
-        describe.skip('POST /api/courses', () => {
+        describe('POST /api/courses', () => {
             let route = '/api/courses';
             it_rejects_unauthorized_post(route);
             it_rejects_non_admin_post(route);
@@ -90,13 +93,13 @@ describe('/api', () => {
                     .post(route)
                     .send({
                         name: 'Introduction to Automated Testing in JavaScript',
-                        description: 'In this course you will use Mocha and supertest to create automated tests for NodeJS applications.'
+                        description: 'In this course you will use Mocha and supertest to create automated tests for NodeJS applications.',
+                        hidden: false
                     })
                     .set('Authorization', 'Bearer ' + access_tokens.admin)
                     .expect(200)
                     .then(res => {
-                        console.log(res.body);
-                        assert(ObjectId.isValid(res.body.id), 'response is not a valid ObjectId');
+                        assert(ObjectId.isValid(res.body._id), 'response is not a valid ObjectId');
                     });
             });
         });
@@ -111,14 +114,14 @@ describe('/api', () => {
                     .set('Authorization', 'Bearer ' + access_tokens.user)
                     .expect(200)
                     .then(res => {
-                        assert(Array.isArray(res.body.courses));
-                        // TODO: make assertions about the courses returned
+                        assert(Array.isArray(res.body.courses), 'not an array');
+                        assert(res.body.courses.length > 0, 'array is empty');
                     });
             });
         });
 
         describe('GET /api/courses/:course_id', () => {
-            let route = '/api/courses/59f6f88b1ac36c0762eb46a9';
+            let route = '/api/courses/' + course_id;
             it_rejects_unauthorized_get(route);
 
             it('finds the course', () => {
@@ -132,24 +135,120 @@ describe('/api', () => {
             });
         });
 
+        describe('GET /api/courses/:course_id/students', () => {
+            let route = '/api/courses/' + course_id + '/students';
+            it_rejects_unauthorized_get(route);
+
+            it('returns a non-empty list of students', () => {
+                return request(runner.server)
+                    .get(route)
+                    .set('Authorization', 'Bearer ' + access_tokens.user)
+                    .expect(200)
+                    .then(res => {
+                        assert(Array.isArray(res.body.students), 'not an array');
+                        assert(res.body.students.length > 0, 'array is empty');
+                    });
+            });
+        });
+
+        describe('GET /api/courses/:course_id/teachers', () => {
+            let route = '/api/courses/' + course_id + '/teachers';
+            it_rejects_unauthorized_get(route);
+
+            it('returns a non-empty list of teachers', () => {
+                return request(runner.server)
+                    .get(route)
+                    .set('Authorization', 'Bearer ' + access_tokens.user)
+                    .expect(200)
+                    .then(res => {
+                        assert(Array.isArray(res.body.teachers), 'not an array');
+                        assert(res.body.teachers.length > 0, 'array is empty');
+                    });
+            });
+        });
+
+        //describe('POST /api/assignment??', () => {
+        //    it('stores the assignment in the database', (done) => {
+        //        request(runner.server)
+        //        .post('/api/assignment')
+        //        .send({
+        //            // TODO: real input
+        //            course_id: '0000000',
+        //            name: 'Assignment name',
+        //            text: 'Assignment text'
+        //        })
+        //        .expect('Content-Type', 'application/json')
+        //        .expect(200, {
+        //            id: 1 // TODO: should be a mongo id
+        //        }, done);
+        //    });
+        //});
     });
 
+    describe('/users', () => {
+        describe('GET /api/users/me', () => {
+            let route = '/api/users/me';
+            it_rejects_unauthorized_get(route);
 
+            it('gets some user information', () => {
+                return request(runner.server)
+                    .get(route)
+                    .set('Authorization', 'Bearer ' + access_tokens.user)
+                    .expect(200)
+                    .then(res => {
+                        assert.equal(res.body.username, 'fake-student-00');
+                        assert(!res.body.admin, 'should not be admin');
+                    });
+            });
+        });
 
-    //describe('POST /api/assignment??', () => {
-    //    it('stores the assignment in the database', (done) => {
-    //        request(runner.server)
-    //        .post('/api/assignment')
-    //        .send({
-    //            // TODO: real input
-    //            course_id: '0000000',
-    //            name: 'Assignment name',
-    //            text: 'Assignment text'
-    //        })
-    //        .expect('Content-Type', 'application/json')
-    //        .expect(200, {
-    //            id: 1 // TODO: should be a mongo id
-    //        }, done);
-    //    });
-    //});
+        describe('GET /api/users/:user_id', () => {
+            // fake-admin-00
+            let route = '/api/users/' + fake_admin_id;
+            it_rejects_unauthorized_get(route);
+
+            it('gets some user information', () => {
+                return request(runner.server)
+                .get(route)
+                .set('Authorization', 'Bearer ' + access_tokens.user)
+                .then(res => {
+                    assert.equal(res.body.username, 'fake-admin-00');
+                });
+            });
+        });
+
+        describe.skip('GET /api/users/register', () => {
+            it('TODO', () => {
+            });
+        });
+
+        describe.skip('GET /api/users/:user_id/submissions', () => {
+            it('TODO', () => {
+            });
+        });
+
+        describe('GET /api/users/:user_id/courses', () => {
+            let route = '/api/users/' + fake_admin_id + '/courses';
+            it_rejects_unauthorized_get(route);
+
+            it('returns a non-empty array', () => {
+                return request(runner.server)
+                .get(route)
+                .set('Authorization', 'Bearer ' + access_tokens.user)
+                .then(res => {
+                    assert(Array.isArray(res.body.courses), 'not an array');
+                    assert(res.body.courses.length > 0, 'array is empty');
+                });
+            });
+        });
+
+        describe.skip('GET /api/users/:user_id/courses/:course_id/submissions', () => {
+            it('TODO', () => {
+            });
+        });
+    });
+
+    describe.skip('/features', () => {
+    });
+
 });

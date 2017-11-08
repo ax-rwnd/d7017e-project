@@ -4,8 +4,6 @@ var testerCom = require('../../lib/tester_communication');
 var errors = require('../../lib/errors');
 var request = require('supertest');
 
-const TESTER_IP = 'http://130.240.5.118:9100';
-
 module.exports = function(router) {
 
     //Retrieve tests from db and send them to tester

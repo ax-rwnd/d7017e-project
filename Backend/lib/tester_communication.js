@@ -6,30 +6,49 @@ var request = require('request');
 var queries = require('../lib/queries/queries');
 var queries_features = require('../lib/queries/features');
 var features = require('../features/features');
-var logger = require('../logger'); //Use Logger
-
-const TESTER_IP = 'https://130.240.5.119:9100';
+var logger = require('../logger');
+var config = require('config');
 
 //Retrieve tests from db and send them to Tester with the format accepted by Tester.
 function validateCode(user_id, lang, code, assignment_id, res) {
 
     //Get tests from our database
     queries.getTestsFromAssignment(assignment_id, function(tests) {
+
+        if(!tests.hasOwnProperty('tests') || tests.tests === undefined) {
+            logger.error('Assignment', assignment_id, 'did not have tests object.');
+            res.sendStatus(500);
+            return;
+        }
+
+        if(!tests.tests.hasOwnProperty('io') || tests.tests.io === undefined) {
+            logger.error('Assignment', assignment_id, 'did not have io list.');
+            res.sendStatus(500);
+            return;
+        }
+
         tests.tests.io.forEach(function(test) {
             test.id = test._id;
             delete test._id;
         });
-        tests.optional_tests.io.forEach(function(test) {
-            test.id = test._id;
-            delete test._id;
-        });
 
-        if(process.env.NODE_ENV != 'development') {
+        if(tests.hasOwnProperty('optional_tests')) {
+            if(tests.optional_tests !== undefined && tests.optional_tests.hasOwnProperty('io')) {
+                tests.optional_tests.io.forEach(function(test) {
+                    test.id = test._id;
+                    delete test._id;
+                });
+            } else {
+                tests.optional_tests = [];
+            }
+        }
+
+        if(config.get('App.environment') != 'development') {
             throw new Error('Remove `rejectUnauthorized` for production in '+ module.filename);
         }
 
         request({
-            url: TESTER_IP,
+            url: config.get('Tester.tester_url'),
             method: 'POST',
             agentOptions: {
                 rejectUnauthorized: false
@@ -68,11 +87,11 @@ function validateCode(user_id, lang, code, assignment_id, res) {
 function getTesterLanguages() {
     return new Promise(function (resolve, reject){
 
-        if(process.env.NODE_ENV != 'development') {
+        if(config.get('App.environment') != 'development') {
             throw new Error('Remove `rejectUnauthorized` for production in '+ module.filename);
         }
         request({
-            url: TESTER_IP+'/languages',
+            url: config.get('Tester.tester_url')+'/languages',
             method: 'GET',
             agentOptions: {
                 rejectUnauthorized: false
@@ -81,7 +100,6 @@ function getTesterLanguages() {
             if(error || response.statusCode != 200) {
                 reject(error);
             } else {
-                console.log(body);
                 resolve(body);
             }
         });

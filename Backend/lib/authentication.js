@@ -4,8 +4,7 @@ var jwt = require('jsonwebtoken');
 var errors = require('./errors.js');
 var util = require('util');
 var queries = require('./queries/queries');
-
-
+var config = require('config');
 
 function AuthorizationError(message, httpCode, errorCode) {
     this.name = this.constructor.name;
@@ -14,9 +13,6 @@ function AuthorizationError(message, httpCode, errorCode) {
     this.errorCode = errorCode;
 }
 util.inherits(AuthorizationError, Error);
-
-
-
 
 exports.validateJWTtoken = function (req, res, next) {
     try {
@@ -34,14 +30,14 @@ exports.validateJWTtoken = function (req, res, next) {
             throw new AuthorizationError("Authorization header invalid format", 401, 6002);
         }
 
-        if (auth[0].toLowerCase() !== process.env.JWT_AUTH_HEADER_PREFIX.toLowerCase()) {
+        if (auth[0].toLowerCase() !== config.get('Auth.auth_header_prefix').toLowerCase()) {
             throw new AuthorizationError("Authorization header invalid format", 401, 6003);
         }
 
         var jwtToken = auth[1];
-        jwt.verify(jwtToken, process.env.JWT_SECRET_KEY, function(err, payload) {
+        jwt.verify(jwtToken, config.get('App.secret'), function(err, payload) {
             if (err) {
-                if (err.name === "TokenExpiredError") { 
+                if (err.name === "TokenExpiredError") {
                     throw new AuthorizationError("Token expired", 401, 6004);
                 }
                 if (err.name === "JsonWebTokenError") {
@@ -78,14 +74,14 @@ exports.validateRefToken = function (req, res, next) {
             throw new AuthorizationError("Authorization header invalid format", 401, 6002);
         }
 
-        if (auth[0].toLowerCase() !== process.env.JWT_AUTH_HEADER_PREFIX.toLowerCase()) {
+        if (auth[0].toLowerCase() !== config.get('Auth.auth_header_prefix').toLowerCase()) {
             throw new AuthorizationError("Authorization header invalid format", 401, 6003);
         }
 
         var jwtToken = auth[1];
-        jwt.verify(jwtToken, process.env.JWT_SECRET_KEY, function(err, payload) {
+        jwt.verify(jwtToken, config.get('App.secret'), function(err, payload) {
             if (err) {
-                if (err.name === "TokenExpiredError") { 
+                if (err.name === "TokenExpiredError") {
                     throw new AuthorizationError("Token expired", 401, 6004);
                 }
                 if (err.name === "JsonWebTokenError") {
