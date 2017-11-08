@@ -55,7 +55,7 @@ module.exports = function(router) {
     router.get('/:course_id', auth.validateJWTtoken, function (req, res, next) {
         var course_id = req.params.course_id;
         
-        queries.getCourse(course_id, "name description teacher assignments").then(function (course) {
+        queries.getCourse(course_id, "name description teachers assignments").then(function (course) {
             return res.json(course);
         })
         .catch(function (err) {
@@ -98,7 +98,17 @@ module.exports = function(router) {
 
     router.post('/:course_id/assignments', auth.validateJWTtoken, function (req, res, next) {
         var course_id = req.params.course_id;
-        res.send("/courses/" + course_id + "/assignments POST Endpoint");
+        var name = req.body.name;
+        var desc = req.body.description;
+        var hidden = req.body.hidden;
+        var languages = req.body.languages;
+
+        queries.createAssignment(name, desc, hidden, languages, course_id).then(function (assignment) {
+            return res.json(assignment);
+        })
+        .catch(function (err) {
+            next(err);
+        });
     });
 
     router.get('/:course_id/assignments/:assignment_id', auth.validateJWTtoken, function (req, res, next) {

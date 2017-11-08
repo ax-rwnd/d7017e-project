@@ -24,5 +24,7 @@ module.exports = {
     NO_ASSIGNMENTS_EXIST: new APIError("No assignments exists", 404, 7007),
     NOT_FOUND: new APIError("Resource not found", 404, 7008),
     USER_NOT_FOUND: new APIError("User not found", 404, 7009),
-    INVALID_ID: new APIError("Invalid ID", 400, 7010)
+    INVALID_ID: new APIError("Invalid ID", 400, 7010),
+    ASSIGNMENT_NOT_CREATED: new APIError("Assignment not created", 500, 7011),
+    FAILED_TO_UPDATE_COURSE: new APIError("Failed to update course", 500, 7012)
 };

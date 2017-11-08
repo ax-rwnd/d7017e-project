@@ -208,6 +208,29 @@ function getCourseAssignments(id, fields) {
     });
 }
 
+function createAssignment(name, description, hidden, languages, course_id) {
+    var newAssignment = new Assignment({name: name, description: description, hidden: hidden, tests: {io: [], lint: false}, optionaal_tests: {io: [], lint: false}, languages: languages});
+    return newAssignment.save().then(function (createdAssignment) {
+        if (!createdAssignment) {
+            console.log("Error: Assignment not created");
+            throw errors.ASSINGMENT_NOT_CREATED;
+        }
+        //Push createdAssignment _id into course_id's assignments
+        Course.findById(course_id).then( function (course) {
+            if (!course) {
+                throw errors.COURSE_DOES_NOT_EXIST;
+            }
+            course.assignments.push(createdAssignment._id);
+            course.save().then(function (updatedCourse) {
+                if (!updatedCourse) {
+                    throw errors.FAILED_TO_UPDATE_COURSE;
+                }
+            });
+        });
+        return createdAssignment;
+    });
+}
+
 //Field argument needs a check. If i don't want teacher, will it still be populated?!
 function getCourse(id, fields) {
     var wantedFields = fields || "name description hidden teachers students assignments";
@@ -276,4 +299,5 @@ exports.getCourseAssignments = getCourseAssignments;
 exports.getCourse = getCourse;
 exports.setRefreshToken = setRefreshToken;
 exports.removeRefreshToken = removeRefreshToken;
+exports.createAssignment = createAssignment;
 
