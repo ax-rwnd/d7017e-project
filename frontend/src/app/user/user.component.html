@@ -31,22 +31,7 @@
               <!-- Panel for badge end -->
             </div>
             <div class="col-md-5">
-              <div *ngIf="course.rewards.progress !== false">
-                <!-- Panel for progress start -->
-                <div class="gamification-block panel panel-default">
-                  <div class="panel-heading gamification-header">
-                    Current Progress
-                  </div>
-                  <div class="panel-body">
-                    <div class="progress progress-margin">
-                      <div class="progress-bar" role="progressbar" [attr.aria-valuenow]="course.rewards.progress" aria-valuemin="0" aria-valuemax ="100"
-                           [style.width]="course.rewards.progress + '%'">
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <!-- Panel for progress end -->
-              </div>
+              <app-mod-progressbar [progress]="course.rewards.progress"></app-mod-progressbar>
               <!-- Assignment panel start -->
               <div class="gamification-block panel panel-default">
                 <div class="panel-heading gamification-header">
@@ -60,6 +45,7 @@
             </div>
             <!-- column for progress and assignment end -->
             <div class="col-md-4">
+              <!-- TODO: app-mod-leaderboard should be subclassed for this view -->
               <app-mod-leaderboard></app-mod-leaderboard> <!-- this should be related to the assignment, so should probably have some kind of input -->
             </div>
           </div>
