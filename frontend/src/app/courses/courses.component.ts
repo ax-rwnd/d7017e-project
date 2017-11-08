@@ -43,9 +43,9 @@ export class CoursesComponent implements OnInit {
   getCourseElement(number) {
     //todo
     //fetch the correct assignment/lab from the course
-    //if (this.assignmentGroups[0].groups[0].availability != false){}
+    if (this.assignmentGroups[0].groups[0].assignments[number-1].available != false){
     this.currentAssignment = this.assignmentGroups[0].groups[0].assignments[number-1].name;
-  }
+  }}
 }
 
 interface AssignmentGroup {
@@ -58,6 +58,7 @@ interface AssignmentGroup {
 interface Assignment {
   id: number;
   name: string;
+  available: boolean;
 }
 
 
