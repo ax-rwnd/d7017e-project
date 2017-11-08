@@ -3,15 +3,13 @@
 import { Injectable } from '@angular/core';
 import 'rxjs/add/operator/map';
 import { environment } from '../../../environments/environment';
-import {HttpClient, HttpRequest} from '@angular/common/http';
+import {HttpClient} from '@angular/common/http';
 import {Http, RequestOptions, Headers} from '@angular/http';
-import {observable} from 'rxjs/symbol/observable';
 
 
 @Injectable()
 export class AuthService {
   access_token: string;
-  cachedRequests: Array<HttpRequest<any>> = [];
 
   constructor(private http: Http) { }
 
@@ -41,10 +39,8 @@ export class AuthService {
 
   public logout(): void {
     // kill token in backend
-    const headers = new Headers();
-    headers.append('Authorization', this.getRefreshToken());
-    const options = new RequestOptions({ headers: headers });
-    this.http.get(environment.backend_ip + '/auth/logout', options).subscribe(
+    console.log('logout log token:' + this.getToken());
+    this.http.get(environment.backend_ip + '/auth/logout').subscribe(
       data => {
         console.log(data);
       },
@@ -54,47 +50,31 @@ export class AuthService {
       }
     );
     // clear token remove user from local storage to log user out
-    localStorage.clear();
+    // localStorage.clear();
   }
 
-  public requestNewToken() {
+  public requestNewToken(): boolean {
     // set refresh token header
     const headers = new Headers();
     headers.append('Authorization', this.getRefreshToken());
+    console.log(this.getRefreshToken());
     const options = new RequestOptions({ headers: headers });
 
-    return this.http.get(environment.backend_ip + '/auth/accesstoken', options).do(
+    this.http.get(environment.backend_ip + '/auth/accesstoken', options).subscribe(
       data => {
-        if (data) {
-          this.access_token = ('bearer ' + data.json().access_token);
-          console.log(this.access_token);
-          console.log(this.getRefreshToken());
-          localStorage.setItem('token', this.access_token);
-        }
+        console.log('THIS IS DATA');
+        console.log(data);
+        this.access_token = data['access_token'];
+        console.log('access_token: ' + this.access_token);
+        localStorage.setItem('token', this.access_token);
+        return true;
       },
       err => {
         console.log(err);
-
-      }).catch ( error => {
-      return observable.of( false );
-    });
-  }
-
-  public collectFailedRequest(request): void {
-    this.cachedRequests.push(request);
-  }
-
-  public retryFailedRequests(): void {
-    // retry the requests. this method can
-    // be called after the token is refreshed
-    this.cachedRequests.forEach( request => {
-      const authHeader = this.getToken();
-      const authReq = request.clone({headers: request.headers.set('Authorization', authHeader)});
-      this.http.request(authReq).subscribe((response) => {
-        // You need to subscribe to observer in order to "retry" your request
-      });
-    } );
-
+        return false;
+      }
+    );
+    return false;
   }
 
 

@@ -27,10 +27,10 @@ export class LoginHelperComponent implements OnInit {
         console.log(data);
         // TOKEN
         this.token = (data['token_type'] + ' ' + data['access_token']);
-        window.localStorage.setItem('token', this.token);
+        localStorage.setItem('token', this.token);
         // REFRESH TOKEN
         this.refresh_token = (data['token_type'] + ' ' + data['refresh_token']);
-        window.localStorage.setItem('refresh_token', this.refresh_token);
+        localStorage.setItem('refresh_token', this.refresh_token);
         // FIX THIS SHIT TO NAVIGATE CORRECTLY
         this.router.navigate(['/user']);
       },
