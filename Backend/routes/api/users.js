@@ -4,7 +4,6 @@ var request = require('request');
 var queries = require('../../lib/queries/queries');
 var errors = require('../../lib/errors.js');
 var auth = require('../../lib/authentication.js');
-var mongoose = require('mongoose');
 
 const BASIC_FILTER = "username email";
 const PRIVILEGED_FILTER = "username email courses admin";
@@ -45,9 +44,6 @@ module.exports = function (router) {
 
     router.get('/:user_id', auth.validateJWTtoken, function (req, res, next) {
         var user_id = req.params.user_id;
-        if (!mongoose.Types.ObjectId.isValid(user_id)) {
-            return next(errors.INVALID_ID);
-        }
         queries.getUser(user_id, BASIC_FILTER).then(function (user) {
             return res.json(user);
         })

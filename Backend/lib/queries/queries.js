@@ -6,6 +6,7 @@ var Course = require('../../models/schemas').Course;
 var Test = require('../../models/schemas').Test;
 var User = require('../../models/schemas').User;
 var errors = require('../errors.js');
+var mongoose = require('mongoose');
 
 // var Assignment, User, Test = require('../../models/schemas.js');
 
@@ -32,6 +33,9 @@ function getTestsFromAssignment(assignmentID, callback) {
 
 function getUser(id, fields) {
     var wantedFields = fields || "username email admin tokens courses providers";
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+            throw errors.INVALID_ID;
+    }
     return User.findById(id, wantedFields).then(function (user) {
         if (!user) {
             console.log("User not found");
@@ -45,6 +49,11 @@ function getUsers(id_array, fields) {
     var wantedFields = fields || "username email admin tokens courses providers";
     var promises = [];
     for (var i = 0; i < id_array.length; i++) {
+        // Check validity of id
+        if (!mongoose.Types.ObjectId.isValid(id_array[i])) {
+            throw errors.INVALID_ID;
+        }
+        // Make a promise for each id
         var temp = User.findById(id_array[i], wantedFields).then(function (user) {
             if (!user) {
                 console.log("User not found");
@@ -52,7 +61,7 @@ function getUsers(id_array, fields) {
             }
             return user;
         });
-        promises.push(temp);
+        promises.push(temp); // Gather all promisese in an array
     }
     return Promise.all(promises);
 }
