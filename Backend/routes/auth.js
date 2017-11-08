@@ -127,7 +127,6 @@ module.exports = function (router) {
         });
     });
 
-
     if (process.env.NODE_ENV === 'development') {
         router.get('/login/fake', (req, res, next) => {
             let admin = req.query.admin === 'true';

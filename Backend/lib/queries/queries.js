@@ -35,17 +35,33 @@ function getUser(id, fields) {
     return User.findById(id, wantedFields).then(function (user) {
         if (!user) {
             console.log("User not found");
-            throw errors.TOKEN_USER_NOT_FOUND;
+            throw errors.USER_NOT_FOUND;
         }
         return user;
     });
+}
+
+function getUsers(id_array, fields) {
+    var wantedFields = fields || "username email admin tokens courses providers";
+    var promises = [];
+    for (var i = 0; i < id_array.length; i++) {
+        var temp = User.findById(id_array[i], wantedFields).then(function (user) {
+            if (!user) {
+                console.log("User not found");
+                throw errors.USER_NOT_FOUND;
+            }
+            return user;
+        });
+        promises.push(temp);
+    }
+    return Promise.all(promises);
 }
 
 function deleteUser(id) {
     return User.findById(id).then(function (user) {
         if (!user) {
             console.log("deleteUser: User not found");
-            throw errors.TOKEN_USER_NOT_FOUND;
+            throw errors.USER_NOT_FOUND;
         }
         User.deleteOne(user, function (err) {
             return err;
@@ -191,7 +207,7 @@ function getCourse(id, fields) {
     .populate("teachers", "username email")
     .populate("assignments", "name description").then(function (course) {
         if (!course) {
-            throw errors.COURSE_DO_NOT_EXIST;
+            throw errors.COURSE_DOES_NOT_EXIST;
         }
         return course;
     });
@@ -240,6 +256,7 @@ function findOrCreateUser(profile) {
 exports.getTestsFromAssignment = getTestsFromAssignment;
 exports.findOrCreateUser = findOrCreateUser;
 exports.getUser = getUser;
+exports.getUsers = getUsers;
 exports.deleteUser = deleteUser;
 exports.getCourses = getCourses;
 exports.createCourse = createCourse;
