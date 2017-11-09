@@ -30,7 +30,8 @@ export class HeadComponent implements OnInit {
   sidebarState: any; // state of the sidebar
   user: any;
   stateDropDown: boolean;
-  data: any;
+  userID: string;
+  res: any; // used to username from data retrieved from database, in ngOnInit()
 
   constructor(@Inject(forwardRef(() => AppComponent)) private appComponent: AppComponent, private headService: HeadService,
               private userService: UserService, private auth: AuthService, private backendService: BackendService) {
@@ -63,13 +64,16 @@ export class HeadComponent implements OnInit {
     this.auth.logout();
   }
 
-  getUsername() {
-    //this.backendService.getMe().then(data => console.log(this.user = data['username'].json().username));
-    console.log(this.data = this.backendService.getMe());
+  getUsername(res) { // retrieve username from the database with the getMe() function from backendService
+    const that = this;
+    this.backendService.getMe().then(function(data) {
+      res = data; // can't use data.username directly, so assign it to another variable first
+      return that.userID = res.username;
+    });
   }
 
   ngOnInit() {
-    this.getUsername();
+    this.getUsername(this.res); // have to use res to get username, data.username doesn't work
     this.stateDropDown = false;
     this.user = this.userService.userInfo;
     this.sidebarState = this.appComponent.sidebarState;
