@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import 'codemirror/mode/go/go';
 import { BackendService } from '../services/backend.service';
 import { AssignmentService } from '../services/assignment.service';
@@ -35,7 +36,8 @@ export class AssignmentComponent implements OnInit {
 
   constructor(private backendService: BackendService,
               private assignmentService: AssignmentService,
-              private headService: HeadService) {
+              private headService: HeadService,
+              private route: ActivatedRoute) {
     this.headService.stateChange.subscribe(sidebarState => {
         this.sidebarState = sidebarState;
     });
@@ -43,10 +45,13 @@ export class AssignmentComponent implements OnInit {
 
   ngOnInit() {
     this.sidebarState = this.headService.getCurrentState();
+    let courseId = this.route.snapshot.params['course'];
+    let assignmentId = this.route.snapshot.params['assignment'];
     // TODO: reimplement when new code arrives in backend
-    // this.backendService.getAssignment(id).then(data => {
+    // this.backendService.getAssignment(courseId, assignmentId).then(data => {
     //   this.assignment = data;
     // });
+    this.course = 'D0009E - Introduktion till programmering'; // endpoint needed, not used anymore
     this.assignment = { name: 'Assignment1', description: 'this is the first assignment', languages: ['python', 'javascript']}; // temp
     this.languages = this.assignment['languages'];
     this.language = this.languages[0];
@@ -55,7 +60,6 @@ export class AssignmentComponent implements OnInit {
     this.content = '';
     this.status = 'Not Completed'; // hardcoded for now, endpoint to backend needed
     this.progress = { current: 0}; // this.assignmentService.progress; what even is this
-    this.course = 'D0009E - Introduktion till programmering'; // endpoint needed, not used anymore
   }
 
   // SubmitCode should update status/progress.

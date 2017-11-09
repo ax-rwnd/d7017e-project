@@ -26,6 +26,7 @@ export class CoursesComponent implements OnInit {
   sidebarState; // state of sidebar
   progress: any;
   currentCourse: any;
+  currentAssignment: any;
 
   constructor(private courseService: CourseService, private route: ActivatedRoute, private headService: HeadService,
               private assignmentService: AssignmentService) {
@@ -36,7 +37,15 @@ export class CoursesComponent implements OnInit {
   ngOnInit() {
     this.sidebarState = this.headService.getCurrentState();
     this.assignmentGroups = this.assignmentService.assignmentGroups;
+    this.currentAssignment = this.assignmentGroups[0].groups[0].assignments[0].name;
   }
+
+  getCourseElement(number) {
+    //todo
+    //fetch the correct assignment/lab from the course
+    if (this.assignmentGroups[0].groups[0].assignments[number-1].available != false){
+    this.currentAssignment = this.assignmentGroups[0].groups[0].assignments[number-1].name;
+  }}
 }
 
 interface AssignmentGroup {
@@ -49,4 +58,7 @@ interface AssignmentGroup {
 interface Assignment {
   id: number;
   name: string;
+  available: boolean;
 }
+
+

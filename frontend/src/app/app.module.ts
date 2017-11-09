@@ -46,12 +46,13 @@ import { ScrollerDirective } from './scroller.directive';
 import { AssignmentGroupComponent } from './assignment-group/assignment-group.component';
 import { GameelementComponent } from './gameelement/gameelement.component';
 import { ModLeaderboardComponent } from './mod-leaderboard/mod-leaderboard.component';
+import { ModProgressbarComponent } from './mod-progressbar/mod-progressbar.component';
 
 
 const appRoutes: Routes = [
   { path: '', component: LoginComponent },
   { path: 'auth', component: LoginHelperComponent },
-  { path: 'courses/:course/assignment', component: AssignmentComponent },
+  { path: 'courses/:course/assignment/:assignment', component: AssignmentComponent },
   { path: 'user', component: UserComponent, canActivate: [AuthGuard]},
   { path: 'courses/:course', component: CoursesComponent},
   { path: 'createAssignmentTest', component: CreateassignmentComponent}
@@ -75,6 +76,7 @@ const appRoutes: Routes = [
     AssignmentGroupComponent,
     GameelementComponent,
     ModLeaderboardComponent,
+    ModProgressbarComponent,
   ],
   imports: [
     BrowserModule,

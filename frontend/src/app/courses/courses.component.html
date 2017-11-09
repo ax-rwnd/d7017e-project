@@ -9,21 +9,33 @@
         Course Description
       </h2>
       <p>
-        This will help you in this moment
-        (Fetching ltu course page)
+      This will help you in this moment
+      (Fetching ltu course page)
       </p>
-      <div class="gamification-block panel panel-default" *ngIf="currentCourse.rewards.progress !== false">
-        <div class="panel-heading gamification-header">
-          Progress
-        </div>
-        <div class="panel-body">
-          <div class="progress progress-margin">
-            <div class="progress-bar" role="progressbar" [attr.aria-valuenow]="currentCourse.rewards.progress" aria-valuemin="0" aria-valuemax ="100"
-                 [style.width]="currentCourse.rewards.progress + '%'">
-            </div>
+      <app-mod-progressbar [progress]="currentCourse.rewards.progress"></app-mod-progressbar>
+    <div class="gamification-block panel panel-default">
+      <div class="panel-heading gamification-header">Map</div>
+      <div class="stepwizard">
+        <div class="stepwizard-row">
+          <div class="stepwizard-step">
+            <button type="button" class="btn btn-primary btn-circle" id="btn1" (click)="getCourseElement(1)">1</button>
+          </div>
+          <div class="stepwizard-step">
+            <button type="button" class="btn btn-primary btn-circle" id="btn2" (click)="getCourseElement(2)">2</button>
+          </div>
+          <div class="stepwizard-step">
+            <button type="button" class="btn btn-primary btn-circle disabled" id="btn3" (click)="getCourseElement(3)">3</button>
+          </div>
+          <div class="stepwizard-step">
+            <button type="button" class="btn btn-primary btn-circle disabled" id="btn4" (click)="getCourseElement(4)">4</button>
           </div>
         </div>
       </div>
+        <div>
+          {{currentAssignment}}
+          <button type="button" [routerLink]="['/courses', courseCode, 'assignment', currentAssignment.id]" courseCode="currentCourse.code">To element</button>
+        </div>
+    </div>
 
       <div class="gamification-block panel panel-default" *ngIf="currentCourse.rewards.score !== false">
         <div class="panel-heading gamification-header">
@@ -47,7 +59,7 @@
         </div>
       </div>
 
-    <app-mod-leaderboard></app-mod-leaderboard>
+      <app-mod-leaderboard [courseCode]="currentCourse.code"></app-mod-leaderboard>
     </div>
     <div class="col-lg-6">
       <div *ngFor="let g of assignmentGroups">

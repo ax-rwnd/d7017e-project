@@ -44,3 +44,20 @@ testem.log
 # System Files
 .DS_Store
 Thumbs.db
+
+# vim stuff
+
+# Swap
+[._]*.s[a-v][a-z]
+[._]*.sw[a-p]
+[._]s[a-v][a-z]
+[._]sw[a-p]
+
+# Session
+Session.vim
+
+# Temporary
+.netrwhist
+*~
+# Auto-generated tag files
+tags

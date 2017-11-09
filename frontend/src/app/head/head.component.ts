@@ -4,6 +4,7 @@ import { HeadService } from '../services/head.service';
 import {AppComponent} from '../app.component';
 import {UserService} from '../services/user.service';
 import {AuthService} from '../services/Auth/Auth.service';
+import {BackendService} from '../services/backend.service';
 
 @Component({
   selector: 'app-head',
@@ -29,9 +30,11 @@ export class HeadComponent implements OnInit {
   sidebarState: any; // state of the sidebar
   user: any;
   stateDropDown: boolean;
+  userID: string;
+  res: any; // used to username from data retrieved from database, in ngOnInit()
 
   constructor(@Inject(forwardRef(() => AppComponent)) private appComponent: AppComponent, private headService: HeadService,
-              private userService: UserService, private auth: AuthService) {
+              private userService: UserService, private auth: AuthService, private backendService: BackendService) {
   }
 
   toggleState($event) { // send to the sidebar in app component that it should toggle state
@@ -61,7 +64,16 @@ export class HeadComponent implements OnInit {
     this.auth.logout();
   }
 
+  getUsername(res) { // retrieve username from the database with the getMe() function from backendService
+    const that = this;
+    this.backendService.getMe().then(function(data) {
+      res = data; // can't use data.username directly, so assign it to another variable first
+      return that.userID = res.username;
+    });
+  }
+
   ngOnInit() {
+    this.getUsername(this.res); // have to use res to get username, data.username doesn't work
     this.stateDropDown = false;
     this.user = this.userService.userInfo;
     this.sidebarState = this.appComponent.sidebarState;
