@@ -16,10 +16,19 @@ export class BackendService {
   constructor(private http: HttpClient) { }
 
   private apiGet(endpoint: string) {
+    // Send a get request to the endpoint
+
     return this.http.get(environment.backend_ip + endpoint)
                 .toPromise()
                 .then(response => response)
                 .catch(err => console.error('API Get failed in ' + endpoint + ' error ' + err));
+  }
+
+  private apiPost(endpoint, body) {
+    // Send a post request to the endpoint
+
+    return this.http.post(environment.backend_ip + endpoint, body, {responseType: 'text'})
+                .subscribe();
   }
 
   getMe() {
@@ -62,7 +71,7 @@ export class BackendService {
   getCourseUsers(id: string) {
     // Get users studying a course
 
-    return this.apiGet('/courses/' + id + '/users');
+    return this.apiGet('/api/courses/' + id + '/users');
   }
 
   submitAssignment(assignment_id: number, lang: string, code: string) {
@@ -81,5 +90,10 @@ export class BackendService {
     // Get an assignment with name desc., langs.
 
     // stub
+  }
+
+  postNewBadge(icon: string, title: string, description: string) {
+    const body = {'icon': icon, 'title': title, 'description': description};
+    return this.apiPost('/api/features/badge', body);
   }
 }

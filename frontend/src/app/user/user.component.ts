@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { trigger, state, style, animate, transition } from '@angular/animations';
 import { HeadService } from '../services/head.service';
+import { BackendService } from '../services/backend.service';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { BsModalRef } from 'ngx-bootstrap/modal/modal-options.class';
 import {FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
@@ -44,7 +45,7 @@ export class UserComponent implements OnInit {
   };
 
   constructor(private http: HttpClient, private route: ActivatedRoute, private headService: HeadService, private userService: UserService,
-              private modalService: BsModalService, private courseService: CourseService, private fb: FormBuilder, public auth: AuthService) {
+              private modalService: BsModalService, private backendService: BackendService, private courseService: CourseService, private fb: FormBuilder, public auth: AuthService) {
     this.headService.stateChange.subscribe(sidebarState => { this.sidebarState = sidebarState; }); // subscribe to the state value head provides
   }
 
@@ -67,7 +68,10 @@ export class UserComponent implements OnInit {
       this.form.value.info, this.form.value.progress, this.form.value.score, this.form.value.badges, this.form.value.leaderboard);
     this.courseService.AddCourse(course);
   }
+
   getMe() {
+    this.backendService.getMe();
+    /*
     this.http.get(environment.backend_ip + '/api/courses/me').subscribe(
       data => {
         console.log(data);
@@ -76,6 +80,10 @@ export class UserComponent implements OnInit {
         console.log(err);
         console.log('something went shit in getMe');
       }
-    );
+    );*/
+  }
+
+  postBadge() {
+    this.backendService.postNewBadge("bronze_medal_badge", "A test task from API", "Totally new, whoa.");
   }
 }
