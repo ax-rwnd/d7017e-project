@@ -86,10 +86,10 @@ export class BackendService {
     // stub
   }
 
-  getAssignment(id: string) {
+  getAssignment(course_id: string, assignment_id: string) {
     // Get an assignment with name desc., langs.
 
-    // stub
+    return this.apiGet('/api/courses/' + course_id + '/assignments/' + assignment_id);
   }
 
   postNewBadge(icon: string, title: string, description: string) {
