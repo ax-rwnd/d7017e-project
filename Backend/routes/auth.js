@@ -128,7 +128,8 @@ module.exports = function (router) {
             }
             let profile = {
                 username: `fake-${role}-${req.query.suffix}`,
-                admin: admin
+                admin: admin,
+                teaching: []
             };
             queries.findOrCreateUser(profile)
             .then(user => {
