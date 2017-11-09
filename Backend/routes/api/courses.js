@@ -154,6 +154,33 @@ module.exports = function(router) {
         });
     });
 
+    router.get('/:course_id/assignments/:assignment_id', auth.validateJWTtoken, function (req, res, next) {
+        var roll;
+        var course_id = req.params.course_id;
+        var assignment_id = req.params.assignment_id;
+        var wantedFields = req.query.fields || null;
+
+        queries.getUser(req.user.id, "teaching").then(function (userObject) {
+            if (userObject.teaching.indexOf(course_id) !== -1) {
+                roll = "teacher";
+            } else if (req.user.admin) {
+                roll = "admin";
+            } else {
+                roll = "student";
+            }
+            if (!queries.checkPermission(wantedFields, "assignments", roll)) {
+                return next(errors.INSUFFICIENT_PERMISSION);
+            }
+            queries.getAssignment(assignment_id, roll, wantedFields).then(function (assignmentObject) {
+                return res.json(assignmentObject);
+            });
+        })
+        .catch(function (err) {
+            next(err);
+        });
+    });
+
+/*
     //TODO: It is currently not checked if the requested assignment actually belongs to the specified course
     router.get('/:course_id/assignments/:assignment_id', auth.validateJWTtoken, function (req, res, next) {
         var course_id = req.params.course_id;
@@ -166,7 +193,7 @@ module.exports = function(router) {
             next(err);
         });
     });
-
+*/
     router.get('/:course_id/assignments/:assignment_id/tests', auth.validateJWTtoken, function (req, res, next) {
         var course_id = req.params.course_id;
         var assignment_id = req.params.assignment_id;

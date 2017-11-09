@@ -11,6 +11,7 @@ var mongoose = require('mongoose');
 
 const FIELDS = {
     COURSE: {
+        MODEL: require('../../models/schemas').Course,
         BASE_FIELDS: "course_code name description",
         ADMIN: "course_code name description teachers students assignments",
         TEACHER: "course_code name description students assignments",
@@ -21,10 +22,25 @@ const FIELDS = {
         BASE_FIELDS: "username email"
     },
     ASSIGNMENTS: {
-        BASE_FIELDS: "name description"
+        MODEL: require('../../models/schemas').Assignment,
+        BASE_FIELDS: "name description",
+        ADMIN: "name description tests optional_tests languages",
+        TEACHER: "name description tests tests.io tests.lint optional_tests optional_tests.io optional_tests.lint languages",
+        STUDENT: "name description languages",
+        POPULATE_FIELDS: "tests.io optional_tests.io"
     },
     STUDENTS: {
         BASE_FIELDS: "username description"
+    },
+    'TESTS.IO': {
+        MODEL: require('../../models/schemas').Test,
+        BASE_FIELDS: "stdout stdin args",
+        POPULATE_FIELDS: ""
+    },
+    'OPTIONAL_TESTS.IO': {
+        MODEL: require('../../models/schemas').Test,
+        BASE_FIELDS: "stdout stdin args",
+        POPULATE_FIELDS: ""
     }
 };
 
@@ -228,6 +244,27 @@ function getCourseAssignments(id, fields) {
     });
 }
 
+function getAssignment(assignment_id, roll, fields) {
+    var wantedFields = fields || FIELDS.ASSIGNMENTS[roll.toUpperCase()];
+    wantedFields = wantedFields.replace(/,/g, " ");
+    
+    return Assignment.findById(assignment_id, wantedFields)
+    .then(function (assignment) {
+        if (!assignment) {
+            throw errors.ASSIGNMENT_DOES_NOT_EXIST;
+        }
+        console.log(assignment);
+
+        console.log(wantedFields);
+        return populateObject(assignment, "assignments", wantedFields)
+        .then(function(populatedAssignment) {
+            return populatedAssignment[0];
+        });
+    });
+}
+
+
+/*
 function getAssignment(id, fields) {
     var wantedFields = fields || "name description hidden tests optional_tests languages";
 
@@ -238,6 +275,7 @@ function getAssignment(id, fields) {
         return assignment;
     });
 }
+*/
 
 function getTest(id, fields) {
     var wantedFields = fields || "stdout stdin args";
@@ -288,19 +326,26 @@ function checkPermission(wantedFields, collection, roll) {
     return true;
 }
 
-// Populates all wanted fields which is a Ref. 
-// Vey minor modifications needed to fit other collections.
-function populateCourseObject(courseObject, wantedFields) {
-    var fieldsToPopulateArray = FIELDS.COURSE.POPULATE_FIELDS.split(" ");
+// Populates all wanted fields which is a Ref.
+// Needs to be specified in FIELDS
+function populateObject(mongooseObject, schema, wantedFields) {
+    console.log(mongooseObject);
+    console.log(schema);
+    console.log(wantedFields);
+    var fieldsToPopulateArray = FIELDS[schema.toUpperCase()].POPULATE_FIELDS.split(" ");
     var populatePromises = [];
+    var model = FIELDS[schema.toUpperCase()].MODEL;
     fieldsToPopulateArray.forEach(function(element) {
+        console.log("LOOP");
         if (wantedFields.indexOf(element) !== -1) {
-            populatePromises.push(Course.populate(courseObject, {path: element, select: FIELDS[element.toUpperCase()].BASE_FIELDS}));
+            console.log(element);
+            populatePromises.push(model.populate(mongooseObject, {path: element, select: FIELDS[element.toUpperCase()].BASE_FIELDS}));
         }
     });
+    console.log(populatePromises);
     if (populatePromises.length === 0) {
         return new Promise((resolve, reject) => {
-            resolve([courseObject]);
+            resolve([mongooseObject]);
         });
     } else {
         return Promise.all(populatePromises);
@@ -317,7 +362,7 @@ function getCourse(courseid, roll, fields) {
             throw errors.COURSE_DOES_NOT_EXIST;
         }
 
-        return populateCourseObject(course, wantedFields)
+        return populateObject(course, "course", wantedFields)
         .then(function(populatedCourse) {
             return populatedCourse[0];
         });
