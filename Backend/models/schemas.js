@@ -99,6 +99,7 @@ var featuresSchema = new Schema({
     custom: {}
 });
 
+
 var Assignment = mongoose.model('Assignment', assignmentSchema);
 var Test = mongoose.model('Test', testSchema);
 var User = mongoose.model('User', userSchema);

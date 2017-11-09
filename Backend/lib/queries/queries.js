@@ -258,18 +258,17 @@ function createAssignment(name, description, hidden, languages, course_id) {
             throw errors.ASSINGMENT_NOT_CREATED;
         }
         //Push createdAssignment _id into course_id's assignments
-        Course.findById(course_id).then( function (course) {
+        return Course.findById(course_id).then( function (course) {
             if (!course) {
                 throw errors.COURSE_DOES_NOT_EXIST;
             }
-            course.assignments.push(createdAssignment._id);
-            course.save().then(function (updatedCourse) {
-                if (!updatedCourse) {
-                    throw errors.FAILED_TO_UPDATE_COURSE;
-                }
+            return Course.update(
+                { _id: course_id },
+                { $push: { assignments: createdAssignment._id } }
+            ).then( function (v) {
+                return createdAssignment;
             });
         });
-        return createdAssignment;
     });
 }
 
@@ -323,8 +322,6 @@ function getCourse(courseid, roll, fields) {
         });
     });
 }
-
-
 
 
 exports.getTestsFromAssignment = getTestsFromAssignment;
