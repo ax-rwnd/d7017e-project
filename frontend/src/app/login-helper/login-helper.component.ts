@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {ActivatedRoute, Params, Router} from '@angular/router';
 import { environment } from '../../environments/environment';
+import {BackendService} from '../services/backend.service';
+import {CourseService} from '../services/course.service';
 
 @Component({
   selector: 'app-login-helper',
@@ -14,7 +16,8 @@ export class LoginHelperComponent implements OnInit {
   token_type: string;
   ticket: string;
 
-  constructor(private http: HttpClient, private activatedRoute: ActivatedRoute, private router: Router) { }
+  constructor(private http: HttpClient, private activatedRoute: ActivatedRoute, private router: Router,
+              private backendService: BackendService, private courseService: CourseService) { }
 
   ngOnInit() {
     this.activatedRoute.queryParams.subscribe((params: Params) => {
@@ -32,6 +35,7 @@ export class LoginHelperComponent implements OnInit {
         this.refresh_token = (data['token_type'] + ' ' + data['refresh_token']);
         localStorage.setItem('refresh_token', this.refresh_token);
         // FIX THIS SHIT TO NAVIGATE CORRECTLY
+        this.courseService.GetAllCoursesForUser('59f9f5a51ac36c0762eb46b0');
         this.router.navigate(['/user']);
       },
       err => {
@@ -42,3 +46,5 @@ export class LoginHelperComponent implements OnInit {
     );
   }
 }
+
+

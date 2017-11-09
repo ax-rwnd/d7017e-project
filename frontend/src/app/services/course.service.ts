@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
+import {BackendService} from './backend.service';
 
 
 @Injectable()
 export class CourseService {
   courses: Course[];
-  constructor() {
+  constructor(private backendService: BackendService) {
     this.courses = [];
     /***hardcoded info later gotten from database***/
     let lbEntry1 = {name: 'anonymous', score: 80};
@@ -51,6 +52,75 @@ export class CourseService {
   AddCourse(course) {
     this.courses[this.courses.length] = course;
   }
+  GetAllCoursesForUser(user_id: string) {
+    this.backendService.getUserCourses('5a01c02d485d0220f8b9cca2')
+      .then(response => {
+        updateCourses(response, this.backendService, this);
+      });
+  }
+}
+
+function updateCourses(response, backendService, courseService) {
+  const courses = response.courses;
+  console.log('response', response);
+  for (let i = 0; i < courses.length; i++) {
+    backendService.getFeaturesCourseUser(courses[i]._id, response._id)
+      .then(featureResponse => {
+        const rewards = handleFeatureResponse(featureResponse);
+        const course = newCourse(courses[i].name, 'CODE' + i, courses[i].description, rewards);
+        console.log('course', course);
+        courseService.AddCourse(course);
+      });
+  }
+}
+
+function updateCourseHelper(name: string, code: string, description: string, course_id: string, user_id: string,
+                            backendService, courseService) {
+  backendService.getFeaturesCourseUser(course_id, user_id)
+    .then(response => {
+      const course = courseService.CreateCourse(name, code, description, false, false, false, false);
+      courseService.AddCourse(course);
+    });
+}
+
+function handleFeatureResponse(response: any) {
+  let progress;
+  const score = false;
+  let badges;
+  const leaderboard = false;
+  if (response.progress !== undefined) {
+    progress = 0;
+    for (let i = 0; i < response.progress.length; i++) {
+      let finished = true;
+      const assignment = response.progress[i];
+      for (let j = 0; j < assignment.tests.length; j++) {
+        const test = assignment.tests[j];
+        if (!test.optional && !test.result) {
+          finished = false;
+          break;
+        }
+      }
+      if (finished) {
+        progress += 100 / response.progress.length;
+      }
+    }
+  } else {
+    progress = false;
+  }
+  if (response.badges !== undefined) {
+    badges = [];
+    console.log(response.badges);
+    for (let i = 0; i < response.badges.length; i++) {
+      if (response.badges[i] === '59ff02b9d86066321c71afce') {
+        badges[badges.length] = 'bronze_medal_badge';
+      } else {
+        badges[badges.length] = 'silver_medal_badge';
+      }
+    }
+  } else {
+    badges = false;
+  }
+  return newRewards(progress, score, badges, leaderboard);
 }
 
 function newCourse(name, code, course_info, rewards) {

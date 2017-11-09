@@ -56,6 +56,9 @@ export class AssignmentComponent implements OnInit {
     this.status = 'Not Completed'; // hardcoded for now, endpoint to backend needed
     this.progress = { current: 0}; // this.assignmentService.progress; what even is this
     this.course = 'D0009E - Introduktion till programmering'; // endpoint needed, not used anymore
+    this.backendService.getUserCourses('59f9f5a51ac36c0762eb46b0');
+    this.backendService.getFeaturesCourseUser('59f9f5a51ac36c0762eb46b0', '59f6f88b1ac36c0762eb46a9');
+    this.backendService.getFeaturesCourse('59f9f5a51ac36c0762eb46b0');
   }
 
   // SubmitCode should update status/progress.

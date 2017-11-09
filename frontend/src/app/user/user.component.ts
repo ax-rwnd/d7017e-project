@@ -11,6 +11,7 @@ import {CourseService} from '../services/course.service';
 import {HttpClient} from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import {AuthService} from "../services/Auth/Auth.service";
+import {BackendService} from "../services/backend.service";
 
 @Component({
   selector: 'app-user',
@@ -44,7 +45,8 @@ export class UserComponent implements OnInit {
   };
 
   constructor(private http: HttpClient, private route: ActivatedRoute, private headService: HeadService, private userService: UserService,
-              private modalService: BsModalService, private courseService: CourseService, private fb: FormBuilder, public auth: AuthService) {
+              private modalService: BsModalService, private courseService: CourseService, private fb: FormBuilder,
+              public auth: AuthService, private backendService: BackendService) {
     this.headService.stateChange.subscribe(sidebarState => { this.sidebarState = sidebarState; }); // subscribe to the state value head provides
   }
 

@@ -82,4 +82,12 @@ export class BackendService {
 
     // stub
   }
+  getFeaturesCourseUser (course_id: string, user_id: string) {
+    console.log('course ', course_id);
+    console.log('user ', user_id);
+    return this.apiGet('/api/features/feature/' + course_id + '/' + user_id);
+  }
+  getFeaturesCourse (course_id: string) {
+    return this.apiGet('/api/features/features/' + course_id);
+  }
 }
