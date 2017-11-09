@@ -5,6 +5,7 @@ var Assignment = require('../../models/schemas').Assignment;
 var Course = require('../../models/schemas').Course;
 var Test = require('../../models/schemas').Test;
 var User = require('../../models/schemas').User;
+var Draft = require('../../models/schemas').Draft;
 var errors = require('../errors.js');
 var mongoose = require('mongoose');
 
@@ -53,6 +54,7 @@ function getTestsFromAssignment(assignmentID, callback) {
 
 function getUser(id, fields) {
     var wantedFields = fields || "username email admin tokens courses teaching providers";
+    // Check validity of id
     if (!mongoose.Types.ObjectId.isValid(id)) {
             throw errors.INVALID_ID;
     }
@@ -81,7 +83,7 @@ function getUsers(id_array, fields) {
             }
             return user;
         });
-        promises.push(temp); // Gather all promisese in an array
+        promises.push(temp); // Gather all promises in an array
     }
     return Promise.all(promises);
 }
@@ -323,6 +325,16 @@ function getCourse(courseid, roll, fields) {
     });
 }
 
+function saveCode(userID, assignmentID, code) {
+    var options = {new: true, upsert: true, fields: "user assignment code"};
+    return Draft.findOneAndUpdate({user: userID, assignment: assignmentID}, {code: code}, options).then(function (draft) {
+        if (!draft) {
+            throw errors.DRAFT_NOT_SAVED;
+        }
+        return draft;
+    });
+}
+
 
 exports.getTestsFromAssignment = getTestsFromAssignment;
 exports.findOrCreateUser = findOrCreateUser;
@@ -342,4 +354,5 @@ exports.getAssignment = getAssignment;
 exports.getTest = getTest;
 exports.getCourse = getCourse;
 exports.checkPermission = checkPermission;
+exports.saveCode = saveCode;
 
