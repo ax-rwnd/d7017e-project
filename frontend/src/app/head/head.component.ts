@@ -4,6 +4,7 @@ import { HeadService } from '../services/head.service';
 import {AppComponent} from '../app.component';
 import {UserService} from '../services/user.service';
 import {AuthService} from '../services/Auth/Auth.service';
+import {BackendService} from '../services/backend.service';
 
 @Component({
   selector: 'app-head',
@@ -29,9 +30,10 @@ export class HeadComponent implements OnInit {
   sidebarState: any; // state of the sidebar
   user: any;
   stateDropDown: boolean;
+  data: any;
 
   constructor(@Inject(forwardRef(() => AppComponent)) private appComponent: AppComponent, private headService: HeadService,
-              private userService: UserService, private auth: AuthService) {
+              private userService: UserService, private auth: AuthService, private backendService: BackendService) {
   }
 
   toggleState($event) { // send to the sidebar in app component that it should toggle state
@@ -61,7 +63,13 @@ export class HeadComponent implements OnInit {
     this.auth.logout();
   }
 
+  getUsername() {
+    //this.backendService.getMe().then(data => console.log(this.user = data['username'].json().username));
+    console.log(this.data = this.backendService.getMe());
+  }
+
   ngOnInit() {
+    this.getUsername();
     this.stateDropDown = false;
     this.user = this.userService.userInfo;
     this.sidebarState = this.appComponent.sidebarState;
