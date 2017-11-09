@@ -167,6 +167,20 @@ module.exports = function(router) {
         });
     });
 
+    // Save draft to assignment
+    // course_id not used, should route be changed? Implement some check?
+    router.post('/:course_id/assignments/:assignment_id/save', auth.validateJWTtoken, function (req, res, next) {
+        var assignment_id = req.params.assignment_id;
+        var code = req.body.code;
+        
+        queries.saveCode(req.user.id, assignment_id, code).then(function (draft) {
+            res.json(draft);
+        })
+        .catch(function (err) {
+            next(err);
+        });
+    });
+
     router.get('/:course_id/assignments/:assignment_id/tests', auth.validateJWTtoken, function (req, res, next) {
         var course_id = req.params.course_id;
         var assignment_id = req.params.assignment_id;

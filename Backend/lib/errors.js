@@ -29,5 +29,6 @@ module.exports = {
     FAILED_TO_UPDATE_COURSE: new APIError("Failed to update course", 500, 7012),
     ASSIGNMENT_DOES_NOT_EXIST: new APIError("Assignment doesn't exist", 404, 7013),
     TEST_DOES_NOT_EXIST: new APIError("Test doesn't exist", 404, 7014),
-    INSUFFICIENT_PERMISSION: new APIError("You don't have the required permissions for these fields.", 403, 7015)
+    INSUFFICIENT_PERMISSION: new APIError("You don't have the required permissions for these fields.", 403, 7015),
+    DRAFT_NOT_SAVED: new APIError("Draft not saved", 500, 7016)
 };
