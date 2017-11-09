@@ -4,10 +4,10 @@ import { Injectable } from '@angular/core';
 export class AssignmentService {
   assignmentGroups: AssignmentGroup[];
   constructor() {
-    const a = [{id: 1, name: 'Assignment 1'}, {id: 2, name: 'Assignment 2'}, {id: 3, name: 'Assignment 3'},
-      {id: 4, name: 'Assignment 4'}, {id: 5, name: 'Assignment 5'}];
-    const e = [{id: 1, name: 'Exercise 1'}, {id: 2, name: 'Exercise 2'}, {id: 3, name: 'Exercise 3'},
-      {id: 4, name: 'Exercise 4'}, {id: 5, name: 'Exercise 5'}];
+    const a = [{id: 1, name: 'Assignment 1', available: true}, {id: 2, name: 'Assignment 2', available: true}, {id: 3, name: 'Assignment 3', available: false},
+      {id: 4, name: 'Assignment 4', available: false}, {id: 5, name: 'Assignment 5', available: false}];
+    const e = [{id: 1, name: 'Exercise 1', available: true}, {id: 2, name: 'Exercise 2', available: true}, {id: 3, name: 'Exercise 3', available: true},
+      {id: 4, name: 'Exercise 4', available: true}, {id: 5, name: 'Exercise 5', available: true}];
     const special = {name: 'Special exercises', collapse: true, availability: 'locked', assignments: e, groups: []};
     const aLvl1 = {name: 'Level 1', collapse: false, availability: false, assignments: a, groups: []};
     const aLvl2 = {name: 'Level 2', collapse: true, availability: 'unlocked', assignments: a, groups: []};
@@ -32,4 +32,5 @@ interface AssignmentGroup {
 interface Assignment {
   id: number;
   name: string;
+  available: boolean;
 }
