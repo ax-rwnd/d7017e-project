@@ -52,7 +52,7 @@ import { ModProgressbarComponent } from './mod-progressbar/mod-progressbar.compo
 const appRoutes: Routes = [
   { path: '', component: LoginComponent },
   { path: 'auth', component: LoginHelperComponent },
-  { path: 'courses/:course/assignment', component: AssignmentComponent },
+  { path: 'courses/:course/assignment/:assignment', component: AssignmentComponent },
   { path: 'user', component: UserComponent, canActivate: [AuthGuard]},
   { path: 'courses/:course', component: CoursesComponent},
   { path: 'createAssignmentTest', component: CreateassignmentComponent}

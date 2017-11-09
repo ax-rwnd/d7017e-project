@@ -5,7 +5,7 @@
     <fa class="navbar-right right-margin" *ngIf="assignmentGroup.availability === 'unlocked'" name="unlock"></fa>
   </div>
   <div class="panel-body" [collapse]="assignmentGroup.collapse">
-    <div [routerLink]="['/courses', courseCode, 'assignment']" *ngFor="let a of assignmentGroup.assignments" class="assignment well">
+    <div [routerLink]="['/courses', courseCode, 'assignment', a.id]" *ngFor="let a of assignmentGroup.assignments" class="assignment well">
       {{a.name}}
     </div>
   </div>

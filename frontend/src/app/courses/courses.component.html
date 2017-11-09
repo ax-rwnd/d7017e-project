@@ -33,7 +33,7 @@
       </div>
         <div>
           {{currentAssignment}}
-          <button type="button" [routerLink]="['/courses', courseCode, 'assignment']" courseCode="currentCourse.code">To element</button>
+          <button type="button" [routerLink]="['/courses', courseCode, 'assignment', currentAssignment.id]" courseCode="currentCourse.code">To element</button>
         </div>
     </div>
 
