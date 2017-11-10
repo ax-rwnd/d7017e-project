@@ -97,8 +97,8 @@ export class BackendService {
 
   submitAssignment(assignment_id: number, lang: string, code: string) {
     // Submis code for testing
-
-    // stub
+    const body = {'assignment_id': assignment_id, 'lang': lang, 'code': code};
+    return this.apiPost('/api/test', body);
   }
 
   createAssignment(description: string, tests: any) {
@@ -107,10 +107,10 @@ export class BackendService {
     // stub
   }
 
-  getAssignment(id: string) {
+  getAssignment(course_id: string, assignment_id: string) {
     // Get an assignment with name desc., langs.
 
-    // stub
+    return this.apiGet('/api/courses/' + course_id + '/assignments/' + assignment_id);
   }
   getCourseAssignments(course_id: string) {
     return this.apiGet('/api/courses/' + course_id + '?fields=assignments');
