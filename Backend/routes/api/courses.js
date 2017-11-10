@@ -59,7 +59,7 @@ module.exports = function(router) {
     // Would force frontend to send userid. courses/me takes user id from token.
     // Frontend is most likely in possesion of userid. Therefore both is possible.
     router.get('/me', auth.validateJWTtoken, function (req, res, next) {
-        queries.getUserCourses(req.user.id, "name description").then(function (courses) {
+        queries.getUserCourses(req.user.id, "name description course_code").then(function (courses) {
             return res.json(courses);
         })
         .catch(function (err) {
