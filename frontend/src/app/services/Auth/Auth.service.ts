@@ -17,7 +17,20 @@ export class AuthService {
 
   public isAuthenticated(): boolean {
     console.log('CheckingToken');
-    if (localStorage.getItem('token')) {
+    if (this.getToken() !== null) {
+      return true;
+    } else if (this.getRefreshToken() !== null) {
+      this.requestNewToken().subscribe(resp => {
+        if (!resp) {
+          console.log('no response');
+          return false;
+        }
+      },
+        err => {
+          console.log(err);
+          console.log('something went shit in isAuthenticated');
+          return false;
+        });
       return true;
     }
     return false;
@@ -27,7 +40,7 @@ export class AuthService {
     if (localStorage.getItem('token') !== null) {
       return localStorage.getItem('token');
     } else {
-      return 'unohavetoken';
+      return null;
     }
   }
 
@@ -35,7 +48,7 @@ export class AuthService {
     if (localStorage.getItem('refresh_token') !== null) {
       return localStorage.getItem('refresh_token');
     } else {
-      return 'unohaverefreshtokentoken';
+      return null;
     }
   }
 
