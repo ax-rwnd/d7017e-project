@@ -16,7 +16,34 @@ export class CourseService {
     let lbEntry5 = {name: 'anonymous', score: 65};
     let leaderboard = [lbEntry1, lbEntry2, lbEntry3, lbEntry4, lbEntry5];
     const rewards1 = newRewards(50, 70, ['silver_medal_badge', 'bronze_trophy_badge'], leaderboard);
-    const course0 = newCourse('Introduction to programming', 'D0009E', 'Course info', rewards1);
+    const course0 = newCourse('Introduction to programming', 'D0009E', '# Information\n' +
+      '\n' +
+      '## Kursens mål\n' +
+      '*Att ge en grundlig introduktion till datorbaserad problemlösning med hjälp av ett modern imperativt programmeringsspråk*\n' +
+      '\n' +
+      '## Innehåll\n' +
+      '\n' +
+      '* Introduktion till programutveckling och programutvecklingsmiljöer.\n' +
+      '* Variabler och programtillstånd, vägval, iteration.\n' +
+      '* Aritmetiska och logiska uttryck, strängar och textbehandling.\n' +
+      '* Sammansatta datatyper, parametrisering och funktionsabstraktion.\n' +
+      '* Filbegreppet, standardbibliotek och felhantering.\n' +
+      '* Referenser kontra värden, dynamiska datastrukturer.\n' +
+      '* Introduktion till objektbegreppet.\n' +
+      '* Problemlösning, programstruktur och dokumentation.\n' +
+      '\n' +
+      '## Litteratur\n' +
+      'Allen Downey, Jeffrey Elkner, Chris Meyers.\n' +
+      '\n' +
+      '*How to Think Like a Computer Scientist: Learning with Python*,\n' +
+      '\n' +
+      'Green Tea Press, 2002.\n' +
+      '\n' +
+      'ISBN: 0971677506\n' +
+      '\n' +
+      'Kurslitteraturen finns även anpassad till Java och C++\n' +
+      '\n' +
+      '(Alternativ kurslitteratur: *Alan Gauld, Learning to program*)', rewards1);
     lbEntry1 = {name: 'anonymous', score: 200};
     lbEntry2 = {name: 'anonymous', score: 190};
     lbEntry3 = {name: 'you', score: 180};

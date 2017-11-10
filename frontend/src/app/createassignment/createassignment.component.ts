@@ -22,8 +22,14 @@ import { BsModalRef } from 'ngx-bootstrap/modal/modal-options.class';
   ]
 })
 export class CreateassignmentComponent implements OnInit {
+
+  assignmentName: string;
+  supportedLanguages: any[];
   content: string;
   unitTests: any[];
+
+
+  editT: any; // used for checking which test should be edited
   sidebarState; // state of sidebar
   modalRef: BsModalRef;
   testType: String;
@@ -47,6 +53,10 @@ export class CreateassignmentComponent implements OnInit {
     this.unitTests = [];
   }
 
+  onChangeAssignmentName(aN) {
+    this.assignmentName = aN;
+  }
+
   onChange(c) {
     this.content = c;
   }
@@ -57,10 +67,26 @@ export class CreateassignmentComponent implements OnInit {
     } else {
       this.unitTests.push([this.testType]);
     }
+    this.testType = '';
+  }
+
+  editExistingTest(e) {
+    if (this.testType === 'io') {
+      this.unitTests[e] = [this.testType, this.form.value.ioInput, this.form.value.ioOutput];
+      console.log(this.unitTests);
+    } else {
+      this.unitTests[e] = [this.testType];
+    }
+    this.testType = '';
   }
 
   openModal(modal) {
     this.testType = '';
+    this.form = this.fb.group(this.defaultForm);
+    this.modalRef = this.modalService.show(modal);
+  }
+
+  openModalEdit(modal) {
     this.form = this.fb.group(this.defaultForm);
     this.modalRef = this.modalService.show(modal);
   }
@@ -71,6 +97,11 @@ export class CreateassignmentComponent implements OnInit {
     } else {
       return false;
     }
+  }
+
+  submitNewAssignment() {
+    this.backendService.createAssignment(this.content, this.unitTests)
+    return;
   }
 }
 

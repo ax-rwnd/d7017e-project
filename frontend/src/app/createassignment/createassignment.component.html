@@ -3,24 +3,19 @@
 <div id="cont" class="content" [@content]="sidebarState">
 
   <div id="difficulty">
-    Assignment difficulty
-    <div class="dropdown" style="float:right;">
-      <button class="dropbtn">Grouping</button>
-      <div class="dropdown-content" style="right:0;">
-        <a>Easy</a>
-        <a>Medium</a>
-        <a>Hard</a>
-      </div>
+    Assignment name:
+    <div style="float:right">
+      <input (text)="assignmentName" (textChanged)="onChangeAssignmentName(assignmentName)" style="color:black; font-weight: normal">
     </div>
   </div>
 
-  <div id="assignmentDescription">
+  <div id="assignmentDescription" appScroller>
     <div ace-editor [(text)]="content" [mode]="'markdown'" [theme]="'eclipse'" [options]="{maxLines: 1000, printMargin: false}" [readOnly]="false" [autoUpdateContent]="true" [durationBeforeCallback]="1000"(textChanged)="onChange(content)"  style="min-height: 100%; width:100%; overflow: auto;">
     </div>
 
   </div>
 
-  <div id="preview">
+  <div id="preview" appScroller>
     <div Markdown [data]="content" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/themes/prism.min.css"></div>
   </div>
 
@@ -31,12 +26,12 @@
   <div *ngFor='let fb of unitTests' id="test">
     <div id="testInfo">
       <h4>{{fb[0]}} Test</h4>
-      <div *ngIf="fb[1]"> {{fb[1]}} </div>
-      <div *ngIf="fb[2]"> {{fb[2]}} </div>
+      <div *ngIf="fb[1]"> Input: {{fb[1]}} </div>
+      <div *ngIf="fb[2]"> Output: {{fb[2]}} </div>
     </div>
     <div id="testEdit">
       <div style="align:right">
-        <button class="btn" (click)="openModal(editTest)">Edit test</button>
+        <button class="btn" (click)="openModalEdit(editTest); testType=fb[0]; editT=unitTests.indexOf(fb)">Edit test</button>
       </div>
     </div>
   </div>
@@ -55,7 +50,7 @@
 
 </div>
 <div id="footer">
-  <button class="btn">Submit Assignment</button>
+  <button class="btn" (click)="submitNewAssignment()">Submit Assignment</button>
 </div>
 
 
@@ -107,7 +102,7 @@
       <span aria-hidden="true">&times;</span>
     </button>
   </div>
-  <form (ngSubmit)="createTest()" [formGroup]="form" novalidate>
+  <form (ngSubmit)="editExistingTest(editT)" [formGroup]="form" novalidate>
     <div class="modal-body">
       <div class="form-group" *ngIf="testIo()">
         <h4>Input</h4>
