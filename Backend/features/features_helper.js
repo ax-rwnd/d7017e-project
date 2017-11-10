@@ -2,6 +2,7 @@
 
 var mongoose = require('mongoose'); //Database communication
 var queries = require('../lib/queries/features');
+var logger = require('../logger');
 
 //see if all mandatory tests are passed
 function passAllMandatoryTests(data) {
@@ -21,8 +22,12 @@ async function getFeature(user_id, assignment_id) {
     for (let feature_item of course.features) {
         let feature = await queries.getFeatureByID(feature_item);
 
-        if(feature.user.equals(user_id)) {
-            return feature;
+        if(feature === null) {
+            logger.warn('Feature '+feature_item+' in course '+course._id+' is null and should be removed!');
+        } else {
+            if(feature.user.equals(user_id)) {
+                return feature;
+            }
         }
     }
 

@@ -12,13 +12,17 @@ function init(emitter, name) {
                 let json = {};
                 json[name] = result;
                 resolve(json);
+            }).catch(function(err) {
+                logger.error(err);
             });
         });
     });
 }
 
 async function run(data) {
+
     let newBadges = [];
+
     let feature = await helper.getFeature(data.user_id, data.assignment_id);
 
     // Merge result with existing data

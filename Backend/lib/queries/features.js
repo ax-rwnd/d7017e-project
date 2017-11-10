@@ -108,19 +108,17 @@ function createFeature(user_id, course_id) {
 }
 
 function getFeatureByID(features_id) {
-    let feature =  Features.findById(features_id);
+    let feature = Features.findById(features_id);
     if(feature === null)
         throw errors.FEATURE_DO_NOT_EXIST;
     return feature;
 }
 
 function updateFeatureProgress(user_id, features_id, assignment_id, data) {
-    console.log(data);
     return Features.update({'_id': features_id, 'user': user_id, 'progress.assignment': assignment_id}, {'$set': {'progress.$': data}}, { runValidators: true }).then(function(result) {
-        console.log(result);
         if(result.n === 0) {
             return Features.update({'_id': features_id, 'user': user_id}, {'$addToSet': {'progress': data}}, { runValidators: true }).then(function(result) {
-                console.log(result);
+                return;
             });
         }
     });
@@ -142,14 +140,18 @@ function getNumberOfCompletedAssignments(course_id, user_id) {
         let course = await Course.findById(course_id);
         course.features.forEach(async function(feature_id) {
             let feature = await getFeatureByID(feature_id);
-            if(feature.user.equals(user_id)) {
-                Features.aggregate()
-                .match({_id: feature._id})
-                .project({
-                    completed: {$size:'$progress'}
-                }).then(function(completed) {
-                    resolve(completed[0].completed);
-                });
+            if(feature === null) {
+                logger.warn('Feature '+feature_id+' in course '+course._id+' is null and should be removed!');
+            } else {
+                if(feature.user.equals(user_id)) {
+                    Features.aggregate()
+                    .match({_id: feature._id})
+                    .project({
+                        completed: {$size:'$progress'}
+                    }).then(function(completed) {
+                        resolve(completed[0].completed);
+                    });
+                }
             }
         });
     });
@@ -176,8 +178,13 @@ async function getFeatureOfUserID(course_id, user_id) {
     for(let feature_id of course.features) {
 
         let feature = await getFeatureByID(feature_id);
-        if(feature.user.equals(user_id)) {
-            return await getFeatureByID(feature_id);
+
+        if(feature === null) {
+            logger.warn('Feature '+feature_id+' in course '+course._id+' is null and should be removed!');
+        } else {
+            if(feature.user.equals(user_id)) {
+                return await getFeatureByID(feature_id);
+            }
         }
     }
 

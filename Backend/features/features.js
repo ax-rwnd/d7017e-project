@@ -47,8 +47,6 @@ function emitEvent(result) {
         }).catch(function(err) {
             throw new Error(err);
         });
-
-
     });
 }
 

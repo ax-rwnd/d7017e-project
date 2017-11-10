@@ -11,6 +11,8 @@ function init(emitter, name) {
                 let json = {};
                 json[name] = result;
                 resolve(json);
+            }).catch(function(err) {
+                logger.error(err);
             });
         });
     });
