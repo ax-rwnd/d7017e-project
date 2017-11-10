@@ -202,7 +202,7 @@ module.exports = function(router) {
         var user_id = req.body.user_id;
         var lang = req.body.lang;
         var code = req.body.code;
-        var assignment_id = req.query.assignment_id;
+        var assignment_id = req.params.assignment_id;
 
         testerCom.validateCode(user_id, lang, code, assignment_id, res);
     });
