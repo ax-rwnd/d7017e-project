@@ -61,8 +61,8 @@ require('./routes/api/features')(features);
 app.use('/api/features', features);
 
 var test_routes = express.Router();
-require('./routes/api/tests')(test_routes);
-app.use('/api/tests', test_routes);
+require('./routes/api/tester')(test_routes);
+app.use('/api/tester', test_routes);
 
 
 //Route not found.
@@ -76,7 +76,7 @@ app.use(function (err, req, res, next) {
         return next(err);
     }
 
-    console.log(err);
+    //console.log(err);
     res.status(err.httpCode).send("HTTP error: " + err.httpCode + " " + err.message);
 });
 
@@ -85,7 +85,7 @@ app.use(function (err, req, res, next) {
         return next(err);
     }
 
-    console.log(err);
+    //console.log(err);
     res.status(err.httpCode).send("HTTP error: " + err.httpCode + " " + err.message);
 });
 
@@ -100,7 +100,7 @@ app.use(function (err, req, res, next) {
         delete err.stack;
     }
 */
-    console.log(err);
+    //console.log(err);
     res.status(500).send("HTTP error: 500 Internal server error");
 });
 

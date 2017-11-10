@@ -7,7 +7,7 @@ var request = require('supertest');
 module.exports = function(router) {
 
     //Retrieve tests from db and send them to tester
-    router.post('/test', function(req, res) {
+    router.post('/run', function(req, res) {
 
         var user_id = req.body.user_id;
         var lang = req.body.lang;
@@ -21,6 +21,8 @@ module.exports = function(router) {
         testerCom.getTesterLanguages().then(function(languages) {
             res.json(languages);
             res.send();
+        }).catch(err => {
+            console.log(err);
         });
     });
 
