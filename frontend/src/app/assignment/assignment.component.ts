@@ -61,7 +61,9 @@ export class AssignmentComponent implements OnInit {
 
   submitCode() {
     const user_id = new ObjectID(this.userid);
-    this.backendService.submitAssignment(user_id, this.assignment['id'], this.language, this.content).then(data => {
+    const assignment_id = this.assignment['id'];
+    const course_id = new ObjectID(this.assignment['course_id']);
+    this.backendService.submitAssignment(user_id, course_id, assignment_id, this.language, this.content).then(data => {
       this.HandleResponse(data);
     });
   }
@@ -94,7 +96,8 @@ export class AssignmentComponent implements OnInit {
       const test = results['io'][i];
       const testindex = i + 1;
       if (!test['ok']) {
-        feedback.push('Test ' + testindex + ' failure: ' + test['stderr']);
+        const failure = (test['stderr'] === '') ? 'Wrong output' : test['stderr'];
+        feedback.push('Test ' + testindex + ' failure: ' + failure);
         passTests = false;
       } else {
         feedback.push('Test ' + testindex + ' ok');
