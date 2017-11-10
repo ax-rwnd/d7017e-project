@@ -99,7 +99,7 @@ export class BackendService {
 
   submitAssignment(user_id: ObjectID, assignment_id: number, lang: string, code: string) {
     // Submis code for testing
-    const body = {'user_id': user_id, 'assignment_id': assignment_id, 'lang': lang, 'code': code};
+    const body = {'user_id': user_id.get(), 'assignment_id': assignment_id, 'lang': lang, 'code': code};
     return this.apiPost('/api/tester/run', body);
   }
 
