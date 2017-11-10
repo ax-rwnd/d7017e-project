@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import 'codemirror/mode/go/go';
-import { BackendService } from '../services/backend.service';
+import { BackendService, ObjectID } from '../services/backend.service';
 import { AssignmentService } from '../services/assignment.service';
 import { trigger, state, style, animate, transition } from '@angular/animations';
 import { HeadService } from '../services/head.service';
@@ -49,7 +49,7 @@ export class AssignmentComponent implements OnInit {
 
   ngOnInit() {
     this.sidebarState = this.headService.getCurrentState();
-    this.userid = this.userService.userInfo.userName;
+    this.userid = this.userService.userInfo.id;
     this.languages = this.assignment['languages'];
     this.language = this.languages[0];
     this.themes = ['eclipse', 'monokai'];
@@ -57,16 +57,13 @@ export class AssignmentComponent implements OnInit {
     this.content = '';
     this.status = 'Not Completed'; // hardcoded for now, endpoint to backend needed
     this.progress = { current: 0}; // this.assignmentService.progress; what even is this
-    console.log('assignment', this.assignment);
   }
 
-  // SubmitCode should update status/progress.
-  // Does submitAssignment give me that status or should i fetch the assignment again?
   submitCode() {
-    // TODO: reimplement when new code arrives in backend
-    // this.backendService.submitAssignment(assignment['id], this.language, this.content).then(data => {
-    //   this.handleResponse(data);
-    // });
+    const user_id = new ObjectID(this.userid);
+    this.backendService.submitAssignment(user_id, this.assignment['id'], this.language, this.content).then(data => {
+      this.HandleResponse(data);
+    });
   }
 
   setTheme(th) {
@@ -88,6 +85,7 @@ export class AssignmentComponent implements OnInit {
   // Update the feedback array
   HandleResponse(value) {
     const feedback = [];
+    value = JSON.parse(value);
     const results = value['results'];
 
     let passTests = true;
@@ -118,6 +116,13 @@ export class AssignmentComponent implements OnInit {
       passTests = false;
     }
     this.setFeedback(feedback);
+
+    if (value['passed']) {
+      this.status = 'Completed';
+    } else {
+      this.status = 'Not Completed';
+    }
+
   }
 
   setLanguage(language: string) {
