@@ -42,7 +42,8 @@ var userSchema = new Schema({
 var draftSchema = new Schema({
     user: { type: Schema.Types.ObjectId, ref: 'User', required: true},
     assignment: { type: Schema.Types.ObjectId, ref: 'Assignment', required: true},
-    code: { type: String, required: true }
+    code: { type: String, required: false },
+    lang: { type: String, required: false }
 });
 
 var courseSchema = new Schema({
