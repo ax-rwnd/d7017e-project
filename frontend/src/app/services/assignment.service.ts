@@ -34,7 +34,9 @@ export class AssignmentService {
     this.courseAssignments[course_id] = [{name: 'Assignments', collapse: true, availability: false, assignments: a, groups: []}];
   }
   GetAssignment(course: string, assignment_id: string) {
-    console.log('group', course);
+    if (this.courseAssignments[course] === undefined) {
+      course = 'default';
+    }
     for (let i = 0; i < this.courseAssignments[course].length; i++) {
       const a = getAssignmentHelper(this.courseAssignments[course][i], assignment_id);
       if (a !== false) {
@@ -54,7 +56,7 @@ function getAssignmentHelper(group: AssignmentGroup, assignment_id: string) {
     }
   }
   for (let i = 0; i < group.groups.length; i++) {
-    const a = this.GetAssignment(group.groups[i], assignment_id);
+    const a = getAssignmentHelper(group.groups[i], assignment_id);
     if (a !== false) {
       return a;
     }
