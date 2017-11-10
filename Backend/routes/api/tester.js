@@ -15,10 +15,4 @@ module.exports = function(router) {
             console.log(err);
         });
     });
-
-    // Test to send easy error messages
-    router.get('/errortest', function (req, res) {
-        res.status(errors.TEST.code).send(errors.TEST.msg);
-    });
-
 };
