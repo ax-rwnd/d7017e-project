@@ -3,11 +3,12 @@
 var testerCom = require('../../lib/tester_communication');
 var errors = require('../../lib/errors');
 var request = require('supertest');
+var auth = require('../../lib/authentication.js');
 
 module.exports = function(router) {
 
     //Retrieve tests from db and send them to tester
-    router.post('/run', function(req, res) {
+    router.post('/run', auth.validateJWTtoken, function(req, res) {
 
         var user_id = req.body.user_id;
         var lang = req.body.lang;
