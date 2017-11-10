@@ -370,11 +370,30 @@ function getCourse(courseid, roll, fields) {
     });
 }
 
-function saveCode(userID, assignmentID, code) {
-    var options = {new: true, upsert: true, fields: "user assignment code"};
-    return Draft.findOneAndUpdate({user: userID, assignment: assignmentID}, {code: code}, options).then(function (draft) {
+function saveCode(userID, assignmentID, code, lang) {
+    // new: true - Creates a new document if it doesn't find one
+    // upsert: true - Returns the updated document
+    var options = {new: true, upsert: true, fields: "user assignment code lang", runValidators: true};
+    return Draft.findOneAndUpdate({user: userID, assignment: assignmentID}, {code: code, lang: lang}, options).then(function (draft) {
         if (!draft) {
             throw errors.DRAFT_NOT_SAVED;
+        }
+        return draft;
+    });
+}
+
+function getCode(userID, assignmentID) {
+    return Draft.findOne({user: userID, assignment: assignmentID}, "user assignment code lang").then(function (draft) {
+        if (!draft) {
+            var newDraft = new Draft({user: userID, assignment: assignmentID, code: "", lang: ""});
+            return newDraft.save().then(function (createdDraft) {
+                if (!createdDraft) {
+                    console.log("Error: Draft not created");
+                }
+                // Don't want to return __v field, maybe there is a better way to do this
+                createdDraft.__v = undefined;
+                return createdDraft;
+            });
         }
         return draft;
     });
@@ -408,4 +427,5 @@ exports.getTest = getTest;
 exports.getCourse = getCourse;
 exports.checkPermission = checkPermission;
 exports.saveCode = saveCode;
+exports.getCode = getCode;
 exports.getCoursesEnabledFeatures = getCoursesEnabledFeatures;
