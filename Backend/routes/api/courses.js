@@ -200,8 +200,25 @@ module.exports = function(router) {
     router.post('/:course_id/assignments/:assignment_id/save', auth.validateJWTtoken, function (req, res, next) {
         var assignment_id = req.params.assignment_id;
         var code = req.body.code;
+        var lang = req.body.lang;
 
-        queries.saveCode(req.user.id, assignment_id, code).then(function (draft) {
+        if (code === undefined || lang === undefined) {
+            return next(errors.BAD_INPUT);
+        }
+
+        queries.saveCode(req.user.id, assignment_id, code, lang).then(function (draft) {
+            res.json(draft);
+        })
+        .catch(function (err) {
+            next(err);
+        });
+    });
+
+    // Retrieve the saved assignment draft, will create and return an empty draft if it doesn't already exist.
+    router.get('/:course_id/assignments/:assignment_id/draft', auth.validateJWTtoken, function (req, res, next) {
+        var assignment_id = req.params.assignment_id;
+
+        queries.getCode(req.user.id, assignment_id).then(function (draft) {
             res.json(draft);
         })
         .catch(function (err) {
