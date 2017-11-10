@@ -39,7 +39,7 @@ function emitEvent(result) {
             return;
         }
 
-        helper.getFeature(result.user_id, result.assignment_id).then(function(fueature) {
+        helper.getFeature(result.user_id, result.assignment_id).then(function(feature) {
             emitter.emit('handleFeatures', result).then(function(data) {
                 result.features = createResultjson(data);
                 resolve(result);

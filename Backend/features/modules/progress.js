@@ -18,7 +18,9 @@ function init(emitter, name) {
 
 async function run(data) {
 
-    queries.updateFeatureProgress(data.assignment_id, {progress: [helper.prepareProgressData(data)]});
+    let feature = await helper.getFeature(data.user_id, data.assignment_id);
+
+    await queries.updateFeatureProgress(data.user_id, feature._id, data.assignment_id, helper.prepareProgressData(data));
 
     let progress = {};
 

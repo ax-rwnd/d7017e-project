@@ -25,7 +25,7 @@ function getBadge(badge_id) {
 }
 
 function updateBadge(badge_id, data) {
-    return Badge.findOneAndUpdate({"_id": badge_id}, data).then(function(badge) {
+    return Badge.findOneAndUpdate({"_id": badge_id}, data, { runValidators: true }).then(function(badge) {
         if(badge === null)
             throw errors.BADGE_DO_NOT_EXIST;
         return badge;
@@ -46,7 +46,7 @@ function getCourseBadge(coursebadge_id) {
 }
 
 function updateCourseBadge(coursebadge_id, data) {
-    return CourseBadge.findOneAndUpdate({'_id': coursebadge_id}, data).then(function(courseBadge) {
+    return CourseBadge.findOneAndUpdate({'_id': coursebadge_id}, data, { runValidators: true }).then(function(courseBadge) {
         if(courseBadge === null)
             throw errors.COURSEBADGE_DO_NOT_EXIST;
         return courseBadge;
@@ -110,14 +110,18 @@ function createFeature(user_id, course_id) {
 function getFeatureByID(features_id) {
     let feature =  Features.findById(features_id);
     if(feature === null)
-        throw new Error('');
+        throw errors.FEATURE_DO_NOT_EXIST;
     return feature;
 }
 
-function updateFeatureProgress(assignment_id, data) {
-    return Features.update({'progress.assignment': assignment_id}, {'$set': data}, function(err) {
-        if(err) {
-            logger.error(err);
+function updateFeatureProgress(user_id, features_id, assignment_id, data) {
+    console.log(data);
+    return Features.update({'_id': features_id, 'user': user_id, 'progress.assignment': assignment_id}, {'$set': {'progress.$': data}}, { runValidators: true }).then(function(result) {
+        console.log(result);
+        if(result.n === 0) {
+            return Features.update({'_id': features_id, 'user': user_id}, {'$addToSet': {'progress': data}}, { runValidators: true }).then(function(result) {
+                console.log(result);
+            });
         }
     });
 }
