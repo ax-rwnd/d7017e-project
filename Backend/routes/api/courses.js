@@ -244,6 +244,22 @@ module.exports = function(router) {
         res.send("/courses/" + course_id + "/assignments/" + assignment_id + "/tests GET Endpoint");
     });
 
+    router.post('/:course_id/assignments/:assignment_id/tests', auth.validateJWTtoken, function (req, res, next) {
+        var course_id = req.params.course_id;
+        var assignment_id = req.params.assignment_id;
+        var stdout = req.body.stdout;
+        var stdin = req.body.stdin;
+        var args = req.body.args;
+        var lint = req.body.lint;
+
+        queries.createTest(stdout, stdin, args, lint, assignment_id).then(function (test) {
+            return res.json(test);
+        })
+        .catch(function (err) {
+            next(err);
+        });
+    });
+
     router.get('/:course_id/assignments/:assignment_id/tests/:test_id', auth.validateJWTtoken, function (req, res, next) {
         var course_id = req.params.course_id;
         var assignment_id = req.params.assignment_id;

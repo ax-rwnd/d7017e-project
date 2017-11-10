@@ -312,6 +312,28 @@ function createAssignment(name, description, hidden, languages, course_id) {
     });
 }
 
+function createTest(stdout, stdin, args, lint, assignment_id) {
+    var newTest = new Test({stdout: stdout, stdin: stdin, args: args});
+    return newTest.save().then(function (createdTest) {
+        if (!createdTest) {
+            console.log("Error: Test not created");
+            throw errors.TEST_NOT_CREATED;
+        }
+        //Push createdAssignment _id into course_id's assignments
+        return Assignment.findById(assignment_id).then( function (assignment) {
+            if (!assignment) {
+                throw errors.ASSINGMENT_DOES_NOT_EXIST;
+            }
+            return Assignment.update(
+                { _id: assignment_id },
+                { $push: { 'tests.io': createdTest._id }, $set: { 'tests.lint': lint } }
+            ).then( function (v) {
+                return createdTest;
+            });
+        });
+    });
+}
+
 
 // Should be able to check permissions for all collections. As long FIELDS value is added.
 function checkPermission(wantedFields, collection, roll) {
@@ -422,6 +444,7 @@ exports.getCourseAssignments = getCourseAssignments;
 exports.setRefreshToken = setRefreshToken;
 exports.removeRefreshToken = removeRefreshToken;
 exports.createAssignment = createAssignment;
+exports.createTest = createTest;
 exports.getAssignment = getAssignment;
 exports.getTest = getTest;
 exports.getCourse = getCourse;
