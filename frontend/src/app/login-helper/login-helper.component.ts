@@ -35,7 +35,7 @@ export class LoginHelperComponent implements OnInit {
         this.refresh_token = (data['token_type'] + ' ' + data['refresh_token']);
         localStorage.setItem('refresh_token', this.refresh_token);
         // FIX THIS SHIT TO NAVIGATE CORRECTLY
-        this.courseService.GetAllCoursesForUser('59f9f5a51ac36c0762eb46b0');
+        this.courseService.GetAllCoursesForUser();
         this.router.navigate(['/user']);
       },
       err => {

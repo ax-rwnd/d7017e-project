@@ -36,8 +36,15 @@ export class CoursesComponent implements OnInit {
 
   ngOnInit() {
     this.sidebarState = this.headService.getCurrentState();
-    this.assignmentGroups = this.assignmentService.assignmentGroups;
-    this.currentAssignment = this.assignmentGroups[0].groups[0].assignments[0].name;
+    console.log('code', this.currentCourse.code);
+    console.log('assignmentGroup', this.assignmentService.courseAssignments[this.currentCourse.code]);
+    console.log('all assignmentGroups', this.assignmentService.courseAssignments);
+    if (this.assignmentService.courseAssignments[this.currentCourse.code] !== undefined) {
+      this.assignmentGroups = this.assignmentService.courseAssignments[this.currentCourse.code];
+    } else {
+      this.assignmentGroups = this.assignmentService.courseAssignments['default'];
+    }
+    // this.currentAssignment = this.assignmentGroups[0].groups[0].assignments[0].name;
   }
 
   getCourseElement(number) {

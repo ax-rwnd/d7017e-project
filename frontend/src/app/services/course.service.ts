@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
 import {BackendService} from './backend.service';
+import {AssignmentService} from './assignment.service';
 
 
 @Injectable()
 export class CourseService {
   courses: Course[];
-  constructor(private backendService: BackendService) {
+  constructor(private backendService: BackendService, private assignmentService: AssignmentService) {
     this.courses = [];
     /***hardcoded info later gotten from database***/
     let lbEntry1 = {name: 'anonymous', score: 80};
@@ -79,15 +80,15 @@ export class CourseService {
   AddCourse(course) {
     this.courses[this.courses.length] = course;
   }
-  GetAllCoursesForUser(user_id: string) {
-    this.backendService.getUserCourses('5a01c02d485d0220f8b9cca2')
+  GetAllCoursesForUser() {
+    this.backendService.getMyCourses()
       .then(response => {
-        updateCourses(response, this.backendService, this);
+        updateCourses(response, this.backendService, this, this.assignmentService);
       });
   }
 }
 
-function updateCourses(response, backendService, courseService) {
+function updateCourses(response, backendService, courseService, assignmentService) {
   const courses = response.courses;
   console.log('response', response);
   for (let i = 0; i < courses.length; i++) {
@@ -95,19 +96,14 @@ function updateCourses(response, backendService, courseService) {
       .then(featureResponse => {
         const rewards = handleFeatureResponse(featureResponse);
         const course = newCourse(courses[i].name, 'CODE' + i, courses[i].description, rewards);
-        console.log('course', course);
         courseService.AddCourse(course);
       });
+    backendService.getCourseAssignments(courses[i]._id)
+      .then(assignmentsResponse => {
+        console.log('assignmentResponse', assignmentsResponse);
+        assignmentService.AddCourseAssignments('CODE' + i, assignmentsResponse.assignments);
+      });
   }
-}
-
-function updateCourseHelper(name: string, code: string, description: string, course_id: string, user_id: string,
-                            backendService, courseService) {
-  backendService.getFeaturesCourseUser(course_id, user_id)
-    .then(response => {
-      const course = courseService.CreateCourse(name, code, description, false, false, false, false);
-      courseService.AddCourse(course);
-    });
 }
 
 function handleFeatureResponse(response: any) {
