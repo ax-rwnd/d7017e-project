@@ -76,8 +76,8 @@ export class BackendService {
 
   submitAssignment(assignment_id: number, lang: string, code: string) {
     // Submis code for testing
-
-    // stub
+    const body = {'assignment_id': assignment_id, 'lang': lang, 'code': code};
+    return this.apiPost('/api/test', body);
   }
 
   createAssignment(description: string, tests: any) {
