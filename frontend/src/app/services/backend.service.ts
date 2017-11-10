@@ -2,6 +2,27 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 
+export class ObjectID {
+  // Defines a controlled type for mongoose object ids
+  // Usage: new ObjectID('59f84c545747361ba848b38'
+  // getSample(ObjectID: sample) {
+  //  this.sampleBackendEndpoint(sample.get());
+  // }
+
+  constructor(private input: string) {
+    const re = new RegExp(/[0-9A-Fa-f]{24}/g);
+    if (!re.test(input)) {
+      throw new TypeError('Object ' + input + ' is not a valid mongoose ObjectID');
+    }
+  }
+
+  get(): string {
+    // Retrieves the primitive string
+
+    return this.input;
+  }
+}
+
 @Injectable()
 export class BackendService {
   // Defines the endpoints for backend integration
@@ -37,10 +58,10 @@ export class BackendService {
     return this.apiGet('/api/users/me');
   }
 
-  getUser(id: string) {
+  getUser(id: ObjectID) {
     // Get info for the user with some ID
 
-    return this.apiGet('/api/users/' + id);
+    return this.apiGet('/api/users/' + id.get());
   }
 
   getCourses() {
@@ -76,8 +97,8 @@ export class BackendService {
 
   submitAssignment(assignment_id: number, lang: string, code: string) {
     // Submis code for testing
-
-    // stub
+    const body = {'assignment_id': assignment_id, 'lang': lang, 'code': code};
+    return this.apiPost('/api/test', body);
   }
 
   createAssignment(description: string, tests: any) {
@@ -86,13 +107,13 @@ export class BackendService {
     // stub
   }
 
-  getAssignment(id: string) {
+  getAssignment(course_id: string, assignment_id: string) {
     // Get an assignment with name desc., langs.
 
-    // stub
+    return this.apiGet('/api/courses/' + course_id + '/assignments/' + assignment_id);
   }
   getCourseAssignments(course_id: string) {
-    return this.apiGet('/api/courses/' + course_id + '?fields=assignments');
+    return this.apiGet('/api/courses/' + course_id + '/assignments');
   }
 
   postNewBadge(icon: string, title: string, description: string) {

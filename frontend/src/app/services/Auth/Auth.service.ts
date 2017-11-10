@@ -16,8 +16,20 @@ export class AuthService {
   constructor(private http: Http) { }
 
   public isAuthenticated(): boolean {
-    console.log('CheckingToken');
-    if (localStorage.getItem('token')) {
+    if (this.getToken() !== null) {
+      return true;
+    } else if (this.getRefreshToken() !== null) {
+      // We've got a refresh token but no token, am I really authenticated?
+      this.requestNewToken().subscribe(resp => {
+        if (!resp) {
+          return false;
+        }
+      },
+        err => {
+          console.log(err);
+          console.log('something went shit in isAuthenticated');
+          return false;
+        });
       return true;
     }
     return false;
@@ -27,7 +39,7 @@ export class AuthService {
     if (localStorage.getItem('token') !== null) {
       return localStorage.getItem('token');
     } else {
-      return 'unohavetoken';
+      return null;
     }
   }
 
@@ -35,7 +47,7 @@ export class AuthService {
     if (localStorage.getItem('refresh_token') !== null) {
       return localStorage.getItem('refresh_token');
     } else {
-      return 'unohaverefreshtokentoken';
+      return null;
     }
   }
 
@@ -66,9 +78,8 @@ export class AuthService {
     return this.http.get(environment.backend_ip + '/auth/accesstoken', options).do(
       data => {
         if (data) {
+          console.log('Success, got new token from backend.');
           this.access_token = ('bearer ' + data.json().access_token);
-          console.log(this.access_token);
-          console.log(this.getRefreshToken());
           localStorage.setItem('token', this.access_token);
         }
       },

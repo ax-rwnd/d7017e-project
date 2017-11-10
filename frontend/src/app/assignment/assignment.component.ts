@@ -6,6 +6,7 @@ import { AssignmentService } from '../services/assignment.service';
 import { trigger, state, style, animate, transition } from '@angular/animations';
 import { HeadService } from '../services/head.service';
 import { CourseService } from '../services/course.service';
+import { UserService } from '../services/user.service';
 
 
 @Component({
@@ -32,12 +33,14 @@ export class AssignmentComponent implements OnInit {
   language: string;
   status: string;
   sidebarState; // state of sidebar
+  userid: string;
   feedback: string[];
 
   constructor(private backendService: BackendService,
               private assignmentService: AssignmentService,
               private headService: HeadService,
-              private route: ActivatedRoute) {
+              private route: ActivatedRoute,
+              private userService: UserService) {
     this.headService.stateChange.subscribe(sidebarState => {
         this.sidebarState = sidebarState;
     });
@@ -45,15 +48,9 @@ export class AssignmentComponent implements OnInit {
   }
 
   ngOnInit() {
-    const a = this.assignmentService.GetAssignment('CODE0', '59e47512d6bcdd1110d20f40');
     this.sidebarState = this.headService.getCurrentState();
-    // TODO: reimplement when new code arrives in backend
-    // this.backendService.getAssignment(courseId, assignmentId).then(data => {
-    //   this.assignment = data;
-    // });
-    this.course = 'D0009E - Introduktion till programmering'; // endpoint needed, not used anymore
-    //this.assignment = { name: 'Assignment1', description: 'this is the first assignment', languages: ['python', 'javascript']}; // temp
-    this.languages = ['python', 'javascript'];
+    this.userid = this.userService.userInfo.userName;
+    this.languages = this.assignment['languages'];
     this.language = this.languages[0];
     this.themes = ['eclipse', 'monokai'];
     this.theme = 'eclipse'; // default theme for now, could be saved on backend
@@ -121,6 +118,17 @@ export class AssignmentComponent implements OnInit {
       passTests = false;
     }
     this.setFeedback(feedback);
+  }
+
+  setLanguage(language: string) {
+    if (language.substr(0, 6) === 'python') {
+      return 'python';
+    } else if (language === 'C#') {
+      return 'csharp';
+    } else {
+      return this.language;
+    }
+
   }
 
 }

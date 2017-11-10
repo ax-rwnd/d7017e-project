@@ -32,7 +32,7 @@
 
       <!--<codemirror [(ngModel)]="content" [config]="{lineNumbers: true}"></codemirror>-->
     <div id="editor" appScroller>
-      <div ace-editor [(text)]="content" [mode]="language" [theme]="theme" [options]="{maxLines: 1000, printMargin: false}" [readOnly]="false" [autoUpdateContent]="true" [durationBeforeCallback]="1000"(textChanged)="onChange(content)"  style="min-height: 100%; width:100%; overflow: auto;"> </div>
+      <div ace-editor [(text)]="content" [mode]="setLanguage(language)" [theme]="theme" [options]="{maxLines: 1000, printMargin: false}" [readOnly]="false" [autoUpdateContent]="true" [durationBeforeCallback]="1000"(textChanged)="onChange(content)"  style="min-height: 100%; width:100%; overflow: auto;"> </div>
     </div>
 
     <div id="submitBar">

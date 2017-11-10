@@ -83,6 +83,7 @@ export class CourseService {
   GetAllCoursesForUser() {
     this.backendService.getMyCourses()
       .then(response => {
+        console.log('getCoursesForUser', response);
         updateCourses(response, this.backendService, this, this.assignmentService);
       });
   }
@@ -97,11 +98,16 @@ function updateCourses(response, backendService, courseService, assignmentServic
         const rewards = handleFeatureResponse(featureResponse);
         const course = newCourse(courses[i].name, 'CODE' + i, courses[i].description, rewards);
         courseService.AddCourse(course);
+      })
+      .catch( err => {
+        const rewards = newRewards(false, false, false, false);
+        const course = newCourse(courses[i].name, 'CODE' + i, courses[i].description, rewards);
+        courseService.AddCourse(course);
       });
     backendService.getCourseAssignments(courses[i]._id)
       .then(assignmentsResponse => {
         console.log('assignmentResponse', assignmentsResponse);
-        assignmentService.AddCourseAssignments('CODE' + i, assignmentsResponse.assignments);
+        assignmentService.AddCourseAssignments('CODE' + i, assignmentsResponse.assignments, courses[i]._id);
       });
   }
 }
