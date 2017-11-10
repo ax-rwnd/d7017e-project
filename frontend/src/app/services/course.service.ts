@@ -57,10 +57,10 @@ export class CourseService {
     const rewards4 = newRewards(false, false, ['gold_medal_badge', 'gold_trophy_badge', 'computer_badge',
       'bronze_medal_badge', 'silver_trophy_badge', 'bronze_trophy_badge'], false);
     const course3 = newCourse('Course name 4', 'D0012E', 'Course info', rewards4);
-    this.courses[0] = course0;
-    this.courses[1] = course1;
-    this.courses[2] = course2;
-    this.courses[3] = course3;
+    //this.courses[0] = course0;
+    //this.courses[1] = course1;
+    //this.courses[2] = course2;
+    //this.courses[3] = course3;
   }
   CreateCourse(name, code, course_info, progress, score, badges, leaderboard) {
     const progValue = progress ? 0 : false;
