@@ -20,10 +20,14 @@ export class LoginHelperComponent implements OnInit {
               private backendService: BackendService, private courseService: CourseService) { }
 
   ngOnInit() {
+    // Retrieving param from url
+    // --TODO Update way of retrieving param, param.ticket?
     this.activatedRoute.queryParams.subscribe((params: Params) => {
       this.ticket = params['ticket'];
       console.log(this.ticket);
     });
+    // UGLY ass request to save tokens
+    // --TODO can this be done cleaner? backend service?
     this.http.get(environment.backend_ip + '/auth/login/ltu?ticket=' + this.ticket + '&service=' + environment.frontend_ip + '/auth').subscribe(
       data => {
         console.log(data);
@@ -36,8 +40,10 @@ export class LoginHelperComponent implements OnInit {
         // FIX THIS SHIT TO NAVIGATE CORRECTLY
         this.courseService.GetAllCoursesForUser();
         this.router.navigate(['/user']);
+        // --TODO add url support to not force /user
       },
       err => {
+        // --TODO add error handling
         console.log(err);
         console.log('something went shit in login-helper');
         this.router.navigate(['/']);

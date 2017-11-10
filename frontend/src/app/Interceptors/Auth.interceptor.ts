@@ -14,7 +14,6 @@ import {Http, RequestOptions, Headers} from '@angular/http';
 @Injectable()
 export class NoopInterceptor implements HttpInterceptor {
   access_token: string;
-  authHeader: string;
   newRequest: HttpRequest<any>;
 
   constructor(private auth: AuthService, private router: Router, private http: Http) {}
@@ -32,9 +31,11 @@ export class NoopInterceptor implements HttpInterceptor {
 
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    // Fix Auth header field
     if (this.auth.isAuthenticated()) {
-      this.authHeader = this.auth.getToken();
-      this.newRequest = request.clone({headers: request.headers.set('Authorization', this.authHeader)});
+      // User logged on, update Authorization header field with access token
+      const authHeader = this.auth.getToken();
+      this.newRequest = request.clone({headers: request.headers.set('Authorization', authHeader)});
     } else {
       // Not logged on, no need to change the auth header.
       this.newRequest = request;
@@ -53,6 +54,8 @@ export class NoopInterceptor implements HttpInterceptor {
             if (!resp) {
               console.log('no response');
             } else {
+              // -- TODO resend all failed requests stored in collectFailedRequests by calling retryFailedRequests().
+              // -- TODO Add more error support.
               // retry failed requests
               // this.auth.retryFailedRequests();
               // return next.handle(authReq);

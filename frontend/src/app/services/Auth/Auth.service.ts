@@ -16,13 +16,12 @@ export class AuthService {
   constructor(private http: Http) { }
 
   public isAuthenticated(): boolean {
-    console.log('CheckingToken');
     if (this.getToken() !== null) {
       return true;
     } else if (this.getRefreshToken() !== null) {
+      // We've got a refresh token but no token, am I really authenticated?
       this.requestNewToken().subscribe(resp => {
         if (!resp) {
-          console.log('no response');
           return false;
         }
       },
@@ -79,9 +78,8 @@ export class AuthService {
     return this.http.get(environment.backend_ip + '/auth/accesstoken', options).do(
       data => {
         if (data) {
+          console.log('Success, got new token from backend.');
           this.access_token = ('bearer ' + data.json().access_token);
-          console.log(this.access_token);
-          console.log(this.getRefreshToken());
           localStorage.setItem('token', this.access_token);
         }
       },
