@@ -203,7 +203,7 @@ function createCourse(name, description, hidden) {
 }
 
 function getUserCourses(id, fields) {
-    var wantedFields = fields || "name description hidden teachers students assignments";
+    var wantedFields = fields || "name description hidden teachers students assignments course_code";
 
     return User.findById(id, "courses").populate("courses", wantedFields).then(function (courseList) {
         if (!courseList) {
