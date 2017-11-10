@@ -2,6 +2,27 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 
+export class ObjectID {
+  // Defines a controlled type for mongoose object ids
+  // Usage: new ObjectID('59f84c545747361ba848b38'
+  // getSample(ObjectID: sample) {
+  //  this.sampleBackendEndpoint(sample.get());
+  // }
+
+  constructor(private input: string) {
+    const re = new RegExp(/[0-9A-Fa-f]{24}/g);
+    if (!re.test(input)) {
+      throw new TypeError('Object ' + input + ' is not a valid mongoose ObjectID');
+    }
+  }
+
+  get(): string {
+    // Retrieves the primitive string
+
+    return this.input;
+  }
+}
+
 @Injectable()
 export class BackendService {
   // Defines the endpoints for backend integration
@@ -37,10 +58,10 @@ export class BackendService {
     return this.apiGet('/api/users/me');
   }
 
-  getUser(id: string) {
+  getUser(id: ObjectID) {
     // Get info for the user with some ID
 
-    return this.apiGet('/api/users/' + id);
+    return this.apiGet('/api/users/' + id.get());
   }
 
   getCourses() {
