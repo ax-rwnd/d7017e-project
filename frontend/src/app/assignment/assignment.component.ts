@@ -45,7 +45,6 @@ export class AssignmentComponent implements OnInit {
   }
 
   ngOnInit() {
-    const a = this.assignmentService.GetAssignment('CODE0', '59e47512d6bcdd1110d20f40');
     this.sidebarState = this.headService.getCurrentState();
     // TODO: reimplement when new code arrives in backend
     // this.backendService.getAssignment(courseId, assignmentId).then(data => {

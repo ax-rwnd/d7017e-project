@@ -74,7 +74,7 @@ function updateCourses(response, backendService, courseService, assignmentServic
     backendService.getCourseAssignments(courses[i]._id)
       .then(assignmentsResponse => {
         console.log('assignmentResponse', assignmentsResponse);
-        assignmentService.AddCourseAssignments('CODE' + i, assignmentsResponse.assignments);
+        assignmentService.AddCourseAssignments('CODE' + i, assignmentsResponse.assignments, courses[i]._id);
       });
   }
 }
