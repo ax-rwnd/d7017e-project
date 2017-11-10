@@ -45,7 +45,7 @@ function updateProgress(progress, feature_progress={}) {
             feature_progress.tests.push(test);
         }
     });
-    
+
     return feature_progress;
 }
 

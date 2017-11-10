@@ -18,7 +18,6 @@ function init(emitter, name) {
 }
 
 async function run(data) {
-
     let newBadges = [];
     let feature = await helper.getFeature(data.user_id, data.assignment_id);
 
@@ -43,7 +42,6 @@ async function run(data) {
             }
         }
     }
-
 
     return newBadges;
 }

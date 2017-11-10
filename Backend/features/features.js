@@ -39,10 +39,16 @@ function emitEvent(result) {
             return;
         }
 
-        emitter.emit('handleFeatures', result).then(function(data) {
-            result.features = data;
-            resolve(result);
+        helper.getFeature(result.user_id, result.assignment_id).then(function(fueature) {
+            emitter.emit('handleFeatures', result).then(function(data) {
+                result.features = createResultjson(data);
+                resolve(result);
+            });
+        }).catch(function(err) {
+            throw new Error(err);
         });
+
+
     });
 }
 
