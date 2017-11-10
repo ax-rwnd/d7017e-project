@@ -83,6 +83,7 @@ export class CourseService {
   GetAllCoursesForUser() {
     this.backendService.getMyCourses()
       .then(response => {
+        console.log('getCoursesForUser', response);
         updateCourses(response, this.backendService, this, this.assignmentService);
       });
   }
