@@ -41,25 +41,26 @@ export class AssignmentComponent implements OnInit {
     this.headService.stateChange.subscribe(sidebarState => {
         this.sidebarState = sidebarState;
     });
+    this.route.params.subscribe( params => this.assignment = this.assignmentService.GetAssignment(params['course'], params['assignment']));
   }
 
   ngOnInit() {
+    const a = this.assignmentService.GetAssignment('CODE0', '59e47512d6bcdd1110d20f40');
     this.sidebarState = this.headService.getCurrentState();
-    let courseId = this.route.snapshot.params['course'];
-    let assignmentId = this.route.snapshot.params['assignment'];
     // TODO: reimplement when new code arrives in backend
     // this.backendService.getAssignment(courseId, assignmentId).then(data => {
     //   this.assignment = data;
     // });
     this.course = 'D0009E - Introduktion till programmering'; // endpoint needed, not used anymore
-    this.assignment = { name: 'Assignment1', description: 'this is the first assignment', languages: ['python', 'javascript']}; // temp
-    this.languages = this.assignment['languages'];
+    //this.assignment = { name: 'Assignment1', description: 'this is the first assignment', languages: ['python', 'javascript']}; // temp
+    this.languages = ['python', 'javascript'];
     this.language = this.languages[0];
     this.themes = ['eclipse', 'monokai'];
     this.theme = 'eclipse'; // default theme for now, could be saved on backend
     this.content = '';
     this.status = 'Not Completed'; // hardcoded for now, endpoint to backend needed
     this.progress = { current: 0}; // this.assignmentService.progress; what even is this
+    console.log('assignment', this.assignment);
   }
 
   // SubmitCode should update status/progress.

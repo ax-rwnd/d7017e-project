@@ -91,6 +91,9 @@ export class BackendService {
 
     return this.apiGet('/api/courses/' + course_id + '/assignments/' + assignment_id);
   }
+  getCourseAssignments(course_id: string) {
+    return this.apiGet('/api/courses/' + course_id + '?fields=assignments');
+  }
 
   postNewBadge(icon: string, title: string, description: string) {
     const body = {'icon': icon, 'title': title, 'description': description};
