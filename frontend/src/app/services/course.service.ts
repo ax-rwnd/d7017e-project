@@ -97,6 +97,11 @@ function updateCourses(response, backendService, courseService, assignmentServic
         const rewards = handleFeatureResponse(featureResponse);
         const course = newCourse(courses[i].name, 'CODE' + i, courses[i].description, rewards);
         courseService.AddCourse(course);
+      })
+      .catch( err => {
+        const rewards = newRewards(false, false, false, false);
+        const course = newCourse(courses[i].name, 'CODE' + i, courses[i].description, rewards);
+        courseService.AddCourse(course);
       });
     backendService.getCourseAssignments(courses[i]._id)
       .then(assignmentsResponse => {
