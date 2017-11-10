@@ -33,15 +33,16 @@ var userSchema = new Schema({
     email: {type: String, required: false},
     admin: {type: Boolean, required: true},
     tokens: [{type: String, required: false}],
-    courses: [{ type: Schema.Types.ObjectId, ref: 'Course', required: false}],
+    courses: [{type: Schema.Types.ObjectId, ref: 'Course', required: false}],
+    teaching: [{type: Schema.Types.ObjectId, ref: 'Course', required: false}],
     providers: [{type: String, required: true}] //LTU, KTH etc.
 });
 
 //user code submissions
-var submissionSchema = new Schema({
+var draftSchema = new Schema({
     user: { type: Schema.Types.ObjectId, ref: 'User', required: true},
     assignment: { type: Schema.Types.ObjectId, ref: 'Assignment', required: true},
-    args: { type: String, required: true }
+    code: { type: String, required: true }
 });
 
 var courseSchema = new Schema({
@@ -98,15 +99,16 @@ var featuresSchema = new Schema({
     custom: {}
 });
 
+
 var Assignment = mongoose.model('Assignment', assignmentSchema);
 var Test = mongoose.model('Test', testSchema);
 var User = mongoose.model('User', userSchema);
-var Submission = mongoose.model('Submission', submissionSchema);
+var Draft = mongoose.model('Draft', draftSchema);
 var Course = mongoose.model('Course', courseSchema);
 var Badge = mongoose.model('Badge', badgeSchema);
 var CourseBadge = mongoose.model('CourseBadge', courseBadgeSchema);
 var Features = mongoose.model('Features', featuresSchema);
-var models = {Assignment: Assignment, Test: Test, User: User, Submission: Submission, Course: Course,
+var models = {Assignment: Assignment, Test: Test, User: User, Draft: Draft, Course: Course,
     Badge: Badge, CourseBadge: CourseBadge, Features: Features};
 
 module.exports = models;

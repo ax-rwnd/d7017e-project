@@ -119,7 +119,6 @@ module.exports = function (router) {
         });
     });
 
-
     if (config.get('App.environment') === 'development') {
         router.get('/login/fake', (req, res, next) => {
             let admin = req.query.admin === 'true';
@@ -129,7 +128,8 @@ module.exports = function (router) {
             }
             let profile = {
                 username: `fake-${role}-${req.query.suffix}`,
-                admin: admin
+                admin: admin,
+                teaching: []
             };
             queries.findOrCreateUser(profile)
             .then(user => {

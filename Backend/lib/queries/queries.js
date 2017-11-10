@@ -5,7 +5,45 @@ var Assignment = require('../../models/schemas').Assignment;
 var Course = require('../../models/schemas').Course;
 var Test = require('../../models/schemas').Test;
 var User = require('../../models/schemas').User;
+var Draft = require('../../models/schemas').Draft;
 var errors = require('../errors.js');
+var mongoose = require('mongoose');
+
+
+const FIELDS = {
+    COURSE: {
+        MODEL: require('../../models/schemas').Course,
+        BASE_FIELDS: "course_code name description",
+        ADMIN: "course_code name description teachers students assignments",
+        TEACHER: "course_code name description students assignments",
+        STUDENT: "course_code name description assignments",
+        POPULATE_FIELDS: "teachers students assignments"
+    },
+    TEACHERS: {
+        BASE_FIELDS: "username email"
+    },
+    ASSIGNMENTS: {
+        MODEL: require('../../models/schemas').Assignment,
+        BASE_FIELDS: "name description",
+        ADMIN: "name description tests optional_tests languages",
+        TEACHER: "name description tests tests.io tests.lint optional_tests optional_tests.io optional_tests.lint languages",
+        STUDENT: "name description languages",
+        POPULATE_FIELDS: "tests.io optional_tests.io"
+    },
+    STUDENTS: {
+        BASE_FIELDS: "username description"
+    },
+    'TESTS.IO': {
+        MODEL: require('../../models/schemas').Test,
+        BASE_FIELDS: "stdout stdin args",
+        POPULATE_FIELDS: ""
+    },
+    'OPTIONAL_TESTS.IO': {
+        MODEL: require('../../models/schemas').Test,
+        BASE_FIELDS: "stdout stdin args",
+        POPULATE_FIELDS: ""
+    }
+};
 
 // var Assignment, User, Test = require('../../models/schemas.js');
 
@@ -31,21 +69,46 @@ function getTestsFromAssignment(assignmentID, callback) {
 
 
 function getUser(id, fields) {
-    var wantedFields = fields || "username email admin tokens courses providers";
+    var wantedFields = fields || "username email admin tokens courses teaching providers";
+    // Check validity of id
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+            throw errors.INVALID_ID;
+    }
     return User.findById(id, wantedFields).then(function (user) {
         if (!user) {
             console.log("User not found");
-            throw errors.TOKEN_USER_NOT_FOUND;
+            throw errors.USER_NOT_FOUND;
         }
         return user;
     });
+}
+
+function getUsers(id_array, fields) {
+    var wantedFields = fields || "username email admin tokens courses teaching providers";
+    var promises = [];
+    for (var i = 0; i < id_array.length; i++) {
+        // Check validity of id
+        if (!mongoose.Types.ObjectId.isValid(id_array[i])) {
+            throw errors.INVALID_ID;
+        }
+        // Make a promise for each id
+        var temp = User.findById(id_array[i], wantedFields).then(function (user) {
+            if (!user) {
+                console.log("User not found");
+                throw errors.USER_NOT_FOUND;
+            }
+            return user;
+        });
+        promises.push(temp); // Gather all promises in an array
+    }
+    return Promise.all(promises);
 }
 
 function deleteUser(id) {
     return User.findById(id).then(function (user) {
         if (!user) {
             console.log("deleteUser: User not found");
-            throw errors.TOKEN_USER_NOT_FOUND;
+            throw errors.USER_NOT_FOUND;
         }
         User.deleteOne(user, function (err) {
             return err;
@@ -183,63 +246,145 @@ function getCourseAssignments(id, fields) {
     });
 }
 
-//Field argument needs a check. If i don't want teacher, will it still be populated?!
-function getCourse(id, fields) {
-    var wantedFields = fields || "name description hidden teachers students assignments";
-
-    return Course.findById(id, wantedFields)
-    .populate("teachers", "username email")
-    .populate("assignments", "name description").then(function (course) {
-        if (!course) {
-            throw errors.COURSE_DO_NOT_EXIST;
+function getAssignment(assignment_id, roll, fields) {
+    var wantedFields = fields || FIELDS.ASSIGNMENTS[roll.toUpperCase()];
+    wantedFields = wantedFields.replace(/,/g, " ");
+    
+    return Assignment.findById(assignment_id, wantedFields)
+    .then(function (assignment) {
+        if (!assignment) {
+            throw errors.ASSIGNMENT_DOES_NOT_EXIST;
         }
-        return course;
+        console.log(assignment);
+
+        console.log(wantedFields);
+        return populateObject(assignment, "assignments", wantedFields)
+        .then(function(populatedAssignment) {
+            return populatedAssignment[0];
+        });
     });
 }
 
+
 /*
-function findOrCreateUser(profile) {
-    return new Promise(function (resolve, reject) {
-        console.log("findUser");
+function getAssignment(id, fields) {
+    var wantedFields = fields || "name description hidden tests optional_tests languages";
 
-        var username;
-        var email;
-
-        username = profile.user;
-        email = profile.attributes.mail;
-
-        console.log(profile);
-        console.log(username);
-        console.log(email);
-
-        User.findOne({username: username}, function (err, user) {
-            console.log("findOne");
-            if (err) {
-              console.log(err);
-              reject(err);
-            }
-            if (!user) {
-                console.log("Creating new user with username " + username);
-                var newUser = new User({username: username, email: email, admin: false, courses: []});
-                newUser.save(function (err, created) {
-                    if (err) {
-                        console.log(err);
-                        reject(err);
-                    }
-                    resolve(created);
-                });
-            } else {
-                console.log("Found user " + user);
-                resolve(user);
-            }
-        });
+    return Assignment.findById(id, fields).then(function (assignment) {
+        if (!assignment) {
+            throw errors.ASSIGNMENT_DOES_NOT_EXIST;
+        }
+        return assignment;
     });
 }
 */
 
+function getTest(id, fields) {
+    var wantedFields = fields || "stdout stdin args";
+
+    return Test.findById(id, fields).then(function (test) {
+        if (!test) {
+            throw errors.TEST_DOES_NOT_EXIST;
+        }
+        return test;
+    });
+}
+
+function createAssignment(name, description, hidden, languages, course_id) {
+    var newAssignment = new Assignment({name: name, description: description, hidden: hidden, tests: {io: [], lint: false}, optionaal_tests: {io: [], lint: false}, languages: languages});
+    return newAssignment.save().then(function (createdAssignment) {
+        if (!createdAssignment) {
+            console.log("Error: Assignment not created");
+            throw errors.ASSINGMENT_NOT_CREATED;
+        }
+        //Push createdAssignment _id into course_id's assignments
+        return Course.findById(course_id).then( function (course) {
+            if (!course) {
+                throw errors.COURSE_DOES_NOT_EXIST;
+            }
+            return Course.update(
+                { _id: course_id },
+                { $push: { assignments: createdAssignment._id } }
+            ).then( function (v) {
+                return createdAssignment;
+            });
+        });
+    });
+}
+
+
+// Should be able to check permissions for all collections. As long FIELDS value is added.
+function checkPermission(wantedFields, collection, roll) {
+    var permissionFields = FIELDS[collection.toUpperCase()][roll.toUpperCase()];
+    if (wantedFields) {
+        wantedFields = wantedFields.split(",");
+        wantedFields.forEach(function(element) {
+            if (permissionFields.indexOf(element.toString()) < 0) {
+                throw errors.INSUFFICIENT_PERMISSION;
+            }
+        });
+    }
+    return true;
+}
+
+// Populates all wanted fields which is a Ref.
+// Needs to be specified in FIELDS
+function populateObject(mongooseObject, schema, wantedFields) {
+    console.log(mongooseObject);
+    console.log(schema);
+    console.log(wantedFields);
+    var fieldsToPopulateArray = FIELDS[schema.toUpperCase()].POPULATE_FIELDS.split(" ");
+    var populatePromises = [];
+    var model = FIELDS[schema.toUpperCase()].MODEL;
+    fieldsToPopulateArray.forEach(function(element) {
+        console.log("LOOP");
+        if (wantedFields.indexOf(element) !== -1) {
+            console.log(element);
+            populatePromises.push(model.populate(mongooseObject, {path: element, select: FIELDS[element.toUpperCase()].BASE_FIELDS}));
+        }
+    });
+    console.log(populatePromises);
+    if (populatePromises.length === 0) {
+        return new Promise((resolve, reject) => {
+            resolve([mongooseObject]);
+        });
+    } else {
+        return Promise.all(populatePromises);
+    }
+}
+
+function getCourse(courseid, roll, fields) {
+    var wantedFields = fields || FIELDS.COURSE[roll.toUpperCase()];
+    wantedFields = wantedFields.replace(/,/g, " ");
+    
+    return Course.findById(courseid, wantedFields)
+    .then(function (course) {
+        if (!course) {
+            throw errors.COURSE_DOES_NOT_EXIST;
+        }
+
+        return populateObject(course, "course", wantedFields)
+        .then(function(populatedCourse) {
+            return populatedCourse[0];
+        });
+    });
+}
+
+function saveCode(userID, assignmentID, code) {
+    var options = {new: true, upsert: true, fields: "user assignment code"};
+    return Draft.findOneAndUpdate({user: userID, assignment: assignmentID}, {code: code}, options).then(function (draft) {
+        if (!draft) {
+            throw errors.DRAFT_NOT_SAVED;
+        }
+        return draft;
+    });
+}
+
+
 exports.getTestsFromAssignment = getTestsFromAssignment;
 exports.findOrCreateUser = findOrCreateUser;
 exports.getUser = getUser;
+exports.getUsers = getUsers;
 exports.deleteUser = deleteUser;
 exports.getCourses = getCourses;
 exports.createCourse = createCourse;
@@ -247,7 +392,12 @@ exports.getUserCourses = getUserCourses;
 exports.getCourseStudents = getCourseStudents;
 exports.getCourseTeachers = getCourseTeachers;
 exports.getCourseAssignments = getCourseAssignments;
-exports.getCourse = getCourse;
 exports.setRefreshToken = setRefreshToken;
 exports.removeRefreshToken = removeRefreshToken;
+exports.createAssignment = createAssignment;
+exports.getAssignment = getAssignment;
+exports.getTest = getTest;
+exports.getCourse = getCourse;
+exports.checkPermission = checkPermission;
+exports.saveCode = saveCode;
 

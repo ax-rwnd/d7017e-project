@@ -15,7 +15,7 @@
     "Auth": {
         "auth_header_prefix": "bearer",
         "cas_url": "https://weblogon.ltu.se/cas/",
-        "access_ttl": 900,
+        "access_ttl": 3600,
         "refresh_ttl": 86400
     },
     // Tester config module

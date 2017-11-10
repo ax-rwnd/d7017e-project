@@ -10,6 +10,11 @@ var Test = require('../../models/schemas').Test;
 
 module.exports = function(router) {
 
+
+    // Get all courses in db
+    // If admin get all
+    // If teacher or student get all not hidden courses.
+    // Also get hidden courses if teacher/student of it?
     router.get('/', auth.validateJWTtoken, function (req, res, next) {
         //Need user object from token verify for admin check.
         /*
@@ -30,6 +35,10 @@ module.exports = function(router) {
         });
     });
 
+
+    // Create new course
+    // Admin/teachers can create unlimited courses
+    // Students limited to 3 courses?
     router.post('/', auth.validateJWTtoken, function (req, res, next) {
         var name = req.body.name;
         var desc = req.body.description;
@@ -43,6 +52,11 @@ module.exports = function(router) {
         });
     });
 
+
+
+    // Should be user/:userid/courses ?
+    // Would force frontend to send userid. courses/me takes user id from token. 
+    // Frontend is most likely in possesion of userid. Therefore both is possible.
     router.get('/me', auth.validateJWTtoken, function (req, res, next) {
         queries.getUserCourses(req.user.id, "name description").then(function (courses) {
             return res.json(courses);
@@ -52,16 +66,45 @@ module.exports = function(router) {
         });
     });
 
+
+    // Get course with id :course_id
+    // Different information depending on user roll. 
+    // What should be given for each roll?
     router.get('/:course_id', auth.validateJWTtoken, function (req, res, next) {
+        var roll;
         var course_id = req.params.course_id;
-        
-        queries.getCourse(course_id, "name description teacher assignments").then(function (course) {
-            return res.json(course);
+        var wantedFields = req.query.fields || null;
+
+        queries.getUser(req.user.id, "teaching").then(function (userObject) {
+            if (userObject.teaching.indexOf(course_id) !== -1) {
+                roll = "teacher";
+            } else if (req.user.admin) {
+                roll = "admin";
+            } else {
+                roll = "student";
+            }
+            if (!queries.checkPermission(wantedFields, "course", roll)) {
+                return next(errors.INSUFFICIENT_PERMISSION);
+            }
+
+            queries.getCourse(course_id, roll, wantedFields).then(function (course) {
+                return res.json(course);
+            });
         })
-        .catch(function (err) {
+        .catch(function(err) {
             next(err);
         });
     });
+
+
+
+    // Deletes course with id :course_id
+    // Only admin and teacher of course can delete course
+    router.delete('/:course_id', auth.validateJWTtoken, function (req, res, next) {
+
+    });
+
+
 
     router.get('/:course_id/students', auth.validateJWTtoken, function (req, res, next) {
         var course_id = req.params.course_id;
@@ -98,13 +141,72 @@ module.exports = function(router) {
 
     router.post('/:course_id/assignments', auth.validateJWTtoken, function (req, res, next) {
         var course_id = req.params.course_id;
-        res.send("/courses/" + course_id + "/assignments POST Endpoint");
+        var name = req.body.name;
+        var desc = req.body.description;
+        var hidden = req.body.hidden;
+        var languages = req.body.languages;
+
+        queries.createAssignment(name, desc, hidden, languages, course_id).then(function (assignment) {
+            return res.json(assignment);
+        })
+        .catch(function (err) {
+            next(err);
+        });
     });
 
     router.get('/:course_id/assignments/:assignment_id', auth.validateJWTtoken, function (req, res, next) {
+        var roll;
         var course_id = req.params.course_id;
         var assignment_id = req.params.assignment_id;
-        res.send("/courses/" + course_id + "/assignments/" + assignment_id + " GET Endpoint");
+        var wantedFields = req.query.fields || null;
+
+        queries.getUser(req.user.id, "teaching").then(function (userObject) {
+            if (userObject.teaching.indexOf(course_id) !== -1) {
+                roll = "teacher";
+            } else if (req.user.admin) {
+                roll = "admin";
+            } else {
+                roll = "student";
+            }
+            if (!queries.checkPermission(wantedFields, "assignments", roll)) {
+                return next(errors.INSUFFICIENT_PERMISSION);
+            }
+            queries.getAssignment(assignment_id, roll, wantedFields).then(function (assignmentObject) {
+                return res.json(assignmentObject);
+            });
+        })
+        .catch(function (err) {
+            next(err);
+        });
+    });
+
+/*
+    //TODO: It is currently not checked if the requested assignment actually belongs to the specified course
+    router.get('/:course_id/assignments/:assignment_id', auth.validateJWTtoken, function (req, res, next) {
+        var course_id = req.params.course_id;
+        var assignment_id = req.params.assignment_id;
+        
+        queries.getAssignment(assignment_id, "name description hidden languages").then(function (assignment) {
+            return res.json(assignment);
+        })
+        .catch(function (err) {
+            next(err);
+        });
+    });
+*/
+
+    // Save draft to assignment
+    // course_id not used, should route be changed? Implement some check?
+    router.post('/:course_id/assignments/:assignment_id/save', auth.validateJWTtoken, function (req, res, next) {
+        var assignment_id = req.params.assignment_id;
+        var code = req.body.code;
+        
+        queries.saveCode(req.user.id, assignment_id, code).then(function (draft) {
+            res.json(draft);
+        })
+        .catch(function (err) {
+            next(err);
+        });
     });
 
     router.get('/:course_id/assignments/:assignment_id/tests', auth.validateJWTtoken, function (req, res, next) {
@@ -117,6 +219,12 @@ module.exports = function(router) {
         var course_id = req.params.course_id;
         var assignment_id = req.params.assignment_id;
         var test_id = req.params.test_id;
-        res.send("/courses/" + course_id + "/assignments/" + assignment_id + "/tests/" + test_id + "GET Endpoint");
+
+        queries.getTest(test_id, "stdout stdin args").then(function (test) {
+            return res.json(test);
+        })
+        .catch(function (err) {
+            next(err);
+        });
     });
 };

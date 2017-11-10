@@ -5,6 +5,11 @@ var queries = require('../../lib/queries/queries');
 var errors = require('../../lib/errors.js');
 var auth = require('../../lib/authentication.js');
 
+const BASIC_FILTER = "username email";
+const PRIVILEGED_FILTER = "username email courses admin";
+const ADMIN_FILTER = "username email admin tokens courses";
+
+
 module.exports = function (router) {
 
     router.get('/', auth.validateJWTtoken, function (req, res, next) {
@@ -13,12 +18,23 @@ module.exports = function (router) {
             res.sendStatus(404);
             return;
         }
-        res.send("/users?ids=" + ids + " GET Endpoint");
+
+        var id_array = ids.split(',');
+        var filter = (req.user.admin === true)
+            ? ADMIN_FILTER
+            : BASIC_FILTER;
+
+        queries.getUsers(id_array, filter).then(function (users) {
+            res.json({users: users});
+        })
+        .catch(function (err) {
+            next(err);
+        });
     });
 
 
     router.get('/me', auth.validateJWTtoken, function (req, res, next) {
-        queries.getUser(req.user.id, "username email courses admin").then(function (user) {
+        queries.getUser(req.user.id, PRIVILEGED_FILTER).then(function (user) {
             res.json(user);
         })
         .catch(function(err) {
@@ -28,7 +44,7 @@ module.exports = function (router) {
 
     router.get('/:user_id', auth.validateJWTtoken, function (req, res, next) {
         var user_id = req.params.user_id;
-        queries.getUser(user_id, "username email").then(function (user) {
+        queries.getUser(user_id, BASIC_FILTER).then(function (user) {
             return res.json(user);
         })
         .catch(function (err) {
@@ -51,12 +67,8 @@ module.exports = function (router) {
                 next(err);
             });
         } else {
-            res.status(401).send("ERROR: Unauthorized, admin only");
+            res.status(403).send("ERROR: Admin only");
         }
-    });
-
-    router.post('/register', auth.validateJWTtoken, function (req, res, next) {
-        res.send("/users/register POST Endpoint");
     });
 
     router.get('/:user_id/submissions', auth.validateJWTtoken, function (req, res, next) {
