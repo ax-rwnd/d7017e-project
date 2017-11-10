@@ -3,15 +3,12 @@
   <div class="container">
     <div class="col-lg-6">
       <h1>
-        This is course {{currentCourse.code}}
+        {{currentCourse.code}}
       </h1>
-      <h2>
-        Course Description
-      </h2>
-      <p>
-      This will help you in this moment
-      (Fetching ltu course page)
-      </p>
+      <button type="button" class="btn" id="createNewAssignment" [routerLink]="['/courses', currentCourse.code, 'createNewAssignment']">Create New Assignment</button>
+
+      <markdown [data]="currentCourse.course_info"></markdown>
+
       <app-mod-progressbar [progress]="currentCourse.rewards.progress"></app-mod-progressbar>
     <div class="gamification-block panel panel-default">
       <div class="panel-heading gamification-header">Map</div>
