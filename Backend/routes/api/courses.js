@@ -4,6 +4,7 @@ var request = require('request');
 var queries = require('../../lib/queries/queries');
 var errors = require('../../lib/errors.js');
 var auth = require('../../lib/authentication.js');
+var testerCom = require('../../lib/tester_communication');
 
 var Assignment = require('../../models/schemas').Assignment;
 var Test = require('../../models/schemas').Test;
@@ -194,6 +195,17 @@ module.exports = function(router) {
         });
     });
 */
+
+    //Submit code to tester
+    router.post('/:course_id/assignments/:assignment_id/submit', auth.validateJWTtoken, function(req, res) {
+
+        var user_id = req.body.user_id;
+        var lang = req.body.lang;
+        var code = req.body.code;
+        var assignment_id = req.query.assignment_id;
+
+        testerCom.validateCode(user_id, lang, code, assignment_id, res);
+    });
 
     // Save draft to assignment
     // course_id not used, should route be changed? Implement some check?
