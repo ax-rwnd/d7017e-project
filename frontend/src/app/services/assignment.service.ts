@@ -29,7 +29,8 @@ export class AssignmentService {
   AddCourseAssignments(course_code: string, assignments: any[], course_id) {
     const a = [];
     for (let i = 0; i < assignments.length; i++) {
-      a[i] = {id: assignments[i]._id, course_id: course_id, name: assignments[i].name, description: assignments[i].description, available: true};
+      a[i] = {id: assignments[i]._id, course_id: course_id, name: assignments[i].name, languages: assignments[i].languages,
+        description: assignments[i].description, available: true};
     }
     this.courseAssignments[course_code] = [{name: 'Assignments', collapse: true, availability: false, assignments: a, groups: []}];
   }
@@ -74,6 +75,7 @@ interface Assignment {
   id: string;
   course_id;
   name: string;
+  languages: string[];
   description: string;
   available: boolean;
 }

@@ -120,4 +120,15 @@ export class AssignmentComponent implements OnInit {
     this.setFeedback(feedback);
   }
 
+  setLanguage(language: string) {
+    if (language.substr(0, 6) === 'python') {
+      return 'python';
+    } else if (language === 'C#') {
+      return 'csharp';
+    } else {
+      return this.language;
+    }
+
+  }
+
 }
