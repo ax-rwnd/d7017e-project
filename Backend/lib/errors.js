@@ -10,8 +10,8 @@ function APIError(message, httpCode, errorCode) {
 
     //include stack trace in error object
 }
-util.inherits(APIError, Error);
 
+util.inherits(APIError, Error);
 
 module.exports = {
     TOKEN_USER_NOT_FOUND: new APIError("Internal Server Error", 500, 7000),
@@ -30,5 +30,8 @@ module.exports = {
     ASSIGNMENT_DOES_NOT_EXIST: new APIError("Assignment doesn't exist", 404, 7013),
     TEST_DOES_NOT_EXIST: new APIError("Test doesn't exist", 404, 7014),
     INSUFFICIENT_PERMISSION: new APIError("You don't have the required permissions for these fields.", 403, 7015),
-    DRAFT_NOT_SAVED: new APIError("Draft not saved", 500, 7016)
+    DRAFT_NOT_SAVED: new APIError("Draft not saved", 500, 7016),
+    BADGE_DO_NOT_EXIST: new APIError("Badge doesn't exist", 404, 7017),
+    COURSEBADGE_DO_NOT_EXIST: new APIError("Course doesn't exist", 404, 7018),
+    FEATURE_DO_NOT_EXIST: new APIError("Course doesn't exist", 404, 7019)
 };

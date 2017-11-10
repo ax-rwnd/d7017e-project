@@ -17,11 +17,19 @@ function createBadge(data) {
 }
 
 function getBadge(badge_id) {
-    return Badge.findById(badge_id);
+    Badge.findById(badge_id).then(function(badge) {
+        if(badge === null)
+            throw errors.BADGE_DO_NOT_EXIST;
+        return badge;
+    });
 }
 
 function updateBadge(badge_id, data) {
-    return Badge.findOneAndUpdate({"_id": badge_id}, data);
+    Badge.findOneAndUpdate({"_id": badge_id}, data).then(function(badge) {
+        if(badge === null)
+            throw errors.BADGE_DO_NOT_EXIST;
+        return badge;
+    });
 }
 
 function createCourseBadge(data) {
@@ -30,30 +38,50 @@ function createCourseBadge(data) {
 }
 
 function getCourseBadge(coursebadge_id) {
-    return CourseBadge.findById(coursebadge_id);
+    CourseBadge.findById(coursebadge_id).then(function(courseBadge) {
+        if(courseBadge === null)
+            throw errors.COURSEBADGE_DO_NOT_EXIST;
+        return courseBadge;
+    });
 }
 
 function updateCourseBadge(coursebadge_id, data) {
-    return CourseBadge.findOneAndUpdate({'_id': coursebadge_id}, data);
+    CourseBadge.findOneAndUpdate({'_id': coursebadge_id}, data).then(function(courseBadge) {
+        if(courseBadge === null)
+            throw errors.COURSEBADGE_DO_NOT_EXIST;
+        return courseBadge;
+    });
 }
 
 function getCourseBadgeByCourseID(course_id) {
-    return CourseBadge.find({'course_id': course_id});
+    CourseBadge.find({'course_id': course_id}).then(function(courseBadge) {
+        if(courseBadge === null)
+            throw errors.COURSEBADGE_DO_NOT_EXIST;
+        return courseBadge;
+    });
 }
 
 function getCourseByID(course_id) {
-    return Course.findById(course_id);
+    Course.findById(course_id).then(function(course) {
+        if(course === null)
+            throw errors.COURSE_DO_NOT_EXIST;
+        return course;
+    });
 }
 
 function getCourseByAssignmentID(assignment_id) {
-    return Course.findOne({'assignments': assignment_id});
+    Course.findOne({'assignments': assignment_id}).then(function(course) {
+        if(course === null)
+            throw errors.COURSE_DO_NOT_EXIST;
+        return course;
+    });
 }
 
 function getNumberOfAssignments(course_id) {
-    return new Promise((resolve, reject) => {
-        getCourseByID(course_id).then(function(course) {
-            resolve(course.assignments.length);
-        });
+    getCourseByID(course_id).then(function(course) {
+        if(course === null)
+            throw errors.COURSE_DO_NOT_EXIST;
+        return course.assignments.length;
     });
 }
 
@@ -66,13 +94,18 @@ function createFeature(user_id, course_id) {
                 course.save().then(function(course) {
                     resolve(feature);
                 });
+            }).catch(function(err) {
+                reject(err);
             });
         });
     });
 }
 
 function getFeatureByID(features_id) {
-    return Features.findById(features_id);
+    let feature =  Features.findById(features_id);
+    if(feature === null)
+        throw new Error('');
+    return feature;
 }
 
 function updateFeatureProgress(assignment_id, data) {

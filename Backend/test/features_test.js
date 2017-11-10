@@ -139,7 +139,9 @@ describe('Tester', () => {
             .set('Authorization', 'Bearer ' + access_token)
             .expect(200)
             .then(res => {
-                //console.log(res.text);
+                console.log(res.text);
+            }).catch(err => {
+                console.log(err);
             });
     });
 });

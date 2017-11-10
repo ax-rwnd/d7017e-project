@@ -183,6 +183,24 @@ describe('/api', () => {
         //        }, done);
         //    });
         //});
+
+        describe('GET /api/courses/:course_id/enabled_features', () => {
+            let route = '/api/courses/' + course_id + '/enabled_features';
+            it_rejects_unauthorized_get(route);
+
+            it('returns a non-empty list of enabled_features', () => {
+                return request(runner.server)
+                    .get(route)
+                    .set('Authorization', 'Bearer ' + access_tokens.user)
+                    .expect(200)
+                    .then(res => {
+
+                        console.log(res.body);
+                        //assert(Array.isArray(res.body.teachers), 'not an array');
+                        //assert(res.body.teachers.length > 0, 'array is empty');
+                    });
+            });
+        });
     });
 
     describe('/users', () => {

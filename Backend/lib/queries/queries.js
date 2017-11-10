@@ -188,7 +188,7 @@ function getCourses(fields, admin) {
         }
         return courseList;
     });
-    
+
 }
 
 function createCourse(name, description, hidden) {
@@ -249,7 +249,7 @@ function getCourseAssignments(id, fields) {
 function getAssignment(assignment_id, roll, fields) {
     var wantedFields = fields || FIELDS.ASSIGNMENTS[roll.toUpperCase()];
     wantedFields = wantedFields.replace(/,/g, " ");
-    
+
     return Assignment.findById(assignment_id, wantedFields)
     .then(function (assignment) {
         if (!assignment) {
@@ -356,7 +356,7 @@ function populateObject(mongooseObject, schema, wantedFields) {
 function getCourse(courseid, roll, fields) {
     var wantedFields = fields || FIELDS.COURSE[roll.toUpperCase()];
     wantedFields = wantedFields.replace(/,/g, " ");
-    
+
     return Course.findById(courseid, wantedFields)
     .then(function (course) {
         if (!course) {
@@ -381,6 +381,18 @@ function saveCode(userID, assignmentID, code) {
 }
 
 
+function getCoursesEnabledFeatures(course_id) {
+    var wantedFields = "enabled_features";
+
+    return Course.findById(course_id).populate(wantedFields).then(function (enabled_features) {
+        if (!enabled_features) {
+            throw errors.COURSE_DO_NOT_EXIST;
+        }
+        return enabled_features;
+    });
+
+}
+
 exports.getTestsFromAssignment = getTestsFromAssignment;
 exports.findOrCreateUser = findOrCreateUser;
 exports.getUser = getUser;
@@ -400,4 +412,4 @@ exports.getTest = getTest;
 exports.getCourse = getCourse;
 exports.checkPermission = checkPermission;
 exports.saveCode = saveCode;
-
+exports.getCoursesEnabledFeatures = getCoursesEnabledFeatures;

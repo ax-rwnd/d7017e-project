@@ -55,7 +55,7 @@ module.exports = function(router) {
 
 
     // Should be user/:userid/courses ?
-    // Would force frontend to send userid. courses/me takes user id from token. 
+    // Would force frontend to send userid. courses/me takes user id from token.
     // Frontend is most likely in possesion of userid. Therefore both is possible.
     router.get('/me', auth.validateJWTtoken, function (req, res, next) {
         queries.getUserCourses(req.user.id, "name description").then(function (courses) {
@@ -68,7 +68,7 @@ module.exports = function(router) {
 
 
     // Get course with id :course_id
-    // Different information depending on user roll. 
+    // Different information depending on user roll.
     // What should be given for each roll?
     router.get('/:course_id', auth.validateJWTtoken, function (req, res, next) {
         var roll;
@@ -130,7 +130,7 @@ module.exports = function(router) {
 
     router.get('/:course_id/assignments', auth.validateJWTtoken, function (req, res, next) {
         var course_id = req.params.course_id;
-        
+
         queries.getCourseAssignments(course_id, "name description hidden languages").then(function (assignments) {
             return res.json(assignments);
         })
@@ -185,7 +185,7 @@ module.exports = function(router) {
     router.get('/:course_id/assignments/:assignment_id', auth.validateJWTtoken, function (req, res, next) {
         var course_id = req.params.course_id;
         var assignment_id = req.params.assignment_id;
-        
+
         queries.getAssignment(assignment_id, "name description hidden languages").then(function (assignment) {
             return res.json(assignment);
         })
@@ -200,7 +200,7 @@ module.exports = function(router) {
     router.post('/:course_id/assignments/:assignment_id/save', auth.validateJWTtoken, function (req, res, next) {
         var assignment_id = req.params.assignment_id;
         var code = req.body.code;
-        
+
         queries.saveCode(req.user.id, assignment_id, code).then(function (draft) {
             res.json(draft);
         })
@@ -224,6 +224,14 @@ module.exports = function(router) {
             return res.json(test);
         })
         .catch(function (err) {
+            next(err);
+        });
+    });
+
+    router.get('/:course_id/enabled_features', auth.validateJWTtoken, function(req, res, next) {
+        queries.getCoursesEnabledFeatures(req.params.course_id).then(function (assignments) {
+            return res.json(assignments);
+        }).catch(function (err) {
             next(err);
         });
     });
