@@ -229,10 +229,8 @@ module.exports = function(router) {
     });
 
     router.get('/:course_id/enabled_features', auth.validateJWTtoken, function(req, res, next) {
-        queries.getCoursesEnabledFeatures(req.params.course_id).then(function (assignments) {
-            return res.json(assignments);
-        }).catch(function (err) {
-            next(err);
-        });
+        queries.getCoursesEnabledFeatures(req.params.course_id).then(function (enabled_features) {
+            res.json(enabled_features);
+        }).catch(next);
     });
 };

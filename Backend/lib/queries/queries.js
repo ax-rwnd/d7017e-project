@@ -382,15 +382,11 @@ function saveCode(userID, assignmentID, code) {
 
 
 function getCoursesEnabledFeatures(course_id) {
-    var wantedFields = "enabled_features";
-
-    return Course.findById(course_id).populate(wantedFields).then(function (enabled_features) {
-        if (!enabled_features) {
+    return Course.findById(course_id).then(function(course) {
+        if(course === null)
             throw errors.COURSE_DO_NOT_EXIST;
-        }
-        return enabled_features;
+        return course.enabled_features;
     });
-
 }
 
 exports.getTestsFromAssignment = getTestsFromAssignment;

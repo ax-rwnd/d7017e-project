@@ -17,7 +17,7 @@ function createBadge(data) {
 }
 
 function getBadge(badge_id) {
-    Badge.findById(badge_id).then(function(badge) {
+    return Badge.findById(badge_id).then(function(badge) {
         if(badge === null)
             throw errors.BADGE_DO_NOT_EXIST;
         return badge;
@@ -25,7 +25,7 @@ function getBadge(badge_id) {
 }
 
 function updateBadge(badge_id, data) {
-    Badge.findOneAndUpdate({"_id": badge_id}, data).then(function(badge) {
+    return Badge.findOneAndUpdate({"_id": badge_id}, data).then(function(badge) {
         if(badge === null)
             throw errors.BADGE_DO_NOT_EXIST;
         return badge;
@@ -38,7 +38,7 @@ function createCourseBadge(data) {
 }
 
 function getCourseBadge(coursebadge_id) {
-    CourseBadge.findById(coursebadge_id).then(function(courseBadge) {
+    return CourseBadge.findById(coursebadge_id).then(function(courseBadge) {
         if(courseBadge === null)
             throw errors.COURSEBADGE_DO_NOT_EXIST;
         return courseBadge;
@@ -46,7 +46,7 @@ function getCourseBadge(coursebadge_id) {
 }
 
 function updateCourseBadge(coursebadge_id, data) {
-    CourseBadge.findOneAndUpdate({'_id': coursebadge_id}, data).then(function(courseBadge) {
+    return CourseBadge.findOneAndUpdate({'_id': coursebadge_id}, data).then(function(courseBadge) {
         if(courseBadge === null)
             throw errors.COURSEBADGE_DO_NOT_EXIST;
         return courseBadge;
@@ -54,7 +54,7 @@ function updateCourseBadge(coursebadge_id, data) {
 }
 
 function getCourseBadgeByCourseID(course_id) {
-    CourseBadge.find({'course_id': course_id}).then(function(courseBadge) {
+    return CourseBadge.find({'course_id': course_id}).then(function(courseBadge) {
         if(courseBadge === null)
             throw errors.COURSEBADGE_DO_NOT_EXIST;
         return courseBadge;
@@ -62,15 +62,16 @@ function getCourseBadgeByCourseID(course_id) {
 }
 
 function getCourseByID(course_id) {
-    Course.findById(course_id).then(function(course) {
-        if(course === null)
+    return Course.findById(course_id).then(function(course) {
+        if(course === null) {
             throw errors.COURSE_DO_NOT_EXIST;
+        }
         return course;
     });
 }
 
 function getCourseByAssignmentID(assignment_id) {
-    Course.findOne({'assignments': assignment_id}).then(function(course) {
+    return Course.findOne({'assignments': assignment_id}).then(function(course) {
         if(course === null)
             throw errors.COURSE_DO_NOT_EXIST;
         return course;
@@ -78,10 +79,15 @@ function getCourseByAssignmentID(assignment_id) {
 }
 
 function getNumberOfAssignments(course_id) {
-    getCourseByID(course_id).then(function(course) {
-        if(course === null)
-            throw errors.COURSE_DO_NOT_EXIST;
-        return course.assignments.length;
+    return new Promise((resolve, reject) => {
+        let c = getCourseByID(course_id).then(function(course) {
+            if(course === null){
+                reject(errors.COURSE_DO_NOT_EXIST);
+            }
+            resolve(course.assignments.length);
+        }).catch(function(err) {
+            reject(err);
+        });
     });
 }
 
@@ -109,7 +115,7 @@ function getFeatureByID(features_id) {
 }
 
 function updateFeatureProgress(assignment_id, data) {
-    Features.update({'progress.assignment': assignment_id}, {'$set': data}, function(err) {
+    return Features.update({'progress.assignment': assignment_id}, {'$set': data}, function(err) {
         if(err) {
             logger.error(err);
         }

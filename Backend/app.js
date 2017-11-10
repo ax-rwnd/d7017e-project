@@ -91,7 +91,7 @@ app.use(function (err, req, res, next) {
 
 app.use(function (err, req, res, next) {
     if (err.name === "CastError") {
-        res.status(400).send("HTTP error: 400 Bad Input");
+        return res.status(400).send("HTTP error: 400 Bad Input");
     }
     //logger.log('error', err.);
 
