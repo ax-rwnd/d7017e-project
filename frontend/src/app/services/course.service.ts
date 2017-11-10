@@ -57,10 +57,10 @@ export class CourseService {
     const rewards4 = newRewards(false, false, ['gold_medal_badge', 'gold_trophy_badge', 'computer_badge',
       'bronze_medal_badge', 'silver_trophy_badge', 'bronze_trophy_badge'], false);
     const course3 = newCourse('Course name 4', 'D0012E', 'Course info', rewards4);
-    //this.courses[0] = course0;
-    //this.courses[1] = course1;
-    //this.courses[2] = course2;
-    //this.courses[3] = course3;
+    // this.courses[0] = course0;
+    // this.courses[1] = course1;
+    // this.courses[2] = course2;
+    // this.courses[3] = course3;
   }
   CreateCourse(name, code, course_info, progress, score, badges, leaderboard) {
     const progValue = progress ? 0 : false;
@@ -96,18 +96,18 @@ function updateCourses(response, backendService, courseService, assignmentServic
     backendService.getFeaturesCourseUser(courses[i]._id, response._id)
       .then(featureResponse => {
         const rewards = handleFeatureResponse(featureResponse);
-        const course = newCourse(courses[i].name, 'CODE' + i, courses[i].description, rewards);
+        const course = newCourse(courses[i].name, courses[i].course_code, courses[i].description, rewards);
         courseService.AddCourse(course);
       })
       .catch( err => {
         const rewards = newRewards(false, false, false, false);
-        const course = newCourse(courses[i].name, 'CODE' + i, courses[i].description, rewards);
+        const course = newCourse(courses[i].name, courses[i].course_code, courses[i].description, rewards);
         courseService.AddCourse(course);
       });
     backendService.getCourseAssignments(courses[i]._id)
       .then(assignmentsResponse => {
         console.log('assignmentResponse', assignmentsResponse);
-        assignmentService.AddCourseAssignments('CODE' + i, assignmentsResponse.assignments, courses[i]._id);
+        assignmentService.AddCourseAssignments(courses[i].course_code, assignmentsResponse.assignments, courses[i]._id);
       });
   }
 }
