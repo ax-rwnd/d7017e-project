@@ -4,6 +4,7 @@ import {ActivatedRoute, Params, Router} from '@angular/router';
 import { environment } from '../../environments/environment';
 import {BackendService} from '../services/backend.service';
 import {CourseService} from '../services/course.service';
+import { UserService } from '../services/user.service';
 
 @Component({
   selector: 'app-login-helper',
@@ -17,7 +18,8 @@ export class LoginHelperComponent implements OnInit {
   ticket: string;
 
   constructor(private http: HttpClient, private activatedRoute: ActivatedRoute, private router: Router,
-              private backendService: BackendService, private courseService: CourseService) { }
+              private backendService: BackendService, private courseService: CourseService,
+              private userService: UserService) { }
 
   ngOnInit() {
     // Retrieving param from url
@@ -39,6 +41,7 @@ export class LoginHelperComponent implements OnInit {
         localStorage.setItem('refresh_token', this.refresh_token);
         // FIX THIS SHIT TO NAVIGATE CORRECTLY
         this.courseService.GetAllCoursesForUser();
+        this.userService.getMe();
         this.router.navigate(['/user']);
         // --TODO add url support to not force /user
       },

@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { trigger, state, style, animate, transition } from '@angular/animations';
 import { HeadService } from '../services/head.service';
-import { BackendService } from '../services/backend.service';
+import { BackendService, ObjectID } from '../services/backend.service';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { BsModalRef } from 'ngx-bootstrap/modal/modal-options.class';
 import {FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
@@ -71,7 +71,7 @@ export class UserComponent implements OnInit {
   }
 
   getMe() {
-    this.backendService.getMe();
+    console.log(this.backendService.getUser(new ObjectID('59f84c545747361ba848b238')));
     /*
     this.http.get(environment.backend_ip + '/api/courses/me').subscribe(
       data => {
