@@ -110,3 +110,10 @@
   clear: left;
   text-align: center;
 }
+
+#markdownGuide {
+  margin: 1em;
+  height: 500px;
+  max-height: 500px;
+  overflow: scroll;
+}

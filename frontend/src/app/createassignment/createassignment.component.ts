@@ -29,6 +29,9 @@ export class CreateassignmentComponent implements OnInit {
   unitTests: any[];
 
 
+  markdownExampleCode: string;
+
+
   editT: any; // used for checking which test should be edited
   sidebarState; // state of sidebar
   modalRef: BsModalRef;
@@ -48,6 +51,7 @@ export class CreateassignmentComponent implements OnInit {
 
   ngOnInit() {
     this.sidebarState = this.headService.getCurrentState();
+    this.markdownExampleCode = '';
     this.content = '';
     this.form = this.fb.group(this.defaultForm);
     this.unitTests = [];
