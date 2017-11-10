@@ -4,6 +4,7 @@ var request = require('request');
 var queries = require('../../lib/queries/queries');
 var errors = require('../../lib/errors.js');
 var auth = require('../../lib/authentication.js');
+var testerCom = require('../../lib/tester_communication');
 
 var Assignment = require('../../models/schemas').Assignment;
 var Test = require('../../models/schemas').Test;
@@ -58,7 +59,7 @@ module.exports = function(router) {
     // Would force frontend to send userid. courses/me takes user id from token.
     // Frontend is most likely in possesion of userid. Therefore both is possible.
     router.get('/me', auth.validateJWTtoken, function (req, res, next) {
-        queries.getUserCourses(req.user.id, "name description").then(function (courses) {
+        queries.getUserCourses(req.user.id, "name description course_code").then(function (courses) {
             return res.json(courses);
         })
         .catch(function (err) {
@@ -195,6 +196,17 @@ module.exports = function(router) {
     });
 */
 
+    //Submit code to tester
+    router.post('/:course_id/assignments/:assignment_id/submit', auth.validateJWTtoken, function(req, res) {
+
+        var user_id = req.body.user_id;
+        var lang = req.body.lang;
+        var code = req.body.code;
+        var assignment_id = req.params.assignment_id;
+
+        testerCom.validateCode(user_id, lang, code, assignment_id, res);
+    });
+
     // Save draft to assignment
     // course_id not used, should route be changed? Implement some check?
     router.post('/:course_id/assignments/:assignment_id/save', auth.validateJWTtoken, function (req, res, next) {
@@ -230,6 +242,22 @@ module.exports = function(router) {
         var course_id = req.params.course_id;
         var assignment_id = req.params.assignment_id;
         res.send("/courses/" + course_id + "/assignments/" + assignment_id + "/tests GET Endpoint");
+    });
+
+    router.post('/:course_id/assignments/:assignment_id/tests', auth.validateJWTtoken, function (req, res, next) {
+        var course_id = req.params.course_id;
+        var assignment_id = req.params.assignment_id;
+        var stdout = req.body.stdout;
+        var stdin = req.body.stdin;
+        var args = req.body.args;
+        var lint = req.body.lint;
+
+        queries.createTest(stdout, stdin, args, lint, assignment_id).then(function (test) {
+            return res.json(test);
+        })
+        .catch(function (err) {
+            next(err);
+        });
     });
 
     router.get('/:course_id/assignments/:assignment_id/tests/:test_id', auth.validateJWTtoken, function (req, res, next) {

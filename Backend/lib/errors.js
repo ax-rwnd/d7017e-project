@@ -33,5 +33,6 @@ module.exports = {
     DRAFT_NOT_SAVED: new APIError("Draft not saved", 500, 7016),
     BADGE_DO_NOT_EXIST: new APIError("Badge doesn't exist", 404, 7017),
     COURSEBADGE_DO_NOT_EXIST: new APIError("Course doesn't exist", 404, 7018),
-    FEATURE_DO_NOT_EXIST: new APIError("Course doesn't exist", 404, 7019)
+    FEATURE_DO_NOT_EXIST: new APIError("Course doesn't exist", 404, 7019),
+    TEST_NOT_CREATED: new APIError("Assignment not created", 500, 7020)
 };
