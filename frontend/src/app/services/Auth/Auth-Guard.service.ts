@@ -7,23 +7,12 @@ import {UserService} from '../user.service';
 
 @Injectable()
 export class AuthGuardService implements CanActivate {
-  constructor(public auth: AuthService, public router: Router,
-              private  courseService: CourseService, private userService: UserService) {}
+  constructor(public auth: AuthService, public router: Router) {}
   canActivate(): boolean {
     if (!this.auth.isAuthenticated()) {
       this.router.navigate(['/']);
       return false;
     }
     return true;
-  }
-
-  canLoad(): boolean {
-    if (this.auth.isAuthenticated()) {
-      console.log('auth-guard');
-      this.courseService.GetAllCoursesForUser();
-      this.userService.getMe();
-      return true;
-    }
-    return false;
   }
 }
