@@ -17,7 +17,7 @@ export class AuthGuardService implements CanActivate {
     return true;
   }
 
-  canLoad(): boolean {
+  canLoad() {
     if (this.auth.isAuthenticated()) {
       console.log('auth-guard');
       this.courseService.GetAllCoursesForUser();

@@ -128,7 +128,6 @@ export class AssignmentComponent implements OnInit {
     } else {
       return this.language;
     }
-
   }
 
 }

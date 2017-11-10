@@ -53,8 +53,8 @@ const appRoutes: Routes = [
   { path: '', component: LoginComponent },
   { path: 'auth', component: LoginHelperComponent },
   { path: 'courses/:course/assignment/:assignment', component: AssignmentComponent, canActivate: [AuthGuard]},
-  { path: 'user', component: UserComponent, canActivate: [AuthGuard], canLoad: [AuthGuard]},
-  { path: 'courses/:course', component: CoursesComponent, canActivate: [AuthGuard], canLoad: [AuthGuard]},
+  { path: 'user', component: UserComponent, canLoad: [AuthGuard]},
+  { path: 'courses/:course', component: CoursesComponent, canLoad: [AuthGuard]},
   { path: 'createAssignmentTest', component: CreateassignmentComponent, canActivate: [AuthGuard]},
   { path: 'courses/:course/createNewAssignment', component: CreateassignmentComponent, canActivate: [AuthGuard]}
 ];

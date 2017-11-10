@@ -81,19 +81,26 @@ export class CourseService {
     this.courses[this.courses.length] = course;
   }
   GetAllCoursesForUser() {
-    this.backendService.getMyCourses()
-      .then(response => {
-        console.log('getCoursesForUser', response);
-        updateCourses(response, this.backendService, this, this.assignmentService);
-      });
+    const promise = new Promise((resolve, reject) => {
+      this.backendService.getMyCourses()
+        .then(response => {
+          console.log('getCoursesForUser', response);
+          updateCourses(response, this.backendService, this, this.assignmentService)
+            .then(resolve)
+            .catch(reject);
+        })
+        .catch(reject);
+    });
+    return promise;
   }
 }
 
 function updateCourses(response, backendService, courseService, assignmentService) {
   const courses = response.courses;
   console.log('response', response);
+  const promiseArray = [];
   for (let i = 0; i < courses.length; i++) {
-    backendService.getFeaturesCourseUser(courses[i]._id, response._id)
+    promiseArray.push(backendService.getFeaturesCourseUser(courses[i]._id, response._id)
       .then(featureResponse => {
         const rewards = handleFeatureResponse(featureResponse);
         const course = newCourse(courses[i].name, 'CODE' + i, courses[i].description, rewards);
@@ -103,13 +110,14 @@ function updateCourses(response, backendService, courseService, assignmentServic
         const rewards = newRewards(false, false, false, false);
         const course = newCourse(courses[i].name, 'CODE' + i, courses[i].description, rewards);
         courseService.AddCourse(course);
-      });
-    backendService.getCourseAssignments(courses[i]._id)
+      }));
+    promiseArray.push(backendService.getCourseAssignments(courses[i]._id)
       .then(assignmentsResponse => {
         console.log('assignmentResponse', assignmentsResponse);
         assignmentService.AddCourseAssignments('CODE' + i, assignmentsResponse.assignments, courses[i]._id);
-      });
+      }));
   }
+  return Promise.all(promiseArray);
 }
 
 function handleFeatureResponse(response: any) {
