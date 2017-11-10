@@ -120,7 +120,7 @@ app.post('/', (req, res) => {
 });
 
 app.get('/languages', (req, res) => {
-    res.json(languages.languages);
+    res.json({languages: languages.languages});
 });
 
 /**
