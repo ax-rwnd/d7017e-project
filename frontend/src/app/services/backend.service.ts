@@ -49,7 +49,9 @@ export class BackendService {
     // Send a post request to the endpoint
 
     return this.http.post(environment.backend_ip + endpoint, body, {responseType: 'text'})
-                .subscribe();
+                .toPromise()
+                .then(response => response)
+                .catch(err => console.error('API Post failed in ' + endpoint + ' error ' + err));
   }
 
   getMe() {
@@ -95,10 +97,10 @@ export class BackendService {
     return this.apiGet('/api/courses/' + id + '/users');
   }
 
-  submitAssignment(assignment_id: number, lang: string, code: string) {
+  submitAssignment(user_id: ObjectID, course_id: ObjectID, assignment_id: number, lang: string, code: string) {
     // Submis code for testing
-    const body = {'assignment_id': assignment_id, 'lang': lang, 'code': code};
-    return this.apiPost('/api/test', body);
+    const body = {'user_id': user_id.get(), 'assignment_id': assignment_id, 'lang': lang, 'code': code};
+    return this.apiPost('/api/courses/' + course_id.get() + '/assignments/' + assignment_id + '/submit', body);
   }
 
   createAssignment(description: string, tests: any) {
@@ -109,7 +111,6 @@ export class BackendService {
 
   getAssignment(course_id: string, assignment_id: string) {
     // Get an assignment with name desc., langs.
-
     return this.apiGet('/api/courses/' + course_id + '/assignments/' + assignment_id);
   }
   getCourseAssignments(course_id: string) {

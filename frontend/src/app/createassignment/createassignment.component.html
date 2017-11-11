@@ -12,11 +12,13 @@
   <div id="assignmentDescription" appScroller>
     <div ace-editor [(text)]="content" [mode]="'markdown'" [theme]="'eclipse'" [options]="{maxLines: 1000, printMargin: false}" [readOnly]="false" [autoUpdateContent]="true" [durationBeforeCallback]="1000"(textChanged)="onChange(content)"  style="min-height: 100%; width:100%; overflow: auto;">
     </div>
-
   </div>
-
   <div id="preview" appScroller>
     <div Markdown [data]="content" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/themes/prism.min.css"></div>
+  </div>
+
+  <div>
+    <button class="btn" (click)="openModal(markdownTutorial)">markdown guide</button>
   </div>
 
   <div id="addTests">
@@ -122,4 +124,17 @@
     </div>
 
   </form>
+</ng-template>
+
+<ng-template #markdownTutorial>
+  <div class="modal-header">
+    <h4 class="modal-title pull-left">Markdown guide</h4>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+
+  <div id="markdownGuide">
+    <markdown [data]="markdownExampleCode"></markdown>
+  </div>
 </ng-template>

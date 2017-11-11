@@ -104,18 +104,18 @@ function updateCourses(response, backendService, courseService, assignmentServic
     promiseArray.push(backendService.getFeaturesCourseUser(courses[i]._id, response._id)
       .then(featureResponse => {
         const rewards = handleFeatureResponse(featureResponse);
-        const course = newCourse(courses[i].name, 'CODE' + i, courses[i].description, rewards);
+        const course = newCourse(courses[i].name, courses[i].course_code, courses[i].description, rewards);
         courseService.AddCourse(course);
       })
       .catch( err => {
         const rewards = newRewards(false, false, false, false);
-        const course = newCourse(courses[i].name, 'CODE' + i, courses[i].description, rewards);
+        const course = newCourse(courses[i].name, courses[i].course_code, courses[i].description, rewards);
         courseService.AddCourse(course);
       }));
     promiseArray.push(backendService.getCourseAssignments(courses[i]._id)
       .then(assignmentsResponse => {
         console.log('assignmentResponse', assignmentsResponse);
-        assignmentService.AddCourseAssignments('CODE' + i, assignmentsResponse.assignments, courses[i]._id);
+        assignmentService.AddCourseAssignments(courses[i].course_code, assignmentsResponse.assignments, courses[i]._id);
       }));
   }
   return Promise.all(promiseArray);
