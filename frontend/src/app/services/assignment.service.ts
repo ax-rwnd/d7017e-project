@@ -32,7 +32,7 @@ export class AssignmentService {
       a[i] = {id: assignments[i]._id, course_id: course_id, name: assignments[i].name, languages: assignments[i].languages,
         description: assignments[i].description, available: true};
     }
-    this.courseAssignments[course_code] = [{name: 'Assignments', collapse: true, availability: false, assignments: a, groups: []}];
+    this.courseAssignments[course_code] = [{name: 'Assignments', collapse: false, availability: false, assignments: a, groups: []}];
   }
   GetAssignment(course: string, assignment_id: string) {
     if (this.courseAssignments[course] === undefined) {
@@ -46,6 +46,21 @@ export class AssignmentService {
     }
     return false;
   }
+  numberOfAssignments(course: string) {
+    return numberOfAssignmentsHelper(this.courseAssignments[course]);
+  }
+}
+
+function numberOfAssignmentsHelper(groups: AssignmentGroup[]) {
+  let number = 0;
+  if (groups === []) {
+    return number;
+  } else {
+    for (let i = 0; i < groups.length; i++) {
+      number += groups[i].assignments.length + numberOfAssignmentsHelper(groups[i].groups);
+    }
+  }
+  return number;
 }
 
 function getAssignmentHelper(group: AssignmentGroup, assignment_id: string) {

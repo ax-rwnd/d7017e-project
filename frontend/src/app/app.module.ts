@@ -37,7 +37,6 @@ import { AssignmentService } from './services/assignment.service';
 
 // AUTH
 import {AuthGuardService as AuthGuard} from './services/Auth/Auth-Guard.service';
-import {CanLoadTeamSection as onLoadguard} from './services/onLoad-Guard.service';
 import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
 import {NoopInterceptor} from './Interceptors/Auth.interceptor';
 
@@ -54,8 +53,8 @@ const appRoutes: Routes = [
   { path: '', component: LoginComponent },
   { path: 'auth', component: LoginHelperComponent },
   { path: 'courses/:course/assignment/:assignment', component: AssignmentComponent, canActivate: [AuthGuard]},
-  { path: 'user', component: UserComponent, canActivate: [AuthGuard], canLoad: [onLoadguard]},
-  { path: 'courses/:course', component: CoursesComponent, canActivate: [AuthGuard], canLoad: [onLoadguard]},
+  { path: 'user', component: UserComponent, canActivate: [AuthGuard]},
+  { path: 'courses/:course', component: CoursesComponent, canActivate: [AuthGuard]},
   { path: 'createAssignmentTest', component: CreateassignmentComponent, canActivate: [AuthGuard]},
   { path: 'courses/:course/createNewAssignment', component: CreateassignmentComponent, canActivate: [AuthGuard]}
 ];
@@ -106,7 +105,6 @@ const appRoutes: Routes = [
       useClass: NoopInterceptor,
       multi: true,
     },
-    onLoadguard,
     HeadService, // the state variable that head provides
     BackendService,
     UserService,

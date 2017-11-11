@@ -11,7 +11,8 @@ import {UserService} from '../services/user.service';
 import {CourseService} from '../services/course.service';
 import {HttpClient} from '@angular/common/http';
 import { environment } from '../../environments/environment';
-import {AuthService} from "../services/Auth/Auth.service";
+import {AuthService} from '../services/Auth/Auth.service';
+import {AssignmentService} from '../services/assignment.service';
 
 @Component({
   selector: 'app-user',
@@ -46,7 +47,7 @@ export class UserComponent implements OnInit {
 
   constructor(private http: HttpClient, private route: ActivatedRoute, private headService: HeadService, private userService: UserService,
               private modalService: BsModalService, private backendService: BackendService, private courseService: CourseService, private fb: FormBuilder,
-              public auth: AuthService) {
+              public auth: AuthService, private assignmentService: AssignmentService) {
     this.headService.stateChange.subscribe(sidebarState => { this.sidebarState = sidebarState; }); // subscribe to the state value head provides
   }
 
@@ -85,6 +86,9 @@ export class UserComponent implements OnInit {
   }
 
   postBadge() {
-    this.backendService.postNewBadge("bronze_medal_badge", "A test task from API", "Totally new, whoa.");
+    this.backendService.postNewBadge('bronze_medal_badge', 'A test task from API', 'Totally new, whoa.');
+  }
+  getProgress(progress, courseCode) {
+   return  (progress / this.assignmentService.numberOfAssignments(courseCode)) * 100;
   }
 }

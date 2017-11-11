@@ -31,7 +31,14 @@ export class CoursesComponent implements OnInit {
   constructor(private courseService: CourseService, private route: ActivatedRoute, private headService: HeadService,
               private assignmentService: AssignmentService) {
     this.headService.stateChange.subscribe(sidebarState => { this.sidebarState = sidebarState; });
-    this.route.params.subscribe( params => this.currentCourse = this.courseService.GetCourse(params['course']));
+    this.route.params.subscribe( params => {
+      this.currentCourse = this.courseService.GetCourse(params['course']);
+      if (this.assignmentService.courseAssignments[this.currentCourse.code] !== undefined) {
+        this.assignmentGroups = this.assignmentService.courseAssignments[this.currentCourse.code];
+      } else {
+        this.assignmentGroups = this.assignmentService.courseAssignments['default'];
+      }
+    });
   }
 
   ngOnInit() {
@@ -39,11 +46,11 @@ export class CoursesComponent implements OnInit {
     console.log('code', this.currentCourse.code);
     console.log('assignmentGroup', this.assignmentService.courseAssignments[this.currentCourse.code]);
     console.log('all assignmentGroups', this.assignmentService.courseAssignments);
-    if (this.assignmentService.courseAssignments[this.currentCourse.code] !== undefined) {
+    /*if (this.assignmentService.courseAssignments[this.currentCourse.code] !== undefined) {
       this.assignmentGroups = this.assignmentService.courseAssignments[this.currentCourse.code];
     } else {
       this.assignmentGroups = this.assignmentService.courseAssignments['default'];
-    }
+    }*/
     // this.currentAssignment = this.assignmentGroups[0].groups[0].assignments[0].name;
   }
 
@@ -53,7 +60,13 @@ export class CoursesComponent implements OnInit {
     if (this.assignmentGroups[0].groups[0].assignments[number-1].available != false){
     this.currentAssignment = this.assignmentGroups[0].groups[0].assignments[number-1].name;
   }}
+
+  getProgress() {
+    return (this.progress / this.assignmentService.numberOfAssignments(this.currentCourse.code)) * 100;
+  }
 }
+
+
 
 interface AssignmentGroup {
   name: string;

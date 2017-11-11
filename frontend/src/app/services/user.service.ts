@@ -7,6 +7,7 @@ export class UserService {
     userName: '',
     id: ''
   };
+  updated = false;
   constructor(private backendService: BackendService) { }
 
   getMe() {

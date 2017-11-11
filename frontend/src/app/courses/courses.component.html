@@ -9,7 +9,7 @@
 
       <markdown [data]="currentCourse.course_info"></markdown>
 
-      <app-mod-progressbar [progress]="currentCourse.rewards.progress"></app-mod-progressbar>
+      <app-mod-progressbar [progress]="getProgress()"></app-mod-progressbar>
     <div class="gamification-block panel panel-default">
       <div class="panel-heading gamification-header">Map</div>
       <div class="stepwizard">
