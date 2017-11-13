@@ -18,7 +18,7 @@ module.exports = function(router) {
         if(req.query.query.length < config.get('Search.min_query_length')) {
             return next(errors.TOO_SHORT_QUERY);
         }
-        
+
         queries.searchDB(req.query.query, req.user.id).then(function (results) {
             let json = {};
 
@@ -26,7 +26,7 @@ module.exports = function(router) {
                 for(var key in result) json[key] = result[key];
             }
 
-            res.json(json);
+            return res.json(json);
         }).catch(next);
     });
 };
