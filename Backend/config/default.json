@@ -35,5 +35,9 @@
             "level": "error",
             "json": false
         }
+    },
+    // SEARCH IN DATABASE
+    "Search": {
+        "min_query_length": 3
     }
 }

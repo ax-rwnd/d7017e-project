@@ -21,6 +21,7 @@ var assignmentSchema = new Schema({
     },
     languages: [String]
 });
+assignmentSchema.index({name: 'text', description: 'text'}, {weights: {name: 5, description: 1}});
 
 var testSchema = new Schema({
     stdout: {type: String, required: true},
@@ -37,6 +38,7 @@ var userSchema = new Schema({
     teaching: [{type: Schema.Types.ObjectId, ref: 'Course', required: false}],
     providers: [{type: String, required: true}] //LTU, KTH etc.
 });
+userSchema.index({username: 'text', email: 'text'});
 
 //user code submissions
 var draftSchema = new Schema({
@@ -47,9 +49,9 @@ var draftSchema = new Schema({
 });
 
 var courseSchema = new Schema({
-    course_code: {type: String, required: true},
-    name: {type: String, required: true},
-    description: {type: String, required: false},
+    course_code: {type: String, required: false, index: true},
+    name: {type: String, required: true, index: true},
+    description: {type: String, required: false, index: true},
     hidden: { type: Boolean, required: true },  //public or private course
     teachers: [{ type: Schema.Types.ObjectId, ref: 'User', required: false }],
     students: [{ type: Schema.Types.ObjectId, ref: 'User', required: false }],
@@ -60,6 +62,7 @@ var courseSchema = new Schema({
         progress: Boolean
     }
 });
+courseSchema.index({course_code: 'text', name: 'text', description: 'text'}, {weights: {course_code: 10, name: 5, description: 1}});
 
 /*
 * Feature schemas

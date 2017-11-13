@@ -5,6 +5,8 @@ const assert = require('assert');
 const ObjectId = require('mongoose').Types.ObjectId;
 
 let runner = require('../bin/www');
+
+// https://github.com/visionmedia/supertest/issues/370#issuecomment-249410533
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 after(() => {

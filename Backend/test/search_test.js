@@ -1,9 +1,14 @@
 'use strict';
+
 var features_helper = require('../features/features_helper');
 const request = require('supertest');
 const assert = require('assert');
+var config = require('config');
 
 let runner = require('../bin/www');
+
+// https://github.com/visionmedia/supertest/issues/370#issuecomment-249410533
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 after(() => {
     runner.server.close(() => {
@@ -21,11 +26,12 @@ function auth() {
         .expect(200)
         .then(res => {
             return res.body.access_token;
+        }).catch(function(err) {
+            console.log(err);
         });
 }
 
-
-describe('Search routes', () => {
+describe('GET /api/search', () => {
 
     let access_token;
 
@@ -33,10 +39,46 @@ describe('Search routes', () => {
         return auth().then(at => access_token = at);
     });
 
-    /*it('GET /api/courses/search', () => {
+    it('Minimum query length is set', () => {
+        assert(config.get('Search.min_query_length') !== undefined, 'Search.min_query_length in config is not set');
+    });
 
-        let query = '59f6f88b1ac36c0762eb46a9';
-        let route = '/api/courses/search';
+    it('Fails on bad query parameter', () => {
+
+        let query = '?iambad=program';
+        let route = '/api/search';
+
+        return request(runner.server)
+            .get(route+query)
+            .set('Authorization', 'Bearer ' + access_token)
+            .expect(400)
+            .then(res => {
+                //console.log(res.body);
+            }).catch(function(err) {
+                console.log(err);
+            });
+    });
+
+    it('Too short query data', () => {
+
+        let query = '?query=hi';
+        let route = '/api/search';
+
+        return request(runner.server)
+            .get(route+query)
+            .set('Authorization', 'Bearer ' + access_token)
+            .expect(400)
+            .then(res => {
+                //console.log(res.body);
+            }).catch(function(err) {
+                console.log(err);
+            });
+    });
+
+    it('Return search results', () => {
+
+        let query = '?query=program';
+        let route = '/api/search';
 
         return request(runner.server)
             .get(route+query)
@@ -44,6 +86,8 @@ describe('Search routes', () => {
             .expect(200)
             .then(res => {
                 console.log(res.body);
+            }).catch(function(err) {
+                console.log(err);
             });
-    });*/
+    });
 });

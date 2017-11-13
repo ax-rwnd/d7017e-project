@@ -60,9 +60,13 @@ var features = express.Router();
 require('./routes/api/features')(features);
 app.use('/api/features', features);
 
-var test_routes = express.Router();
-require('./routes/api/tester')(test_routes);
-app.use('/api/tester', test_routes);
+var tester = express.Router();
+require('./routes/api/tester')(tester);
+app.use('/api/tester', tester);
+
+var search = express.Router();
+require('./routes/api/search')(search);
+app.use('/api/search', search);
 
 
 //Route not found.

@@ -430,6 +430,40 @@ function getCoursesEnabledFeatures(course_id) {
     });
 }
 
+function searchDB(query) {
+
+    let promises = [];
+
+
+    promises.push(Course.find({$text: {$search: query}, 'hidden': false}, {score: {$meta: "textScore"}})
+        .select('-__v -hidden -features -assignments -students -enabled_features')
+        .sort({score: {$meta: "textScore"}})
+        .limit(999999).then(docs => {
+            return {'courses': docs};
+        }).catch(err => {
+            console.log(err);
+        }));
+
+    promises.push(Assignment.find({$text: {$search: query}, 'hidden': false}, {score: {$meta: "textScore"}})
+        .select('-__v -tests -optional_tests -hidden -languages')
+        .sort({score: {$meta: "textScore"}})
+        .limit(999999).then(docs => {
+            return {'assignments': docs};
+        }).catch(err => {
+            console.log(err);
+        }));
+    promises.push(User.find({$text: {$search: query}}, {score: {$meta: "textScore"}})
+        .select('-__v -tokens -providers')
+        .sort({score: {$meta: "textScore"}})
+        .limit(999999).then(docs => {
+            return {'users': docs};
+        }).catch(err => {
+            console.log(err);
+        }));
+
+    return Promise.all(promises);
+}
+
 exports.getTestsFromAssignment = getTestsFromAssignment;
 exports.findOrCreateUser = findOrCreateUser;
 exports.getUser = getUser;
@@ -452,3 +486,4 @@ exports.checkPermission = checkPermission;
 exports.saveCode = saveCode;
 exports.getCode = getCode;
 exports.getCoursesEnabledFeatures = getCoursesEnabledFeatures;
+exports.searchDB = searchDB;
