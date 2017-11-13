@@ -11,6 +11,8 @@ function init(emitter, name) {
                 let json = {};
                 json[name] = result;
                 resolve(json);
+            }).catch(function(err) {
+                logger.error(err);
             });
         });
     });
@@ -18,7 +20,9 @@ function init(emitter, name) {
 
 async function run(data) {
 
-    queries.updateFeatureProgress(data.assignment_id, {progress: [helper.prepareProgressData(data)]});
+    let feature = await helper.getFeature(data.user_id, data.assignment_id);
+
+    await queries.updateFeatureProgress(data.user_id, feature._id, data.assignment_id, helper.prepareProgressData(data));
 
     let progress = {};
 
@@ -45,7 +49,7 @@ function updateProgress(progress, feature_progress={}) {
             feature_progress.tests.push(test);
         }
     });
-    
+
     return feature_progress;
 }
 

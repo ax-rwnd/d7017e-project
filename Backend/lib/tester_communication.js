@@ -90,7 +90,7 @@ function getTesterLanguages() {
         if(config.get('App.environment') != 'development') {
             throw new Error('Remove `rejectUnauthorized` for production in '+ module.filename);
         }
-        console.log(config.get('Tester.tester_url')+'/languages');
+        
         request({
             url: config.get('Tester.tester_url')+'/languages',
             method: 'GET',
@@ -101,7 +101,6 @@ function getTesterLanguages() {
             if(error || response.statusCode != 200) {
                 throw new Error(error);
             } else {
-                console.log(4);
                 resolve(body);
             }
         });

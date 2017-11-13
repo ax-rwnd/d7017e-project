@@ -44,7 +44,11 @@ module.exports = function (router) {
 
     router.get('/:user_id', auth.validateJWTtoken, function (req, res, next) {
         var user_id = req.params.user_id;
-        queries.getUser(user_id, BASIC_FILTER).then(function (user) {
+        var filter = (req.user.admin === true)
+            ? ADMIN_FILTER
+            : BASIC_FILTER;
+
+        queries.getUser(user_id, filter).then(function (user) {
             return res.json(user);
         })
         .catch(function (err) {

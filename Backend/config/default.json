@@ -4,7 +4,7 @@
         "dbConfig": {
             "host": "mongodb://130.240.5.132",
             "port": 27018,
-            "database_name": "test"
+            "database_name": "staging"
         }
     },
     // APP config module
@@ -35,5 +35,9 @@
             "level": "error",
             "json": false
         }
+    },
+    // SEARCH IN DATABASE
+    "Search": {
+        "min_query_length": 3
     }
 }

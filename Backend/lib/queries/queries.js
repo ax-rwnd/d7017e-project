@@ -203,7 +203,7 @@ function createCourse(name, description, hidden) {
 }
 
 function getUserCourses(id, fields) {
-    var wantedFields = fields || "name description hidden teachers students assignments";
+    var wantedFields = fields || "name description hidden teachers students assignments course_code";
 
     return User.findById(id, "courses").populate("courses", wantedFields).then(function (courseList) {
         if (!courseList) {
@@ -354,6 +354,28 @@ function createAssignment(name, description, hidden, languages, course_id) {
     });
 }
 
+function createTest(stdout, stdin, args, lint, assignment_id) {
+    var newTest = new Test({stdout: stdout, stdin: stdin, args: args});
+    return newTest.save().then(function (createdTest) {
+        if (!createdTest) {
+            console.log("Error: Test not created");
+            throw errors.TEST_NOT_CREATED;
+        }
+        //Push createdAssignment _id into course_id's assignments
+        return Assignment.findById(assignment_id).then( function (assignment) {
+            if (!assignment) {
+                throw errors.ASSINGMENT_DOES_NOT_EXIST;
+            }
+            return Assignment.update(
+                { _id: assignment_id },
+                { $push: { 'tests.io': createdTest._id }, $set: { 'tests.lint': lint } }
+            ).then( function (v) {
+                return createdTest;
+            });
+        });
+    });
+}
+
 
 // Should be able to check permissions for all collections. As long FIELDS value is added.
 function checkPermission(wantedFields, collection, roll) {
@@ -412,9 +434,11 @@ function getCourse(courseid, roll, fields) {
     });
 }
 
-function saveCode(userID, assignmentID, code) {
-    var options = {new: true, upsert: true, fields: "user assignment code"};
-    return Draft.findOneAndUpdate({user: userID, assignment: assignmentID}, {code: code}, options).then(function (draft) {
+function saveCode(userID, assignmentID, code, lang) {
+    // new: true - Creates a new document if it doesn't find one
+    // upsert: true - Returns the updated document
+    var options = {new: true, upsert: true, fields: "user assignment code lang", runValidators: true};
+    return Draft.findOneAndUpdate({user: userID, assignment: assignmentID}, {code: code, lang: lang}, options).then(function (draft) {
         if (!draft) {
             throw errors.DRAFT_NOT_SAVED;
         }
@@ -422,17 +446,96 @@ function saveCode(userID, assignmentID, code) {
     });
 }
 
+function getCode(userID, assignmentID) {
+    return Draft.findOne({user: userID, assignment: assignmentID}, "user assignment code lang").then(function (draft) {
+        if (!draft) {
+            var newDraft = new Draft({user: userID, assignment: assignmentID, code: "", lang: ""});
+            return newDraft.save().then(function (createdDraft) {
+                if (!createdDraft) {
+                    console.log("Error: Draft not created");
+                }
+                // Don't want to return __v field, maybe there is a better way to do this
+                createdDraft.__v = undefined;
+                return createdDraft;
+            });
+        }
+        return draft;
+    });
+}
+
 
 function getCoursesEnabledFeatures(course_id) {
-    var wantedFields = "enabled_features";
-
-    return Course.findById(course_id).populate(wantedFields).then(function (enabled_features) {
-        if (!enabled_features) {
+    return Course.findById(course_id).then(function(course) {
+        if(course === null)
             throw errors.COURSE_DO_NOT_EXIST;
-        }
-        return enabled_features;
+        return course.enabled_features;
     });
+}
 
+function searchDB(query, user_id) {
+    return getAssignmentIDsByUser(user_id).then(assignment_ids => {
+
+        let promises = [];
+
+        promises.push(Course.find({$text: {$search: query}, 'students': user_id, 'hidden': false}, {score: {$meta: "textScore"}})
+            .select('-__v -hidden -features -assignments -students -enabled_features')
+            .sort({score: {$meta: "textScore"}})
+            .limit(20).then(docs => {
+                return {'courses': docs};
+            }).catch(err => {
+                console.log(err);
+            }));
+
+        promises.push(Assignment.find({$text: {$search: query}, '_id': assignment_ids, 'hidden': false}, {score: {$meta: "textScore"}})
+            .select('-__v -tests -optional_tests -hidden -languages')
+            .sort({score: {$meta: "textScore"}})
+            .limit(20).then(docs => {
+                return {'assignments': docs};
+            }).catch(err => {
+                console.log(err);
+            }));
+        promises.push(User.find({$text: {$search: query}}, {score: {$meta: "textScore"}})
+            .select('-__v -tokens -providers')
+            .sort({score: {$meta: "textScore"}})
+            .limit(20).then(docs => {
+                return {'users': docs};
+            }).catch(err => {
+                console.log(err);
+            }));
+
+        return Promise.all(promises);
+    });
+}
+
+// Helper function for searchDB()
+function getAssignmentIDsByUser(user_id) {
+    return getUserCourses(user_id, '_id').then(function(courses) {
+
+        // Get IDs of courses user is in
+        let ids = [];
+        for(let course of courses.courses) {
+            ids.push(course._id);
+        }
+
+        // Get assignemnts from courses
+        let assignment_promises = [];
+        for(let id of ids) {
+            assignment_promises.push(getCourseAssignments(id, 'assignments').then(assignment => {
+                return assignment;
+            }));
+        }
+
+        // Get assignment IDs from assignments
+        let assignment_ids = [];
+        return Promise.all(assignment_promises).then(course => {
+            for(let assignments of course) {
+                for(let assignment of assignments.assignments) {
+                    assignment_ids.push(assignment._id);
+                }
+            }
+            return assignment_ids;
+        });
+    });
 }
 
 exports.getTestsFromAssignment = getTestsFromAssignment;
@@ -450,9 +553,12 @@ exports.getCourseAssignments = getCourseAssignments;
 exports.setRefreshToken = setRefreshToken;
 exports.removeRefreshToken = removeRefreshToken;
 exports.createAssignment = createAssignment;
+exports.createTest = createTest;
 exports.getAssignment = getAssignment;
 exports.getTest = getTest;
 exports.getCourse = getCourse;
 exports.checkPermission = checkPermission;
 exports.saveCode = saveCode;
+exports.getCode = getCode;
 exports.getCoursesEnabledFeatures = getCoursesEnabledFeatures;
+exports.searchDB = searchDB;

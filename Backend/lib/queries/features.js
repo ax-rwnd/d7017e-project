@@ -7,7 +7,6 @@ var Test = require('../../models/schemas').Test;
 var User = require('../../models/schemas').User;
 var Badge = require('../../models/schemas').Badge;
 var Features = require('../../models/schemas').Features;
-var CourseBadge = require('../../models/schemas').CourseBadge;
 var errors = require('../errors.js');
 var logger = require('../../logger.js');
 
@@ -17,7 +16,7 @@ function createBadge(data) {
 }
 
 function getBadge(badge_id) {
-    Badge.findById(badge_id).then(function(badge) {
+    return Badge.findById(badge_id).then(function(badge) {
         if(badge === null)
             throw errors.BADGE_DO_NOT_EXIST;
         return badge;
@@ -25,52 +24,32 @@ function getBadge(badge_id) {
 }
 
 function updateBadge(badge_id, data) {
-    Badge.findOneAndUpdate({"_id": badge_id}, data).then(function(badge) {
+    return Badge.findOneAndUpdate({"_id": badge_id}, data, { runValidators: true }).then(function(badge) {
         if(badge === null)
             throw errors.BADGE_DO_NOT_EXIST;
         return badge;
     });
 }
 
-function createCourseBadge(data) {
-    let courseBadge = new CourseBadge(data);
-    return courseBadge.save();
-}
-
-function getCourseBadge(coursebadge_id) {
-    CourseBadge.findById(coursebadge_id).then(function(courseBadge) {
-        if(courseBadge === null)
-            throw errors.COURSEBADGE_DO_NOT_EXIST;
-        return courseBadge;
-    });
-}
-
-function updateCourseBadge(coursebadge_id, data) {
-    CourseBadge.findOneAndUpdate({'_id': coursebadge_id}, data).then(function(courseBadge) {
-        if(courseBadge === null)
-            throw errors.COURSEBADGE_DO_NOT_EXIST;
-        return courseBadge;
-    });
-}
-
-function getCourseBadgeByCourseID(course_id) {
-    CourseBadge.find({'course_id': course_id}).then(function(courseBadge) {
-        if(courseBadge === null)
-            throw errors.COURSEBADGE_DO_NOT_EXIST;
-        return courseBadge;
+function getBadgeByCourseID(course_id) {
+    return Badge.find({'course_id': course_id}).then(function(badge) {
+        if(badge === null)
+            throw errors.BADGE_DO_NOT_EXIST;
+        return badge;
     });
 }
 
 function getCourseByID(course_id) {
-    Course.findById(course_id).then(function(course) {
-        if(course === null)
+    return Course.findById(course_id).then(function(course) {
+        if(course === null) {
             throw errors.COURSE_DO_NOT_EXIST;
+        }
         return course;
     });
 }
 
 function getCourseByAssignmentID(assignment_id) {
-    Course.findOne({'assignments': assignment_id}).then(function(course) {
+    return Course.findOne({'assignments': assignment_id}).then(function(course) {
         if(course === null)
             throw errors.COURSE_DO_NOT_EXIST;
         return course;
@@ -78,10 +57,15 @@ function getCourseByAssignmentID(assignment_id) {
 }
 
 function getNumberOfAssignments(course_id) {
-    getCourseByID(course_id).then(function(course) {
-        if(course === null)
-            throw errors.COURSE_DO_NOT_EXIST;
-        return course.assignments.length;
+    return new Promise((resolve, reject) => {
+        let c = getCourseByID(course_id).then(function(course) {
+            if(course === null){
+                reject(errors.COURSE_DO_NOT_EXIST);
+            }
+            resolve(course.assignments.length);
+        }).catch(function(err) {
+            reject(err);
+        });
     });
 }
 
@@ -102,16 +86,20 @@ function createFeature(user_id, course_id) {
 }
 
 function getFeatureByID(features_id) {
-    let feature =  Features.findById(features_id);
-    if(feature === null)
-        throw new Error('');
-    return feature;
+    return Features.findById(features_id).lean().then(function(feature) {
+        if(feature === null)
+            throw errors.FEATURE_DO_NOT_EXIST;
+
+        return feature;
+    });
 }
 
-function updateFeatureProgress(assignment_id, data) {
-    Features.update({'progress.assignment': assignment_id}, {'$set': data}, function(err) {
-        if(err) {
-            logger.error(err);
+function updateFeatureProgress(user_id, features_id, assignment_id, data) {
+    return Features.update({'_id': features_id, 'user': user_id, 'progress.assignment': assignment_id}, {'$set': {'progress.$': data}}, { runValidators: true }).then(function(result) {
+        if(result.n === 0) {
+            return Features.update({'_id': features_id, 'user': user_id}, {'$addToSet': {'progress': data}}, { runValidators: true }).then(function(result) {
+                return;
+            });
         }
     });
 }
@@ -132,14 +120,18 @@ function getNumberOfCompletedAssignments(course_id, user_id) {
         let course = await Course.findById(course_id);
         course.features.forEach(async function(feature_id) {
             let feature = await getFeatureByID(feature_id);
-            if(feature.user.equals(user_id)) {
-                Features.aggregate()
-                .match({_id: feature._id})
-                .project({
-                    completed: {$size:'$progress'}
-                }).then(function(completed) {
-                    resolve(completed[0].completed);
-                });
+            if(feature === null) {
+                logger.warn('Feature '+feature_id+' in course '+course._id+' is null and should be removed!');
+            } else {
+                if(feature.user.equals(user_id)) {
+                    Features.aggregate()
+                    .match({_id: feature._id})
+                    .project({
+                        completed: {$size:'$progress'}
+                    }).then(function(completed) {
+                        resolve(completed[0].completed);
+                    });
+                }
             }
         });
     });
@@ -166,23 +158,34 @@ async function getFeatureOfUserID(course_id, user_id) {
     for(let feature_id of course.features) {
 
         let feature = await getFeatureByID(feature_id);
-        if(feature.user.equals(user_id)) {
-            return await getFeatureByID(feature_id);
+
+        if(feature === null) {
+            logger.warn('Feature '+feature_id+' in course '+course._id+' is null and should be removed!');
+        } else {
+            if(feature.user.equals(user_id)) {
+
+                feature.total_assignments = await getNumberOfAssignments(course_id);
+                feature.completed_assignments = await getNumberOfCompletedAssignments(course_id, user_id);
+
+                return feature;
+            }
         }
     }
 
     // User had no feature in that course create it
-    let feature = await createFeature(user_id, course_id);
-    return await getFeatureByID(feature._id);
+    let new_feature = await createFeature(user_id, course_id);
+
+    let feature = await getFeatureByID(new_feature._id);
+
+    feature.total_assignments = await getNumberOfAssignments(course_id);
+    feature.completed_assignments = await getNumberOfCompletedAssignments(course_id, user_id);
+
+    return feature;
 }
 
 exports.createBadge = createBadge;
 exports.getBadge = getBadge;
 exports.updateBadge = updateBadge;
-exports.createCourseBadge = createCourseBadge;
-exports.getCourseBadge = getCourseBadge;
-exports.updateCourseBadge = updateCourseBadge;
-exports.getCourseBadgeByCourseID = getCourseBadgeByCourseID;
 exports.getCourseByID = getCourseByID;
 exports.getCourseByAssignmentID = getCourseByAssignmentID;
 exports.getNumberOfAssignments = getNumberOfAssignments;

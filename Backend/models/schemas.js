@@ -21,6 +21,7 @@ var assignmentSchema = new Schema({
     },
     languages: [String]
 });
+assignmentSchema.index({name: 'text', description: 'text'}, {weights: {name: 5, description: 1}});
 
 var testSchema = new Schema({
     stdout: {type: String, required: true},
@@ -37,18 +38,20 @@ var userSchema = new Schema({
     teaching: [{type: Schema.Types.ObjectId, ref: 'Course', required: false}],
     providers: [{type: String, required: true}] //LTU, KTH etc.
 });
+userSchema.index({username: 'text', email: 'text'});
 
 //user code submissions
 var draftSchema = new Schema({
     user: { type: Schema.Types.ObjectId, ref: 'User', required: true},
     assignment: { type: Schema.Types.ObjectId, ref: 'Assignment', required: true},
-    code: { type: String, required: true }
+    code: { type: String, required: false },
+    lang: { type: String, required: false }
 });
 
 var courseSchema = new Schema({
-    course_code: {type: String, required: true},
-    name: {type: String, required: true},
-    description: {type: String, required: false},
+    course_code: {type: String, required: false, index: true},
+    name: {type: String, required: true, index: true},
+    description: {type: String, required: false, index: true},
     hidden: { type: Boolean, required: true },  //public or private course
     teachers: [{ type: Schema.Types.ObjectId, ref: 'User', required: false }],
     students: [{ type: Schema.Types.ObjectId, ref: 'User', required: false }],
@@ -59,23 +62,19 @@ var courseSchema = new Schema({
         progress: Boolean
     }
 });
+courseSchema.index({course_code: 'text', name: 'text', description: 'text'}, {weights: {course_code: 10, name: 5, description: 1}});
 
 /*
 * Feature schemas
 */
 
-//a general gamification badge
-var badgeSchema = new Schema({
-    icon: {type: String, required: true},   //path to an icon image file
-    title: {type: String, required: true},
-    description: {type: String, required: true}
-});
-
 //a course-specific badge. Needs reference to a course, badge and goals that "unlocks" it.
-var courseBadgeSchema = new Schema({
+var badgeSchema = new Schema({
     course_id: { type: Schema.Types.ObjectId, ref: 'Course', required: true},
-    badge_id: { type: Schema.Types.ObjectId, ref: 'Badge', required: true},
-    //Goals that "unlocks" the badge. This can be other badge(s), assignment(s) etc.
+    icon: {type: String, required: true},   //name of an icon image file
+    title: {type: String, required: true},
+    description: {type: String, required: true},
+    //Goals that "unlocks" the badge. This can be other CourseBadge(s), Assignment(s) etc.
     goals: {
         badges: [{ type: Schema.Types.ObjectId, ref: 'Badge', required: false}],
         assignments:
@@ -105,9 +104,8 @@ var User = mongoose.model('User', userSchema);
 var Draft = mongoose.model('Draft', draftSchema);
 var Course = mongoose.model('Course', courseSchema);
 var Badge = mongoose.model('Badge', badgeSchema);
-var CourseBadge = mongoose.model('CourseBadge', courseBadgeSchema);
 var Features = mongoose.model('Features', featuresSchema);
 var models = {Assignment: Assignment, Test: Test, User: User, Draft: Draft, Course: Course,
-    Badge: Badge, CourseBadge: CourseBadge, Features: Features};
+    Badge: Badge, CourseBadge: Badge, Features: Features};
 
 module.exports = models;

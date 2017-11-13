@@ -12,6 +12,8 @@ function init(emitter, name) {
                 let json = {};
                 json[name] = result;
                 resolve(json);
+            }).catch(function(err) {
+                logger.error(err);
             });
         });
     });
@@ -20,21 +22,22 @@ function init(emitter, name) {
 async function run(data) {
 
     let newBadges = [];
+
     let feature = await helper.getFeature(data.user_id, data.assignment_id);
 
     // Merge result with existing data
     feature.progress = mergeResultWithProgress(data, feature.progress);
 
-    let courseBadges = await queries.getCourseBadgeByCourseID(data.course_id);
+    let badges = await queries.getBadgeByCourseID(data.course_id);
 
     // Badges can need other badges in order to be completed
     let achievedNewBadge = true;
     while(achievedNewBadge) {
         // Only iterate loop if a new badge has been completed
         achievedNewBadge = false;
-        for(let courseBadge of courseBadges) {
+        for(let badge of badges) {
             // Calculate a new badge
-            let badge = calcCourseBadge(feature.badges, feature.progress, courseBadge);
+            let badge = calcBadge(feature.badges, feature.progress, badge);
             if(badge !== undefined && feature.badges.indexOf(badge) === -1) {
                 let result = await queries.addBadgeToFeature(badge, feature._id);
                 newBadges.push(await queries.getBadge(badge));
@@ -43,7 +46,6 @@ async function run(data) {
             }
         }
     }
-
 
     return newBadges;
 }
@@ -68,15 +70,15 @@ function mergeResultWithProgress(result, progress) {
     return progress;
 }
 
-function calcCourseBadge(badges, progress, courseBadge) {
+function calcBadge(badges, progress, badge) {
 
     // Compare badges
-    if(!helper.arrayContainsArray(badges, courseBadge.goals.badges)) {
-        logger.warn('Badges failed coursebadge');
+    if(!helper.arrayContainsArray(badges, badge.goals.badges)) {
+        logger.warn('Badges failed badge');
         return;
     }
 
-    for(let assignment of courseBadge.goals.assignments) {
+    for(let assignment of badge.goals.assignments) {
 
         // Find assignment in progress
         let assignment_progress;
@@ -87,7 +89,7 @@ function calcCourseBadge(badges, progress, courseBadge) {
             }
         }
         if(assignment_progress === undefined) {
-            logger.warn("Assignment required for CourseBadge as not yet been done");
+            logger.warn("Assignment required for Badge as not yet been done");
             return;
         }
 
@@ -108,13 +110,13 @@ function calcCourseBadge(badges, progress, courseBadge) {
         // Compare code size
         if("code_size" in assignment) {
             if(assignment.code_size < assignment_progress.code_size) {
-                logger.warn("Code size was larger than required for CourseBadge");
+                logger.warn("Code size was larger than required for Badge");
                 return;
             }
         }
     }
 
-    return courseBadge.badge_id;
+    return badge.badge_id;
 }
 
 exports.init = init;
