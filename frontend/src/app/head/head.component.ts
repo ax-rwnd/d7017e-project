@@ -67,13 +67,13 @@ export class HeadComponent implements OnInit {
   getUsername(res) { // retrieve username from the database with the getMe() function from backendService
     const that = this;
     this.backendService.getMe().then(function(data) {
-      res = data; // can't use data.username directly, so assign it to another variable first
+      res = data;
       return that.userID = res.username;
     });
   }
 
   ngOnInit() {
-    this.getUsername(this.res); // have to use res to get username, data.username doesn't work
+    this.getUsername(this.res);
     this.stateDropDown = false;
     this.user = this.userService.userInfo;
     this.sidebarState = this.appComponent.sidebarState;
