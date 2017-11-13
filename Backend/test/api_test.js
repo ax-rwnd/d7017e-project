@@ -35,7 +35,7 @@ function it_rejects_unauthorized_post(route) {
 describe('/api', () => {
     let access_tokens;
     let fake_admin_id = '59fb4afa453dd62c44b07d29';
-    // skattedeklaration
+    // intro programmering
     let course_id = '59f6f88b1ac36c0762eb46a9';
 
     before(() => {
@@ -130,7 +130,7 @@ describe('/api', () => {
                     .set('Authorization', 'Bearer ' + access_tokens.user)
                     .expect(200)
                     .then(res => {
-                        assert.equal(res.body.name, "Introduktion till skattedeklaration");
+                        assert.equal(res.body.name, "Introduktion till programmering");
                     });
             });
         });
@@ -148,6 +148,28 @@ describe('/api', () => {
                         assert(Array.isArray(res.body.students), 'not an array');
                         assert(res.body.students.length > 0, 'array is empty');
                     });
+            });
+        });
+
+        describe('PUT /api/courses/:course_id/students', () => {
+            let route = '/api/courses/' + course_id + '/students';
+
+            it('succeeds if you are a teacher with valid input', () => {
+                return request(runner.server)
+                    .put(route)
+                    .send({
+                        student_id: '59fc236a2b731410888bf8f2'
+                    }).set('Authorization', 'Bearer ' + access_tokens.user)
+                    .expect(200);
+            });
+
+            it.skip('does temporary debugging things', () => {
+                return request(runner.server)
+                    .put(route)
+                    .send({
+                        student_id: '5a04819da823e12a84ef3f06'///*'59fc236a2b731410888bf8f2'*/ '1234'
+                    }).set('Authorization', 'Bearer ' + access_tokens.user)
+                    .expect(200);
             });
         });
 
@@ -229,6 +251,7 @@ describe('/api', () => {
                 return request(runner.server)
                 .get(route)
                 .set('Authorization', 'Bearer ' + access_tokens.user)
+                .expect(200)
                 .then(res => {
                     assert.equal(res.body.username, 'fake-admin-00');
                 });

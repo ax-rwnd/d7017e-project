@@ -117,6 +117,26 @@ module.exports = function(router) {
         });
     });
 
+    router.put('/:course_id/students', auth.validateJWTtoken, function (req, res, next) {
+        var course_id = req.params.course_id;
+        var student_id = req.body.student_id;
+        queries.getUser(req.user.id, "teaching")
+        .then(function (userObject) {
+            // admins and teachers can invite students
+            if (req.user.admin || userObject.teaching.indexOf(course_id) !== -1) {
+                return queries.addCourseStudent(course_id, student_id);
+            } else {
+                // TODO: use a better error
+                next(errors.INSUFFICIENT_PERMISSION);
+            }
+        }).then(function () {
+            res.sendStatus(200);
+        }).catch(err => {
+            console.log(err);
+            next(err);
+        });
+    });
+
     router.get('/:course_id/teachers', auth.validateJWTtoken, function (req, res, next) {
         var course_id = req.params.course_id;
 

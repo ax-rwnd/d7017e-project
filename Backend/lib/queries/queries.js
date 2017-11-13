@@ -224,6 +224,48 @@ function getCourseStudents(id, fields) {
     });
 }
 
+// Adds a student to a course. Because of the database schema,
+// the user document receives a reference to the course AND
+// the course document receives a reference to the user.
+// In Mongo, we get per-document atomicity.
+function addCourseStudent(course_id, student_id) {
+    return User.count({_id: student_id})
+    .then(count => {
+        if (count === 0) {
+            // TODO use an APIError
+            throw new Error('No such student');
+        }
+        return Course.update(
+            {_id: course_id},
+            {$addToSet: {students: student_id}},
+            {runValidators: true}
+        );
+    }).then(function (raw) {
+        // check if the course update was ok
+        if (raw.ok !== 1) {
+            // TODO: make a real error message!
+            throw new Error('Mongo error: failed to add to user.courses');
+        // check if the course existed
+        } else if (raw.n === 0) {
+            // TODO: make it an APIError
+            throw new Error('Course does not exist');
+        }
+        return User.update(
+            {_id: student_id},
+            {$addToSet: {courses: course_id}},
+            {runValidators: true}
+        );
+    }).then(function(raw) {
+        // check if the user update was ok
+        if (raw.ok === 1) {
+            return true;
+        } else {
+            // TODO: make a real error message!
+            throw new Error('Mongo error: failed to add to user.courses');
+        }
+    });
+}
+
 function getCourseTeachers(id, fields) {
     var wantedFields = fields || "username email admin courses providers";
 
@@ -402,6 +444,7 @@ exports.getCourses = getCourses;
 exports.createCourse = createCourse;
 exports.getUserCourses = getUserCourses;
 exports.getCourseStudents = getCourseStudents;
+exports.addCourseStudent = addCourseStudent;
 exports.getCourseTeachers = getCourseTeachers;
 exports.getCourseAssignments = getCourseAssignments;
 exports.setRefreshToken = setRefreshToken;
