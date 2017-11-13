@@ -4,7 +4,6 @@ var express = require('express'); //Routes package
 var mongoose = require('mongoose'); //Database communication
 mongoose.Promise = require('bluebird');
 var bodyParser = require('body-parser');
-var passport = require('passport'); //authentication
 var expressHbs = require('express-handlebars');
 var cors = require('cors');
 var config = require('config');
@@ -40,7 +39,6 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
     extended: true
 }));
-app.use(passport.initialize());
 app.use(cors({origin: '*'}));
 
 //defining routes

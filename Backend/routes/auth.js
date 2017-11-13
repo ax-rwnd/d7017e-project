@@ -155,7 +155,6 @@ module.exports = function (router) {
     });
 
     router.get('/accesstoken', auth.validateRefToken, function (req, res, next) {
-
         queries.getUser(req.user.id, "username email courses admin").then(function (user) {
             res.json({
                 access_token: create_access_token(user.id, user.admin),

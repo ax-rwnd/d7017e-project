@@ -230,12 +230,8 @@ module.exports = function(router) {
     // course_id not used, should route be changed? Implement some check?
     router.post('/:course_id/assignments/:assignment_id/save', auth.validateJWTtoken, function (req, res, next) {
         var assignment_id = req.params.assignment_id;
-        var code = req.body.code;
-        var lang = req.body.lang;
-
-        if (code === undefined || lang === undefined) {
-            return next(errors.BAD_INPUT);
-        }
+        var code = req.body.code || "";
+        var lang = req.body.lang || "";
 
         queries.saveCode(req.user.id, assignment_id, code, lang).then(function (draft) {
             res.json(draft);
