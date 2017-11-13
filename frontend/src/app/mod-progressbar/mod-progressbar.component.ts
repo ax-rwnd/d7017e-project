@@ -9,4 +9,4 @@ export class ModProgressbarComponent implements OnInit {
   @Input() progress: number;
 
   ngOnInit() {
- }
+ }}
