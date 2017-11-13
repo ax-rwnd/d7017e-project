@@ -430,38 +430,52 @@ function getCoursesEnabledFeatures(course_id) {
     });
 }
 
-function searchDB(query) {
+function searchDB(query, user_id) {
 
-    let promises = [];
+    return getUserCourses(user_id, '_id').then(function(courses) {
 
+        // Get IDs of courses user is in
+        let ids = [];
+        for(let course of courses.courses) {
+            ids.push(course._id);
+        }
 
-    promises.push(Course.find({$text: {$search: query}, 'hidden': false}, {score: {$meta: "textScore"}})
-        .select('-__v -hidden -features -assignments -students -enabled_features')
-        .sort({score: {$meta: "textScore"}})
-        .limit(999999).then(docs => {
-            return {'courses': docs};
-        }).catch(err => {
-            console.log(err);
-        }));
+        // Get assignemnts IDs from courses
+        // TODO
+        /*return getCourseAssignments(!DS 4RR4Y, '_id').then(function(assignment) {
 
-    promises.push(Assignment.find({$text: {$search: query}, 'hidden': false}, {score: {$meta: "textScore"}})
-        .select('-__v -tests -optional_tests -hidden -languages')
-        .sort({score: {$meta: "textScore"}})
-        .limit(999999).then(docs => {
-            return {'assignments': docs};
-        }).catch(err => {
-            console.log(err);
-        }));
-    promises.push(User.find({$text: {$search: query}}, {score: {$meta: "textScore"}})
-        .select('-__v -tokens -providers')
-        .sort({score: {$meta: "textScore"}})
-        .limit(999999).then(docs => {
-            return {'users': docs};
-        }).catch(err => {
-            console.log(err);
-        }));
+        });*/
 
-    return Promise.all(promises);
+        let promises = [];
+
+        promises.push(Course.find({$text: {$search: query}, 'students': user_id, 'hidden': false}, {score: {$meta: "textScore"}})
+            .select('-__v -hidden -features -assignments -students -enabled_features')
+            .sort({score: {$meta: "textScore"}})
+            .limit(20).then(docs => {
+                return {'courses': docs};
+            }).catch(err => {
+                console.log(err);
+            }));
+
+        promises.push(Assignment.find({$text: {$search: query}, 'hidden': false}, {score: {$meta: "textScore"}})
+            .select('-__v -tests -optional_tests -hidden -languages')
+            .sort({score: {$meta: "textScore"}})
+            .limit(20).then(docs => {
+                return {'assignments': docs};
+            }).catch(err => {
+                console.log(err);
+            }));
+        promises.push(User.find({$text: {$search: query}}, {score: {$meta: "textScore"}})
+            .select('-__v -tokens -providers')
+            .sort({score: {$meta: "textScore"}})
+            .limit(20).then(docs => {
+                return {'users': docs};
+            }).catch(err => {
+                console.log(err);
+            }));
+
+        return Promise.all(promises);
+    });
 }
 
 exports.getTestsFromAssignment = getTestsFromAssignment;

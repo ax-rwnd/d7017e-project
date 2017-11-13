@@ -30,6 +30,9 @@ function initFeatures() {
 }
 
 function emitEvent(result) {
+
+    console.log("emitEvent");
+
     return new Promise(function (resolve, reject) {
 
         result.passed = helper.passAllMandatoryTests(result);
@@ -40,6 +43,8 @@ function emitEvent(result) {
         }
 
         helper.getFeature(result.user_id, result.assignment_id).then(function(feature) {
+
+            console.log(feature);
             emitter.emit('handleFeatures', result).then(function(data) {
                 result.features = createResultjson(data);
                 resolve(result);

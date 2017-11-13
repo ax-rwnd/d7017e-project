@@ -18,8 +18,8 @@ module.exports = function(router) {
         if(req.query.query.length < config.get('Search.min_query_length')) {
             return next(errors.TOO_SHORT_QUERY);
         }
-
-        queries.searchDB(req.query.query).then(function (results) {
+        
+        queries.searchDB(req.query.query, req.user.id).then(function (results) {
             let json = {};
 
             for(let result of results) {
