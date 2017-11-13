@@ -107,8 +107,6 @@ describe('Features routes', () => {
             .expect(200)
             .then(res => {
                 //console.log(res.body);
-            }).catch(function(err) {
-                console.log(err);
             });
     });
 
@@ -124,33 +122,77 @@ describe('Features routes', () => {
             .expect(200)
             .then(res => {
                 //console.log(res.body);
-            }).catch(function(err) {
-                console.log(err);
             });
     });
 
 });
 
+describe('Badge routes', () => {
 
-describe('Tester', () => {
     let access_token;
 
     before(() => {
         return auth().then(at => access_token = at);
     });
 
-    it('GET /api/tester/languages', () => {
+    let badge = {
+        course_id: "59f991991ac36c0762eb46af",
+        icon: 'pretty_icon',   //name of an icon image file
+        title: 'Pretty badge',
+        description: 'Very impossibru badge',
+        goals: {
+            badges: [],
+            assignments: []
+        }
+    };
+    
+    let new_title = 'Another title';
 
-        let route = '/api/tester/languages';
+    let badge_id;
+
+    it('POST /api/features/badge', () => {
+
+        let route = '/api/features/badge';
 
         return request(runner.server)
-            .get(route)
+            .post(route)
             .set('Authorization', 'Bearer ' + access_token)
+            .send(badge)
+            .set('Content-Type', 'application/json')
             .expect(200)
-            .then(function(res) {
-                //console.log(res.text);
-            }).catch(err => {
-                console.log(err);
+            .then(res => {
+                badge_id = res.body._id;
             });
     });
+
+    it('PUT /api/features/badge', () => {
+
+        badge.title = new_title;
+
+        let route = '/api/features/badge';
+
+        return request(runner.server)
+            .put(route+'/'+badge_id)
+            .set('Authorization', 'Bearer ' + access_token)
+            .send(badge)
+            .set('Content-Type', 'application/json')
+            .expect(200)
+            .then(res => {
+                //console.log(res.body);
+            });
+    });
+
+    it('GET /api/features/badge', () => {
+
+        let route = '/api/features/badge';
+
+        return request(runner.server)
+            .put(route+'/'+badge_id)
+            .set('Authorization', 'Bearer ' + access_token)
+            .expect(200)
+            .then(res => {
+                assert(res.body.title == new_title, 'Updated badge did not have title '+new_title+' but '+res.body.title);
+            });
+    });
+
 });

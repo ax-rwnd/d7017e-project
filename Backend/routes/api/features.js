@@ -9,8 +9,8 @@ var logger = require('../../logger.js');
 module.exports = function(router) {
 
     router.post('/badge', auth.validateJWTtoken, function (req, res, next) {
-        features.createBadge(req.body).then(function() {
-            res.sendStatus(200);
+        features.createBadge(req.body).then(function(badge) {
+            res.send(badge);
         }).catch(next);
     });
 
@@ -21,27 +21,14 @@ module.exports = function(router) {
     });
 
     router.put('/badge/:badge_id', auth.validateJWTtoken, function(req, res, next) {
-        features.updateBadge(req.params.badge_id, req.body).then(function() {
-            res.sendStatus(200);
+        features.updateBadge(req.params.badge_id, req.body).then(function(badge) {
+            res.send(badge);
         }).catch(next);
     });
 
-    router.post('/coursebadge', auth.validateJWTtoken, function(req, res, next) {
-        features.createCourseBadge(req.body).then(function() {
-            res.sendStatus(200);
-        }).catch(next);
-    });
-
-    router.get('/coursebadge/:coursebadge_id', auth.validateJWTtoken, function(req, res, next) {
-        features.getCourseBadge(req.params.coursebadge_id).then(function(courseBadge) {
-            res.send(courseBadge);
-        }).catch(next);
-    });
-
-    router.put('/coursebadge/:coursebadge_id', auth.validateJWTtoken, function(req, res, next) {
-        features.updateCourseBadge(req.params.coursebadge_id, req.body).then(function() {
-            res.sendStatus(200);
-        }).catch(next);
+    router.delete('/badge/:badge_id', auth.validateJWTtoken, function(req, res, next) {
+        // TODO
+        res.sendStatus(501);
     });
 
     router.get('/features/:course_id', auth.validateJWTtoken, function(req, res, next) {

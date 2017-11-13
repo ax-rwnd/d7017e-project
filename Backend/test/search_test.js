@@ -26,8 +26,6 @@ function auth() {
         .expect(200)
         .then(res => {
             return res.body.access_token;
-        }).catch(function(err) {
-            console.log(err);
         });
 }
 
@@ -54,8 +52,6 @@ describe('GET /api/search', () => {
             .expect(400)
             .then(res => {
                 //console.log(res.body);
-            }).catch(function(err) {
-                console.log(err);
             });
     });
 
@@ -70,8 +66,6 @@ describe('GET /api/search', () => {
             .expect(400)
             .then(res => {
                 //console.log(res.body);
-            }).catch(function(err) {
-                console.log(err);
             });
     });
 
@@ -86,8 +80,6 @@ describe('GET /api/search', () => {
             .expect(200)
             .then(res => {
                 //console.log(res.body);
-            }).catch(function(err) {
-                console.log(err);
             });
     });
 });

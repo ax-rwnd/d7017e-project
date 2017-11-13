@@ -7,7 +7,6 @@ var Test = require('../../models/schemas').Test;
 var User = require('../../models/schemas').User;
 var Badge = require('../../models/schemas').Badge;
 var Features = require('../../models/schemas').Features;
-var CourseBadge = require('../../models/schemas').CourseBadge;
 var errors = require('../errors.js');
 var logger = require('../../logger.js');
 
@@ -32,32 +31,11 @@ function updateBadge(badge_id, data) {
     });
 }
 
-function createCourseBadge(data) {
-    let courseBadge = new CourseBadge(data);
-    return courseBadge.save();
-}
-
-function getCourseBadge(coursebadge_id) {
-    return CourseBadge.findById(coursebadge_id).then(function(courseBadge) {
-        if(courseBadge === null)
-            throw errors.COURSEBADGE_DO_NOT_EXIST;
-        return courseBadge;
-    });
-}
-
-function updateCourseBadge(coursebadge_id, data) {
-    return CourseBadge.findOneAndUpdate({'_id': coursebadge_id}, data, { runValidators: true }).then(function(courseBadge) {
-        if(courseBadge === null)
-            throw errors.COURSEBADGE_DO_NOT_EXIST;
-        return courseBadge;
-    });
-}
-
-function getCourseBadgeByCourseID(course_id) {
-    return CourseBadge.find({'course_id': course_id}).then(function(courseBadge) {
-        if(courseBadge === null)
-            throw errors.COURSEBADGE_DO_NOT_EXIST;
-        return courseBadge;
+function getBadgeByCourseID(course_id) {
+    return Badge.find({'course_id': course_id}).then(function(badge) {
+        if(badge === null)
+            throw errors.BADGE_DO_NOT_EXIST;
+        return badge;
     });
 }
 
@@ -201,17 +179,13 @@ async function getFeatureOfUserID(course_id, user_id) {
 
     feature.total_assignments = await getNumberOfAssignments(course_id);
     feature.completed_assignments = await getNumberOfCompletedAssignments(course_id, user_id);
-    
+
     return feature;
 }
 
 exports.createBadge = createBadge;
 exports.getBadge = getBadge;
 exports.updateBadge = updateBadge;
-exports.createCourseBadge = createCourseBadge;
-exports.getCourseBadge = getCourseBadge;
-exports.updateCourseBadge = updateCourseBadge;
-exports.getCourseBadgeByCourseID = getCourseBadgeByCourseID;
 exports.getCourseByID = getCourseByID;
 exports.getCourseByAssignmentID = getCourseByAssignmentID;
 exports.getNumberOfAssignments = getNumberOfAssignments;
