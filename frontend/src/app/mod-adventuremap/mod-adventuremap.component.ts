@@ -7,27 +7,30 @@ import { Component, OnInit, Input } from '@angular/core';
   styleUrls: ['../gameelement/gameelement.component.css', './mod-adventuremap.component.css']
 })
 export class ModAdventuremapComponent implements OnInit {
-
-	@Input() assignments: any[];
-  assignmentz: {};
+	
+	@Input() assignments: Assignment;
 
   ngOnInit() {
   	test();
   }
+}
 
-getCourseElement(number) {
+function getCourseElement(number) {
     //todo
     //fetch the correct assignment/lab from the course
     
    }
 
 function test(){
+	const a = [];
   	for (let i=0; i<4; i++){
-  		assignmentz{i} = {id: i, name: 'name s', available: true}
+  		a[i] = {id: i, name: 'name s', available: true}
   	}
-		console.log('see amount', this.assignmentz);
+  	this.assignments = a;
+		//console.log('see amount', this.assignmentz);
 }
-interface assignmentz {
+
+interface Assignment {
 	id: number;
 	name: string;
 	available: boolean;
