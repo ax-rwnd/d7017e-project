@@ -85,7 +85,7 @@ describe('GET /api/search', () => {
             .set('Authorization', 'Bearer ' + access_token)
             .expect(200)
             .then(res => {
-                console.log(res.body);
+                //console.log(res.body);
             }).catch(function(err) {
                 console.log(err);
             });

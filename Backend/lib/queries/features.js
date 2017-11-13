@@ -201,9 +201,7 @@ async function getFeatureOfUserID(course_id, user_id) {
 
     feature.total_assignments = await getNumberOfAssignments(course_id);
     feature.completed_assignments = await getNumberOfCompletedAssignments(course_id, user_id);
-
-    console.log(feature);
-
+    
     return feature;
 }
 

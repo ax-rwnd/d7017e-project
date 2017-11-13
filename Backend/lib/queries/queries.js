@@ -431,20 +431,7 @@ function getCoursesEnabledFeatures(course_id) {
 }
 
 function searchDB(query, user_id) {
-
-    return getUserCourses(user_id, '_id').then(function(courses) {
-
-        // Get IDs of courses user is in
-        let ids = [];
-        for(let course of courses.courses) {
-            ids.push(course._id);
-        }
-
-        // Get assignemnts IDs from courses
-        // TODO
-        /*return getCourseAssignments(!DS 4RR4Y, '_id').then(function(assignment) {
-
-        });*/
+    return getAssignmentIDsByUser(user_id).then(assignment_ids => {
 
         let promises = [];
 
@@ -457,7 +444,7 @@ function searchDB(query, user_id) {
                 console.log(err);
             }));
 
-        promises.push(Assignment.find({$text: {$search: query}, 'hidden': false}, {score: {$meta: "textScore"}})
+        promises.push(Assignment.find({$text: {$search: query}, '_id': assignment_ids, 'hidden': false}, {score: {$meta: "textScore"}})
             .select('-__v -tests -optional_tests -hidden -languages')
             .sort({score: {$meta: "textScore"}})
             .limit(20).then(docs => {
@@ -475,6 +462,37 @@ function searchDB(query, user_id) {
             }));
 
         return Promise.all(promises);
+    });
+}
+
+// Helper function for searchDB()
+function getAssignmentIDsByUser(user_id) {
+    return getUserCourses(user_id, '_id').then(function(courses) {
+
+        // Get IDs of courses user is in
+        let ids = [];
+        for(let course of courses.courses) {
+            ids.push(course._id);
+        }
+
+        // Get assignemnts from courses
+        let assignment_promises = [];
+        for(let id of ids) {
+            assignment_promises.push(getCourseAssignments(id, 'assignments').then(assignment => {
+                return assignment;
+            }));
+        }
+
+        // Get assignment IDs from assignments
+        let assignment_ids = [];
+        return Promise.all(assignment_promises).then(course => {
+            for(let assignments of course) {
+                for(let assignment of assignments.assignments) {
+                    assignment_ids.push(assignment._id);
+                }
+            }
+            return assignment_ids;
+        });
     });
 }
 
