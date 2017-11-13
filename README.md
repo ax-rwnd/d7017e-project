@@ -12,14 +12,12 @@ Tester was built and tested with docker 17.09-ce.
 
 1. Clone the repo: `git clone https://github.com/ax-rwnd/d7017e-project`
 2. Change directory to the Manager folder: `cd d7017e-project/tester`
-  1. Install the dependencies for the Manager: `npm i`
-  2. Change directory to Runner: `cd runner`
-  3. Install dependencies for runner: `npm i`
-3. (Optional) Select languages by adding/removing dependencies in `Makefile`. For instance the line `all: python27 python3 java c #haskell` selects the languages Python 2.7, Python 3, Java, C, but not Haskell (since it's commented out).
-4. Run the Makefile: `make`
-5. (Optional) Set preferences for Runner in `config/default.js`. There, things like queue lengths and ports may be configured.
-6. Move back up to manager: `cd ..`
-7. Start Manager: `node server.js {PORT}`
+3. Install the dependencies for the Manager: `npm i`
+4. (Optional) Select languages by adding/removing dependencies in `Makefile`. For instance the line `all: python27 python3 java c #haskell` selects the languages Python 2.7, Python 3, Java, C, but not Haskell (since it's commented out).
+5. Run the Makefile: `make`
+6. (Optional) Set preferences for Runner in `config/default.js`. There, things like queue lengths and ports may be configured.
+7. Move back up to manager: `cd ..`
+8. Start Manager: `node server.js {PORT}`
 
 ## Backend [![Build Status](http://130.240.5.119:8080/job/GPP-Backend-Dev-CI/badge/icon)](http://130.240.5.119:8080/job/GPP-Backend-Dev-CI/)
 
