@@ -166,15 +166,6 @@ describe('/api', () => {
                     }).set('Authorization', 'Bearer ' + access_tokens.user)
                     .expect(200);
             });
-
-            it.skip('does temporary debugging things', () => {
-                return request(runner.server)
-                    .put(route)
-                    .send({
-                        student_id: '5a04819da823e12a84ef3f06'///*'59fc236a2b731410888bf8f2'*/ '1234'
-                    }).set('Authorization', 'Bearer ' + access_tokens.user)
-                    .expect(200);
-            });
         });
 
         describe('GET /api/courses/:course_id/teachers', () => {
@@ -192,23 +183,6 @@ describe('/api', () => {
                     });
             });
         });
-
-        //describe('POST /api/assignment??', () => {
-        //    it('stores the assignment in the database', (done) => {
-        //        request(runner.server)
-        //        .post('/api/assignment')
-        //        .send({
-        //            // TODO: real input
-        //            course_id: '0000000',
-        //            name: 'Assignment name',
-        //            text: 'Assignment text'
-        //        })
-        //        .expect('Content-Type', 'application/json')
-        //        .expect(200, {
-        //            id: 1 // TODO: should be a mongo id
-        //        }, done);
-        //    });
-        //});
 
         describe('GET /api/courses/:course_id/enabled_features', () => {
             let route = '/api/courses/' + course_id + '/enabled_features';
