@@ -192,11 +192,11 @@ describe('/api', () => {
             it('returns a non-empty list of assignments', () => {
                 return request(runner.server)
                     .get(route)
-                    .set('Authorization', 'Bearer' + access_tokens.user)
+                    .set('Authorization', 'Bearer ' + access_tokens.user)
                     .expect(200)
                     .then(res => {
                         assert(Array.isArray(res.body.assignments), 'not an array');
-                        assert(res.body.teachers.length > 0, 'array is empty');
+                        assert(res.body.assignments.length > 0, 'array is empty');
                     });
             });
         });
