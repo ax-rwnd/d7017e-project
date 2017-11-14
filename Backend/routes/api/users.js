@@ -11,7 +11,6 @@ const ADMIN_FILTER = "username email admin tokens courses";
 
 
 module.exports = function (router) {
-
     router.get('/', auth.validateJWTtoken, function (req, res, next) {
         var ids = req.query.ids;
         if (!ids) {

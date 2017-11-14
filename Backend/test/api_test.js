@@ -1,5 +1,8 @@
 'use strict';
 
+// force test mode BEFORE starting the server
+process.env.NODE_ENV = 'test';
+
 const request = require('supertest');
 const assert = require('assert');
 const ObjectId = require('mongoose').Types.ObjectId;
@@ -36,7 +39,7 @@ function it_rejects_unauthorized_post(route) {
 
 describe('/api', () => {
     let access_tokens;
-    let fake_admin_id = '59fb4afa453dd62c44b07d29';
+    let fake_admin_id = '5a041440bf85f83d5446f3bc';
     // intro programmering
     let course_id = '59f6f88b1ac36c0762eb46a9';
 
@@ -79,8 +82,9 @@ describe('/api', () => {
                     .set('Authorization', 'Bearer ' + access_tokens.user)
                     .expect(200)
                     .then(res => {
-                        assert(Array.isArray(res.body), 'not an array');
-                        assert(res.body.length > 0, 'array is empty');
+                        let courses = res.body.courses;
+                        assert(Array.isArray(courses), 'not an array');
+                        assert(courses.length > 0, 'array is empty');
                     });
             });
         });
@@ -88,7 +92,6 @@ describe('/api', () => {
         describe('POST /api/courses', () => {
             let route = '/api/courses';
             it_rejects_unauthorized_post(route);
-            it_rejects_non_admin_post(route);
 
             it('returns the new id', () => {
                 return request(runner.server)
@@ -164,15 +167,6 @@ describe('/api', () => {
                     }).set('Authorization', 'Bearer ' + access_tokens.user)
                     .expect(200);
             });
-
-            it.skip('does temporary debugging things', () => {
-                return request(runner.server)
-                    .put(route)
-                    .send({
-                        student_id: '5a04819da823e12a84ef3f06'///*'59fc236a2b731410888bf8f2'*/ '1234'
-                    }).set('Authorization', 'Bearer ' + access_tokens.user)
-                    .expect(200);
-            });
         });
 
         describe('GET /api/courses/:course_id/teachers', () => {
@@ -190,23 +184,6 @@ describe('/api', () => {
                     });
             });
         });
-
-        //describe('POST /api/assignment??', () => {
-        //    it('stores the assignment in the database', (done) => {
-        //        request(runner.server)
-        //        .post('/api/assignment')
-        //        .send({
-        //            // TODO: real input
-        //            course_id: '0000000',
-        //            name: 'Assignment name',
-        //            text: 'Assignment text'
-        //        })
-        //        .expect('Content-Type', 'application/json')
-        //        .expect(200, {
-        //            id: 1 // TODO: should be a mongo id
-        //        }, done);
-        //    });
-        //});
 
         describe('GET /api/courses/:course_id/assignments', () => {
             let route = '/api/courses/' + course_id + '/assignments';

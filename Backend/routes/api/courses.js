@@ -9,14 +9,38 @@ var testerCom = require('../../lib/tester_communication');
 var Assignment = require('../../models/schemas').Assignment;
 var Test = require('../../models/schemas').Test;
 
+const BASIC_FILTER = "name description";
+const ADMIN_FILTER = "name description course_code teachers students assignments features enabled_features hidden";
+
 module.exports = function(router) {
-
-
     // Get all courses in db
     // If admin get all
     // If teacher or student get all not hidden courses.
     // Also get hidden courses if teacher/student of it?
     router.get('/', auth.validateJWTtoken, function (req, res, next) {
+        var ids = req.query.ids;
+
+        var filter = (req.user.admin === true)
+            ? ADMIN_FILTER
+            : BASIC_FILTER;
+
+        if (!ids) {
+            queries.getCourses(filter, req.user.admin).then(function (courses) {
+                return res.json({courses: courses});
+            })
+            .catch(function (err) {
+                next(err);
+            });
+        } else {
+            var id_array = ids.split(',');
+            queries.getCourses(filter, req.user.admin, id_array).then(function (courses) {
+                return res.json({courses: courses});
+            })
+            .catch(function (err) {
+                next(err);
+            });
+        }
+        
         //Need user object from token verify for admin check.
         /*
         if (user.admin) {
@@ -28,12 +52,6 @@ module.exports = function(router) {
             });
         }
         */
-        queries.getCourses("name description", false).then(function (courses) {
-            return res.json(courses);
-        })
-        .catch(function (err) {
-            next(err);
-        });
     });
 
 
