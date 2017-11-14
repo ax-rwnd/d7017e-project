@@ -209,7 +209,7 @@ describe('/api', () => {
         //});
 
         describe('GET /api/courses/:course_id/assignments', () => {
-            let route = 'api/courses/' + course_id + 'assignments';
+            let route = 'api/courses/' + course_id + '/assignments';
             it_rejects_unauthorized_get(route);
 
             it('returns a non-empty list of assignments', () => {
