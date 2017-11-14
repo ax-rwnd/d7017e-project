@@ -82,8 +82,9 @@ describe('/api', () => {
                     .set('Authorization', 'Bearer ' + access_tokens.user)
                     .expect(200)
                     .then(res => {
-                        assert(Array.isArray(res.body), 'not an array');
-                        assert(res.body.length > 0, 'array is empty');
+                        let courses = res.body.courses;
+                        assert(Array.isArray(courses), 'not an array');
+                        assert(courses.length > 0, 'array is empty');
                     });
             });
         });
