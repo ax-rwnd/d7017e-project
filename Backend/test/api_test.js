@@ -191,7 +191,7 @@ describe('/api', () => {
             });
         });
         
-        describe('POST /api/courses/:course_id/assignments' () => {
+        describe('POST /api/courses/:course_id/assignments', () => {
             let route = '/api/courses/' + course_id + '/assignments';
             
             it('returns an assignment id', () => {
