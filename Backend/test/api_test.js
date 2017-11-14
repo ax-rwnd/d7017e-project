@@ -190,23 +190,26 @@ describe('/api', () => {
                     });
             });
         });
-
-        //describe('POST /api/assignment??', () => {
-        //    it('stores the assignment in the database', (done) => {
-        //        request(runner.server)
-        //        .post('/api/assignment')
-        //        .send({
-        //            // TODO: real input
-        //            course_id: '0000000',
-        //            name: 'Assignment name',
-        //            text: 'Assignment text'
-        //        })
-        //        .expect('Content-Type', 'application/json')
-        //        .expect(200, {
-        //            id: 1 // TODO: should be a mongo id
-        //        }, done);
-        //    });
-        //});
+        
+        describe('POST /api/courses/:course_id/assignments' () => {
+            let route = '/api/courses/' + course_id + '/assignments';
+            
+            it('returns an assignment id', () => {
+                return request(runner.server)
+                    .post(route)
+                    .send({
+                        name: 'Introduktion till tester',
+                        description: 'Skriv tester med mocha',
+                        hidden: false,
+                        languages: 'javascript'
+                    })
+                    .set('Authorization', 'Bearer' + access_tokens.user)
+                    .expect(200)
+                    .then(res => {
+                        assert(ObjectId.isValid(res.body._id), 'response is not a valid ObjectId');
+                    });
+            });
+        });
 
         describe('GET /api/courses/:course_id/enabled_features', () => {
             let route = '/api/courses/' + course_id + '/enabled_features';
