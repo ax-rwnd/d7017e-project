@@ -119,7 +119,7 @@ module.exports = function (router) {
         });
     });
 
-    if (config.get('App.environment') === 'development') {
+    if (config.get('App.environment') === 'development' || config.get('App.environment') === 'test') {
         router.get('/login/fake', (req, res, next) => {
             let admin = req.query.admin === 'true';
             let role = admin ? 'admin' : 'student';
