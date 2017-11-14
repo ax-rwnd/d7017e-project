@@ -1,5 +1,8 @@
 'use strict';
 
+// force test mode BEFORE starting the server
+process.env.NODE_ENV = 'test';
+
 const request = require('supertest');
 const assert = require('assert');
 const ObjectId = require('mongoose').Types.ObjectId;
@@ -36,7 +39,7 @@ function it_rejects_unauthorized_post(route) {
 
 describe('/api', () => {
     let access_tokens;
-    let fake_admin_id = '59fb4afa453dd62c44b07d29';
+    let fake_admin_id = '5a041440bf85f83d5446f3bc';
     // intro programmering
     let course_id = '59f6f88b1ac36c0762eb46a9';
 
@@ -88,7 +91,6 @@ describe('/api', () => {
         describe('POST /api/courses', () => {
             let route = '/api/courses';
             it_rejects_unauthorized_post(route);
-            it_rejects_non_admin_post(route);
 
             it('returns the new id', () => {
                 return request(runner.server)
