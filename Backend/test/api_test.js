@@ -184,6 +184,22 @@ describe('/api', () => {
             });
         });
 
+        describe('GET /api/courses/:course_id/assignments', () => {
+            let route = 'api/courses/' + course_id + '/assignments';
+            it_rejects_unauthorized_get(route);
+
+            it('returns a non-empty list of assignments', () => {
+                return request(runner.server)
+                    .get(route)
+                    .set('Authorization', 'Bearer' + access_tokens.user)
+                    .expect(200)
+                    .then(res => {
+                        assert(Array.isArray(res.body.assignments), 'not an array');
+                        assert(res.body.teachers.length > 0, 'array is empty');
+                    });
+            });
+        });
+
         describe('GET /api/courses/:course_id/enabled_features', () => {
             let route = '/api/courses/' + course_id + '/enabled_features';
             it_rejects_unauthorized_get(route);
