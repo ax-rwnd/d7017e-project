@@ -10,7 +10,7 @@ export class CourseService {
   constructor(private backendService: BackendService, private assignmentService: AssignmentService) {
     this.courses = [];
     /***hardcoded info later gotten from database***/
-    let lbEntry1 = {name: 'anonymous', score: 80};
+    /*let lbEntry1 = {name: 'anonymous', score: 80};
     let lbEntry2 = {name: 'anonymous', score: 76};
     let lbEntry3 = {name: 'you', score: 70};
     let lbEntry4 = {name: 'anonymous', score: 67};
@@ -61,7 +61,7 @@ export class CourseService {
     this.courses[0] = course0;
     this.courses[1] = course1;
     this.courses[2] = course2;
-    this.courses[3] = course3;
+    this.courses[3] = course3;*/
   }
   CreateCourse(id, name, code, course_info, progress, score, badges, leaderboard) {
     const progValue = progress ? 0 : false;

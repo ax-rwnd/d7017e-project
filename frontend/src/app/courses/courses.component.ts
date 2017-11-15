@@ -33,8 +33,8 @@ export class CoursesComponent implements OnInit {
     this.headService.stateChange.subscribe(sidebarState => { this.sidebarState = sidebarState; });
     this.route.params.subscribe( params => {
       this.currentCourse = this.courseService.GetCourse(params['course']);
-      if (this.assignmentService.courseAssignments[this.currentCourse.code] !== undefined) {
-        this.assignmentGroups = this.assignmentService.courseAssignments[this.currentCourse.code];
+      if (this.assignmentService.courseAssignments[this.currentCourse.id] !== undefined) {
+        this.assignmentGroups = this.assignmentService.courseAssignments[this.currentCourse.id];
       } else {
         this.assignmentGroups = this.assignmentService.courseAssignments['default'];
       }
@@ -62,11 +62,9 @@ export class CoursesComponent implements OnInit {
   }}
 
   getProgress() {
-    return (this.progress / this.assignmentService.numberOfAssignments(this.currentCourse.code)) * 100;
+    return (this.progress / this.assignmentService.numberOfAssignments(this.currentCourse.id)) * 100;
   }
 }
-
-
 
 interface AssignmentGroup {
   name: string;
