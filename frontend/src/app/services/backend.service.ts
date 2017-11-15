@@ -42,7 +42,7 @@ export class BackendService {
     return this.http.get(environment.backend_ip + endpoint)
                 .toPromise()
                 .then(response => response)
-                .catch(err => console.error('API Get failed in ' + endpoint + ' error ' + err));
+                .catch(err => console.error('API Get failed in ' + endpoint + ' error', err));
   }
 
   private apiPost(endpoint, body) {
@@ -51,7 +51,7 @@ export class BackendService {
     return this.http.post(environment.backend_ip + endpoint, body, {responseType: 'text'})
                 .toPromise()
                 .then(response => response)
-                .catch(err => console.error('API Post failed in ' + endpoint + ' error ' + err));
+                .catch(err => console.error('API Post failed in ' + endpoint + ' error ', err));
   }
 
   private apiPut(endpoint, body) {
@@ -60,7 +60,7 @@ export class BackendService {
     return this.http.put(environment.backend_ip + endpoint, body, {responseType: 'text'})
                 .toPromise()
                 .then(response => response)
-                .catch(err => console.error('API Put failed in ' + endpoint + ' error ' + err));
+                .catch(err => console.error('API Put failed in ' + endpoint + ' error ', err));
   }
 
   // Add a student to a course.
