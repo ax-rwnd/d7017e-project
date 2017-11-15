@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
-import { Router, CanActivate } from '@angular/router';
+import {Router, CanActivate} from '@angular/router';
 import { AuthService } from './Auth.service';
 import {CourseService} from '../course.service';
 import {UserService} from '../user.service';
+import { environment } from '../../../environments/environment';
 
 @Injectable()
 export class AuthGuardService implements CanActivate {
@@ -12,9 +13,12 @@ export class AuthGuardService implements CanActivate {
   canActivate() {
     return new Promise(resolve => {
       if (!this.auth.isAuthenticated()) {
-        this.router.navigate(['/']);
+        // NOT AUTHENTICATED
+        const redirect = 'https://weblogon.ltu.se/cas/login?service=' + environment.frontend_ip + '/auth?urlPath=' + window.location.href;
+        window.location.href = redirect;
         resolve(false);
       } else if (!this.courseService.updated || !this.userService.updated) {
+        // AUTHENTICATED
         this.courseService.updated = true;
         this.userService.updated = true;
         activateHelper(this.courseService, this.userService)

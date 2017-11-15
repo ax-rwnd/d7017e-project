@@ -145,4 +145,7 @@ export class BackendService {
   getFeaturesCourse (course_id: string) {
     return this.apiGet('/api/features/features/' + course_id);
   }
+  login(ticket: string, service: string) {
+    return this.apiGet('/auth/login/ltu?ticket=' + ticket + '&service=' + service);
+  }
 }

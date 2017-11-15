@@ -72,7 +72,12 @@ export class UserComponent implements OnInit {
   }
 
   getMe() {
-    console.log(this.backendService.getUser(new ObjectID('59f84c545747361ba848b238')));
+    // console.log(this.backendService.getUser(new ObjectID('59f84c545747361ba848b238')));
+    return this.backendService.getMe().then(resp => {
+      console.log(resp);
+    }).catch(err => {
+      console.log(err);
+    });
     /*
     this.http.get(environment.backend_ip + '/api/courses/me').subscribe(
       data => {
