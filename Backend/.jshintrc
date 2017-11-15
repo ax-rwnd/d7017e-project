@@ -2,5 +2,6 @@
   "esversion": 6,
   "node": true,
   "laxbreak": true,
-  "strict": "global"
+  "strict": "global",
+  "loopfunc": true
 }
