@@ -110,7 +110,7 @@ export class BackendService {
   getCourseUsers(id: string) {
     // Get users studying a course
 
-    return this.apiGet('/api/courses/' + id + '/users');
+    return this.apiGet('/api/courses/' + id + '/students');
   }
 
   submitAssignment(user_id: ObjectID, course_id: ObjectID, assignment_id: number, lang: string, code: string) {
@@ -143,7 +143,7 @@ export class BackendService {
     return this.apiGet('/api/features/feature/' + course_id + '/' + user_id);
   }
   getFeaturesCourse (course_id: string) {
-    return this.apiGet('/api/features/features/' + course_id);
+    return this.apiGet('/api/courses/' + course_id + '/enabled_features');
   }
   login(ticket: string, service: string) {
     return this.apiGet('/auth/login/ltu?ticket=' + ticket + '&service=' + service);

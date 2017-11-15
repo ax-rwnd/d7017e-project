@@ -9,7 +9,6 @@ import { Component, OnInit, Input } from '@angular/core';
 
 export class ModLeaderboardComponent extends GameelementComponent implements OnInit {
   @Input() courseCode: string;
-
   public leaderList: any[];
 
   ngOnInit() {
@@ -19,5 +18,12 @@ export class ModLeaderboardComponent extends GameelementComponent implements OnI
       //  to be switched for the object ID and then it needs to be parsed.
       this.leaderList = [{name: this.courseCode, score: 10}];
     });
+
+    super.getElements(this.courseCode);
   }
+
+  isEnabled() {
+    return this.queryEnabled('leaderboard');
+  }
+
 }
