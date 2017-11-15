@@ -42,6 +42,7 @@ describe('/api', () => {
     let fake_admin_id = '5a041440bf85f83d5446f3bc';
     // intro programmering
     let course_id = '59f6f88b1ac36c0762eb46a9';
+    let assignment_id;
 
     before(() => {
         access_tokens = {};
@@ -199,8 +200,9 @@ describe('/api', () => {
                     })
                     .set('Authorization', 'Bearer ' + access_tokens.user)
                     .expect(200)
-                    a75c5ef9159394c45e117141d066fa460774b5d1.then(res => {
+                    .then(res => {
                         assert(ObjectId.isValid(res.body._id), 'response is not a valid ObjectId');
+                        assignment_id = res.body._id;
                     });
             });
         });
