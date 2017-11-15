@@ -43,6 +43,7 @@ describe('/api', () => {
     // intro programmering
     let course_id = '59f6f88b1ac36c0762eb46a9';
     let assignment_id;
+    let test_id;
 
     before(() => {
         access_tokens = {};
@@ -221,6 +222,27 @@ describe('/api', () => {
                     .then(res => {
                         assert(Array.isArray(res.body.assignments), 'not an array');
                         assert(res.body.assignments.length > 0, 'array is empty');
+                    });
+            });
+        });
+        
+        describe('POST /api/courses/:course_id/assignments/:assignment_id/tests', () => {
+
+            it('returns a test id', () => {
+                let route = '/api/courses/' + course_id + '/assignments/' + assignment_id + '/tests';
+                return request(runner.server)
+                    .post(route)
+                    .send({
+                        stdout: 'Output',
+                        stdin: 'Input',
+                        args: [],
+                        lint: true
+                    })
+                    .set('Authorization', 'Bearer ' + access_tokens.user)
+                    .expect(200)
+                    .then(res => {
+                        assert(ObjectId.isValid(res.body._id), 'response is not a valid ObjectId');
+                        test_id = res.body._id;
                     });
             });
         });
