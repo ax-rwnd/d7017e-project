@@ -9,7 +9,7 @@ var testerCom = require('../../lib/tester_communication');
 var Assignment = require('../../models/schemas').Assignment;
 var Test = require('../../models/schemas').Test;
 
-const BASIC_FILTER = "name description";
+const BASIC_FILTER = "name description course_code enabled_features";
 const ADMIN_FILTER = "name description course_code teachers students assignments features enabled_features hidden";
 
 module.exports = function(router) {
@@ -40,7 +40,7 @@ module.exports = function(router) {
                 next(err);
             });
         }
-        
+
         //Need user object from token verify for admin check.
         /*
         if (user.admin) {
@@ -62,8 +62,12 @@ module.exports = function(router) {
         var name = req.body.name;
         var desc = req.body.description;
         var hidden = req.body.hidden;
+        var course_code = req.body.course_code;
+        var enabled_features = req.body.enabled_features;
+        // TODO: validate input
+        // TODO: check permissions
 
-        queries.createCourse(name, desc, hidden).then(function (course) {
+        queries.createCourse(name, desc, hidden, course_code, enabled_features).then(function (course) {
             return res.json(course);
         })
         .catch(function (err) {

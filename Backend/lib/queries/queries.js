@@ -213,8 +213,10 @@ function getCourses(fields, admin, id_array) {
     
 }
 
-function createCourse(name, description, hidden) {
-    var newCourse = new Course({name: name, description: description, hidden: hidden, teachers: [], students: [], assignments: [], features: []});
+function createCourse(name, description, hidden, course_code, enabled_features) {
+    course_code = course_code || '';
+    enabled_features = enabled_features || {};
+    var newCourse = new Course({name: name, description: description, course_code: course_code, hidden: hidden, teachers: [], students: [], assignments: [], features: [], enabled_features: enabled_features});
     return newCourse.save().then(function (createdCourse) {
         if (!createdCourse) {
             console.log("Error: Course not created");

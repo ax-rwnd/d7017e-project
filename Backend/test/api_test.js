@@ -100,7 +100,9 @@ describe('/api', () => {
                     .send({
                         name: 'Introduction to Automated Testing in JavaScript',
                         description: 'In this course you will use Mocha and supertest to create automated tests for NodeJS applications.',
-                        hidden: false
+                        hidden: false,
+                        course_code: 'D00testingE',
+                        enabled_features: {badges: true}
                     })
                     .set('Authorization', 'Bearer ' + access_tokens.admin)
                     .expect(200)
