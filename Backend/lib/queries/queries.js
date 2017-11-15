@@ -49,7 +49,6 @@ const FIELDS = {
 
 //get all tests related to a specific assignment.
 function getTestsFromAssignment(assignmentID, callback) {
-
     Assignment.findById(assignmentID)
     .populate({
         path: 'tests.io',
@@ -171,24 +170,47 @@ function findOrCreateUser(profile) {
     });
 }
 
-function getCourses(fields, admin) {
+function getCourses(fields, admin, id_array) {
     var wantedFields = fields || "name description hidden teachers students assignments";
+    if (!id_array){
+       if (admin) {
+            return Course.find({}, wantedFields).then(function (courseList) {
+                if (!courseList) {
+                    throw errors.NO_COURSES_EXISTS;
+                }
+                return courseList;
+            });
+        } else {
+            return Course.find({'hidden': false}, wantedFields).then(function (courseList) {
+                if (!courseList) {
+                    throw errors.NO_COURSES_EXISTS;
+                }
+                return courseList;
+            });
+        } 
+    } else {
+        var promises = [];
+        var query = (admin === true)
+            ? {}
+            : {hidden: false};
 
-    if (admin) {
-        return Course.find({}, wantedFields).then(function (courseList) {
-            if (!courseList) {
-                throw errors.NO_COURSES_EXISTS;
+        for (var i = 0; i < id_array.length; i++) {
+            // Check validity of id
+            if (!mongoose.Types.ObjectId.isValid(id_array[i])) {
+                throw errors.INVALID_ID;
             }
-            return courseList;
-        });
-    }
-    return Course.find({'hidden': false}, wantedFields).then(function (courseList) {
-        if (!courseList) {
-            throw errors.NO_COURSES_EXISTS;
+            query._id = id_array[i];
+            var temp = Course.findOne(query, wantedFields).then(function (course) {
+                if (!course) {
+                    throw errors.COURSE_DOES_NOT_EXIST;
+                }
+                return course;
+            });
+            promises.push(temp); // Gather all promises in an array
         }
-        return courseList;
-    });
-
+        return Promise.all(promises);
+    }
+    
 }
 
 function createCourse(name, description, hidden) {
