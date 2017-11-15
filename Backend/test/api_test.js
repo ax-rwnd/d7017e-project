@@ -225,7 +225,7 @@ describe('/api', () => {
                     });
             });
         });
-        
+
         describe('POST /api/courses/:course_id/assignments/:assignment_id/tests', () => {
 
             it('returns a test id', () => {
@@ -243,6 +243,22 @@ describe('/api', () => {
                     .then(res => {
                         assert(ObjectId.isValid(res.body._id), 'response is not a valid ObjectId');
                         test_id = res.body._id;
+                    });
+            });
+        });
+
+        describe('GET /api/courses/:course_id/assignments/:assignment_id/tests/:test_id', () => {
+
+            it('returns a test object', () => {
+                let route = '/api/courses/' + course_id + '/assignments/' + assignment_id + '/tests/' + test_id;
+                it_rejects_unauthorized_get(route);
+                return request(runner.server)
+                    .get(route)
+                    .set('Authorization', 'Bearer ' + access_tokens.user)
+                    .expect(200)
+                    .then(res => {
+                        assert(ObjectId.isValid(res.body._id), 'response is not a valid ObjectId');
+                        assert(test_id == res.body._id, 'response is not the requested test');
                     });
             });
         });
