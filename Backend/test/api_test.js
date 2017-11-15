@@ -197,9 +197,9 @@ describe('/api', () => {
                         hidden: false,
                         languages: 'javascript'
                     })
-                    .set('Authorization', 'Bearer' + access_tokens.user)
+                    .set('Authorization', 'Bearer ' + access_tokens.user)
                     .expect(200)
-                    .then(res => {
+                    a75c5ef9159394c45e117141d066fa460774b5d1.then(res => {
                         assert(ObjectId.isValid(res.body._id), 'response is not a valid ObjectId');
                     });
             });
