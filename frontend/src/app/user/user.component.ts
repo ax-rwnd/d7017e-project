@@ -66,7 +66,7 @@ export class UserComponent implements OnInit {
     this.modalRef = this.modalService.show(modal);
   }
   createCourse() {
-    const course = this.courseService.CreateCourse(this.form.value.name, this.form.value.code,
+    const course = this.courseService.CreateCourse('10000', this.form.value.name, this.form.value.code,
       this.form.value.info, this.form.value.progress, this.form.value.score, this.form.value.badges, this.form.value.leaderboard);
     this.courseService.AddCourse(course);
   }
