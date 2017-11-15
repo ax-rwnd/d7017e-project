@@ -115,7 +115,7 @@ function updateCourses(response, backendService, courseService, assignmentServic
     promiseArray.push(backendService.getCourseAssignments(courses[i]._id)
       .then(assignmentsResponse => {
         console.log('assignmentResponse', assignmentsResponse);
-        assignmentService.AddCourseAssignments(courses[i].course_code, assignmentsResponse.assignments, courses[i]._id);
+        assignmentService.AddCourseAssignments(courses[i]._id, assignmentsResponse.assignments);
       }));
   }
   return Promise.all(promiseArray);

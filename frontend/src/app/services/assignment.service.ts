@@ -35,10 +35,11 @@ export class AssignmentService {
     this.courseAssignments[course_id] = [{name: 'Assignments', collapse: false, availability: false, assignments: a, groups: []}];
   }
   GetAssignment(course_id: string, assignment_id: string) {
-    console.log('course id ', course_id);
     if (this.courseAssignments[course_id] === undefined) {
       course_id = 'default';
     }
+    console.log('course id ', course_id);
+    console.log('assignments', this.courseAssignments[course_id])
     for (let i = 0; i < this.courseAssignments[course_id].length; i++) {
       const a = getAssignmentHelper(this.courseAssignments[course_id][i], assignment_id);
       if (a !== false) {
