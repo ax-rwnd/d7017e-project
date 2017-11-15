@@ -186,6 +186,26 @@ describe('/api', () => {
                     });
             });
         });
+        
+        describe('POST /api/courses/:course_id/assignments', () => {
+            let route = '/api/courses/' + course_id + '/assignments';
+            
+            it('returns an assignment id', () => {
+                return request(runner.server)
+                    .post(route)
+                    .send({
+                        name: 'Introduktion till tester',
+                        description: 'Skriv tester med mocha',
+                        hidden: false,
+                        languages: 'javascript'
+                    })
+                    .set('Authorization', 'Bearer ' + access_tokens.user)
+                    .expect(200)
+                    a75c5ef9159394c45e117141d066fa460774b5d1.then(res => {
+                        assert(ObjectId.isValid(res.body._id), 'response is not a valid ObjectId');
+                    });
+            });
+        });
 
         describe('GET /api/courses/:course_id/assignments', () => {
             let route = '/api/courses/' + course_id + '/assignments';
