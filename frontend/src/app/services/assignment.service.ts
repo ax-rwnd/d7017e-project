@@ -26,20 +26,20 @@ export class AssignmentService {
     assignmentGroups[1] = {name: 'Exercises', collapse: true, availability: false, assignments: [], groups: [eLvl1, eLvl2, eLvl3]};*/
     this.courseAssignments['default'] = assignmentGroups;
   }
-  AddCourseAssignments(course_code: string, assignments: any[], course_id) {
+  AddCourseAssignments(course_id: string, assignments: any[]) {
     const a = [];
     for (let i = 0; i < assignments.length; i++) {
       a[i] = {id: assignments[i]._id, course_id: course_id, name: assignments[i].name, languages: assignments[i].languages,
         description: assignments[i].description, available: true};
     }
-    this.courseAssignments[course_code] = [{name: 'Assignments', collapse: false, availability: false, assignments: a, groups: []}];
+    this.courseAssignments[course_id] = [{name: 'Assignments', collapse: false, availability: false, assignments: a, groups: []}];
   }
-  GetAssignment(course: string, assignment_id: string) {
-    if (this.courseAssignments[course] === undefined) {
-      course = 'default';
+  GetAssignment(course_id: string, assignment_id: string) {
+    if (this.courseAssignments[course_id] === undefined) {
+      course_id = 'default';
     }
-    for (let i = 0; i < this.courseAssignments[course].length; i++) {
-      const a = getAssignmentHelper(this.courseAssignments[course][i], assignment_id);
+    for (let i = 0; i < this.courseAssignments[course_id].length; i++) {
+      const a = getAssignmentHelper(this.courseAssignments[course_id][i], assignment_id);
       if (a !== false) {
         return a;
       }

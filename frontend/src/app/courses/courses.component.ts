@@ -44,7 +44,7 @@ export class CoursesComponent implements OnInit {
   ngOnInit() {
     this.sidebarState = this.headService.getCurrentState();
     console.log('code', this.currentCourse.code);
-    console.log('assignmentGroup', this.assignmentService.courseAssignments[this.currentCourse.code]);
+    console.log('assignmentGroup', this.assignmentService.courseAssignments[this.currentCourse.id]);
     console.log('all assignmentGroups', this.assignmentService.courseAssignments);
     /*if (this.assignmentService.courseAssignments[this.currentCourse.code] !== undefined) {
       this.assignmentGroups = this.assignmentService.courseAssignments[this.currentCourse.code];

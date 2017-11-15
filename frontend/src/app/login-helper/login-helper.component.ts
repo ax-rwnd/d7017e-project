@@ -17,9 +17,7 @@ export class LoginHelperComponent implements OnInit {
   token_type: string;
   ticket: string;
 
-  constructor(private http: HttpClient, private activatedRoute: ActivatedRoute, private router: Router,
-              private backendService: BackendService, private courseService: CourseService,
-              private userService: UserService) { }
+  constructor(private http: HttpClient, private activatedRoute: ActivatedRoute, private router: Router) { }
 
   ngOnInit() {
     // Retrieving param from url
@@ -52,5 +50,3 @@ export class LoginHelperComponent implements OnInit {
     );
   }
 }
-
-

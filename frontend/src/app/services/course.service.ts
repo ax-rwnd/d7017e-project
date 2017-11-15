@@ -17,7 +17,7 @@ export class CourseService {
     let lbEntry5 = {name: 'anonymous', score: 65};
     let leaderboard = [lbEntry1, lbEntry2, lbEntry3, lbEntry4, lbEntry5];
     const rewards1 = newRewards(50, 70, ['silver_medal_badge', 'bronze_trophy_badge'], leaderboard);
-    const course0 = newCourse('Introduction to programming', 'D0009E', '# Information\n' +
+    const course0 = newCourse('0', 'Introduction to programming', 'D0009E', '# Information\n' +
       '\n' +
       '## Kursens mål\n' +
       '*Att ge en grundlig introduktion till datorbaserad problemlösning med hjälp av ett modern imperativt programmeringsspråk*\n' +
@@ -52,28 +52,28 @@ export class CourseService {
     lbEntry5 = {name: 'anonymous', score: 165};
     leaderboard = [lbEntry1, lbEntry2, lbEntry3, lbEntry4, lbEntry5];
     const rewards2 = newRewards(90, 180, ['bronze_medal_badge', 'silver_trophy_badge'], leaderboard);
-    const course1 = newCourse('Course name 2', 'D0010E', 'Course info', rewards2);
+    const course1 = newCourse('1', 'Course name 2', 'D0010E', 'Course info', rewards2);
     const rewards3 = newRewards(40, 50, false, false);
-    const course2 = newCourse('Course name 3', 'D0011E', 'Course info', rewards3);
+    const course2 = newCourse('2', 'Course name 3', 'D0011E', 'Course info', rewards3);
     const rewards4 = newRewards(false, false, ['gold_medal_badge', 'gold_trophy_badge', 'computer_badge',
       'bronze_medal_badge', 'silver_trophy_badge', 'bronze_trophy_badge'], false);
-    const course3 = newCourse('Course name 4', 'D0012E', 'Course info', rewards4);
+    const course3 = newCourse('3', 'Course name 4', 'D0012E', 'Course info', rewards4);
     this.courses[0] = course0;
     this.courses[1] = course1;
     this.courses[2] = course2;
     this.courses[3] = course3;*/
   }
-  CreateCourse(name, code, course_info, progress, score, badges, leaderboard) {
+  CreateCourse(id, name, code, course_info, progress, score, badges, leaderboard) {
     const progValue = progress ? 0 : false;
     const scoreValue = score ? 0 : false;
     const badgesArr = badges ? [] : false;
     const lbArr = leaderboard ? [{name: 'anonymous', score: 20}, {name: 'anonymous', score: 10}, {name: 'you', score: 10},
         {name: 'anonymous', score: 0}, {name: 'anonymous', score: 0}] : false;
-    return newCourse(name, code, course_info, newRewards(progValue, scoreValue, badgesArr, lbArr));
+    return newCourse(id, name, code, course_info, newRewards(progValue, scoreValue, badgesArr, lbArr));
   }
-  GetCourse(courseCode) {
+  GetCourse(courseId) {
     for (let i = 0; i < this.courses.length; i++) {
-      if (this.courses[i].code === courseCode) {
+      if (this.courses[i].id === courseId) {
         return this.courses[i];
       }
     }
@@ -104,12 +104,12 @@ function updateCourses(response, backendService, courseService, assignmentServic
     promiseArray.push(backendService.getFeaturesCourseUser(courses[i]._id, response._id)
       .then(featureResponse => {
         const rewards = handleFeatureResponse(featureResponse);
-        const course = newCourse(courses[i].name, courses[i].course_code, courses[i].description, rewards);
+        const course = newCourse(courses[i]._id, courses[i].name, courses[i].course_code, courses[i].description, rewards);
         courseService.AddCourse(course);
       })
       .catch( err => {
         const rewards = newRewards(false, false, false, false);
-        const course = newCourse(courses[i].name, courses[i].course_code, courses[i].description, rewards);
+        const course = newCourse(courses[i]._id, courses[i].name, courses[i].course_code, courses[i].description, rewards);
         courseService.AddCourse(course);
       }));
     promiseArray.push(backendService.getCourseAssignments(courses[i]._id)
@@ -147,8 +147,9 @@ function handleFeatureResponse(response: any) {
   return newRewards(progress, score, badges, leaderboard);
 }
 
-function newCourse(name, code, course_info, rewards) {
+function newCourse(id, name, code, course_info, rewards) {
   return {
+    id: id,
     name: name,
     code: code,
     course_info: course_info,
@@ -166,6 +167,7 @@ function newRewards(progress, score, badges, leaderboard) {
 }
 
 interface Course {
+  id: string;
   name: string;
   code: string;
   course_info: string;

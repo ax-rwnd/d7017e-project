@@ -15,7 +15,7 @@
         <div class="gamification-block shadow panel panel-default" *ngFor="let course of courses">
           <div class="panel-heading gamification-header">
             <!-- Course panel title -->
-            <div [routerLink]="['/courses', course.code]" class="pointer"><h4>{{course.code}} - {{course.name}}</h4></div>
+            <div [routerLink]="['/courses', course.id]" class="pointer"><h4>{{course.code}} - {{course.name}}</h4></div>
           </div>
           <!-- 'Main' body panel -->
           <div class="panel-body">
