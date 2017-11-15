@@ -3,7 +3,7 @@
 import { Injectable } from '@angular/core';
 import 'rxjs/add/operator/map';
 import { environment } from '../../../environments/environment';
-import {HttpClient, HttpRequest} from '@angular/common/http';
+import {HttpRequest} from '@angular/common/http';
 import {Http, RequestOptions, Headers} from '@angular/http';
 import {observable} from 'rxjs/symbol/observable';
 

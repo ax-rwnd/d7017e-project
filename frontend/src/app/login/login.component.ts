@@ -4,6 +4,7 @@ import { UserService } from '../services/user.service';
 import { HttpClient } from '@angular/common/http';
 import {Observable} from 'rxjs/Observable';
 import { environment } from '../../environments/environment';
+import {ActivatedRoute, Router} from "@angular/router";
 
 
 class User {
@@ -36,8 +37,11 @@ export class LoginComponent implements OnInit {
     this.user = this.userService.userInfo;
     this.frontend_ip = environment.frontend_ip;
   }
+  casLogin() {
 
-
+    const redirect = 'https://weblogon.ltu.se/cas/login?service=' + environment.frontend_ip + '/auth?urlPath=/user';
+    window.location.href = redirect;
+  }
 }
 
 

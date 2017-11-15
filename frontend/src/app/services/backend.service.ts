@@ -54,6 +54,22 @@ export class BackendService {
                 .catch(err => console.error('API Post failed in ' + endpoint + ' error ' + err));
   }
 
+  private apiPut(endpoint, body) {
+    // Send a put request to the endpoint
+
+    return this.http.put(environment.backend_ip + endpoint, body, {responseType: 'text'})
+                .toPromise()
+                .then(response => response)
+                .catch(err => console.error('API Put failed in ' + endpoint + ' error ' + err));
+  }
+
+  // Add a student to a course.
+  addUserToCourse(course_id: ObjectID, student_id: ObjectID) {
+    const body = {student_id: student_id.get()};
+
+    return this.apiPut('/api/courses/' + course_id.get() + '/students', body);
+  }
+
   getMe() {
     // Get information for the currently logged in user
 
@@ -128,5 +144,8 @@ export class BackendService {
   }
   getFeaturesCourse (course_id: string) {
     return this.apiGet('/api/features/features/' + course_id);
+  }
+  login(ticket: string, service: string) {
+    return this.apiGet('/auth/login/ltu?ticket=' + ticket + '&service=' + service);
   }
 }
