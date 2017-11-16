@@ -134,6 +134,12 @@ export class BackendService {
     return this.apiGet('/api/courses/' + course_id + '/assignments');
   }
 
+  getCourseAssignmentTests(course_id: ObjectID, assignment_id: ObjectID) {
+    // Get all tests of a specific assignment
+
+    return this.apiGet('/api/courses/' + course_id.get() + '/assignments/' + assignment_id.get() + '/tests/');
+  }
+
   postNewBadge(icon: string, title: string, description: string) {
     const body = {'icon': icon, 'title': title, 'description': description};
     return this.apiPost('/api/features/badge', body);
