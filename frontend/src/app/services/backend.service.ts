@@ -42,7 +42,7 @@ export class BackendService {
     return this.http.get(environment.backend_ip + endpoint)
                 .toPromise()
                 .then(response => response)
-                .catch(err => console.error('API Get failed in ' + endpoint + ' error ' + err));
+                .catch(err => console.error('API Get failed in ' + endpoint + ' error', err));
   }
 
   private apiPost(endpoint, body) {
@@ -51,7 +51,7 @@ export class BackendService {
     return this.http.post(environment.backend_ip + endpoint, body, {responseType: 'text'})
                 .toPromise()
                 .then(response => response)
-                .catch(err => console.error('API Post failed in ' + endpoint + ' error ' + err));
+                .catch(err => console.error('API Post failed in ' + endpoint + ' error ', err));
   }
 
   private apiPut(endpoint, body) {
@@ -60,7 +60,7 @@ export class BackendService {
     return this.http.put(environment.backend_ip + endpoint, body, {responseType: 'text'})
                 .toPromise()
                 .then(response => response)
-                .catch(err => console.error('API Put failed in ' + endpoint + ' error ' + err));
+                .catch(err => console.error('API Put failed in ' + endpoint + ' error ', err));
   }
 
   // Add a student to a course.
@@ -110,7 +110,7 @@ export class BackendService {
   getCourseUsers(id: string) {
     // Get users studying a course
 
-    return this.apiGet('/api/courses/' + id + '/users');
+    return this.apiGet('/api/courses/' + id + '/students');
   }
 
   submitAssignment(user_id: ObjectID, course_id: ObjectID, assignment_id: ObjectID, lang: string, code: string) {
@@ -150,7 +150,7 @@ export class BackendService {
     return this.apiGet('/api/features/feature/' + course_id + '/' + user_id);
   }
   getFeaturesCourse (course_id: string) {
-    return this.apiGet('/api/features/features/' + course_id);
+    return this.apiGet('/api/courses/' + course_id + '/enabled_features');
   }
   login(ticket: string, service: string) {
     return this.apiGet('/auth/login/ltu?ticket=' + ticket + '&service=' + service);

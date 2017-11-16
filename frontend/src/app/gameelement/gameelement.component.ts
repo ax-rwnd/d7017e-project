@@ -12,12 +12,28 @@ import { BackendService } from '../services/backend.service';
 
 export class GameelementComponent implements OnInit {
   constructor(public backendService: BackendService) {}
+  public elements: any;
 
   ngOnInit() {
   }
 
-  isEnabled(componentName: string) {
-    // Check if the component is enabled
-    // Stub
+  queryEnabled(componentName: string) {
+    if (this.elements === undefined) {
+      console.warn('God undefined elements in', componentName);
+      return false;
+    } else {
+      return this.elements[componentName] === true;
+    }
+  }
+
+  protected getElements(courseId: string) {
+    this.backendService.getFeaturesCourse(courseId)
+      .then(data => {
+        this.elements = data;
+      })
+      .catch(err => {
+        console.error('Failed to get enabled status in modular gmae component', err);
+        this.elements = {};
+      });
   }
 }
