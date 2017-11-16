@@ -106,22 +106,23 @@ describe('Features routes', () => {
             .set('Authorization', 'Bearer ' + access_token)
             .expect(200)
             .then(res => {
+                assert(Array.isArray(res.body.features), 'not an array');
                 //console.log(res.body);
             });
     });
 
-    it('GET /api/features/feature/:course_id/:user_id', () => {
+    it('GET /api/features/feature/:course_id/me', () => {
 
         let course_id = '5a0475bb1ac36c0762eb46b9';
-        let user_id = '5a01c02d485d0220f8b9cca2';
         let route = '/api/features/feature';
 
         return request(runner.server)
-            .get(route+'/'+course_id+'/'+user_id)
+            .get(route+'/'+course_id+'/me')
             .set('Authorization', 'Bearer ' + access_token)
             .expect(200)
             .then(res => {
-                console.log(res.body);
+                assert(Array.isArray(res.body.badges), 'not an array');
+                assert(Array.isArray(res.body.progress), 'not an array');
             });
     });
 

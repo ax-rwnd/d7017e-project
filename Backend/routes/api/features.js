@@ -37,8 +37,9 @@ module.exports = function(router) {
         }).catch(next);
     });
 
-    router.get('/feature/:course_id/:user_id', auth.validateJWTtoken, function(req, res, next) {
-        features.getFeatureOfUserID(req.params.course_id, req.params.user_id).then(function(progress) {
+    router.get('/feature/:course_id/me', auth.validateJWTtoken, function(req, res, next) {
+        console.log(req.user.id);
+        features.getFeatureOfUserID(req.params.course_id, req.user.id).then(function(progress) {
             return res.send(progress);
         }).catch(next);
     });
