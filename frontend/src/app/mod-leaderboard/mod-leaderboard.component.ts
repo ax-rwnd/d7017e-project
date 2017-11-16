@@ -18,7 +18,7 @@ export class ModLeaderboardComponent extends GameelementComponent implements OnC
   ngOnChanges(changes: SimpleChanges) {
     this.update();
   }
- 
+
   update() {
     super.getElements(this.courseCode);
     this.updateList ();
