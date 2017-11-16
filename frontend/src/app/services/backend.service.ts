@@ -151,12 +151,10 @@ export class BackendService {
     return this.apiGet('/api/courses/' + course_id + '/enabled_features');
   }
 
-  getFeaturesCourseUser (course_id: string, user_id: string) {
+  getFeaturesCourseMe (course_id: string) {
     // Get feature state for a user in a course
 
-    console.log('course ', course_id);
-    console.log('user ', user_id);
-    return this.apiGet('/api/features/feature/' + course_id + '/' + user_id);
+    return this.apiGet('/api/features/feature/' + course_id + '/me');
   }
 
   getFeaturesCourse (course_id: string) {

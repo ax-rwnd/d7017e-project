@@ -97,11 +97,14 @@ export class CourseService {
 }
 
 function updateCourses(response, backendService, courseService, assignmentService) {
+  // Updates the courses with input from backend, some course service a´nd an assignment service
+
   const courses = response.courses;
   console.log('response', response);
   const promiseArray = [];
+
   for (let i = 0; i < courses.length; i++) {
-    promiseArray.push(backendService.getFeaturesCourseUser(courses[i]._id, response._id)
+    promiseArray.push(backendService.getFeaturesCourseMe(courses[i]._id)
       .then(featureResponse => {
         const rewards = handleFeatureResponse(featureResponse);
         const course = newCourse(courses[i]._id, courses[i].name, courses[i].course_code, courses[i].description, rewards);
@@ -118,6 +121,7 @@ function updateCourses(response, backendService, courseService, assignmentServic
         assignmentService.AddCourseAssignments(courses[i]._id, assignmentsResponse.assignments);
       }));
   }
+
   return Promise.all(promiseArray);
 }
 
