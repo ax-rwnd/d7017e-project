@@ -28,23 +28,27 @@ function auth() {
         });
 }
 
-describe('Tester', () => {
+describe('/tester', () => {
     let access_token;
 
     before(() => {
         return auth().then(at => access_token = at);
     });
 
-    it('GET /api/tester/languages', () => {
+    describe('GET /api/tester/languages', () => {
 
-        let route = '/api/tester/languages';
+        it('Get langauges that tester supports', () => {
 
-        return request(runner.server)
-            .get(route)
-            .set('Authorization', 'Bearer ' + access_token)
-            .expect(200)
-            .then(function(res) {
-                //console.log(res.text);
-            });
+            let route = '/api/tester/languages';
+
+            return request(runner.server)
+                .get(route)
+                .set('Authorization', 'Bearer ' + access_token)
+                .expect(200)
+                .then(function(res) {
+                    assert(res.body.hasOwnProperty('languages'), 'Result did not have property languages');
+                    assert(Array.isArray(res.body.languages), 'Property languages was not an array');
+                });
+        });
     });
 });

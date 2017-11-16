@@ -11,6 +11,7 @@ module.exports = function(router) {
     //get Tester's supported languages
     router.get('/languages', auth.validateJWTtoken, function(req, res) {
         testerCom.getTesterLanguages().then(function(languages) {
+            res.setHeader('Content-Type', 'application/json');
             return res.send(languages);
         }).catch(err => {
             logger.error(err);

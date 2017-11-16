@@ -29,7 +29,7 @@ function auth() {
         });
 }
 
-describe('GET /api/search', () => {
+describe('/search', () => {
 
     let access_token;
 
@@ -37,49 +37,66 @@ describe('GET /api/search', () => {
         return auth().then(at => access_token = at);
     });
 
-    it('Minimum query length is set', () => {
-        assert(config.get('Search.min_query_length') !== undefined, 'Search.min_query_length in config is not set');
+    describe('Check config so that minimun query length is set', () => {
+
+        it('Minimum query length is set', () => {
+            assert(config.get('Search.min_query_length') !== undefined, 'Search.min_query_length in config is not set');
+        });
     });
 
-    it('Fails on bad query parameter', () => {
+    describe('GET /api/search', () => {
 
-        let query = '?iambad=program';
-        let route = '/api/search';
+        it('Fails on bad query parameter', () => {
 
-        return request(runner.server)
-            .get(route+query)
-            .set('Authorization', 'Bearer ' + access_token)
-            .expect(400)
-            .then(res => {
-                //console.log(res.body);
-            });
+            let query = '?iambad=program';
+            let route = '/api/search';
+
+            return request(runner.server)
+                .get(route+query)
+                .set('Authorization', 'Bearer ' + access_token)
+                .expect(400)
+                .then(res => {
+                    assert(res.error.text == 'HTTP error: 400 Bad input. Expected: "?query=XYZ"', 'query was misspelled');
+                });
+        });
     });
 
-    it('Too short query data', () => {
+    describe('GET /api/search', () => {
 
-        let query = '?query=hi';
-        let route = '/api/search';
+        it('Too short query data', () => {
 
-        return request(runner.server)
-            .get(route+query)
-            .set('Authorization', 'Bearer ' + access_token)
-            .expect(400)
-            .then(res => {
-                //console.log(res.body);
-            });
+            let query = '?query=hi';
+            let route = '/api/search';
+
+            return request(runner.server)
+                .get(route+query)
+                .set('Authorization', 'Bearer ' + access_token)
+                .expect(400)
+                .then(res => {
+                    assert(res.error.text == 'HTTP error: 400 Bad input. Expected query with length atleast '+config.get('Search.min_query_length'), 'Too short query data');
+                });
+        });
     });
 
-    it('Return search results', () => {
+    describe('GET /api/search', () => {
 
-        let query = '?query=program';
-        let route = '/api/search';
+        it('Return search results', () => {
 
-        return request(runner.server)
-            .get(route+query)
-            .set('Authorization', 'Bearer ' + access_token)
-            .expect(200)
-            .then(res => {
-                //console.log(res.body);
-            });
+            let query = '?query=program';
+            let route = '/api/search';
+
+            return request(runner.server)
+                .get(route+query)
+                .set('Authorization', 'Bearer ' + access_token)
+                .expect(200)
+                .then(res => {
+                    assert(res.body.hasOwnProperty('courses'), 'Result did not have property courses');
+                    assert(Array.isArray(res.body.courses), 'Property courses was not an array');
+                    assert(res.body.hasOwnProperty('assignments'), 'Result did not have property assignments');
+                    assert(Array.isArray(res.body.assignments), 'Property assignments was not an array');
+                    assert(res.body.hasOwnProperty('users'), 'Result did not have property users');
+                    assert(Array.isArray(res.body.users), 'Property users was not an array');
+                });
+        });
     });
 });
