@@ -38,7 +38,6 @@ module.exports = function(router) {
     });
 
     router.get('/feature/:course_id/me', auth.validateJWTtoken, function(req, res, next) {
-        console.log(req.user.id);
         features.getFeatureOfUserID(req.params.course_id, req.user.id).then(function(progress) {
             return res.send(progress);
         }).catch(next);
