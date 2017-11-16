@@ -1,5 +1,5 @@
 import { GameelementComponent } from '../gameelement/gameelement.component';
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, OnChanges, SimpleChanges, SimpleChange } from '@angular/core';
 
 @Component({
   selector: 'app-mod-leaderboard',
@@ -7,13 +7,21 @@ import { Component, OnInit, Input } from '@angular/core';
   styleUrls: ['../gameelement/gameelement.component.css']
 })
 
-export class ModLeaderboardComponent extends GameelementComponent implements OnInit {
+export class ModLeaderboardComponent extends GameelementComponent implements OnChanges, OnInit {
   @Input() courseCode: string;
   public leaderList: any[];
 
   ngOnInit() {
-    this.updateList();
+    this.update();
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    this.update();
+  }
+ 
+  update() {
     super.getElements(this.courseCode);
+    this.updateList ();
   }
 
   updateList () {

@@ -35,6 +35,8 @@ export class AssignmentComponent implements OnInit {
   sidebarState; // state of sidebar
   userid: string;
   feedback: string[];
+  tests: any;
+  testStrings: any;
 
   constructor(private backendService: BackendService,
               private assignmentService: AssignmentService,
@@ -57,15 +59,55 @@ export class AssignmentComponent implements OnInit {
     this.content = '';
     this.status = 'Not Completed'; // hardcoded for now, endpoint to backend needed
     this.progress = { current: 0}; // this.assignmentService.progress; what even is this
+    // this.getTests();
+    // Use getTests as soon as backend routes are working
+    this.tests = [
+        {
+        '_id': '59e4cb34d679e102ff66b865',
+        'stdin': '',
+        'stdout': 'hello world\n',
+        'args': [],
+        '__v': 0},
+        {
+          '_id': '59e4cb34d679e102ff66b865',
+          'stdin': 'test',
+          'stdout': 'hello world again\n',
+          'args': [],
+          '__v': 1},
+      ];
+      this.testStrings = this.formatTests(this.tests);
   }
 
+  // Submit code to backend for testing
   submitCode() {
     const user_id = new ObjectID(this.userid);
-    const assignment_id = this.assignment['id'];
+    const assignment_id = new ObjectID(this.assignment['id']);
     const course_id = new ObjectID(this.assignment['course_id']);
     this.backendService.submitAssignment(user_id, course_id, assignment_id, this.language, this.content).then(data => {
       this.HandleResponse(data);
     });
+  }
+
+  getTests() {
+    const assignment_id = new ObjectID(this.assignment['course_id']);
+    const course_id = new ObjectID(this.assignment['course_id']);
+    this.backendService.getCourseAssignmentTests(course_id, assignment_id).then(data => {
+      this.tests = data;
+    });
+  }
+
+  formatTests(tests) {
+    let formattedTests = [];
+    for (let test of tests) {
+      formattedTests.push(this.formatTest(test));
+    }
+    return formattedTests;
+  }
+
+  // Takes a test and returns a markdown string for displaying the test
+  formatTest(test) {
+    const testMarkdown = '```text\nstdin: ' + test['stdin'] + '\nargs: ' + test['args'] + '\nstdout: ' + test['stdout'] + '```';
+    return testMarkdown;
   }
 
   setTheme(th) {
@@ -84,7 +126,7 @@ export class AssignmentComponent implements OnInit {
     this.feedback = fb;
   }
 
-  // Update the feedback array
+  // Handle the response from a code submission. Update the feedback div and update the course progress
   HandleResponse(value) {
     const feedback = [];
     value = JSON.parse(value);
@@ -122,6 +164,7 @@ export class AssignmentComponent implements OnInit {
 
     if (value['passed']) {
       this.status = 'Completed';
+      // TODO update course progress
     } else {
       this.status = 'Not Completed';
     }

@@ -113,10 +113,11 @@ export class BackendService {
     return this.apiGet('/api/courses/' + id + '/students');
   }
 
-  submitAssignment(user_id: ObjectID, course_id: ObjectID, assignment_id: number, lang: string, code: string) {
-    // Submis code for testing
-    const body = {'user_id': user_id.get(), 'assignment_id': assignment_id, 'lang': lang, 'code': code};
-    return this.apiPost('/api/courses/' + course_id.get() + '/assignments/' + assignment_id + '/submit', body);
+  submitAssignment(user_id: ObjectID, course_id: ObjectID, assignment_id: ObjectID, lang: string, code: string) {
+    // Submits code for testing
+
+    const body = {'lang': lang, 'code': code};
+    return this.apiPost('/api/courses/' + course_id.get() + '/assignments/' + assignment_id.get() + '/submit', body);
   }
 
   createAssignment(description: string, tests: any) {
@@ -131,6 +132,12 @@ export class BackendService {
   }
   getCourseAssignments(course_id: string) {
     return this.apiGet('/api/courses/' + course_id + '/assignments');
+  }
+
+  getCourseAssignmentTests(course_id: ObjectID, assignment_id: ObjectID) {
+    // Get all tests of a specific assignment
+
+    return this.apiGet('/api/courses/' + course_id.get() + '/assignments/' + assignment_id.get() + '/tests/');
   }
 
   postNewBadge(icon: string, title: string, description: string) {
