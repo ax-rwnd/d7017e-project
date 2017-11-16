@@ -21,7 +21,6 @@ export class GameelementComponent implements OnInit {
     // Check if some component is enabled
 
     if (this.elements === undefined) {
-      console.warn('God undefined elements in', componentName);
       return false;
     } else {
       return this.elements[componentName] === true;
