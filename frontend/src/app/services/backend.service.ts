@@ -163,6 +163,11 @@ export class BackendService {
     return this.apiGet('/api/features/features/' + course_id);
   }
 
+  postNewCourse(name: string, desc: string, hidden: boolean, course_code: string, en_feat: Object) { // post a new course to data base
+    // name, description, hidden, course_code, enabled_features
+    const body = {'name': name, 'description': desc, 'hidden': hidden, 'course_code': course_code, 'enabled_features': en_feat};
+    return this.apiPost('/api/courses', body);
+  }
 
   login(ticket: string, service: string) {
     return this.apiGet('/auth/login/ltu?ticket=' + ticket + '&service=' + service);

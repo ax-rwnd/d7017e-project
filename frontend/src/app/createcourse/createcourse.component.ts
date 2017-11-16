@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { trigger, state, style, animate, transition } from '@angular/animations';
 import { HeadService } from '../services/head.service';
-import {FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
-import {CourseService} from '../services/course.service';
+import {FormGroup, FormControl, Validators } from '@angular/forms';
+import {BackendService} from '../services/backend.service';
 
 @Component({
   selector: 'app-createcourse',
@@ -17,24 +17,15 @@ import {CourseService} from '../services/course.service';
     ])
   ]
 })
+
 export class CreatecourseComponent implements OnInit {
-  window: Window;
   sidebarState: any;
   content: string;
   body: any;
   form: FormGroup;
-  defaultForm = {
-    name: ['', [Validators.required]],
-    code: ['', ],
-    progress: [false, []],
-    map: [false, []],
-    badges: [false, []],
-    leaderboard: [false, []],
-    hidden: ['', ]
-  };
   errorMessage: string;
 
-  constructor(private headService: HeadService, private courseService: CourseService, private fb: FormBuilder) {
+  constructor(private headService: HeadService, private backendService: BackendService) {
     this.headService.stateChange.subscribe(sidebarState => { this.sidebarState = sidebarState; }); // subscribe to the state value head provides
   }
 
@@ -42,30 +33,35 @@ export class CreatecourseComponent implements OnInit {
     this.content = c;
   }
 
-  submitCourse() { // will fix it so it looks better
-    const name = this.form.value.name;
-    const code = this.form.value.code;
-    const desc = this.content;
-    const prog = !!this.form.value.progress; // false if empty otherwise true
-    const badg = !!this.form.value.badges;
-    const map  = !!this.form.value.map;
-    const lbrd = !!this.form.value.leaderboard;
-    const hidd = !this.form.value.hidden; // true if empty, false if not
-    if ( name === '' || desc === '' ) {
+  submitCourse() {
+    // First check so no required fields are empty
+    if ( this.form.value.name === '' || this.content === '' ) { // Since desc can't be in the form-group defined own required message
       this.errorMessage = '* Please fill in all required fields';
       window.scrollTo({ left: 0, top: 0, behavior: 'smooth' }); // go to top of page smoothly if error occur
     } else {
-      this.body = {'name': name, 'desc': desc, 'hidden': hidd, 'course_code': code };
-      console.log('Body created:', this.body);
+      const enabled_features = {'badges': this.form.value.badges, 'progress': this.form.value.progress};
+      const courseID = this.backendService.postNewCourse(this.form.value.name, this.content, !this.form.value.hidden, this.form.value.code, enabled_features);
+      console.log('Post course, got back:', courseID);
     }
   }
 
   ngOnInit() {
     this.sidebarState = this.headService.getCurrentState();
-    this.form = this.fb.group(this.defaultForm);
+    this.form = createForm();
     this.content = '';
     this.body = '{}';
     this.errorMessage = '';
   }
+}
 
+function createForm() {
+  return new FormGroup({
+    name: new FormControl('', Validators.required),
+    code: new FormControl(''),
+    progress: new FormControl(false),
+    badges: new FormControl(false),
+    map: new FormControl({value: false, disabled: true}), // temporary disabled, not implemented in database yet?
+    leaderboard: new FormControl({value: false, disabled: true}), // temporary disabled, not implemented in database yet?
+    hidden: new FormControl(true), // will by default be set true
+  });
 }
