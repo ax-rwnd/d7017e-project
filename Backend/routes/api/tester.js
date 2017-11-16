@@ -4,6 +4,7 @@ var testerCom = require('../../lib/tester_communication');
 var errors = require('../../lib/errors');
 var request = require('supertest');
 var auth = require('../../lib/authentication.js');
+var logger = require('../../logger.js');
 
 module.exports = function(router) {
 
@@ -12,8 +13,8 @@ module.exports = function(router) {
         testerCom.getTesterLanguages().then(function(languages) {
             return res.send(languages);
         }).catch(err => {
-            console.log(err);
+            logger.error(err);
         });
     });
-    
+
 };

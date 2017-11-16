@@ -112,16 +112,16 @@ describe('Features routes', () => {
 
     it('GET /api/features/feature/:course_id/:user_id', () => {
 
-        let course_id = '59f6f88b1ac36c0762eb46a9';
-        let user_id = '59f9f5a51ac36c0762eb46b0';
-        let route = '/api/features/feature/';
+        let course_id = '5a0475bb1ac36c0762eb46b9';
+        let user_id = '5a01c02d485d0220f8b9cca2';
+        let route = '/api/features/feature';
 
         return request(runner.server)
-            .get(route+course_id+'/'+user_id)
+            .get(route+'/'+course_id+'/'+user_id)
             .set('Authorization', 'Bearer ' + access_token)
             .expect(200)
             .then(res => {
-                //console.log(res.body);
+                console.log(res.body);
             });
     });
 
@@ -138,14 +138,14 @@ describe('Badge routes', () => {
     let badge = {
         course_id: "59f991991ac36c0762eb46af",
         icon: 'pretty_icon',   //name of an icon image file
-        title: 'Pretty badge',
-        description: 'Very impossibru badge',
+        title: 'Pretty badgererer',
+        description: 'Very impossibru badgeererer',
         goals: {
             badges: [],
             assignments: []
         }
     };
-    
+
     let new_title = 'Another title';
 
     let badge_id;

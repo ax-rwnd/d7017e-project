@@ -7,8 +7,6 @@ var config = require('config');
 
 let runner = require('../bin/www');
 
-console.log(process.env.NODE_ENV);
-
 // https://github.com/visionmedia/supertest/issues/370#issuecomment-249410533
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 

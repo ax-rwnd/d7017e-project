@@ -74,7 +74,7 @@ var badgeSchema = new Schema({
     icon: {type: String, required: true},   //name of an icon image file
     title: {type: String, required: true},
     description: {type: String, required: true},
-    //Goals that "unlocks" the badge. This can be other CourseBadge(s), Assignment(s) etc.
+    //Goals that "unlocks" the badge. This can be other Badge(s), Assignment(s) etc.
     goals: {
         badges: [{ type: Schema.Types.ObjectId, ref: 'Badge', required: false}],
         assignments:
@@ -106,6 +106,6 @@ var Course = mongoose.model('Course', courseSchema);
 var Badge = mongoose.model('Badge', badgeSchema);
 var Features = mongoose.model('Features', featuresSchema);
 var models = {Assignment: Assignment, Test: Test, User: User, Draft: Draft, Course: Course,
-    Badge: Badge, CourseBadge: Badge, Features: Features};
+    Badge: Badge, Features: Features};
 
 module.exports = models;

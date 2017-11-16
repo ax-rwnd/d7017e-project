@@ -188,10 +188,10 @@ describe('/api', () => {
                     });
             });
         });
-        
+
         describe('POST /api/courses/:course_id/assignments', () => {
             let route = '/api/courses/' + course_id + '/assignments';
-            
+
             it('returns an assignment id', () => {
                 return request(runner.server)
                     .post(route)
@@ -259,6 +259,28 @@ describe('/api', () => {
                     .then(res => {
                         assert(ObjectId.isValid(res.body._id), 'response is not a valid ObjectId');
                         assert(test_id == res.body._id, 'response is not the requested test');
+                    });
+            });
+        });
+
+        describe('GET /api/courses/:course_id/assignments/:assignment_id/submit', () => {
+
+            it('run assignments tests', () => {
+                let course_id_test = '59f6f88b1ac36c0762eb46a9';
+                let assignment_id_test = '59f8a2a81ac36c0762eb46ae';
+
+                let route = '/api/courses/' + course_id + '/assignments/' + assignment_id_test + '/submit';
+                it_rejects_unauthorized_get(route);
+                return request(runner.server)
+                    .post(route)
+                    .set('Authorization', 'Bearer ' + access_tokens.user)
+                    .send({
+                        'lang': 'python3',
+                        'code': 'print(\"hello world\")\n'
+                    })
+                    .expect(200)
+                    .then(res => {
+                        assert(assignment_id_test == res.body.assignment_id, 'response is not contain the correct assignment_id');
                     });
             });
         });

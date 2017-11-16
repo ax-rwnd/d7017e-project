@@ -8,6 +8,7 @@ var User = require('../../models/schemas').User;
 var Draft = require('../../models/schemas').Draft;
 var errors = require('../errors.js');
 var mongoose = require('mongoose');
+var logger = require('../../logger.js');
 
 
 const FIELDS = {
@@ -49,6 +50,7 @@ const FIELDS = {
 
 //get all tests related to a specific assignment.
 function getTestsFromAssignment(assignmentID, callback) {
+    console.log(assignmentID);
     Assignment.findById(assignmentID)
     .populate({
         path: 'tests.io',
@@ -187,7 +189,7 @@ function getCourses(fields, admin, id_array) {
                 }
                 return courseList;
             });
-        } 
+        }
     } else {
         var promises = [];
         var query = (admin === true)
@@ -210,7 +212,7 @@ function getCourses(fields, admin, id_array) {
         }
         return Promise.all(promises);
     }
-    
+
 }
 
 function createCourse(name, description, hidden, course_code, enabled_features) {
@@ -507,7 +509,7 @@ function searchDB(query, user_id) {
             .limit(20).then(docs => {
                 return {'courses': docs};
             }).catch(err => {
-                console.log(err);
+                logger.error(err);
             }));
 
         promises.push(Assignment.find({$text: {$search: query}, '_id': assignment_ids, 'hidden': false}, {score: {$meta: "textScore"}})
@@ -516,7 +518,7 @@ function searchDB(query, user_id) {
             .limit(20).then(docs => {
                 return {'assignments': docs};
             }).catch(err => {
-                console.log(err);
+                logger.error(err);
             }));
         promises.push(User.find({$text: {$search: query}}, {score: {$meta: "textScore"}})
             .select('-__v -tokens -providers')
@@ -524,7 +526,7 @@ function searchDB(query, user_id) {
             .limit(20).then(docs => {
                 return {'users': docs};
             }).catch(err => {
-                console.log(err);
+                logger.error(err);
             }));
 
         return Promise.all(promises);

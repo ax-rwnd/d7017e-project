@@ -27,7 +27,7 @@ async function run(data) {
     let progress = {};
 
     progress.total = await queries.getNumberOfAssignments(data.course_id);
-    progress.completed = await queries.getNumberOfCompletedAssignments(data.course_id, data.user_id);
+    progress.completed = await queries.getNumberOfCompletedAssignmentsByFeatureID(feature._id);
 
     return progress;
 }

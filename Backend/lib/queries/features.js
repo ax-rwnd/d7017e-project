@@ -87,8 +87,9 @@ function createFeature(user_id, course_id) {
 
 function getFeatureByID(features_id) {
     return Features.findById(features_id).lean().then(function(feature) {
-        if(feature === null)
+        if(feature === null) {
             throw errors.FEATURE_DO_NOT_EXIST;
+        }
 
         return feature;
     });
@@ -115,25 +116,13 @@ function addBadgeToFeature(badge_id, features_id) {
     });
 }
 
-function getNumberOfCompletedAssignments(course_id, user_id) {
-    return new Promise(async (resolve, reject) => {
-        let course = await Course.findById(course_id);
-        course.features.forEach(async function(feature_id) {
-            let feature = await getFeatureByID(feature_id);
-            if(feature === null) {
-                logger.warn('Feature '+feature_id+' in course '+course._id+' is null and should be removed!');
-            } else {
-                if(feature.user.equals(user_id)) {
-                    Features.aggregate()
-                    .match({_id: feature._id})
-                    .project({
-                        completed: {$size:'$progress'}
-                    }).then(function(completed) {
-                        resolve(completed[0].completed);
-                    });
-                }
-            }
-        });
+function getNumberOfCompletedAssignmentsByFeatureID(feature_id) {
+    return Features.aggregate()
+    .match({_id: feature_id})
+    .project({
+        completed: {$size:'$progress'}
+    }).then(function(completed) {
+        return completed[0].completed;
     });
 }
 
@@ -146,7 +135,9 @@ async function getFeaturesOfCourse(course_id) {
 
     json.features = [];
     for(let feature_id of course.features) {
-        json.features.push(await getFeatureByID(feature_id));
+        let feature = await getFeatureByID(feature_id);
+        feature.completed_assignments = await getNumberOfCompletedAssignmentsByFeatureID(feature_id);
+        json.features.push(feature);
     }
 
     return json;
@@ -157,15 +148,21 @@ async function getFeatureOfUserID(course_id, user_id) {
 
     for(let feature_id of course.features) {
 
-        let feature = await getFeatureByID(feature_id);
+        let feature;
+        try {
+            feature = await getFeatureByID(feature_id);
+        } catch (err) {
+            logger.warn('Feature '+feature_id+' in course '+course._id+' is null and should be removed!');
+            continue;
+        }
 
         if(feature === null) {
             logger.warn('Feature '+feature_id+' in course '+course._id+' is null and should be removed!');
         } else {
-            if(feature.user.equals(user_id)) {
+            if(feature.user == (user_id)) {
 
                 feature.total_assignments = await getNumberOfAssignments(course_id);
-                feature.completed_assignments = await getNumberOfCompletedAssignments(course_id, user_id);
+                feature.completed_assignments = await getNumberOfCompletedAssignmentsByFeatureID(feature._id);
 
                 return feature;
             }
@@ -178,13 +175,14 @@ async function getFeatureOfUserID(course_id, user_id) {
     let feature = await getFeatureByID(new_feature._id);
 
     feature.total_assignments = await getNumberOfAssignments(course_id);
-    feature.completed_assignments = await getNumberOfCompletedAssignments(course_id, user_id);
+    feature.completed_assignments = await getNumberOfCompletedAssignmentsByFeatureID(feature._id);
 
     return feature;
 }
 
 exports.createBadge = createBadge;
 exports.getBadge = getBadge;
+exports.getBadgeByCourseID = getBadgeByCourseID;
 exports.updateBadge = updateBadge;
 exports.getCourseByID = getCourseByID;
 exports.getCourseByAssignmentID = getCourseByAssignmentID;
@@ -193,6 +191,6 @@ exports.createFeature = createFeature;
 exports.getFeatureByID = getFeatureByID;
 exports.updateFeatureProgress = updateFeatureProgress;
 exports.addBadgeToFeature = addBadgeToFeature;
-exports.getNumberOfCompletedAssignments = getNumberOfCompletedAssignments;
+exports.getNumberOfCompletedAssignmentsByFeatureID = getNumberOfCompletedAssignmentsByFeatureID;
 exports.getFeaturesOfCourse = getFeaturesOfCourse;
 exports.getFeatureOfUserID = getFeatureOfUserID;
