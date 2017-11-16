@@ -33,13 +33,19 @@ body {
   background-color: #133756;
   border-style: none;
   color: white;
-  transition: background-color 0.5s ease-out;
+  transition: background-color 0.5s ease-out,
+              color 0.5s ease-out;
   padding: 0.7em;
 }
 
 .btn:hover {
-  color: white;
+  color: grey;
   background-color: #0f2837;
+}
+
+.btn:focus {
+  color: white;
+  border-style: none;
 }
 
 /* Pills modification */

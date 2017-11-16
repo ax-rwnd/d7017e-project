@@ -1,0 +1,66 @@
+<app-head></app-head>
+<div id="cont" class="content" [@content]="sidebarState">
+    <form class="container" (ngSubmit)="submitCourse()" [formGroup]="form" novalidate>
+      <h2>Create course <span class="required">{{errorMessage}}</span></h2>
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="code">Course code</label>
+            <input type="text" class="form-control" id="code" formControlName="code" ngModel>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="name">Course name</label> <span class="required">*</span>
+            <input type="text" class="form-control" id="name" formControlName="name" ngModel required>
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="features">Features</label>
+        <div id="features" class="form-check">
+          <label class="form-check-label">
+            <input class="form-check-input" formControlName="badges" type="checkbox"> Badges
+          </label>
+          <label class="form-check-label">
+            <span style="display:inline-block; width: 0.5em;"></span> <input class="form-check-input" formControlName="progress" type="checkbox"> Progressbar
+          </label>
+          <label class="form-check-label">
+            <span style="display:inline-block; width: 0.5em;"></span> <input class="form-check-input" formControlName="map" type="checkbox"> Adventure map
+          </label>
+          <label class="form-check-label">
+            <span style="display:inline-block; width: 0.5em;"></span> <input class="form-check-input" formControlName="leaderboard" type="checkbox"> Leaderboard
+          </label>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="desc">Course description</label> <span class="required">*</span>
+        <div id="desc">
+          <tabset>
+            <tab heading="Write" id="tab1">
+              <div class="assignmentDescription" appScroller>
+                <div ace-editor [(text)]="content" [mode]="'markdown'" [theme]="'eclipse'" [options]="{maxLines: 1000, printMargin: false}" [readOnly]="false" [autoUpdateContent]="true" [durationBeforeCallback]="1000"(textChanged)="onChange(content)"  style="min-height: 100%; width:100%; overflow: auto;"></div>
+              </div>
+            </tab>
+            <tab heading="Preview">
+              <div class="preview" appScroller>
+                <div Markdown [data]="content" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/themes/prism.min.css"></div>
+              </div>
+            </tab>
+          </tabset>
+        </div>
+      </div>
+      <div class="row set-margin">
+        <div class="col-md-2">
+          <button type="submit" class="btn">Create course</button>
+        </div>
+        <div class="col-md-2">
+          <div class="form-check set-checkbox-margin">
+            <label class="form-check-label">
+              <input class="form-check-input" formControlName="hidden" type="checkbox"> Make public
+            </label>
+          </div>
+        </div>
+      </div>
+    </form>
+</div>
