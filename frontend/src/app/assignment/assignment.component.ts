@@ -59,9 +59,10 @@ export class AssignmentComponent implements OnInit {
     this.progress = { current: 0}; // this.assignmentService.progress; what even is this
   }
 
+  // Submit code to backend for testing
   submitCode() {
     const user_id = new ObjectID(this.userid);
-    const assignment_id = this.assignment['id'];
+    const assignment_id = new ObjectID(this.assignment['id']);
     const course_id = new ObjectID(this.assignment['course_id']);
     this.backendService.submitAssignment(user_id, course_id, assignment_id, this.language, this.content).then(data => {
       this.HandleResponse(data);
@@ -84,7 +85,7 @@ export class AssignmentComponent implements OnInit {
     this.feedback = fb;
   }
 
-  // Update the feedback array
+  // Handle the response from a code submission. Update the feedback div and update the course progress
   HandleResponse(value) {
     const feedback = [];
     value = JSON.parse(value);
@@ -122,6 +123,7 @@ export class AssignmentComponent implements OnInit {
 
     if (value['passed']) {
       this.status = 'Completed';
+      // TODO update course progress
     } else {
       this.status = 'Not Completed';
     }
