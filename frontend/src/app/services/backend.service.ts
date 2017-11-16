@@ -144,14 +144,28 @@ export class BackendService {
     const body = {'icon': icon, 'title': title, 'description': description};
     return this.apiPost('/api/features/badge', body);
   }
+
+  getEnabledFeaturesCourse (course_id: string) {
+    // Get enabled features for a course
+
+    return this.apiGet('/api/courses/' + course_id + '/enabled_features');
+  }
+
   getFeaturesCourseUser (course_id: string, user_id: string) {
+    // Get feature state for a user in a course
+
     console.log('course ', course_id);
     console.log('user ', user_id);
     return this.apiGet('/api/features/feature/' + course_id + '/' + user_id);
   }
+
   getFeaturesCourse (course_id: string) {
-    return this.apiGet('/api/courses/' + course_id + '/enabled_features');
+    // Get features for all users in a course
+
+    return this.apiGet('/api/features/features/' + course_id);
   }
+
+
   login(ticket: string, service: string) {
     return this.apiGet('/auth/login/ltu?ticket=' + ticket + '&service=' + service);
   }
