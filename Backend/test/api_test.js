@@ -263,14 +263,13 @@ describe('/api', () => {
             });
         });
 
-        describe('GET /api/courses/:course_id/assignments/:assignment_id/submit', () => {
+        describe('POST /api/courses/:course_id/assignments/:assignment_id/submit', () => {
 
             it('run assignments tests', () => {
-                let course_id_test = '59f6f88b1ac36c0762eb46a9';
                 let assignment_id_test = '59f8a2a81ac36c0762eb46ae';
 
                 let route = '/api/courses/' + course_id + '/assignments/' + assignment_id_test + '/submit';
-                it_rejects_unauthorized_get(route);
+                it_rejects_unauthorized_post(route);
                 return request(runner.server)
                     .post(route)
                     .set('Authorization', 'Bearer ' + access_tokens.user)
@@ -281,6 +280,87 @@ describe('/api', () => {
                     .expect(200)
                     .then(res => {
                         assert(assignment_id_test == res.body.assignment_id, 'response is not contain the correct assignment_id');
+                    });
+            });
+        });
+
+        describe('POST /:course_id/assignments/:assignment_id/save', () => {
+            it('saves an empty draft to the database', () => {
+                let assignment_id = '59f8a2a81ac36c0762eb46ae';
+
+                let route = '/api/courses/' + course_id + '/assignments/' + assignment_id + '/save';
+
+                it_rejects_unauthorized_post(route);
+                return request(runner.server)
+                    .post(route)
+                    .set('Authorization', 'Bearer ' + access_tokens.user)
+                    .send()
+                    .expect(200)
+                    .then(res => {
+                        assert(assignment_id == res.body.assignment, 'response does not contain the correct assignment_id');
+                        assert(res.body.lang == "", 'response param lang is not empty');
+                        assert(res.body.code == "", 'response param code is not empty');
+                    });
+            });
+            it('saves a draft to the database', () => {
+                let assignment_id = '59f8a2a81ac36c0762eb46ae';
+
+                let route = '/api/courses/' + course_id + '/assignments/' + assignment_id + '/save';
+
+                let lang = 'python3';
+                let code = 'print(\"hello world\")\n';
+                it_rejects_unauthorized_post(route);
+                return request(runner.server)
+                    .post(route)
+                    .set('Authorization', 'Bearer ' + access_tokens.user)
+                    .send({
+                        'lang': lang,
+                        'code': code
+                    })
+                    .expect(200)
+                    .then(res => {
+                        assert(assignment_id == res.body.assignment, 'response does not contain the correct assignment_id');
+                        assert(lang == res.body.lang, 'response does not contain the correct lang');
+                        assert(code == res.body.code, 'response does not contain the correct code');
+                    });
+            });
+        });
+
+        describe('GET /:course_id/assignments/:assignment_id/draft', () => {
+            it('retrieves a draft from the database', () => {
+                let assignment_id = '59f8a2a81ac36c0762eb46ae';
+
+                let route = '/api/courses/' + course_id + '/assignments/' + assignment_id + '/draft';
+
+                let lang = 'python3';
+                let code = 'print(\"hello world\")\n';
+                it_rejects_unauthorized_get(route);
+                return request(runner.server)
+                    .get(route)
+                    .set('Authorization', 'Bearer ' + access_tokens.user)
+                    .send()
+                    .expect(200)
+                    .then(res => {
+                        assert(assignment_id == res.body.assignment, 'response does not contain the correct assignment_id');
+                        assert(res.body.lang == lang, 'response does not contain the correct lang');
+                        assert(res.body.code == code, 'response does not contain the correct code');
+                    });
+            });
+            it('retrieves a non-existing draft from the database', () => {
+                let assignment_id = '59f8a2a81ac36c0762eb32be';
+
+                let route = '/api/courses/' + course_id + '/assignments/' + assignment_id + '/draft';
+
+                it_rejects_unauthorized_get(route);
+                return request(runner.server)
+                    .get(route)
+                    .set('Authorization', 'Bearer ' + access_tokens.user)
+                    .send()
+                    .expect(200)
+                    .then(res => {
+                        assert(assignment_id == res.body.assignment, 'response does not contain the correct assignment_id');
+                        assert(res.body.lang == "", 'response param lang is not empty');
+                        assert(res.body.code == "", 'response param code is not empty');
                     });
             });
         });
