@@ -39,9 +39,15 @@ function it_rejects_unauthorized_post(route) {
     });
 }
 
+// extracts the user id from a web token
+function get_id_from_token(token) {
+    return jwt.verify(token, config.get('App.secret')).id;
+}
+
 describe('/api', () => {
     let access_tokens;
-    let fake_admin_id;
+    let user_id;
+    let admin_id;
     // intro programmering
     let course_id = '59f6f88b1ac36c0762eb46a9';
     let assignment_id;
@@ -55,6 +61,7 @@ describe('/api', () => {
             .expect(200)
             .then(res => {
                 access_tokens.user = res.body.access_token;
+                user_id = get_id_from_token(res.body.access_token);
             });
         let admin_promise = request(runner.server)
             .get('/auth/login/fake')
@@ -62,9 +69,7 @@ describe('/api', () => {
             .expect(200)
             .then(res => {
                 access_tokens.admin = res.body.access_token;
-                let payload = jwt.verify(res.body.access_token, config.get('App.secret'));
-                console.log('payload:', payload);
-                fake_admin_id = payload.id;
+                admin_id = get_id_from_token(res.body.access_token);
             });
         return Promise.all([user_promise, admin_promise]);
     });
@@ -410,7 +415,7 @@ describe('/api', () => {
         describe('GET /api/users/:user_id', () => {
             it('gets some user information', () => {
                 return request(runner.server)
-                .get('/api/users/' + fake_admin_id)
+                .get('/api/users/' + admin_id)
                 .set('Authorization', 'Bearer ' + access_tokens.user)
                 .expect(200)
                 .then(res => {
@@ -432,7 +437,7 @@ describe('/api', () => {
         describe('GET /api/users/:user_id/courses', () => {
             it('returns a non-empty array', () => {
                 return request(runner.server)
-                .get('/api/users/' + fake_admin_id + '/courses')
+                .get('/api/users/' + admin_id + '/courses')
                 .set('Authorization', 'Bearer ' + access_tokens.user)
                 .then(res => {
                     assert(Array.isArray(res.body.courses), 'not an array');
