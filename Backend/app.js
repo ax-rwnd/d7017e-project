@@ -12,6 +12,7 @@ var errors = require('./lib/errors.js');
 var morgan = require('morgan');
 var fs = require('fs');
 var crypto = require('crypto');
+var auth = require('./lib/authentication');
 
 var app = express();
 
@@ -42,9 +43,12 @@ app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
 app.use(cors({origin: '*'}));
 
 //defining routes
-var auth = express.Router();
-require('./routes/auth')(auth);
-app.use('/auth', auth);
+var auth_router = express.Router();
+require('./routes/auth')(auth_router);
+app.use('/auth', auth_router);
+
+// only authenticated users can access /api
+app.use('/api', auth.validateJWTtoken);
 
 var users = express.Router();
 require('./routes/api/users')(users);

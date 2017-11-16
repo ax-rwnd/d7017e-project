@@ -9,7 +9,7 @@ var config = require('config');
 
 module.exports = function(router) {
 
-    router.get('/', auth.validateJWTtoken, function(req, res, next) {
+    router.get('/', function(req, res, next) {
 
         if (!('query' in req.query)) {
             return next(errors.BAD_QUERY_STRUCTURE);
