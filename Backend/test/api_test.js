@@ -6,6 +6,8 @@ process.env.NODE_ENV = 'test';
 const request = require('supertest');
 const assert = require('assert');
 const ObjectId = require('mongoose').Types.ObjectId;
+const config = require('config');
+const jwt = require('jsonwebtoken');
 
 let runner = require('../bin/www');
 
@@ -39,7 +41,7 @@ function it_rejects_unauthorized_post(route) {
 
 describe('/api', () => {
     let access_tokens;
-    let fake_admin_id = '5a041440bf85f83d5446f3bc';
+    let fake_admin_id;
     // intro programmering
     let course_id = '59f6f88b1ac36c0762eb46a9';
     let assignment_id;
@@ -60,6 +62,9 @@ describe('/api', () => {
             .expect(200)
             .then(res => {
                 access_tokens.admin = res.body.access_token;
+                let payload = jwt.verify(res.body.access_token, config.get('App.secret'));
+                console.log('payload:', payload);
+                fake_admin_id = payload.id;
             });
         return Promise.all([user_promise, admin_promise]);
     });
@@ -109,6 +114,7 @@ describe('/api', () => {
                     .expect(200)
                     .then(res => {
                         assert(ObjectId.isValid(res.body._id), 'response is not a valid ObjectId');
+                        course_id = res.body._id;
                     });
             });
         });
@@ -322,13 +328,9 @@ describe('/api', () => {
         });
 
         describe('GET /api/users/:user_id', () => {
-            // fake-admin-00
-            let route = '/api/users/' + fake_admin_id;
-            it_rejects_unauthorized_get(route);
-
             it('gets some user information', () => {
                 return request(runner.server)
-                .get(route)
+                .get('/api/users/' + fake_admin_id)
                 .set('Authorization', 'Bearer ' + access_tokens.user)
                 .expect(200)
                 .then(res => {
@@ -348,12 +350,9 @@ describe('/api', () => {
         });
 
         describe('GET /api/users/:user_id/courses', () => {
-            let route = '/api/users/' + fake_admin_id + '/courses';
-            it_rejects_unauthorized_get(route);
-
             it('returns a non-empty array', () => {
                 return request(runner.server)
-                .get(route)
+                .get('/api/users/' + fake_admin_id + '/courses')
                 .set('Authorization', 'Bearer ' + access_tokens.user)
                 .then(res => {
                     assert(Array.isArray(res.body.courses), 'not an array');
