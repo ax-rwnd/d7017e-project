@@ -22,10 +22,12 @@ export class ModBadgesComponent extends GameelementComponent implements OnInit, 
 
   update() {
     super.getElements(this.courseCode);
-    console.log('elements', this.elements);
+    this.backendService.getFeaturesCourseMe(this.courseCode).then( (data: any) => {
+      this.badges = data.badges;
+    });
   }
 
   isEnabled() {
-    return true; // this.queryEnabled('badges');
+    return this.queryEnabled('badges');
   }
 }
