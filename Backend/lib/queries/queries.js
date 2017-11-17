@@ -15,10 +15,10 @@ const FIELDS = {
     COURSE: {
         MODEL: require('../../models/schemas').Course,
         BASE_FIELDS: "course_code name description",
-        ADMIN: "course_code name description teachers students assignments",
-        TEACHER: "course_code name description students assignments",
+        ADMIN: "course_code name description autojoin teachers students invited pending assignments",
+        TEACHER: "course_code name description autojoin teachers students invited pending assignments",
         STUDENT: "course_code name description assignments",
-        POPULATE_FIELDS: "teachers students assignments"
+        POPULATE_FIELDS: "teachers students invited pending assignments"
     },
     TEACHERS: {
         BASE_FIELDS: "username email"
@@ -292,6 +292,158 @@ function addCourseStudent(course_id, student_id) {
     });
 }
 
+function addCoursePending(course_id, student_id) {
+    return User.count({_id: student_id})
+    .then(count => {
+        if (count === 0) {
+            // TODO use an APIError
+            throw new Error('No such student');
+        }
+        return Course.update(
+            {_id: course_id},
+            {$addToSet: {pending: student_id}},
+            {runValidators: true}
+        );
+    }).then(function (raw) {
+        // check if the course update was ok
+        if (raw.ok !== 1) {
+            // TODO: make a real error message!
+            throw new Error('Mongo error: failed to add to user.courses');
+        // check if the course existed
+        } else if (raw.n === 0) {
+            // TODO: make it an APIError
+            throw new Error('Course does not exist');
+        }
+        return User.update(
+            {_id: student_id},
+            {$addToSet: {pending: course_id}},
+            {runValidators: true}
+        );
+    }).then(function(raw) {
+        // check if the user update was ok
+        if (raw.ok === 1) {
+            return true;
+        } else {
+            // TODO: make a real error message!
+            throw new Error('Mongo error: failed to add to user.courses');
+        }
+    });
+}
+
+function addCourseInvite(course_id, student_id) {
+    return User.count({_id: student_id})
+    .then(count => {
+        if (count === 0) {
+            // TODO use an APIError
+            throw new Error('No such student');
+        }
+        return Course.update(
+            {_id: course_id},
+            {$addToSet: {invited: student_id}},
+            {runValidators: true}
+        );
+    }).then(function (raw) {
+        // check if the course update was ok
+        if (raw.ok !== 1) {
+            // TODO: make a real error message!
+            throw new Error('Mongo error: failed to add to user.courses');
+        // check if the course existed
+        } else if (raw.n === 0) {
+            // TODO: make it an APIError
+            throw new Error('Course does not exist');
+        }
+        return User.update(
+            {_id: student_id},
+            {$addToSet: {invited: course_id}},
+            {runValidators: true}
+        );
+    }).then(function(raw) {
+        // check if the user update was ok
+        if (raw.ok === 1) {
+            return true;
+        } else {
+            // TODO: make a real error message!
+            throw new Error('Mongo error: failed to add to user.courses');
+        }
+    });
+}
+
+function removeCourseInvite(course_id, student_id) {
+    return User.count({_id: student_id})
+    .then(count => {
+        if (count === 0) {
+            // TODO use an APIError
+            throw new Error('No such student');
+        }
+        return Course.update(
+            {_id: course_id},
+            {$pull: {invited: student_id}},
+            {runValidators: true}
+        );
+    }).then(function (raw) {
+        // check if the course update was ok
+        if (raw.ok !== 1) {
+            // TODO: make a real error message!
+            throw new Error('Mongo error: failed to add to user.courses');
+        // check if the course existed
+        } else if (raw.n === 0) {
+            // TODO: make it an APIError
+            throw new Error('Course does not exist');
+        }
+        return User.update(
+            {_id: student_id},
+            {$pull: {invited: course_id}},
+            {runValidators: true}
+        );
+    }).then(function(raw) {
+        // check if the user update was ok
+        if (raw.ok === 1) {
+            return true;
+        } else {
+            // TODO: make a real error message!
+            throw new Error('Mongo error: failed to add to user.courses');
+        }
+    });
+}
+
+function removeCoursePending(course_id, student_id) {
+    return User.count({_id: student_id})
+    .then(count => {
+        if (count === 0) {
+            // TODO use an APIError
+            throw new Error('No such student');
+        }
+        return Course.update(
+            {_id: course_id},
+            {$pull: {pending: student_id}},
+            {runValidators: true}
+        );
+    }).then(function (raw) {
+        // check if the course update was ok
+        if (raw.ok !== 1) {
+            // TODO: make a real error message!
+            throw new Error('Mongo error: failed to add to user.courses');
+        // check if the course existed
+        } else if (raw.n === 0) {
+            // TODO: make it an APIError
+            throw new Error('Course does not exist');
+        }
+        return User.update(
+            {_id: student_id},
+            {$pull: {pending: course_id}},
+            {runValidators: true}
+        );
+    }).then(function(raw) {
+        // check if the user update was ok
+        if (raw.ok === 1) {
+            return true;
+        } else {
+            // TODO: make a real error message!
+            throw new Error('Mongo error: failed to add to user.courses');
+        }
+    });
+}
+
 function getCourseTeachers(id, fields) {
     var wantedFields = fields || "username email admin courses providers";
 
@@ -443,6 +595,17 @@ function populateObject(mongooseObject, schema, wantedFields) {
     }
 }
 
+// Should be merged with getCourse maybe
+function getCourseSimple(courseid) {
+    return Course.findById(courseid, "autojoin students teachers invited pending")
+    .then(function (courseObject) {
+        if (!courseObject) {
+            throw errors.COURSE_DOES_NOT_EXIST;
+        }
+        return courseObject;
+    });
+}
+
 function getCourse(courseid, roll, fields) {
     var wantedFields = fields || FIELDS.COURSE[roll.toUpperCase()];
     wantedFields = wantedFields.replace(/,/g, " ");
@@ -574,6 +737,10 @@ exports.createCourse = createCourse;
 exports.getUserCourses = getUserCourses;
 exports.getCourseStudents = getCourseStudents;
 exports.addCourseStudent = addCourseStudent;
+exports.addCoursePending = addCoursePending;
+exports.addCourseInvite = addCourseInvite;
+exports.removeCourseInvite = removeCourseInvite;
+exports.removeCoursePending = removeCoursePending;
 exports.getCourseTeachers = getCourseTeachers;
 exports.getCourseAssignments = getCourseAssignments;
 exports.setRefreshToken = setRefreshToken;
@@ -583,8 +750,11 @@ exports.createTest = createTest;
 exports.getAssignment = getAssignment;
 exports.getTest = getTest;
 exports.getCourse = getCourse;
+exports.getCourseSimple = getCourseSimple;
 exports.checkPermission = checkPermission;
 exports.saveCode = saveCode;
 exports.getCode = getCode;
 exports.getCoursesEnabledFeatures = getCoursesEnabledFeatures;
 exports.searchDB = searchDB;
+
+

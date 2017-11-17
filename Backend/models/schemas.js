@@ -36,6 +36,8 @@ var userSchema = new Schema({
     tokens: [{type: String, required: false}],
     courses: [{type: Schema.Types.ObjectId, ref: 'Course', required: false}],
     teaching: [{type: Schema.Types.ObjectId, ref: 'Course', required: false}],
+    invited: [{type: Schema.Types.ObjectId, ref: 'Course', required: false}],
+    pending: [{type: Schema.Types.ObjectId, ref: 'Course', required: false}],
     providers: [{type: String, required: true}] //LTU, KTH etc.
 });
 userSchema.index({username: 'text', email: 'text'});
@@ -52,9 +54,12 @@ var courseSchema = new Schema({
     course_code: {type: String, required: false, index: true},
     name: {type: String, required: true, index: true},
     description: {type: String, required: false, index: true},
-    hidden: { type: Boolean, required: true },  //public or private course
+    hidden: {type: Boolean, required: true},  //public or private course
+    autojoin: {type: Boolean, default: false},
     teachers: [{ type: Schema.Types.ObjectId, ref: 'User', required: false }],
     students: [{ type: Schema.Types.ObjectId, ref: 'User', required: false }],
+    invited: [{type: Schema.Types.ObjectId, ref: 'User', required: false}],
+    pending: [{type: Schema.Types.ObjectId, ref: 'User', required: false}],
     assignments: [{ type: Schema.Types.ObjectId, ref: 'Assignment', required: false }],
     features: [{ type: Schema.Types.ObjectId, ref: 'Features', required: true }], //progress, badges etc.
     enabled_features: {
