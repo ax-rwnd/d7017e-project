@@ -13,6 +13,8 @@ var morgan = require('morgan');
 var fs = require('fs');
 var crypto = require('crypto');
 var auth = require('./lib/authentication');
+var swaggerUi = require('swagger-ui-express');
+var swaggerDocument = require('./lib/swagger.json');
 
 var app = express();
 
@@ -70,6 +72,7 @@ var search = express.Router();
 require('./routes/api/search')(search);
 app.use('/api/search', search);
 
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 //Route not found.
 app.use(function (req, res, next) {
