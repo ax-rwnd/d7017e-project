@@ -49,9 +49,9 @@ var draftSchema = new Schema({
 });
 
 var courseSchema = new Schema({
-    course_code: {type: String, required: false, index: true},
-    name: {type: String, required: true, index: true},
-    description: {type: String, required: false, index: true},
+    course_code: {type: String, required: false},
+    name: {type: String, required: true},
+    description: {type: String, required: false},
     hidden: { type: Boolean, required: true },  //public or private course
     teachers: [{ type: Schema.Types.ObjectId, ref: 'User', required: false }],
     students: [{ type: Schema.Types.ObjectId, ref: 'User', required: false }],

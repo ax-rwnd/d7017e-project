@@ -96,6 +96,32 @@ describe('/search', () => {
                     assert(Array.isArray(res.body.assignments), 'Property assignments was not an array');
                     assert(res.body.hasOwnProperty('users'), 'Result did not have property users');
                     assert(Array.isArray(res.body.users), 'Property users was not an array');
+
+                    assert(res.body.assignments.length > 0, 'Property assignments was empty');
+                });
+        });
+    });
+
+    describe('GET /api/search', () => {
+
+        it('Return search results with "categories" as filter', () => {
+
+            let query = '?query=program&categories=users,courses';
+            let route = '/api/search';
+
+            return request(runner.server)
+                .get(route+query)
+                .set('Authorization', 'Bearer ' + access_token)
+                .expect(200)
+                .then(res => {
+                    assert(res.body.hasOwnProperty('courses'), 'Result did not have property courses');
+                    assert(Array.isArray(res.body.courses), 'Property courses was not an array');
+                    assert(res.body.hasOwnProperty('assignments'), 'Result did not have property assignments');
+                    assert(Array.isArray(res.body.assignments), 'Property assignments was not an array');
+                    assert(res.body.hasOwnProperty('users'), 'Result did not have property users');
+                    assert(Array.isArray(res.body.users), 'Property users was not an array');
+
+                    assert(res.body.assignments.length == 0, 'Property assignments was not empty');
                 });
         });
     });

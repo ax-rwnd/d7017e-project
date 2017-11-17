@@ -19,14 +19,8 @@ module.exports = function(router) {
             return next(errors.TOO_SHORT_QUERY);
         }
 
-        queries.searchDB(req.query.query, req.user.id).then(function (results) {
-            let json = {};
-
-            for(let result of results) {
-                for(var key in result) json[key] = result[key];
-            }
-
-            return res.json(json);
+        queries.searchDB(req.query.query, req.query.categories, req.user.id).then(function (results) {
+            return res.json(results);
         }).catch(next);
     });
 };

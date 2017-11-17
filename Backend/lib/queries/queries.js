@@ -512,39 +512,76 @@ function getCoursesEnabledFeatures(course_id) {
     });
 }
 
-function searchDB(query, user_id) {
+function searchDB(query, categories, user_id) {
     return getAssignmentIDsByUser(user_id).then(assignment_ids => {
 
         let promises = [];
+        let json = {
+            courses: [],
+            assignments: [],
+            users: []
+        };
 
-        promises.push(Course.find({$text: {$search: query}, 'students': user_id, 'hidden': false}, {score: {$meta: "textScore"}})
-            .select('-__v -hidden -features -assignments -students -enabled_features')
-            .sort({score: {$meta: "textScore"}})
-            .limit(20).then(docs => {
-                return {'courses': docs};
-            }).catch(err => {
-                logger.error(err);
-            }));
+        if(categories) {
+            categories = categories.split(',');
 
-        promises.push(Assignment.find({$text: {$search: query}, '_id': assignment_ids, 'hidden': false}, {score: {$meta: "textScore"}})
-            .select('-__v -tests -optional_tests -hidden -languages')
-            .sort({score: {$meta: "textScore"}})
-            .limit(20).then(docs => {
-                return {'assignments': docs};
-            }).catch(err => {
-                logger.error(err);
-            }));
-        promises.push(User.find({$text: {$search: query}}, {score: {$meta: "textScore"}})
-            .select('-__v -tokens -providers')
-            .sort({score: {$meta: "textScore"}})
-            .limit(20).then(docs => {
-                return {'users': docs};
-            }).catch(err => {
-                logger.error(err);
-            }));
+            if (categories.indexOf('courses') !== -1) {
+                promises.push(searchDBCourses(query, user_id));
+            }
+            if (categories.indexOf('assignments') !== -1) {
+                promises.push(searchDBAssignments(query, assignment_ids));
+            }
+            if (categories.indexOf('users') !== -1) {
+                promises.push(searchDBUsers(query));
+            }
+        } else {
+            promises.push(searchDBCourses(query, user_id));
+            promises.push(searchDBAssignments(query, assignment_ids));
+            promises.push(searchDBUsers(query));
+        }
 
-        return Promise.all(promises);
+        return Promise.all(promises).then(function(results) {
+
+            for(let result of results) {
+                for(var key in result) json[key] = result[key];
+            }
+
+            return json;
+        });
     });
+}
+
+function searchDBCourses(query, user_id) {
+    return Course.find({$text: {$search: query}, 'students': user_id, 'hidden': false}, {score: {$meta: "textScore"}})
+        .select('-__v -hidden -features -assignments -students -enabled_features')
+        .sort({score: {$meta: "textScore"}})
+        .limit(20).then(docs => {
+            return {'courses': docs};
+        }).catch(err => {
+            logger.error(err);
+        });
+}
+
+function searchDBAssignments(query, assignment_ids) {
+    return Assignment.find({$text: {$search: query}, '_id': assignment_ids, 'hidden': false}, {score: {$meta: "textScore"}})
+        .select('-__v -tests -optional_tests -hidden -languages')
+        .sort({score: {$meta: "textScore"}})
+        .limit(20).then(docs => {
+            return {'assignments': docs};
+        }).catch(err => {
+            logger.error(err);
+        });
+}
+
+function searchDBUsers(query) {
+    return User.find({$text: {$search: query}}, {score: {$meta: "textScore"}})
+        .select('-__v -tokens -providers')
+        .sort({score: {$meta: "textScore"}})
+        .limit(20).then(docs => {
+            return {'users': docs};
+        }).catch(err => {
+            logger.error(err);
+        });
 }
 
 // Helper function for searchDB()
