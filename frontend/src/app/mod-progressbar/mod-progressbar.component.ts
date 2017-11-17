@@ -8,16 +8,26 @@ import { Component, OnInit, Input, OnChanges, SimpleChanges, SimpleChange } from
 })
 export class ModProgressbarComponent extends GameelementComponent implements OnInit, OnChanges {
   // Defines a progress bar, suitable for use in courses
-  @Input() progress: number;
+  @Input() courseCode: string;
   private maxAssignments: number;
   private currentAssignments: number;
 
   ngOnInit() {
     this.currentAssignments = 0;
     this.maxAssignments = 0;
+    this.update();
   }
 
   ngOnChanges() {
+    this.update();
+  }
+
+  update() {
+    this.backendService.getFeaturesCourseMe(this.courseCode).then((data: any) => {
+      this.currentAssignments = data.completed_assignments;
+      this.maxAssignments = data.total_assignments;
+      console.error('features:', data);
+    });
   }
 
   isEnabled() {
