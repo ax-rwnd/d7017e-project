@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "test": "NODE_ENV=test mocha",
+    "test": "cross-env NODE_ENV=test mocha",
     "start": "forever start ./bin/www",
     "stop": "forever stopall"
   },
@@ -26,6 +26,7 @@
     "swagger-ui-express": "latest",
     "throw.js": "^3.0.1",
     "winston": "^2.4.0",
-    "xml2js": "^0.4.19"
+    "xml2js": "^0.4.19",
+    "cross-env": "latest"
   }
 }
