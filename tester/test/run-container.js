@@ -1,3 +1,6 @@
+/* jshint node: true, mocha: true */
+'use strict';
+
 const logger = require('../log.js');
 const request = require('request');
 const Docker = require('dockerode');
@@ -14,7 +17,7 @@ async function startContainer(lang) {
             AutoRemove: true,
         }
     };
-    c = await docker.createContainer(containerConfig);
+    var c = await docker.createContainer(containerConfig);
     var container = await c.start();
     const inspectData = await container.inspect();
     container.extra = {address: inspectData.NetworkSettings.IPAddress + ':8080'};
@@ -53,14 +56,5 @@ async function startRunner(lang) {
     await containerReady(container);
     return container;
 }
-//
-//logger.level = 'debug';
-//startRunner('python27').then(container => {
-//    logger.debug('ok');
-//    container.stop();
-//}).catch(err => {
-//    logger.debug('err');
-//    logger.debug(err);
-//});
 
 module.exports.startRunner = startRunner;

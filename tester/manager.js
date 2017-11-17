@@ -21,7 +21,17 @@ function newRequest(req, res) {
         chunks.push(chunk);
     }).on('end', () => {
         //Convert the array of Buffers to a javascript object
-        var body = JSON.parse(Buffer.concat(chunks).toString());
+        let body;
+        try {
+            body = JSON.parse(Buffer.concat(chunks).toString());
+        } catch (e) {
+            logger.warn('Could not parse json data.',
+                'Could be because of single quotes or no quotes at all');
+                logger.warn('Indata was', chunks.toString());
+            res.sendStatus(400);
+            return;
+        }
+
 
         if(!isValidInput(body)) {
             logger.warn('Not valid input data');

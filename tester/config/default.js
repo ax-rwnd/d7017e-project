@@ -1,4 +1,9 @@
-var { languages } = require('./languages.js');
+try {
+    var { languages } = require('./languages.js');
+} catch(e) {
+    console.log("* * * * *\n\nRemember to run the Makefile\n\n* * * * *");
+    process.exit(1);
+}
 
 //This is the default configuration file for the docker manager
 //other config files will overwrite some or all default fields

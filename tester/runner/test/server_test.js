@@ -1,3 +1,6 @@
+/* jshint node: true, mocha: true */
+'use strict';
+
 var request = require('supertest');
 var assert = require('assert');
 

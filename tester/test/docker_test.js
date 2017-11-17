@@ -1,3 +1,6 @@
+/* jshint node: true, mocha: true */
+'use strict';
+
 const assert = require('assert');
 const docker = require('../docker.js');
 const request = require('request');

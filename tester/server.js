@@ -7,6 +7,9 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var config = require('config');
 var manager = require('./manager.js');
+var https = require('https');
+var fs = require('fs');
+var languages = require('./config/languages');
 
 const HOST = '0.0.0.0';
 var port;
@@ -115,7 +118,27 @@ app.get('/', (req, res) => {
 app.post('/', (req, res) => {
     manager.newRequest(req, res);
 });
-var server = app.listen(port, HOST);
+
+app.get('/languages', (req, res) => {
+    res.json({languages: languages.languages});
+});
+
+/**
+ * Create HTTPS server.
+ */
+
+var key = fs.readFileSync('encryption/private.key');
+var cert = fs.readFileSync('encryption/server.crt');
+var options = {
+    key: key,
+    cert: cert
+};
+
+var server = https.createServer(options, app);
+server.listen({
+    port: port,
+    host: HOST
+});
 
 var exitMessage = false;
 process.on('SIGINT', function() {
@@ -144,5 +167,4 @@ process.on('SIGINT', function() {
     }
 });
 
-
-logger.info(`Running on http://${HOST}:${port}`);
+logger.info(`Running on ${HOST}:${port}`);
