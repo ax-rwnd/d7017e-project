@@ -63,10 +63,10 @@ export class BackendService {
                 .catch(err => console.error('API Put failed in ' + endpoint + ' error ', err));
   }
 
-  // Add a student to a course.
   addUserToCourse(course_id: ObjectID, student_id: ObjectID) {
-    const body = {student_id: student_id.get()};
+  // Add a student to a course.
 
+    const body = {student_id: student_id.get()};
     return this.apiPut('/api/courses/' + course_id.get() + '/students', body);
   }
 
@@ -174,6 +174,12 @@ export class BackendService {
     // Get features for all users in a course
 
     return this.apiGet('/api/features/features/' + course_id);
+  }
+
+  getSearch (query: string) {
+    // Search the database.
+
+    return this.apiGet('/api/search?query=' + query);
   }
 
   postNewCourse(name: string, desc: string, hidden: boolean, course_code: string, en_feat: Object) { // post a new course to data base
