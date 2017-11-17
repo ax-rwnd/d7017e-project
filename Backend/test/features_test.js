@@ -88,7 +88,7 @@ describe('Test passAllMandatoryTests', () => {
     }
 });
 
-describe('Features routes', () => {
+describe('/features', () => {
 
     let access_token;
 
@@ -96,50 +96,47 @@ describe('Features routes', () => {
         return auth().then(at => access_token = at);
     });
 
-    it('GET /api/features/features/:course_id', () => {
+    describe('GET /api/features/features/:course_id', () => {
 
-        let course_id = '59f6f88b1ac36c0762eb46a9';
-        let route = '/api/features/features/';
 
-        return request(runner.server)
-            .get(route+course_id)
-            .set('Authorization', 'Bearer ' + access_token)
-            .expect(200)
-            .then(res => {
-                assert(Array.isArray(res.body.features), 'not an array');
-                //console.log(res.body);
-            });
+        it('Get features for all users in course', () => {
+
+            let course_id = '59f6f88b1ac36c0762eb46a9';
+            let route = '/api/features/features/';
+
+            return request(runner.server)
+                .get(route+course_id)
+                .set('Authorization', 'Bearer ' + access_token)
+                .expect(200)
+                .then(res => {
+                    assert(Array.isArray(res.body.features), 'not an array');
+                });
+        });
     });
 
-    it('GET /api/features/feature/:course_id/me', () => {
+    describe('GET /api/features/feature/:course_id/me', () => {
 
-        let course_id = '5a0475bb1ac36c0762eb46b9';
-        let route = '/api/features/feature';
+        it('Get feature for user in course', () => {
 
-        return request(runner.server)
-            .get(route+'/'+course_id+'/me')
-            .set('Authorization', 'Bearer ' + access_token)
-            .expect(200)
-            .then(res => {
-                assert(Array.isArray(res.body.badges), 'not an array');
-                assert(Array.isArray(res.body.progress), 'not an array');
-            });
+            let course_id = '59f6f88b1ac36c0762eb46a9';
+            let route = '/api/features/feature';
+
+            return request(runner.server)
+                .get(route+'/'+course_id+'/me')
+                .set('Authorization', 'Bearer ' + access_token)
+                .expect(200)
+                .then(res => {
+                    assert(Array.isArray(res.body.badges), 'not an array');
+                    assert(Array.isArray(res.body.progress), 'not an array');
+                });
+        });
     });
 
-});
-
-describe('Badge routes', () => {
-
-    let access_token;
-
-    before(() => {
-        return auth().then(at => access_token = at);
-    });
 
     let badge = {
         course_id: "59f991991ac36c0762eb46af",
         icon: 'pretty_icon',   //name of an icon image file
-        title: 'Pretty badgererer',
+        title: 'Pretty badge',
         description: 'Very impossibru badgeererer',
         goals: {
             badges: [],
@@ -151,49 +148,64 @@ describe('Badge routes', () => {
 
     let badge_id;
 
-    it('POST /api/features/badge', () => {
+    describe('POST /api/features/badge', () => {
 
-        let route = '/api/features/badge';
+        it('Create a badge', () => {
 
-        return request(runner.server)
-            .post(route)
-            .set('Authorization', 'Bearer ' + access_token)
-            .send(badge)
-            .set('Content-Type', 'application/json')
-            .expect(200)
-            .then(res => {
-                badge_id = res.body._id;
-            });
+            let route = '/api/features/badge';
+
+            return request(runner.server)
+                .post(route)
+                .set('Authorization', 'Bearer ' + access_token)
+                .send(badge)
+                .set('Content-Type', 'application/json')
+                .expect(200)
+                .then(res => {
+                    badge_id = res.body._id;
+                });
+        });
     });
 
-    it('PUT /api/features/badge', () => {
+    describe('PUT /api/features/badge', () => {
 
-        badge.title = new_title;
+        it('Update a badge', () => {
 
-        let route = '/api/features/badge';
+            badge.title = new_title;
 
-        return request(runner.server)
-            .put(route+'/'+badge_id)
-            .set('Authorization', 'Bearer ' + access_token)
-            .send(badge)
-            .set('Content-Type', 'application/json')
-            .expect(200)
-            .then(res => {
-                //console.log(res.body);
-            });
+            let route = '/api/features/badge';
+
+            return request(runner.server)
+                .put(route+'/'+badge_id)
+                .set('Authorization', 'Bearer ' + access_token)
+                .send(badge)
+                .set('Content-Type', 'application/json')
+                .expect(200)
+                .then(res => {
+                    assert(res.body._id == badge_id, 'Badge IDs did not match');
+                });
+        });
     });
 
-    it('GET /api/features/badge', () => {
+    describe('GET /api/features/badge', () => {
 
-        let route = '/api/features/badge';
+        it('Fetch a badge', () => {
 
-        return request(runner.server)
-            .put(route+'/'+badge_id)
-            .set('Authorization', 'Bearer ' + access_token)
-            .expect(200)
-            .then(res => {
-                assert(res.body.title == new_title, 'Updated badge did not have title '+new_title+' but '+res.body.title);
-            });
+            let route = '/api/features/badge';
+
+            return request(runner.server)
+                .put(route+'/'+badge_id)
+                .set('Authorization', 'Bearer ' + access_token)
+                .expect(200)
+                .then(res => {
+                    assert(res.body.title == new_title, 'Updated badge did not have title '+new_title+' but '+res.body.title);
+                });
+        });
+
+    });
+
+    describe.skip('DELETE /api/features/badge/:badge_id', () => {
+        it('TODO', () => {
+        });
     });
 
 });

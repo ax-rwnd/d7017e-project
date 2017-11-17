@@ -9,6 +9,8 @@ var Draft = require('../../models/schemas').Draft;
 var errors = require('../errors.js');
 var mongoose = require('mongoose');
 var logger = require('../../logger.js');
+var jwt = require('jsonwebtoken');
+var config = require('config');
 
 
 const FIELDS = {
@@ -118,6 +120,18 @@ function deleteUser(id) {
 }
 
 function setRefreshToken(userObject, token) {
+    // Iterate through refresh token array and expired tokens
+    var i = userObject.tokens.length;
+    while (i--) {
+        jwt.verify(userObject.tokens[i], config.get('App.secret'), function(err, payload) {
+            if (err) {
+                if (err.name === "TokenExpiredError") {
+                    userObject.tokens.splice(i, 1);
+                }
+            }
+        });
+    }
+
     userObject.tokens.push(token);
     userObject.save().then(function (updatedUser) {
         console.log("Ref token saved");

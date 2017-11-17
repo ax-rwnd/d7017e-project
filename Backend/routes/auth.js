@@ -111,6 +111,7 @@ module.exports = function (router) {
                     } else {
                         // Extract the error code from the XML parse
                         var error = result['cas:serviceResponse']['cas:authenticationFailure'][0].$.code;
+                        console.log(error);
                         next(error);
                         //res.json({error: error});
                     }

@@ -1,11 +1,12 @@
 'use strict';
 var util = require('util');
 // This file defines enums for easy error handling
+var config = require('config');
 
 function APIError(message, httpCode, errorCode) {
     this.name = this.constructor.name;
     this.message = message;
-    this. httpCode = httpCode;
+    this.httpCode = httpCode;
     this.errorCode = errorCode;
 
     //include stack trace in error object
@@ -35,7 +36,12 @@ module.exports = {
     // 7018
     FEATURE_DO_NOT_EXIST: new APIError("Course doesn't exist", 404, 7019),
     TEST_NOT_CREATED: new APIError("Assignment not created", 500, 7020),
+<<<<<<< HEAD
     BAD_QUERY_STRUCTURE: new APIError('Bad input. Expected: \'?query=XYZ\'', 400, 7021),
     TOO_SHORT_QUERY: new APIError('Bad input. Expected query with length atleast 3', 400, 7022),
     USER_ALREADY_IN_COURSE: new APIError('User is already a member of this course', 400, 7023)
+=======
+    BAD_QUERY_STRUCTURE: new APIError('Bad input. Expected: "?query=XYZ"', 400, 7021),
+    TOO_SHORT_QUERY: new APIError('Bad input. Expected query with length atleast '+config.get('Search.min_query_length'), 400, 7022)
+>>>>>>> 8b41aa1ea1b2538e0108589bd835ce8242671b64
 };
