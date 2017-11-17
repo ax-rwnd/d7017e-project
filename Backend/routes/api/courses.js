@@ -160,7 +160,6 @@ module.exports = function(router) {
         });
     });
 
-<<<<<<< HEAD
 
     // TODO
     // Documentation
