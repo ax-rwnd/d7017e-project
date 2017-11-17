@@ -165,7 +165,7 @@ module.exports = function(router) {
     // Documentation
     // Test
     // Rename? Should it really both do invites and accept pending?
-    router.post('/:course_id/invite', auth.validateJWTtoken, function (req, res, next) {
+    router.post('/:course_id/invite', function (req, res, next) {
         var course_id = req.params.course_id;
         var student_id = req.body.student_id;
         queries.getUser(req.user.id, "teaching")
@@ -207,12 +207,19 @@ module.exports = function(router) {
         }); 
     });
 
+    router.put('/:course_id/invite', function (req, res, next) {
+
+    });
+
+    router.delete('/:course_id/invite', function (req, res, next) {
+
+    });
     
     // TODO
     // Documentation
     // Test
     // Rename? Should it really do both sign up and accept invite?
-    router.post('/:course_id/join', auth.validateJWTtoken, function (req, res, next) {
+    router.post('/:course_id/join', function (req, res, next) {
         var course_id = req.params.course_id;
         console.log("Join hit");
         queries.getCourseSimple(course_id)
@@ -250,7 +257,15 @@ module.exports = function(router) {
         }); 
     });
 
-    router.get('/:course_id/teachers', auth.validateJWTtoken, function (req, res, next) {
+    router.put('/:course_id/join', function (req, res, next) {
+
+    });
+
+    router.delete('/:course_id/join', function (req, res, next) {
+
+    });
+
+    router.get('/:course_id/teachers', function (req, res, next) {
         var course_id = req.params.course_id;
 
         queries.getCourseTeachers(course_id, "username email").then(function (teachers) {
@@ -260,6 +275,9 @@ module.exports = function(router) {
             next(err);
         });
     });
+
+    router.put('/:course_id/teachers', function (req, res, next) {
+
 
     router.get('/:course_id/assignments', function (req, res, next) {
         var course_id = req.params.course_id;
