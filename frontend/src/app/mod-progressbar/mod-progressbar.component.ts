@@ -23,10 +23,11 @@ export class ModProgressbarComponent extends GameelementComponent implements OnI
   }
 
   update() {
+    // Grab updates from backend
+
     this.backendService.getFeaturesCourseMe(this.courseCode).then((data: any) => {
       this.currentAssignments = data.completed_assignments;
       this.maxAssignments = data.total_assignments;
-      console.error('features:', data);
     });
   }
 
