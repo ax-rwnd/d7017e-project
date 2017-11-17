@@ -36,18 +36,20 @@ export class UserComponent implements OnInit {
   modalRef: BsModalRef;
   form: FormGroup;
   defaultForm = {
-    name: ['', [Validators.required]],
+    search: ''
+    /*name: ['', [Validators.required]],
     code: ['', [Validators.required]],
     course_info: ['', [Validators.required]],
     progress: [false, []],
     score: [false, []],
     badges: [false, []],
-    leaderboard: [false, []],
+    leaderboard: [false, []],*/
   };
+  possibleCourses: any[];
 
   constructor(private http: HttpClient, private route: ActivatedRoute, private headService: HeadService, private userService: UserService,
-              private modalService: BsModalService, private backendService: BackendService, private courseService: CourseService, private fb: FormBuilder,
-              public auth: AuthService, private assignmentService: AssignmentService) {
+              private modalService: BsModalService, private backendService: BackendService, private courseService: CourseService,
+              private fb: FormBuilder, public auth: AuthService, private assignmentService: AssignmentService) {
     this.headService.stateChange.subscribe(sidebarState => { this.sidebarState = sidebarState; }); // subscribe to the state value head provides
   }
 
@@ -57,6 +59,7 @@ export class UserComponent implements OnInit {
     this.user = this.userService.userInfo;
     this.statistics = false;
     this.form = this.fb.group(this.defaultForm);
+    this.possibleCourses = [{name: 'course 1', id: '0'}, {name: 'course 2', id: '1'}];
   }
   toggleStatistics() {
     this.statistics = !this.statistics;
@@ -69,6 +72,12 @@ export class UserComponent implements OnInit {
     const course = this.courseService.CreateCourse('10000', this.form.value.name, this.form.value.code,
       this.form.value.info, this.form.value.progress, this.form.value.score, this.form.value.badges, this.form.value.leaderboard);
     this.courseService.AddCourse(course);
+  }
+  searchCourse() {
+    console.log(this.form.value);
+  }
+  join(id) {
+    console.log(id);
   }
 
   getMe() {

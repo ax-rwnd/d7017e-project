@@ -6,6 +6,7 @@
         {{currentCourse.code}}
       </h1>
       <button type="button" class="btn" id="createNewAssignment" [routerLink]="['/courses', currentCourse.id, 'createNewAssignment']">Create New Assignment</button>
+      <button type="button" class="btn" (click)="openModal(inviteStudentModal)">Invite student to course</button>
 
       <markdown [data]="currentCourse.course_info"></markdown>
 
@@ -45,3 +46,37 @@
   </div>
 
 </div>
+
+<ng-template #inviteStudentModal>
+  <div class="modal-header">
+    <h4 class="modal-title pull-left">Find course</h4>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label for="search">Search term</label>
+        <input type="text" id="search" ngModel required>
+
+      </div>
+    </div>
+    <div class="modal-body">
+      <table class="table table-striped">
+        <thead>
+        <tr>
+          <th class="col-md-10">Course</th>
+          <th class="col-md-2">Join</th>
+        </tr>
+        </thead>
+        <tbody *ngFor="let p of possibleStudents">
+        <tr>
+          <td> {{p.name}} </td>
+          <td> <button class="btn" (click)="invite(p.id)">Invite</button> </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="modal-footer">
+    </div>
+</ng-template>

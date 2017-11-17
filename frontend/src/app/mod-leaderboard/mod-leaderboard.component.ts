@@ -33,5 +33,4 @@ export class ModLeaderboardComponent extends GameelementComponent implements OnC
   isEnabled() {
     return this.queryEnabled('leaderboard');
   }
-
 }

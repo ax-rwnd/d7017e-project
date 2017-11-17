@@ -77,7 +77,7 @@ const appRoutes: Routes = [
     AssignmentGroupComponent,
     GameelementComponent,
     ModLeaderboardComponent,
-    ModProgressbarComponent,
+    ModProgressbarComponent
   ],
   imports: [
     BrowserModule,

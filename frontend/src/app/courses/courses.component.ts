@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 
+import { BsModalService } from 'ngx-bootstrap/modal';
+import { BsModalRef } from 'ngx-bootstrap/modal/modal-options.class';
+
 import {CourseService} from '../services/course.service';
 import { trigger, state, style, animate, transition } from '@angular/animations';
 import { HeadService } from '../services/head.service';
@@ -27,9 +30,11 @@ export class CoursesComponent implements OnInit {
   progress: any;
   currentCourse: any;
   currentAssignment: any;
+  possibleStudents: any[];
+  modalRef: BsModalRef;
 
   constructor(private courseService: CourseService, private route: ActivatedRoute, private headService: HeadService,
-              private assignmentService: AssignmentService) {
+              private assignmentService: AssignmentService, private modalService: BsModalService) {
     this.headService.stateChange.subscribe(sidebarState => { this.sidebarState = sidebarState; });
     this.route.params.subscribe( params => {
       this.currentCourse = this.courseService.GetCourse(params['course']);
@@ -46,6 +51,7 @@ export class CoursesComponent implements OnInit {
     console.log('code', this.currentCourse.code);
     console.log('assignmentGroup', this.assignmentService.courseAssignments[this.currentCourse.id]);
     console.log('all assignmentGroups', this.assignmentService.courseAssignments);
+    this.possibleStudents = [{name: 'asdfgh-3', id: '0'}, {name: 'qwerty-2', id: '1'}];
     /*if (this.assignmentService.courseAssignments[this.currentCourse.code] !== undefined) {
       this.assignmentGroups = this.assignmentService.courseAssignments[this.currentCourse.code];
     } else {
@@ -63,6 +69,12 @@ export class CoursesComponent implements OnInit {
 
   getProgress() {
     return (this.progress / this.assignmentService.numberOfAssignments(this.currentCourse.id)) * 100;
+  }
+  openModal(modal) {
+    this.modalRef = this.modalService.show(modal);
+  }
+  invite(id) {
+    console.log(id);
   }
 }
 
