@@ -120,6 +120,19 @@ export class BackendService {
     return this.apiPost('/api/courses/' + course_id.get() + '/assignments/' + assignment_id.get() + '/submit', body);
   }
 
+  postDraft(course_id: ObjectID, assignment_id: ObjectID, code: string, lang: string) {
+    // Saves a draft of the editors content on backend
+
+    const body = {'code': code, 'lang': lang};
+    return this.apiPost('/api/courses/' + course_id.get() + '/assignments/' + assignment_id.get() + '/save', body);
+  }
+
+  getDraft(course_id: ObjectID, assignment_id: ObjectID) {
+    // Gets a draft of the editors content from backend
+
+    return this.apiGet('/api/courses/' + course_id.get() + '/assignments/' + assignment_id.get() + '/draft');
+  }
+
   createAssignment(description: string, tests: any) {
     // Creates an assignment with some tests
 
