@@ -29,5 +29,9 @@
   cursor: pointer;
   font-weight: bold;
 }
-    
- 
+
+.user-list {
+  margin-bottom: 10px;
+  background-color: rgba(29,117,175,0.27);
+}
+

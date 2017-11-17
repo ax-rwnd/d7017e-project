@@ -49,33 +49,29 @@
 
 <ng-template #inviteStudentModal>
   <div class="modal-header">
-    <h4 class="modal-title pull-left">Find course</h4>
+    <h4 class="modal-title pull-left">Invite students</h4>
     <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
       <span aria-hidden="true">&times;</span>
     </button>
   </div>
     <div class="modal-body">
-      <div class="form-group">
-        <label for="search">Search term</label>
-        <input type="text" id="search" ngModel required>
-
-      </div>
+      <form (ngSubmit)="search()" [formGroup]="form" novalidate>
+        <div class="form-group">
+          <label for="search">Search term</label>
+          <input type="text" class="form-control" id="search" formControlName="search" ngModel required>
+        </div>
+        <button class="btn" type="submit">Search</button>
+      </form>
     </div>
     <div class="modal-body">
-      <table class="table table-striped">
-        <thead>
-        <tr>
-          <th class="col-md-10">Course</th>
-          <th class="col-md-2">Join</th>
-        </tr>
-        </thead>
-        <tbody *ngFor="let p of possibleStudents">
-        <tr>
-          <td> {{p.name}} </td>
-          <td> <button class="btn" (click)="invite(p.id)">Invite</button> </td>
-        </tr>
-        </tbody>
-      </table>
+      <div class="well-sm user-list" *ngFor="let p of possibleStudents">
+        <div class="row">
+          <div class="col-md-10">
+            <h4>{{p.name}}</h4>
+          </div>
+          <div class="col-md-2"> <button class="btn" (click)="invite(p.id)">Invite</button> </div>
+        </div>
+      </div>
     </div>
     <div class="modal-footer">
     </div>
