@@ -4,9 +4,9 @@
     </div>
     <div class="panel-body">
       <div class="progress progress-margin">
-        <div class="progress-bar" role="progressbar" [attr.aria-valuenow]="progress"
-                                  aria-valuemin="0" aria-valuemax ="100"
-                                  [style.width]="progress + '%'">
+        <div class="progress-bar" role="progressbar" [attr.aria-valuenow]="currentAssignments"
+                                  aria-valuemin="0" aria-valuemax ="maxAssignments"
+                                  [style.width]="currentAssignments + '%'">
         </div>
       </div>
     </div>

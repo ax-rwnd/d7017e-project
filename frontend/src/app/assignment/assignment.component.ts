@@ -39,17 +39,20 @@ export class AssignmentComponent implements OnInit, OnDestroy {
   tests: any;
   testStrings: any;
   draftSubscription: Subscription;
+  currentCourse: any;
 
   constructor(private backendService: BackendService,
               private assignmentService: AssignmentService,
               private headService: HeadService,
               private route: ActivatedRoute,
-              private userService: UserService) {
+              private userService: UserService,
+              private courseService: CourseService) {
     this.headService.stateChange.subscribe(sidebarState => {
         this.sidebarState = sidebarState;
     });
     this.route.params.subscribe( params => {
       this.assignment = this.assignmentService.GetAssignment(params['course'], params['assignment']);
+      this.currentCourse = this.courseService.GetCourse(params['course']);
       this.backendService.getDraft(new ObjectID(params['course']), new ObjectID(params['assignment'])).then(data => {
         this.resolveLanguage(data['lang']);
         this.content = data['code'];
@@ -63,13 +66,19 @@ export class AssignmentComponent implements OnInit, OnDestroy {
     this.languages = this.assignment['languages'];
     this.themes = ['eclipse', 'monokai'];
     this.theme = 'eclipse'; // default theme for now, could be saved on backend
-    this.status = 'Not Completed'; // hardcoded for now, endpoint to backend needed
     this.progress = { current: 0}; // this.assignmentService.progress; what even is this
     if (typeof this.language === 'undefined') {
       this.language = this.languages[0];
     }
     if (typeof this.content === 'undefined') {
       this.content = '';
+    }
+
+    this.status = 'Not Completed';
+    for (let prog of this.currentCourse.rewards.progress) {
+      if (prog.assignment === this.assignment.id) {
+        this.status = 'Completed';
+      }
     }
     // this.getTests();
     // Use getTests as soon as backend routes are working
@@ -160,7 +169,6 @@ export class AssignmentComponent implements OnInit, OnDestroy {
   // Handle the response from a code submission. Update the feedback div and update the course progress
   HandleResponse(value) {
     const feedback = [];
-    value = JSON.parse(value);
     const results = value['results'];
 
     let passTests = true;

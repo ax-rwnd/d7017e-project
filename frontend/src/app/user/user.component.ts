@@ -102,7 +102,7 @@ export class UserComponent implements OnInit {
   postBadge() {
     this.backendService.postNewBadge('bronze_medal_badge', 'A test task from API', 'Totally new, whoa.');
   }
-  getProgress(progress, courseCode) {
-   return  (progress / this.assignmentService.numberOfAssignments(courseCode)) * 100;
+  getProgress(courseId) {
+    return this.courseService.GetProgress(courseId);
   }
 }

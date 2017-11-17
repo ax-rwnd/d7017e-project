@@ -77,7 +77,7 @@ export class CoursesComponent implements OnInit {
     }}
 
   getProgress() {
-    return (this.progress / this.assignmentService.numberOfAssignments(this.currentCourse.id)) * 100;
+    return (this.courseService.GetProgress(this.currentCourse.id));
   }
   openModal(modal) {
     this.modalRef = this.modalService.show(modal);
