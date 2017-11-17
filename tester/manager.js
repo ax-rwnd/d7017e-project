@@ -24,7 +24,7 @@ function newRequest(req, res) {
         var body = JSON.parse(Buffer.concat(chunks).toString());
 
         if(!isValidInput(body)) {
-            logger.warn('Not vaild input data');
+            logger.warn('Not valid input data');
             res.sendStatus(400);
             return;
         }
@@ -91,7 +91,7 @@ function isValidInput(input) {
         // Check so langauge actually is supported by the system
         if('lang' in input &&
                 config.get('docker.LANGS').indexOf(input.lang) == -1) {
-            logger.info('Langauge actually is not supported by the system.',
+            logger.info('Language actually is not supported by the system.',
                 'Got:', input.lang);
             valid = false;
         }
