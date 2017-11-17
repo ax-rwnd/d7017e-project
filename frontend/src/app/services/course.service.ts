@@ -69,7 +69,8 @@ export class CourseService {
     const badgesArr = badges ? [] : false;
     const lbArr = leaderboard ? [{name: 'anonymous', score: 20}, {name: 'anonymous', score: 10}, {name: 'you', score: 10},
         {name: 'anonymous', score: 0}, {name: 'anonymous', score: 0}] : false;
-    return newCourse(id, name, code, course_info, newRewards(progValue, scoreValue, badgesArr, lbArr));
+    const progress_assignments = newProgress(0, 0);
+    return newCourse(id, name, code, course_info, newRewards(progValue, scoreValue, badgesArr, lbArr), progress_assignments);
   }
   GetCourse(courseId) {
     for (let i = 0; i < this.courses.length; i++) {
@@ -94,6 +95,20 @@ export class CourseService {
     });
     return promise;
   }
+  UpdateCourseProgress(courseId, progress) {
+    // Updates the progress field of the course, not to be confused with reward.progress
+    let i;
+    for (i = 0; i < this.courses.length; i++) {
+      if (this.courses[i].id === courseId) {
+        this.courses[i].progress = progress;
+      }
+    }
+  }
+  GetProgress(courseId) {
+    // Returns progress for a course
+    const course = this.GetCourse(courseId);
+    return  (course.progress.completed / course.progress.total) * 100;
+  }
 }
 
 function updateCourses(response, backendService, courseService, assignmentService) {
@@ -107,21 +122,21 @@ function updateCourses(response, backendService, courseService, assignmentServic
     promiseArray.push(backendService.getFeaturesCourseMe(courses[i]._id)
       .then(featureResponse => {
         const rewards = handleFeatureResponse(featureResponse);
-        const course = newCourse(courses[i]._id, courses[i].name, courses[i].course_code, courses[i].description, rewards);
+        const progress = newProgress(featureResponse.total_assignments, featureResponse.completed_assignments);
+        const course = newCourse(courses[i]._id, courses[i].name, courses[i].course_code, courses[i].description, rewards, progress);
         courseService.AddCourse(course);
       })
       .catch( err => {
         const rewards = newRewards(false, false, false, false);
-        const course = newCourse(courses[i]._id, courses[i].name, courses[i].course_code, courses[i].description, rewards);
+        const progress = newProgress(0, 0);
+        const course = newCourse(courses[i]._id, courses[i].name, courses[i].course_code, courses[i].description, rewards, progress);
         courseService.AddCourse(course);
       }));
     promiseArray.push(backendService.getCourseAssignments(courses[i]._id)
       .then(assignmentsResponse => {
-        console.log('assignmentResponse', assignmentsResponse);
         assignmentService.AddCourseAssignments(courses[i]._id, assignmentsResponse.assignments);
       }));
   }
-
   return Promise.all(promiseArray);
 }
 
@@ -131,7 +146,7 @@ function handleFeatureResponse(response: any) {
   let badges;
   const leaderboard = false;
   if (response.progress !== undefined) {
-    progress = response.progress.length;
+    progress = response.progress;
   } else {
     progress = false;
   }
@@ -151,13 +166,14 @@ function handleFeatureResponse(response: any) {
   return newRewards(progress, score, badges, leaderboard);
 }
 
-function newCourse(id, name, code, course_info, rewards) {
+function newCourse(id, name, code, course_info, rewards, progress) {
   return {
     id: id,
     name: name,
     code: code,
     course_info: course_info,
-    rewards: rewards
+    rewards: rewards,
+    progress: progress
   };
 }
 
@@ -170,12 +186,25 @@ function newRewards(progress, score, badges, leaderboard) {
   };
 }
 
+function newProgress(total, completed) {
+  return {
+    total: total,
+    completed: completed
+  };
+}
+
+interface Progress {
+  total: number;
+  completed: number;
+}
+
 interface Course {
   id: string;
   name: string;
   code: string;
   course_info: string;
   rewards: Rewards;
+  progress: any;
 }
 
 interface Rewards {
