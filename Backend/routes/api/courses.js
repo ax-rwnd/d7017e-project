@@ -252,9 +252,6 @@ module.exports = function(router) {
     });
 
     router.get('/:course_id/teachers', auth.validateJWTtoken, function (req, res, next) {
-=======
-    router.get('/:course_id/teachers', function (req, res, next) {
->>>>>>> 8b41aa1ea1b2538e0108589bd835ce8242671b64
         var course_id = req.params.course_id;
 
         queries.getCourseTeachers(course_id, "username email").then(function (teachers) {
