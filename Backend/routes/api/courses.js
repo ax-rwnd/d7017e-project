@@ -277,6 +277,7 @@ module.exports = function(router) {
     });
 
     router.put('/:course_id/teachers', function (req, res, next) {
+    });
 
 
     router.get('/:course_id/assignments', function (req, res, next) {
