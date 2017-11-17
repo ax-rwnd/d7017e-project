@@ -7,6 +7,7 @@ import titleContains = until.titleContains;
 import {FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { BsModalRef } from 'ngx-bootstrap/modal/modal-options.class';
+import {ActivatedRoute} from "@angular/router";
 
 @Component({
   selector: 'app-createassignment',
@@ -25,9 +26,10 @@ export class CreateassignmentComponent implements OnInit {
 
   assignmentName: string;
   supportedLanguages: any[];
+  languages: string[];
   content: string;
   unitTests: any[];
-
+  courseId: string;
 
   markdownExampleCode: string;
 
@@ -45,14 +47,16 @@ export class CreateassignmentComponent implements OnInit {
   };
 
   constructor(private backendService: BackendService, private headService: HeadService,
-              private modalService: BsModalService, private fb: FormBuilder) {
+              private modalService: BsModalService, private fb: FormBuilder, private route: ActivatedRoute) {
+    this.route.params.subscribe(params => this.courseId = params['course']);
     this.headService.stateChange.subscribe(sidebarState => { this.sidebarState = sidebarState; });
   }
 
   ngOnInit() {
     this.sidebarState = this.headService.getCurrentState();
-    this.markdownExampleCode = '';
+    this.markdownExampleCode = '### Headers\n```\n# h1\n## h2\n### h3\n#### h4\n##### h5\n###### h6\n\nAlternatively, for H1 and H2, an underline-ish style:\n\nAlt-H1\n======\n\nAlt-H2\n------\n```\n# h1\n## h2\n### h3\n#### h4\n##### h5\n###### h6\n\nAlt-H1\n======\n\nAlt-H2\n------\n\n### Emphasis\n```\nEmphasis, aka italics, with *asterisks* or _underscores_.\n\nStrong emphasis, aka bold, with **asterisks** or __underscores__.\n\nCombined emphasis with **asterisks and _underscores_**.\n\nStrikethrough uses two tildes. ~~Scratch this.~~\n```\n Emphasis, aka italics, with *asterisks* or _underscores_.\n\nStrong emphasis, aka bold, with **asterisks** or __underscores__.\n\nCombined emphasis with **asterisks and _underscores_**.\n\nStrikethrough uses two tildes. ~~Scratch this.~~\n### Lists\n```\n 1. First ordered list item\n 2. Another item\n\t* Unordered sub-list.\n 1. Actual numbers don\'t matter, just that it\'s a number\\n\t1. Ordered sub-list\n 4. And another item.\n\n* Unordered list can use asterisks\n- Or minuses\n + Or pluses\n```\n 1. First ordered list item\n 2. Another item\n\t* Unordered sub-list.\n 1. Actual numbers don\'t matter, just that it\'s a number\n\t1. Ordered sub-list\n 4. And another item.\n\n* Unordered list can use asterisks\n- Or minuses\n+ Or pluses\n\n### links\n```\n[I\'m an inline-style link](https://www.google.com)\n\n[I\'m an inline-style link with title](https://www.google.com "Google\'s Homepage")\n```\n[I\'m an inline-style link](https://www.google.com)\n\n[I\'m an inline-style link with title](https://www.google.com "Google\'s Homepage")\n\nURLs and URLs in angle brackets will automatically get turned into links. \n```\nhttp://www.google.com or <http://www.google.com>\n```\nhttp://www.google.com or <http://www.google.com>\n\n### Code and syntax highlighting\nBlocks of code are either fenced by lines with three back-ticks ` ``` ` , or are indented with four spaces. Only the fenced code blocks support syntax highlighting\n```\n```javascript\nvar s = "JavaScript syntax highlighting";\nalert(s);\n```\n \n```python\ndef myFunc():\n\tprint "Hello World!"\n```\n```\n\n```javascript\nvar s = "JavaScript syntax highlighting";\nalert(s);\n```\n \n```python\ndef myFunc():\n\tprint "Hello World!"\n```\n\n### Images\n```\nInline-style: \n![alt text](https://www.ltu.se/cms_fs/1.148872!/image/LTU_L_sve_bla.png_gen/derivatives/landscape_half/LTU_L_sve_bla.png "Logo Title Text 1")\n\nReference-style: \n![alt text][logo]\n\n[logo]: https://www.ltu.se/cms_fs/1.148872!/image/LTU_L_sve_bla.png_gen/derivatives/landscape_half/LTU_L_sve_bla.png "Logo Title Text 2"\n```\nInline-style: \n![alt text](https://www.ltu.se/cms_fs/1.148872!/image/LTU_L_sve_bla.png_gen/derivatives/landscape_half/LTU_L_sve_bla.png "Logo Title Text 1")\n\nReference-style: \n![alt text][logo]\n\n[logo]: https://www.ltu.se/cms_fs/1.148872!/image/LTU_L_sve_bla.png_gen/derivatives/landscape_half/LTU_L_sve_bla.png "Logo Title Text 2"\n\n### blockquotes \n```\n> Blockquotes are very handy in email to emulate reply text.\n> This line is part of the same quote.\n```\n\n> Quotes are really cool\n\n### Horizontal Rule\n```\nThree or more...\n\n---\n\nHyphens\n\n***\n\nAsterisks\n\n___\n\nUnderscores\n```\nThree or more...\n\n---\n\nHyphens\n\n***\n\nAsterisks\n\n___\n\nUnderscores\n\n### Inline HTML\nYou can ofcourse use raw HTML in your text.';
     this.content = '';
+    this.languages = [];
     this.form = this.fb.group(this.defaultForm);
     this.unitTests = [];
   }
@@ -104,8 +108,26 @@ export class CreateassignmentComponent implements OnInit {
   }
 
   submitNewAssignment() {
-    this.backendService.createAssignment(this.content, this.unitTests)
-    return;
+    /*this.backendService.createAssignment(this.courseId, this.assignmentName, this.content, this.languages)
+      .then( response => {
+        console.log(response);
+        const assignmentId = response['description'];
+        console.log('asdasdasd', assignmentId);
+        for (const test in this.unitTests) {
+          this.backendService.createTest(this.courseId, test, response);
+        }
+      }).catch(err => {console.error('failed to get ', err);
+      });
+      */
+    const that = this;
+    this.backendService.createAssignment(this.courseId, this.assignmentName, this.content, this.languages)
+      .then(function (response){
+        const assignmentId = response;
+        console.log('assignmentId', assignmentId._id);
+        for (const test in that.unitTests) {
+          that.backendService.createTest(that.courseId, that.unitTests, assignmentId._id);
+        }
+      });
   }
 }
 

@@ -6,6 +6,7 @@
   <!--<p><a class="userlinks" (click)="toggleStatistics()">Statistics</a></p>-->
   <button type="button" class="btn" (click)="getMe()">test getMe</button>
   <button type="button" class="btn" (click)="postBadge()">test postNewBadge</button>
+  <button type="button" class="btn" (click)="openModal(searchCourseModal)">Find course to join</button>
 
   <div class="container">
     <div class="row">
@@ -61,7 +62,7 @@
 </div>
 
 <ng-template #courseModal>
-  <div class="modal-header">
+  <!--<div class="modal-header">
     <h4 class="modal-title pull-left">Create course</h4>
     <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
       <span aria-hidden="true">&times;</span>
@@ -104,6 +105,32 @@
     </div>
     <div class="modal-footer">
       <button type="submit" class="btn" (click)="modalRef.hide()">Submit</button>
+
+    </div>
+  </form>-->
+</ng-template>
+
+<ng-template #searchCourseModal>
+  <div class="modal-header">
+    <h4 class="modal-title pull-left">Find course</h4>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <form (ngSubmit)="searchCourse()" [formGroup]="form" novalidate>
+    <div class="modal-body">
+      <div class="form-group">
+        <label for="search">Search term</label>
+        <input type="text" class="form-control" id="search" formControlName="search" ngModel required>
+      </div>
+    </div>
+    <div class="modal-body">
+        <div class="container" *ngFor="let p of possibleCourses">
+          <div class="col-md-10"> {{p.name}} </div>
+          <div class="col-md-2"> <button class="btn" (click)="join(p.id)">Join</button> </div>
+        </div>
+    </div>
+    <div class="modal-footer">
 
     </div>
   </form>

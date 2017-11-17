@@ -5,7 +5,7 @@
   <div id="difficulty">
     Assignment name:
     <div style="float:right">
-      <input (text)="assignmentName" (textChanged)="onChangeAssignmentName(assignmentName)" style="color:black; font-weight: normal">
+      <input (text)="assignmentName" style="color:black; font-weight: normal" [(ngModel)]="assignmentName">
     </div>
   </div>
 
