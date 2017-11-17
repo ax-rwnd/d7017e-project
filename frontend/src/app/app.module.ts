@@ -7,6 +7,7 @@ import { AlertModule } from 'ngx-bootstrap';
 import { ButtonsModule } from 'ngx-bootstrap';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { CollapseModule } from 'ngx-bootstrap/collapse';
+import { TabsModule } from 'ngx-bootstrap/tabs';
 import { ModalModule } from 'ngx-bootstrap';
 import { AngularFontAwesomeModule } from 'angular-font-awesome/angular-font-awesome';
 
@@ -47,6 +48,7 @@ import { AssignmentGroupComponent } from './assignment-group/assignment-group.co
 import { GameelementComponent } from './gameelement/gameelement.component';
 import { ModLeaderboardComponent } from './mod-leaderboard/mod-leaderboard.component';
 import { ModProgressbarComponent } from './mod-progressbar/mod-progressbar.component';
+import { CreatecourseComponent } from './createcourse/createcourse.component';
 
 
 const appRoutes: Routes = [
@@ -56,7 +58,8 @@ const appRoutes: Routes = [
   { path: 'user', component: UserComponent, canActivate: [AuthGuard]},
   { path: 'courses/:course', component: CoursesComponent, canActivate: [AuthGuard]},
   { path: 'createAssignmentTest', component: CreateassignmentComponent, canActivate: [AuthGuard]},
-  { path: 'courses/:course/createNewAssignment', component: CreateassignmentComponent, canActivate: [AuthGuard]}
+  { path: 'courses/:course/createNewAssignment', component: CreateassignmentComponent, canActivate: [AuthGuard]},
+  { path: 'user/createCourse', component: CreatecourseComponent, canActivate: [AuthGuard]}
 ];
 
 
@@ -77,7 +80,8 @@ const appRoutes: Routes = [
     AssignmentGroupComponent,
     GameelementComponent,
     ModLeaderboardComponent,
-    ModProgressbarComponent
+    ModProgressbarComponent,
+    CreatecourseComponent,
   ],
   imports: [
     BrowserModule,
@@ -91,6 +95,7 @@ const appRoutes: Routes = [
     ButtonsModule.forRoot(),
     BsDropdownModule.forRoot(),
     CollapseModule.forRoot(),
+    TabsModule.forRoot(),
     HttpClientModule,
     HttpModule,
     AngularFontAwesomeModule,

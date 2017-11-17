@@ -16,18 +16,30 @@ export class ModLeaderboardComponent extends GameelementComponent implements OnC
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    console.log('changes: ', changes);
     this.update();
   }
-  update() {
-    this.backendService.getCourseUsers(this.courseCode).then(data => {
-      // TODO: the call will look something like this once
-      //  backend implements the API endpoint, however, the coursecode needs
-      //  to be switched for the object ID and then it needs to be parsed.
-      this.leaderList = [{name: this.courseCode, score: 10}];
-    });
 
+  update() {
     super.getElements(this.courseCode);
+    this.updateList ();
+  }
+
+  updateList () {
+    // Update the leaderboard
+
+    this.backendService.getFeaturesCourse(this.courseCode).then((data: any) => {
+      const students: any[] = data.features;
+
+      // Get list of students
+      let leaderList = students.map(student => {
+        return {name: student._id, score: student.completed_assignments};
+      });
+
+      // Sort and filter out low-scoring students
+      leaderList = leaderList.sort( (a: any, b: any) => a.score < b.scire ? -1 : a.score < b.score ? 1 : 0);
+      this.leaderList = leaderList.slice(0, 5);
+    })
+      .catch(err => console.error('Leaderboard update failed', err));
   }
 
   isEnabled() {

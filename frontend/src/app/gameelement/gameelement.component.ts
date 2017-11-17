@@ -18,8 +18,9 @@ export class GameelementComponent implements OnInit {
   }
 
   queryEnabled(componentName: string) {
+    // Check if some component is enabled
+
     if (this.elements === undefined) {
-      console.warn('God undefined elements in', componentName);
       return false;
     } else {
       return this.elements[componentName] === true;
@@ -27,7 +28,9 @@ export class GameelementComponent implements OnInit {
   }
 
   protected getElements(courseId: string) {
-    this.backendService.getFeaturesCourse(courseId)
+    // Retrieve elements from the backend
+
+    this.backendService.getEnabledFeaturesCourse(courseId)
       .then(data => {
         this.elements = data;
       })

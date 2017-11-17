@@ -63,10 +63,10 @@ export class BackendService {
                 .catch(err => console.error('API Put failed in ' + endpoint + ' error ', err));
   }
 
-  // Add a student to a course.
   addUserToCourse(course_id: ObjectID, student_id: ObjectID) {
-    const body = {student_id: student_id.get()};
+  // Add a student to a course.
 
+    const body = {student_id: student_id.get()};
     return this.apiPut('/api/courses/' + course_id.get() + '/students', body);
   }
 
@@ -144,14 +144,37 @@ export class BackendService {
     const body = {'icon': icon, 'title': title, 'description': description};
     return this.apiPost('/api/features/badge', body);
   }
-  getFeaturesCourseUser (course_id: string, user_id: string) {
-    console.log('course ', course_id);
-    console.log('user ', user_id);
-    return this.apiGet('/api/features/feature/' + course_id + '/' + user_id);
-  }
-  getFeaturesCourse (course_id: string) {
+
+  getEnabledFeaturesCourse (course_id: string) {
+    // Get enabled features for a course
+
     return this.apiGet('/api/courses/' + course_id + '/enabled_features');
   }
+
+  getFeaturesCourseMe (course_id: string) {
+    // Get feature state for a user in a course
+
+    return this.apiGet('/api/features/feature/' + course_id + '/me');
+  }
+
+  getFeaturesCourse (course_id: string) {
+    // Get features for all users in a course
+
+    return this.apiGet('/api/features/features/' + course_id);
+  }
+
+  getSearch (query: string) {
+    // Search the database.
+
+    return this.apiGet('/api/search?query=' + query);
+  }
+
+  postNewCourse(name: string, desc: string, hidden: boolean, course_code: string, en_feat: Object) { // post a new course to data base
+    // name, description, hidden, course_code, enabled_features
+    const body = {'name': name, 'description': desc, 'hidden': hidden, 'course_code': course_code, 'enabled_features': en_feat};
+    return this.apiPost('/api/courses', body);
+  }
+
   login(ticket: string, service: string) {
     return this.apiGet('/auth/login/ltu?ticket=' + ticket + '&service=' + service);
   }
