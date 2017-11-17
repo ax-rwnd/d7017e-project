@@ -5,7 +5,7 @@
       <h1>
         {{currentCourse.code}}
       </h1>
-      <button type="button" class="btn" id="createNewAssignment" [routerLink]="['/courses', currentCourse.code, 'createNewAssignment']">Create New Assignment</button>
+      <button type="button" class="btn" id="createNewAssignment" [routerLink]="['/courses', currentCourse.id, 'createNewAssignment']">Create New Assignment</button>
 
       <markdown [data]="currentCourse.course_info"></markdown>
 
