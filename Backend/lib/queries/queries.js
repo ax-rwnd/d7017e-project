@@ -20,7 +20,7 @@ const FIELDS = {
         ADMIN: "course_code name description autojoin teachers students invited pending assignments",
         TEACHER: "course_code name description autojoin teachers students invited pending assignments",
         STUDENT: "course_code name description assignments",
-        POPULATE_FIELDS: "teachers students invited pending assignments"
+        POPULATE_FIELDS: "teachers students assignments"
     },
     TEACHERS: {
         BASE_FIELDS: "username email"
