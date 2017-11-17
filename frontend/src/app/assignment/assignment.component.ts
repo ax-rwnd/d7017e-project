@@ -169,7 +169,6 @@ export class AssignmentComponent implements OnInit, OnDestroy {
   // Handle the response from a code submission. Update the feedback div and update the course progress
   HandleResponse(value) {
     const feedback = [];
-    value = JSON.parse(value);
     const results = value['results'];
 
     let passTests = true;
