@@ -49,6 +49,7 @@ import { GameelementComponent } from './gameelement/gameelement.component';
 import { ModLeaderboardComponent } from './mod-leaderboard/mod-leaderboard.component';
 import { ModProgressbarComponent } from './mod-progressbar/mod-progressbar.component';
 import { CreatecourseComponent } from './createcourse/createcourse.component';
+import { ModBadgesComponent } from './mod-badges/mod-badges.component';
 
 
 const appRoutes: Routes = [
@@ -82,6 +83,7 @@ const appRoutes: Routes = [
     ModLeaderboardComponent,
     ModProgressbarComponent,
     CreatecourseComponent,
+    ModBadgesComponent,
   ],
   imports: [
     BrowserModule,
