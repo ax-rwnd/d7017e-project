@@ -160,7 +160,97 @@ module.exports = function(router) {
         });
     });
 
-    router.get('/:course_id/teachers', function (req, res, next) {
+
+    // TODO
+    // Documentation
+    // Test
+    // Rename? Should it really both do invites and accept pending?
+    router.post('/:course_id/invite', auth.validateJWTtoken, function (req, res, next) {
+        var course_id = req.params.course_id;
+        var student_id = req.body.student_id;
+        queries.getUser(req.user.id, "teaching")
+        .then(function (userObject) {
+            // admins and teachers can invite students
+            if (req.user.admin || userObject.teaching.indexOf(course_id) !== -1) {
+                queries.getCourseSimple(course_id)
+                .then(function(courseObject) {
+                    console.log("Simple Done");
+                    if (courseObject.students.indexOf(student_id) !== -1
+                    || courseObject.teachers.indexOf(student_id) !== -1) {
+                        throw errors.USER_ALREADY_IN_COURSE;
+                    }
+                    if (courseObject.pending.indexOf(student_id) !== -1) {
+                        return queries.removeCoursePending(course_id, student_id)
+                        .then(function() {
+                            return queries.addCourseStudent(course_id, student_id)
+                            .then(function() {
+                                return res.status(201);
+                            });
+                        });  
+                    }
+                    if (courseObject.invited.indexOf(student_id) !== -1) {
+                        return res.sendStatus(202);
+                    }
+
+                    return queries.addCourseInvite(course_id, student_id)
+                    .then(function() {
+                        return res.sendStatus(202);
+                    });
+                });
+            } else {
+                // TODO: use a better error
+                throw errors.INSUFFICIENT_PERMISSION;
+            }
+        })
+        .catch(function(err) {
+            return next(err);
+        }); 
+    });
+
+    
+    // TODO
+    // Documentation
+    // Test
+    // Rename? Should it really do both sign up and accept invite?
+    router.post('/:course_id/join', auth.validateJWTtoken, function (req, res, next) {
+        var course_id = req.params.course_id;
+        console.log("Join hit");
+        queries.getCourseSimple(course_id)
+        .then(function (courseObject) {
+            if (courseObject.students.indexOf(req.user.id) !== -1
+            || courseObject.teachers.indexOf(req.user.id) !== -1) {
+                throw errors.USER_ALREADY_IN_COURSE;
+            }
+            if (courseObject.pending.indexOf(req.user.id) !== -1) {
+                return res.sendStatus(202);
+            }
+            if (courseObject.invited.indexOf(req.user.id) !== -1) {
+                return queries.removeCourseInvite(course_id, req.user.id)
+                .then(function () {
+                    return queries.addCourseStudent(course_id, req.user.id)
+                    .then(function () {
+                        return res.status(201);
+                    });
+                });  
+            }
+            if (courseObject.autojoin) {
+                return queries.addCourseStudent(course_id, req.user.id)
+                .then(function () {
+                    return res.status(201);
+                });
+            } else {
+                return queries.addCoursePending(course_id, req.user.id)
+                .then(function () {
+                    return res.sendStatus(202);
+                });
+            }
+        })
+        .catch(function (err) {
+            return next(err);
+        }); 
+    });
+
+    router.get('/:course_id/teachers', auth.validateJWTtoken, function (req, res, next) {
         var course_id = req.params.course_id;
 
         queries.getCourseTeachers(course_id, "username email").then(function (teachers) {
