@@ -118,7 +118,7 @@ describe('/features', () => {
 
         it('Get feature for user in course', () => {
 
-            let course_id = '5a0475bb1ac36c0762eb46b9';
+            let course_id = '59f6f88b1ac36c0762eb46a9';
             let route = '/api/features/feature';
 
             return request(runner.server)
