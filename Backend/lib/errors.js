@@ -36,7 +36,7 @@ module.exports = {
     // 7018
     FEATURE_DO_NOT_EXIST: new APIError("Course doesn't exist", 404, 7019),
     TEST_NOT_CREATED: new APIError("Assignment not created", 500, 7020),
-    BAD_QUERY_STRUCTURE: new APIError('Bad input. Expected: \'?query=XYZ\'', 400, 7021),
+    BAD_QUERY_STRUCTURE: new APIError('Bad input. Expected: "?query=XYZ"', 400, 7021),
     TOO_SHORT_QUERY: new APIError('Bad input. Expected query with length atleast 3', 400, 7022),
     USER_ALREADY_IN_COURSE: new APIError('User is already a member of this course', 400, 7023)
 };
