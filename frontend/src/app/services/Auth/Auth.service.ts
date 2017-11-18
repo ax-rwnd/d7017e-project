@@ -81,6 +81,7 @@ export class AuthService {
           console.log('Success, got new token from backend.');
           this.access_token = ('bearer ' + data.json().access_token);
           localStorage.setItem('token', this.access_token);
+          // this.retryFailedRequests();
         }
       },
       err => {
@@ -96,19 +97,23 @@ export class AuthService {
     this.cachedRequests.push(request);
   }
 
-  public retryFailedRequests(): void {
+  public retryFailedRequests() {
     // retry the requests. this method can
     // be called after the token is refreshed
     this.cachedRequests.forEach( request => {
-      const authHeader = this.getToken();
-      const authReq = request.clone({headers: request.headers.set('Authorization', authHeader)});
-       // this.http.request(authReq).subscribe((response) => {
-        // You need to subscribe to observer in order to "retry" your request
-      // });
+      // set token header
+      const headers = new Headers();
+      headers.append('Authorization', this.getToken());
+      const options = new RequestOptions({ headers: headers });
+      this.http.request(request.url, options).subscribe(resp => {
+        if (resp) {
+          console.log('successfully retried request');
+          console.log(resp);
+          // --TODO vad ska hända här? ingenting? vad för typ av request kan ha blivit retried?
+        } else {
+          console.log('something went shit in retryFailedRequests');
+        }
+      });
     } );
-
   }
-
-
-
 }
