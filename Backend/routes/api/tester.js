@@ -4,7 +4,7 @@ var testerCom = require('../../lib/tester_communication');
 var errors = require('../../lib/errors');
 var request = require('supertest');
 var auth = require('../../lib/authentication.js');
-var logger = require('../../logger.js');
+var logger = require('../../lib/logger.js');
 
 module.exports = function(router) {
 

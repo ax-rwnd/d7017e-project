@@ -8,7 +8,7 @@ var User = require('../../models/schemas').User;
 var Draft = require('../../models/schemas').Draft;
 var errors = require('../errors.js');
 var mongoose = require('mongoose');
-var logger = require('../../logger.js');
+var logger = require('../logger.js');
 var jwt = require('jsonwebtoken');
 var config = require('config');
 
