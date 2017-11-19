@@ -23,7 +23,7 @@ async function getFeature(user_id, assignment_id) {
         let feature = await queries.getFeatureByID(feature_item);
 
         if(feature === null) {
-            logger.warn('Feature '+feature_item+' in course '+course._id+' is null and should be removed!');
+            logger.log("warn",'Feature '+feature_item+' in course '+course._id+' is null and should be removed!');
         } else {
             if(feature.user.equals(user_id)) {
                 return feature;

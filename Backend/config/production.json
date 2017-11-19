@@ -4,11 +4,7 @@
         "dbConfig": {
             "host": "mongodb://130.240.5.132",
             "port": 27018,
-            "database_name": "???"
+            "database_name": "staging"
         }
-    },
-    //Tester config module
-    "Tester": {
-
     }
 }

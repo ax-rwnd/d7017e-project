@@ -118,6 +118,7 @@ function initApp() {
     let dbConfig = config.get('Mongo.dbConfig'); //Get mongo database config
     logger.initializeLogger(app);
     logger.log("info","Server running in " + app.get('env') + " mode.");
+    
     mongoose.connect(dbConfig.host+":"+dbConfig.port+'/'+dbConfig.database_name, { useMongoClient: true }); // Connect to development- or production database);
 }
 

@@ -8,7 +8,7 @@ var User = require('../../models/schemas').User;
 var Draft = require('../../models/schemas').Draft;
 var errors = require('../errors.js');
 var mongoose = require('mongoose');
-var logger = require('../../logger.js');
+var logger = require('../logger.js');
 var jwt = require('jsonwebtoken');
 var config = require('config');
 
@@ -721,7 +721,7 @@ function searchDBCourses(query, user_id) {
         .limit(20).then(docs => {
             return {'courses': docs};
         }).catch(err => {
-            logger.error(err);
+            logger.log("error",err);
         });
 }
 
@@ -732,7 +732,7 @@ function searchDBAssignments(query, assignment_ids) {
         .limit(20).then(docs => {
             return {'assignments': docs};
         }).catch(err => {
-            logger.error(err);
+            logger.log("error",err);
         });
 }
 
@@ -743,7 +743,7 @@ function searchDBUsers(query) {
         .limit(20).then(docs => {
             return {'users': docs};
         }).catch(err => {
-            logger.error(err);
+            logger.log("error",err);
         });
 }
 

@@ -148,12 +148,12 @@ async function getFeatureOfUserID(course_id, user_id) {
         try {
             feature = await getFeatureByID(feature_id);
         } catch (err) {
-            logger.warn('Feature '+feature_id+' in course '+course._id+' is null and should be removed!');
+            logger.log("warn",'Feature '+feature_id+' in course '+course._id+' is null and should be removed!');
             continue;
         }
 
         if(feature === null) {
-            logger.warn('Feature '+feature_id+' in course '+course._id+' is null and should be removed!');
+            logger.log("warn",'Feature '+feature_id+' in course '+course._id+' is null and should be removed!');
         } else {
             if(feature.user == (user_id)) {
 

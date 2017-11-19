@@ -12,7 +12,7 @@ function init(emitter, name) {
                 json[name] = result;
                 resolve(json);
             }).catch(function(err) {
-                logger.error(err);
+                logger.log("error",err);
             });
         });
     });

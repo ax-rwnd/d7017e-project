@@ -15,8 +15,8 @@
  //Custom log levels
  const loggerLevels = {
   levels: {
-    error: 0, 
-    serverError: 1,
+    serverError: 0,    
+    error: 1, 
     warn: 2, 
     info: 3, 
     verbose: 4, 
@@ -28,7 +28,7 @@
  const logger = new (winston.Logger)({
   levels: loggerLevels.levels,
   level: 'info',
-  transport: transports
+  transports: transports
 });
 
 /*
@@ -85,8 +85,7 @@ logger.generalStream = {
   }
 };
 
-//module.exports = logger; //Expose logger to other modules what want to use it
-
+//Expose logger to other modules what want to use it
 module.exports = {
   log,
   initializeLogger
