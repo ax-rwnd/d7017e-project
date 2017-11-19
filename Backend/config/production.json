@@ -6,5 +6,10 @@
             "port": 27018,
             "database_name": "staging"
         }
+    },
+    // APP config module
+    "App": {
+        "title": "d7017e-backend",
+        "port": 18001
     }
 }

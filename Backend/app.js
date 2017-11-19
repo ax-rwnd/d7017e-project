@@ -115,6 +115,7 @@ app.use(function (err, req, res, next) {
 
 // Function to initiate the app/server into development- or production mode. (depends on NODE_ENV)
 function initApp() {
+    app.set('port', config.get('App.port')); //Set port from config
     let dbConfig = config.get('Mongo.dbConfig'); //Get mongo database config
     logger.initializeLogger(app);
     logger.log("info","Server running in " + app.get('env') + " mode.");
