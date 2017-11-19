@@ -8,6 +8,9 @@ import {CourseService} from '../services/course.service';
 import { trigger, state, style, animate, transition } from '@angular/animations';
 import { HeadService } from '../services/head.service';
 import { AssignmentService } from '../services/assignment.service';
+import {FormBuilder, FormGroup} from '@angular/forms';
+import {BackendService} from '../services/backend.service';
+
 
 @Component({
   selector: 'app-courses',
@@ -31,10 +34,15 @@ export class CoursesComponent implements OnInit {
   currentCourse: any;
   currentAssignment: any;
   possibleStudents: any[];
+  form: FormGroup;
   modalRef: BsModalRef;
+  defaultForm = {
+    search: ''
+  };
 
   constructor(private courseService: CourseService, private route: ActivatedRoute, private headService: HeadService,
-              private assignmentService: AssignmentService, private modalService: BsModalService) {
+              private fb: FormBuilder, private assignmentService: AssignmentService, private modalService: BsModalService,
+              private backendService: BackendService) {
     this.headService.stateChange.subscribe(sidebarState => { this.sidebarState = sidebarState; });
     this.route.params.subscribe( params => {
       this.currentCourse = this.courseService.GetCourse(params['course']);
@@ -52,6 +60,7 @@ export class CoursesComponent implements OnInit {
     console.log('assignmentGroup', this.assignmentService.courseAssignments[this.currentCourse.id]);
     console.log('all assignmentGroups', this.assignmentService.courseAssignments);
     this.possibleStudents = [{name: 'asdfgh-3', id: '0'}, {name: 'qwerty-2', id: '1'}];
+    this.form = this.fb.group(this.defaultForm);
     /*if (this.assignmentService.courseAssignments[this.currentCourse.code] !== undefined) {
       this.assignmentGroups = this.assignmentService.courseAssignments[this.currentCourse.code];
     } else {
@@ -64,8 +73,8 @@ export class CoursesComponent implements OnInit {
     //todo
     //fetch the correct assignment/lab from the course
     if (this.assignmentGroups[0].groups[0].assignments[number-1].available != false){
-    this.currentAssignment = this.assignmentGroups[0].groups[0].assignments[number-1].name;
-  }}
+      this.currentAssignment = this.assignmentGroups[0].groups[0].assignments[number-1].name;
+    }}
 
   getProgress() {
     return (this.courseService.GetProgress(this.currentCourse.id));
@@ -75,6 +84,18 @@ export class CoursesComponent implements OnInit {
   }
   invite(id) {
     console.log(id);
+  }
+  search() {
+    console.log(this.form.value.search);
+    this.possibleStudents = [];
+    this.backendService.getSearch(this.form.value.search)
+      .then(response => {
+        const users = response['users'];
+        for (let i = 0; i < users.length; i++) {
+          console.log(users[i]);
+          this.possibleStudents[i] = {name: users[i]['username'], id: users[i]['_id']};
+        }
+      });
   }
 }
 

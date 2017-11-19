@@ -41,14 +41,9 @@ export class NoopInterceptor implements HttpInterceptor {
             if (!resp) {
               console.log('no response');
             } else {
-              // -- TODO resend all failed requests stored in collectFailedRequests by calling retryFailedRequests().
-              // -- TODO Add more error support.
-              // retry failed requests
-              // this.auth.retryFailedRequests();
-              // return next.handle(authReq);
+              this.auth.retryFailedRequests();
             }
           });
-
         }
       }
     });

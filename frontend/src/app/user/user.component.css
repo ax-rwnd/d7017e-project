@@ -40,7 +40,7 @@
   font-weight: bold;
 }
 
-
-
-
-
+.course-list {
+  margin-bottom: 10px;
+  background-color: rgba(29,117,175,0.27);
+}

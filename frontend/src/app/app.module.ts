@@ -9,6 +9,7 @@ import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { CollapseModule } from 'ngx-bootstrap/collapse';
 import { TabsModule } from 'ngx-bootstrap/tabs';
 import { ModalModule } from 'ngx-bootstrap';
+import { TooltipModule } from 'ngx-bootstrap/tooltip';
 import { AngularFontAwesomeModule } from 'angular-font-awesome/angular-font-awesome';
 
 import { CodemirrorModule } from 'ng2-codemirror';
@@ -49,6 +50,7 @@ import { GameelementComponent } from './gameelement/gameelement.component';
 import { ModLeaderboardComponent } from './mod-leaderboard/mod-leaderboard.component';
 import { ModProgressbarComponent } from './mod-progressbar/mod-progressbar.component';
 import { CreatecourseComponent } from './createcourse/createcourse.component';
+import { ModBadgesComponent } from './mod-badges/mod-badges.component';
 
 
 const appRoutes: Routes = [
@@ -82,6 +84,7 @@ const appRoutes: Routes = [
     ModLeaderboardComponent,
     ModProgressbarComponent,
     CreatecourseComponent,
+    ModBadgesComponent,
   ],
   imports: [
     BrowserModule,
@@ -96,6 +99,7 @@ const appRoutes: Routes = [
     BsDropdownModule.forRoot(),
     CollapseModule.forRoot(),
     TabsModule.forRoot(),
+    TooltipModule.forRoot(),
     HttpClientModule,
     HttpModule,
     AngularFontAwesomeModule,
