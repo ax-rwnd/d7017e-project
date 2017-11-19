@@ -2,3 +2,22 @@
   margin-top: 20%;
   margin-bottom: 20%; /* Remove the default bottom margin of .jumbotron */
 }
+
+.jumbotron {
+  background-image: url("/assets/images/bronze_medal_badge.png");
+  background-position: 0px 0px;
+  background-repeat: repeat;
+  animation: animatedBackground 4s linear infinite;
+}
+
+@keyframes animatedBackground {
+	0% {
+    background-position: 0 0;
+	}
+	50% {
+    background-position: 48px 96px;
+	}
+	100% {
+    background-position: 96px 192px;
+	}
+}
