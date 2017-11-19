@@ -4,7 +4,6 @@ var express = require('express'); //Routes package
 var mongoose = require('mongoose'); //Database communication
 mongoose.Promise = require('bluebird');
 var bodyParser = require('body-parser');
-var passport = require('passport'); //authentication
 var expressHbs = require('express-handlebars');
 var cors = require('cors');
 var config = require('config');
@@ -12,6 +11,9 @@ var logger = require('./lib/logger'); //Use Logger
 var errors = require('./lib/errors.js');
 var fs = require('fs');
 var crypto = require('crypto');
+var auth = require('./lib/authentication');
+var swaggerUi = require('swagger-ui-express');
+var swaggerDocument = require('./lib/swagger.json');
 
 var app = express();
 
@@ -40,13 +42,15 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
     extended: true
 }));
-app.use(passport.initialize());
 app.use(cors({origin: '*'}));
 
 //defining routes
-var auth = express.Router();
-require('./routes/auth')(auth);
-app.use('/auth', auth);
+var auth_router = express.Router();
+require('./routes/auth')(auth_router);
+app.use('/auth', auth_router);
+
+// only authenticated users can access /api
+app.use('/api', auth.validateJWTtoken);
 
 var users = express.Router();
 require('./routes/api/users')(users);
@@ -60,10 +64,15 @@ var features = express.Router();
 require('./routes/api/features')(features);
 app.use('/api/features', features);
 
-var test_routes = express.Router();
-require('./routes/api/tester')(test_routes);
-app.use('/api/tester', test_routes);
+var tester = express.Router();
+require('./routes/api/tester')(tester);
+app.use('/api/tester', tester);
 
+var search = express.Router();
+require('./routes/api/search')(search);
+app.use('/api/search', search);
+
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 //Route not found.
 app.use(function (req, res, next) {

@@ -1,9 +1,13 @@
 'use strict';
+
 var features_helper = require('../features/features_helper');
 const request = require('supertest');
 const assert = require('assert');
 
 let runner = require('../bin/www');
+
+// https://github.com/visionmedia/supertest/issues/370#issuecomment-249410533
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 after(() => {
     runner.server.close(() => {
@@ -17,6 +21,18 @@ after(() => {
 // performs a deep copy assuming a is simple (no functions or circular references)
 function clone(a) {
    return JSON.parse(JSON.stringify(a));
+}
+
+function auth() {
+    return request(runner.server)
+        .get('/auth/login/fake')
+        .query({admin: 'false'})
+        .expect(200)
+        .then(res => {
+            return res.body.access_token;
+        }).catch(function(err) {
+            console.log(err);
+        });
 }
 
 describe('Test passAllMandatoryTests', () => {
@@ -72,76 +88,124 @@ describe('Test passAllMandatoryTests', () => {
     }
 });
 
-function auth() {
-    return request(runner.server)
-        .get('/auth/login/fake')
-        .query({admin: 'false'})
-        .expect(200)
-        .then(res => {
-            return res.body.access_token;
+describe('/features', () => {
+
+    let access_token;
+
+    before(() => {
+        return auth().then(at => access_token = at);
+    });
+
+    describe('GET /api/features/features/:course_id', () => {
+
+
+        it('Get features for all users in course', () => {
+
+            let course_id = '59f6f88b1ac36c0762eb46a9';
+            let route = '/api/features/features/';
+
+            return request(runner.server)
+                .get(route+course_id)
+                .set('Authorization', 'Bearer ' + access_token)
+                .expect(200)
+                .then(res => {
+                    assert(Array.isArray(res.body.features), 'not an array');
+                });
         });
-}
-
-
-describe('Features routes', () => {
-
-    let access_token;
-
-    before(() => {
-        return auth().then(at => access_token = at);
     });
 
-    it('GET /api/features/features/:course_id', () => {
+    describe('GET /api/features/feature/:course_id/me', () => {
 
-        let course_id = '59f6f88b1ac36c0762eb46a9';
-        let route = '/api/features/features/';
+        it('Get feature for user in course', () => {
 
-        return request(runner.server)
-            .get(route+course_id)
-            .set('Authorization', 'Bearer ' + access_token)
-            .expect(200)
-            .then(res => {
-                //console.log(res.body);
-            });
+            let course_id = '59f6f88b1ac36c0762eb46a9';
+            let route = '/api/features/feature';
+
+            return request(runner.server)
+                .get(route+'/'+course_id+'/me')
+                .set('Authorization', 'Bearer ' + access_token)
+                .expect(200)
+                .then(res => {
+                    assert(Array.isArray(res.body.badges), 'not an array');
+                    assert(Array.isArray(res.body.progress), 'not an array');
+                });
+        });
     });
 
-    it('GET /api/features/feature/:course_id/:user_id', () => {
 
-        let course_id = '59f6f88b1ac36c0762eb46a9';
-        let user_id = '59f9f5a51ac36c0762eb46b0';
-        let route = '/api/features/feature/';
+    let badge = {
+        course_id: "59f991991ac36c0762eb46af",
+        icon: 'pretty_icon',   //name of an icon image file
+        title: 'Pretty badge',
+        description: 'Very impossibru badgeererer',
+        goals: {
+            badges: [],
+            assignments: []
+        }
+    };
 
-        return request(runner.server)
-            .get(route+course_id+'/'+user_id)
-            .set('Authorization', 'Bearer ' + access_token)
-            .expect(200)
-            .then(res => {
-                //console.log(res.body);
-            });
+    let new_title = 'Another title';
+
+    let badge_id;
+
+    describe('POST /api/features/badge', () => {
+
+        it('Create a badge', () => {
+
+            let route = '/api/features/badge';
+
+            return request(runner.server)
+                .post(route)
+                .set('Authorization', 'Bearer ' + access_token)
+                .send(badge)
+                .set('Content-Type', 'application/json')
+                .expect(200)
+                .then(res => {
+                    badge_id = res.body._id;
+                });
+        });
     });
 
-});
+    describe('PUT /api/features/badge', () => {
 
+        it('Update a badge', () => {
 
-describe('Tester', () => {
-    let access_token;
+            badge.title = new_title;
 
-    before(() => {
-        return auth().then(at => access_token = at);
+            let route = '/api/features/badge';
+
+            return request(runner.server)
+                .put(route+'/'+badge_id)
+                .set('Authorization', 'Bearer ' + access_token)
+                .send(badge)
+                .set('Content-Type', 'application/json')
+                .expect(200)
+                .then(res => {
+                    assert(res.body._id == badge_id, 'Badge IDs did not match');
+                });
+        });
     });
 
-    it('GET /api/tests/languages', () => {
+    describe('GET /api/features/badge', () => {
 
-        let route = '/api/tests/languages';
+        it('Fetch a badge', () => {
 
-        return request(runner.server)
-            .get(route)
-            .set('Authorization', 'Bearer ' + access_token)
-            .expect(200)
-            .then(res => {
-                console.log(res.text);
-            }).catch(err => {
-                console.log(err);
-            });
+            let route = '/api/features/badge';
+
+            return request(runner.server)
+                .put(route+'/'+badge_id)
+                .set('Authorization', 'Bearer ' + access_token)
+                .expect(200)
+                .then(res => {
+                    assert(res.body.title == new_title, 'Updated badge did not have title '+new_title+' but '+res.body.title);
+                });
+        });
+
     });
+
+    describe.skip('DELETE /api/features/badge/:badge_id', () => {
+        it('TODO', () => {
+        });
+    });
+
 });

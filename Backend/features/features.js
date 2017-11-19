@@ -30,6 +30,7 @@ function initFeatures() {
 }
 
 function emitEvent(result) {
+
     return new Promise(function (resolve, reject) {
 
         result.passed = helper.passAllMandatoryTests(result);

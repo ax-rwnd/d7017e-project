@@ -8,14 +8,17 @@ var User = require('../../models/schemas').User;
 var Draft = require('../../models/schemas').Draft;
 var errors = require('../errors.js');
 var mongoose = require('mongoose');
+var logger = require('../../logger.js');
+var jwt = require('jsonwebtoken');
+var config = require('config');
 
 
 const FIELDS = {
     COURSE: {
         MODEL: require('../../models/schemas').Course,
         BASE_FIELDS: "course_code name description",
-        ADMIN: "course_code name description teachers students assignments",
-        TEACHER: "course_code name description students assignments",
+        ADMIN: "course_code name description autojoin teachers students invited pending assignments",
+        TEACHER: "course_code name description autojoin teachers students invited pending assignments",
         STUDENT: "course_code name description assignments",
         POPULATE_FIELDS: "teachers students assignments"
     },
@@ -49,7 +52,7 @@ const FIELDS = {
 
 //get all tests related to a specific assignment.
 function getTestsFromAssignment(assignmentID, callback) {
-
+    console.log(assignmentID);
     Assignment.findById(assignmentID)
     .populate({
         path: 'tests.io',
@@ -117,6 +120,18 @@ function deleteUser(id) {
 }
 
 function setRefreshToken(userObject, token) {
+    // Iterate through refresh token array and expired tokens
+    var i = userObject.tokens.length;
+    while (i--) {
+        jwt.verify(userObject.tokens[i], config.get('App.secret'), function(err, payload) {
+            if (err) {
+                if (err.name === "TokenExpiredError") {
+                    userObject.tokens.splice(i, 1);
+                }
+            }
+        });
+    }
+
     userObject.tokens.push(token);
     userObject.save().then(function (updatedUser) {
         console.log("Ref token saved");
@@ -171,28 +186,53 @@ function findOrCreateUser(profile) {
     });
 }
 
-function getCourses(fields, admin) {
+function getCourses(fields, admin, id_array) {
     var wantedFields = fields || "name description hidden teachers students assignments";
-
-    if (admin) {
-        return Course.find({}, wantedFields).then(function (courseList) {
-            if (!courseList) {
-                throw errors.NO_COURSES_EXISTS;
-            }
-            return courseList;
-        });
-    }
-    return Course.find({'hidden': false}, wantedFields).then(function (courseList) {
-        if (!courseList) {
-            throw errors.NO_COURSES_EXISTS;
+    if (!id_array){
+       if (admin) {
+            return Course.find({}, wantedFields).then(function (courseList) {
+                if (!courseList) {
+                    throw errors.NO_COURSES_EXISTS;
+                }
+                return courseList;
+            });
+        } else {
+            return Course.find({'hidden': false}, wantedFields).then(function (courseList) {
+                if (!courseList) {
+                    throw errors.NO_COURSES_EXISTS;
+                }
+                return courseList;
+            });
         }
-        return courseList;
-    });
+    } else {
+        var promises = [];
+        var query = (admin === true)
+            ? {}
+            : {hidden: false};
+
+        for (var i = 0; i < id_array.length; i++) {
+            // Check validity of id
+            if (!mongoose.Types.ObjectId.isValid(id_array[i])) {
+                throw errors.INVALID_ID;
+            }
+            query._id = id_array[i];
+            var temp = Course.findOne(query, wantedFields).then(function (course) {
+                if (!course) {
+                    throw errors.COURSE_DOES_NOT_EXIST;
+                }
+                return course;
+            });
+            promises.push(temp); // Gather all promises in an array
+        }
+        return Promise.all(promises);
+    }
 
 }
 
-function createCourse(name, description, hidden) {
-    var newCourse = new Course({name: name, description: description, hidden: hidden, teachers: [], students: [], assignments: [], features: []});
+function createCourse(name, description, hidden, course_code, enabled_features) {
+    course_code = course_code || '';
+    enabled_features = enabled_features || {};
+    var newCourse = new Course({name: name, description: description, course_code: course_code, hidden: hidden, teachers: [], students: [], assignments: [], features: [], enabled_features: enabled_features});
     return newCourse.save().then(function (createdCourse) {
         if (!createdCourse) {
             console.log("Error: Course not created");
@@ -221,6 +261,200 @@ function getCourseStudents(id, fields) {
             throw errors.NO_STUDENTS_EXISTS;
         }
         return studentList;
+    });
+}
+
+// Adds a student to a course. Because of the database schema,
+// the user document receives a reference to the course AND
+// the course document receives a reference to the user.
+// In Mongo, we get per-document atomicity.
+function addCourseStudent(course_id, student_id) {
+    return User.count({_id: student_id})
+    .then(count => {
+        if (count === 0) {
+            // TODO use an APIError
+            throw new Error('No such student');
+        }
+        return Course.update(
+            {_id: course_id},
+            {$addToSet: {students: student_id}},
+            {runValidators: true}
+        );
+    }).then(function (raw) {
+        // check if the course update was ok
+        if (raw.ok !== 1) {
+            // TODO: make a real error message!
+            throw new Error('Mongo error: failed to add to user.courses');
+        // check if the course existed
+        } else if (raw.n === 0) {
+            // TODO: make it an APIError
+            throw new Error('Course does not exist');
+        }
+        return User.update(
+            {_id: student_id},
+            {$addToSet: {courses: course_id}},
+            {runValidators: true}
+        );
+    }).then(function(raw) {
+        // check if the user update was ok
+        if (raw.ok === 1) {
+            return true;
+        } else {
+            // TODO: make a real error message!
+            throw new Error('Mongo error: failed to add to user.courses');
+        }
+    });
+}
+
+function addCoursePending(course_id, student_id) {
+    return User.count({_id: student_id})
+    .then(count => {
+        if (count === 0) {
+            // TODO use an APIError
+            throw new Error('No such student');
+        }
+        return Course.update(
+            {_id: course_id},
+            {$addToSet: {pending: student_id}},
+            {runValidators: true}
+        );
+    }).then(function (raw) {
+        // check if the course update was ok
+        if (raw.ok !== 1) {
+            // TODO: make a real error message!
+            throw new Error('Mongo error: failed to add to user.courses');
+        // check if the course existed
+        } else if (raw.n === 0) {
+            // TODO: make it an APIError
+            throw new Error('Course does not exist');
+        }
+        return User.update(
+            {_id: student_id},
+            {$addToSet: {pending: course_id}},
+            {runValidators: true}
+        );
+    }).then(function(raw) {
+        // check if the user update was ok
+        if (raw.ok === 1) {
+            return true;
+        } else {
+            // TODO: make a real error message!
+            throw new Error('Mongo error: failed to add to user.courses');
+        }
+    });
+}
+
+function addCourseInvite(course_id, student_id) {
+    return User.count({_id: student_id})
+    .then(count => {
+        if (count === 0) {
+            // TODO use an APIError
+            throw new Error('No such student');
+        }
+        return Course.update(
+            {_id: course_id},
+            {$addToSet: {invited: student_id}},
+            {runValidators: true}
+        );
+    }).then(function (raw) {
+        // check if the course update was ok
+        if (raw.ok !== 1) {
+            // TODO: make a real error message!
+            throw new Error('Mongo error: failed to add to user.courses');
+        // check if the course existed
+        } else if (raw.n === 0) {
+            // TODO: make it an APIError
+            throw new Error('Course does not exist');
+        }
+        return User.update(
+            {_id: student_id},
+            {$addToSet: {invited: course_id}},
+            {runValidators: true}
+        );
+    }).then(function(raw) {
+        // check if the user update was ok
+        if (raw.ok === 1) {
+            return true;
+        } else {
+            // TODO: make a real error message!
+            throw new Error('Mongo error: failed to add to user.courses');
+        }
+    });
+}
+
+function removeCourseInvite(course_id, student_id) {
+    return User.count({_id: student_id})
+    .then(count => {
+        if (count === 0) {
+            // TODO use an APIError
+            throw new Error('No such student');
+        }
+        return Course.update(
+            {_id: course_id},
+            {$pull: {invited: student_id}},
+            {runValidators: true}
+        );
+    }).then(function (raw) {
+        // check if the course update was ok
+        if (raw.ok !== 1) {
+            // TODO: make a real error message!
+            throw new Error('Mongo error: failed to add to user.courses');
+        // check if the course existed
+        } else if (raw.n === 0) {
+            // TODO: make it an APIError
+            throw new Error('Course does not exist');
+        }
+        return User.update(
+            {_id: student_id},
+            {$pull: {invited: course_id}},
+            {runValidators: true}
+        );
+    }).then(function(raw) {
+        // check if the user update was ok
+        if (raw.ok === 1) {
+            return true;
+        } else {
+            // TODO: make a real error message!
+            throw new Error('Mongo error: failed to add to user.courses');
+        }
+    });
+}
+
+function removeCoursePending(course_id, student_id) {
+    return User.count({_id: student_id})
+    .then(count => {
+        if (count === 0) {
+            // TODO use an APIError
+            throw new Error('No such student');
+        }
+        return Course.update(
+            {_id: course_id},
+            {$pull: {pending: student_id}},
+            {runValidators: true}
+        );
+    }).then(function (raw) {
+        // check if the course update was ok
+        if (raw.ok !== 1) {
+            // TODO: make a real error message!
+            throw new Error('Mongo error: failed to add to user.courses');
+        // check if the course existed
+        } else if (raw.n === 0) {
+            // TODO: make it an APIError
+            throw new Error('Course does not exist');
+        }
+        return User.update(
+            {_id: student_id},
+            {$pull: {pending: course_id}},
+            {runValidators: true}
+        );
+    }).then(function(raw) {
+        // check if the user update was ok
+        if (raw.ok === 1) {
+            return true;
+        } else {
+            // TODO: make a real error message!
+            throw new Error('Mongo error: failed to add to user.courses');
+        }
     });
 }
 
@@ -375,6 +609,17 @@ function populateObject(mongooseObject, schema, wantedFields) {
     }
 }
 
+// Should be merged with getCourse maybe
+function getCourseSimple(courseid) {
+    return Course.findById(courseid, "autojoin students teachers invited pending")
+    .then(function (courseObject) {
+        if (!courseObject) {
+            throw errors.COURSE_DOES_NOT_EXIST;
+        }
+        return courseObject;
+    });
+}
+
 function getCourse(courseid, roll, fields) {
     var wantedFields = fields || FIELDS.COURSE[roll.toUpperCase()];
     wantedFields = wantedFields.replace(/,/g, " ");
@@ -430,6 +675,109 @@ function getCoursesEnabledFeatures(course_id) {
     });
 }
 
+function searchDB(query, categories, user_id) {
+    return getAssignmentIDsByUser(user_id).then(assignment_ids => {
+
+        let promises = [];
+        let json = {
+            courses: [],
+            assignments: [],
+            users: []
+        };
+
+        if(categories) {
+            categories = categories.split(',');
+
+            if (categories.indexOf('courses') !== -1) {
+                promises.push(searchDBCourses(query, user_id));
+            }
+            if (categories.indexOf('assignments') !== -1) {
+                promises.push(searchDBAssignments(query, assignment_ids));
+            }
+            if (categories.indexOf('users') !== -1) {
+                promises.push(searchDBUsers(query));
+            }
+        } else {
+            promises.push(searchDBCourses(query, user_id));
+            promises.push(searchDBAssignments(query, assignment_ids));
+            promises.push(searchDBUsers(query));
+        }
+
+        return Promise.all(promises).then(function(results) {
+
+            for(let result of results) {
+                for(var key in result) json[key] = result[key];
+            }
+
+            return json;
+        });
+    });
+}
+
+function searchDBCourses(query, user_id) {
+    return Course.find({$text: {$search: query}, 'students': user_id, 'hidden': false}, {score: {$meta: "textScore"}})
+        .select('-__v -hidden -features -assignments -students -enabled_features')
+        .sort({score: {$meta: "textScore"}})
+        .limit(20).then(docs => {
+            return {'courses': docs};
+        }).catch(err => {
+            logger.error(err);
+        });
+}
+
+function searchDBAssignments(query, assignment_ids) {
+    return Assignment.find({$text: {$search: query}, '_id': assignment_ids, 'hidden': false}, {score: {$meta: "textScore"}})
+        .select('-__v -tests -optional_tests -hidden -languages')
+        .sort({score: {$meta: "textScore"}})
+        .limit(20).then(docs => {
+            return {'assignments': docs};
+        }).catch(err => {
+            logger.error(err);
+        });
+}
+
+function searchDBUsers(query) {
+    return User.find({$text: {$search: query}}, {score: {$meta: "textScore"}})
+        .select('-__v -tokens -providers')
+        .sort({score: {$meta: "textScore"}})
+        .limit(20).then(docs => {
+            return {'users': docs};
+        }).catch(err => {
+            logger.error(err);
+        });
+}
+
+// Helper function for searchDB()
+function getAssignmentIDsByUser(user_id) {
+    return getUserCourses(user_id, '_id').then(function(courses) {
+
+        // Get IDs of courses user is in
+        let ids = [];
+        for(let course of courses.courses) {
+            ids.push(course._id);
+        }
+
+        // Get assignemnts from courses
+        let assignment_promises = [];
+        for(let id of ids) {
+            assignment_promises.push(getCourseAssignments(id, 'assignments').then(assignment => {
+                return assignment;
+            }));
+        }
+
+        // Get assignment IDs from assignments
+        let assignment_ids = [];
+        return Promise.all(assignment_promises).then(course => {
+            for(let assignments of course) {
+                for(let assignment of assignments.assignments) {
+                    assignment_ids.push(assignment._id);
+                }
+            }
+            return assignment_ids;
+        });
+    });
+}
+
 exports.getTestsFromAssignment = getTestsFromAssignment;
 exports.findOrCreateUser = findOrCreateUser;
 exports.getUser = getUser;
@@ -439,6 +787,11 @@ exports.getCourses = getCourses;
 exports.createCourse = createCourse;
 exports.getUserCourses = getUserCourses;
 exports.getCourseStudents = getCourseStudents;
+exports.addCourseStudent = addCourseStudent;
+exports.addCoursePending = addCoursePending;
+exports.addCourseInvite = addCourseInvite;
+exports.removeCourseInvite = removeCourseInvite;
+exports.removeCoursePending = removeCoursePending;
 exports.getCourseTeachers = getCourseTeachers;
 exports.getCourseAssignments = getCourseAssignments;
 exports.setRefreshToken = setRefreshToken;
@@ -448,7 +801,11 @@ exports.createTest = createTest;
 exports.getAssignment = getAssignment;
 exports.getTest = getTest;
 exports.getCourse = getCourse;
+exports.getCourseSimple = getCourseSimple;
 exports.checkPermission = checkPermission;
 exports.saveCode = saveCode;
 exports.getCode = getCode;
 exports.getCoursesEnabledFeatures = getCoursesEnabledFeatures;
+exports.searchDB = searchDB;
+
+

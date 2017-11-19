@@ -3,14 +3,14 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "test": "mocha",
+    "test": "cross-env NODE_ENV=test mocha",
     "start": "forever start ./bin/www",
     "stop": "forever stopall"
   },
   "dependencies": {
     "bluebird": "^3.5.1",
     "body-parser": "^1.18.2",
-    "config": "^1.27.0",
+    "config": "^1.28.1",
     "cors": "^2.8.4",
     "debug": "~2.2.0",
     "events-async": "^1.1.0",
@@ -18,15 +18,15 @@
     "express-handlebars": "^3.0.0",
     "forever": "~0.15.3",
     "jsonwebtoken": "^8.1.0",
-    "mongoose": "^4.12.1",
+    "mongoose": "^4.13.1",
     "morgan": "^1.9.0",
-    "passport": "^0.4.0",
-    "passport-cas": "^0.1.1",
     "request": "^2.83.0",
     "require-dir": "^0.3.2",
     "supertest": "^3.0.0",
+    "swagger-ui-express": "latest",
     "throw.js": "^3.0.1",
     "winston": "^2.4.0",
-    "xml2js": "^0.4.19"
+    "xml2js": "^0.4.19",
+    "cross-env": "latest"
   }
 }

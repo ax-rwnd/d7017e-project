@@ -9,14 +9,38 @@ var testerCom = require('../../lib/tester_communication');
 var Assignment = require('../../models/schemas').Assignment;
 var Test = require('../../models/schemas').Test;
 
+const BASIC_FILTER = "name description course_code enabled_features";
+const ADMIN_FILTER = "name description course_code teachers students assignments features enabled_features hidden";
+
 module.exports = function(router) {
-
-
     // Get all courses in db
     // If admin get all
     // If teacher or student get all not hidden courses.
     // Also get hidden courses if teacher/student of it?
-    router.get('/', auth.validateJWTtoken, function (req, res, next) {
+    router.get('/', function (req, res, next) {
+        var ids = req.query.ids;
+
+        var filter = (req.user.admin === true)
+            ? ADMIN_FILTER
+            : BASIC_FILTER;
+
+        if (!ids) {
+            queries.getCourses(filter, req.user.admin).then(function (courses) {
+                return res.json({courses: courses});
+            })
+            .catch(function (err) {
+                next(err);
+            });
+        } else {
+            var id_array = ids.split(',');
+            queries.getCourses(filter, req.user.admin, id_array).then(function (courses) {
+                return res.json({courses: courses});
+            })
+            .catch(function (err) {
+                next(err);
+            });
+        }
+
         //Need user object from token verify for admin check.
         /*
         if (user.admin) {
@@ -28,24 +52,22 @@ module.exports = function(router) {
             });
         }
         */
-        queries.getCourses("name description", false).then(function (courses) {
-            return res.json(courses);
-        })
-        .catch(function (err) {
-            next(err);
-        });
     });
 
 
     // Create new course
     // Admin/teachers can create unlimited courses
     // Students limited to 3 courses?
-    router.post('/', auth.validateJWTtoken, function (req, res, next) {
+    router.post('/', function (req, res, next) {
         var name = req.body.name;
         var desc = req.body.description;
         var hidden = req.body.hidden;
+        var course_code = req.body.course_code;
+        var enabled_features = req.body.enabled_features;
+        // TODO: validate input
+        // TODO: check permissions
 
-        queries.createCourse(name, desc, hidden).then(function (course) {
+        queries.createCourse(name, desc, hidden, course_code, enabled_features).then(function (course) {
             return res.json(course);
         })
         .catch(function (err) {
@@ -58,7 +80,7 @@ module.exports = function(router) {
     // Should be user/:userid/courses ?
     // Would force frontend to send userid. courses/me takes user id from token.
     // Frontend is most likely in possesion of userid. Therefore both is possible.
-    router.get('/me', auth.validateJWTtoken, function (req, res, next) {
+    router.get('/me', function (req, res, next) {
         queries.getUserCourses(req.user.id, "name description course_code").then(function (courses) {
             return res.json(courses);
         })
@@ -71,7 +93,7 @@ module.exports = function(router) {
     // Get course with id :course_id
     // Different information depending on user roll.
     // What should be given for each roll?
-    router.get('/:course_id', auth.validateJWTtoken, function (req, res, next) {
+    router.get('/:course_id', function (req, res, next) {
         var roll;
         var course_id = req.params.course_id;
         var wantedFields = req.query.fields || null;
@@ -101,13 +123,13 @@ module.exports = function(router) {
 
     // Deletes course with id :course_id
     // Only admin and teacher of course can delete course
-    router.delete('/:course_id', auth.validateJWTtoken, function (req, res, next) {
+    router.delete('/:course_id', function (req, res, next) {
 
     });
 
 
 
-    router.get('/:course_id/students', auth.validateJWTtoken, function (req, res, next) {
+    router.get('/:course_id/students', function (req, res, next) {
         var course_id = req.params.course_id;
 
         queries.getCourseStudents(course_id, "username email").then(function (students) {
@@ -118,7 +140,132 @@ module.exports = function(router) {
         });
     });
 
-    router.get('/:course_id/teachers', auth.validateJWTtoken, function (req, res, next) {
+    router.put('/:course_id/students', function (req, res, next) {
+        var course_id = req.params.course_id;
+        var student_id = req.body.student_id;
+        queries.getUser(req.user.id, "teaching")
+        .then(function (userObject) {
+            // admins and teachers can invite students
+            if (req.user.admin || userObject.teaching.indexOf(course_id) !== -1) {
+                return queries.addCourseStudent(course_id, student_id);
+            } else {
+                // TODO: use a better error
+                next(errors.INSUFFICIENT_PERMISSION);
+            }
+        }).then(function () {
+            res.sendStatus(200);
+        }).catch(err => {
+            console.log(err);
+            next(err);
+        });
+    });
+
+
+    // TODO
+    // Documentation
+    // Test
+    // Rename? Should it really both do invites and accept pending?
+    router.post('/:course_id/invite', function (req, res, next) {
+        var course_id = req.params.course_id;
+        var student_id = req.body.student_id;
+        queries.getUser(req.user.id, "teaching")
+        .then(function (userObject) {
+            // admins and teachers can invite students
+            if (req.user.admin || userObject.teaching.indexOf(course_id) !== -1) {
+                queries.getCourseSimple(course_id)
+                .then(function(courseObject) {
+                    console.log("Simple Done");
+                    if (courseObject.students.indexOf(student_id) !== -1
+                    || courseObject.teachers.indexOf(student_id) !== -1) {
+                        throw errors.USER_ALREADY_IN_COURSE;
+                    }
+                    if (courseObject.pending.indexOf(student_id) !== -1) {
+                        return queries.removeCoursePending(course_id, student_id)
+                        .then(function() {
+                            return queries.addCourseStudent(course_id, student_id)
+                            .then(function() {
+                                return res.status(201);
+                            });
+                        });  
+                    }
+                    if (courseObject.invited.indexOf(student_id) !== -1) {
+                        return res.sendStatus(202);
+                    }
+
+                    return queries.addCourseInvite(course_id, student_id)
+                    .then(function() {
+                        return res.sendStatus(202);
+                    });
+                });
+            } else {
+                // TODO: use a better error
+                throw errors.INSUFFICIENT_PERMISSION;
+            }
+        })
+        .catch(function(err) {
+            return next(err);
+        }); 
+    });
+
+    router.put('/:course_id/invite', function (req, res, next) {
+
+    });
+
+    router.delete('/:course_id/invite', function (req, res, next) {
+
+    });
+    
+    // TODO
+    // Documentation
+    // Test
+    // Rename? Should it really do both sign up and accept invite?
+    router.post('/:course_id/join', function (req, res, next) {
+        var course_id = req.params.course_id;
+        console.log("Join hit");
+        queries.getCourseSimple(course_id)
+        .then(function (courseObject) {
+            if (courseObject.students.indexOf(req.user.id) !== -1
+            || courseObject.teachers.indexOf(req.user.id) !== -1) {
+                throw errors.USER_ALREADY_IN_COURSE;
+            }
+            if (courseObject.pending.indexOf(req.user.id) !== -1) {
+                return res.sendStatus(202);
+            }
+            if (courseObject.invited.indexOf(req.user.id) !== -1) {
+                return queries.removeCourseInvite(course_id, req.user.id)
+                .then(function () {
+                    return queries.addCourseStudent(course_id, req.user.id)
+                    .then(function () {
+                        return res.status(201);
+                    });
+                });  
+            }
+            if (courseObject.autojoin) {
+                return queries.addCourseStudent(course_id, req.user.id)
+                .then(function () {
+                    return res.status(201);
+                });
+            } else {
+                return queries.addCoursePending(course_id, req.user.id)
+                .then(function () {
+                    return res.sendStatus(202);
+                });
+            }
+        })
+        .catch(function (err) {
+            return next(err);
+        }); 
+    });
+
+    router.put('/:course_id/join', function (req, res, next) {
+
+    });
+
+    router.delete('/:course_id/join', function (req, res, next) {
+
+    });
+
+    router.get('/:course_id/teachers', function (req, res, next) {
         var course_id = req.params.course_id;
 
         queries.getCourseTeachers(course_id, "username email").then(function (teachers) {
@@ -129,7 +276,11 @@ module.exports = function(router) {
         });
     });
 
-    router.get('/:course_id/assignments', auth.validateJWTtoken, function (req, res, next) {
+    router.put('/:course_id/teachers', function (req, res, next) {
+    });
+
+
+    router.get('/:course_id/assignments', function (req, res, next) {
         var course_id = req.params.course_id;
 
         queries.getCourseAssignments(course_id, "name description hidden languages").then(function (assignments) {
@@ -140,7 +291,7 @@ module.exports = function(router) {
         });
     });
 
-    router.post('/:course_id/assignments', auth.validateJWTtoken, function (req, res, next) {
+    router.post('/:course_id/assignments', function (req, res, next) {
         var course_id = req.params.course_id;
         var name = req.body.name;
         var desc = req.body.description;
@@ -155,7 +306,7 @@ module.exports = function(router) {
         });
     });
 
-    router.get('/:course_id/assignments/:assignment_id', auth.validateJWTtoken, function (req, res, next) {
+    router.get('/:course_id/assignments/:assignment_id', function (req, res, next) {
         var roll;
         var course_id = req.params.course_id;
         var assignment_id = req.params.assignment_id;
@@ -183,7 +334,7 @@ module.exports = function(router) {
 
 /*
     //TODO: It is currently not checked if the requested assignment actually belongs to the specified course
-    router.get('/:course_id/assignments/:assignment_id', auth.validateJWTtoken, function (req, res, next) {
+    router.get('/:course_id/assignments/:assignment_id', function (req, res, next) {
         var course_id = req.params.course_id;
         var assignment_id = req.params.assignment_id;
 
@@ -197,7 +348,7 @@ module.exports = function(router) {
 */
 
     //Submit code to tester
-    router.post('/:course_id/assignments/:assignment_id/submit', auth.validateJWTtoken, function(req, res) {
+    router.post('/:course_id/assignments/:assignment_id/submit', function(req, res) {
 
         var lang = req.body.lang;
         var code = req.body.code;
@@ -208,14 +359,10 @@ module.exports = function(router) {
 
     // Save draft to assignment
     // course_id not used, should route be changed? Implement some check?
-    router.post('/:course_id/assignments/:assignment_id/save', auth.validateJWTtoken, function (req, res, next) {
+    router.post('/:course_id/assignments/:assignment_id/save', function (req, res, next) {
         var assignment_id = req.params.assignment_id;
-        var code = req.body.code;
-        var lang = req.body.lang;
-
-        if (code === undefined || lang === undefined) {
-            return next(errors.BAD_INPUT);
-        }
+        var code = req.body.code || "";
+        var lang = req.body.lang || "";
 
         queries.saveCode(req.user.id, assignment_id, code, lang).then(function (draft) {
             res.json(draft);
@@ -226,7 +373,7 @@ module.exports = function(router) {
     });
 
     // Retrieve the saved assignment draft, will create and return an empty draft if it doesn't already exist.
-    router.get('/:course_id/assignments/:assignment_id/draft', auth.validateJWTtoken, function (req, res, next) {
+    router.get('/:course_id/assignments/:assignment_id/draft', function (req, res, next) {
         var assignment_id = req.params.assignment_id;
 
         queries.getCode(req.user.id, assignment_id).then(function (draft) {
@@ -237,13 +384,13 @@ module.exports = function(router) {
         });
     });
 
-    router.get('/:course_id/assignments/:assignment_id/tests', auth.validateJWTtoken, function (req, res, next) {
+    router.get('/:course_id/assignments/:assignment_id/tests', function (req, res, next) {
         var course_id = req.params.course_id;
         var assignment_id = req.params.assignment_id;
         res.send("/courses/" + course_id + "/assignments/" + assignment_id + "/tests GET Endpoint");
     });
 
-    router.post('/:course_id/assignments/:assignment_id/tests', auth.validateJWTtoken, function (req, res, next) {
+    router.post('/:course_id/assignments/:assignment_id/tests', function (req, res, next) {
         var course_id = req.params.course_id;
         var assignment_id = req.params.assignment_id;
         var stdout = req.body.stdout;
@@ -259,7 +406,7 @@ module.exports = function(router) {
         });
     });
 
-    router.get('/:course_id/assignments/:assignment_id/tests/:test_id', auth.validateJWTtoken, function (req, res, next) {
+    router.get('/:course_id/assignments/:assignment_id/tests/:test_id', function (req, res, next) {
         var course_id = req.params.course_id;
         var assignment_id = req.params.assignment_id;
         var test_id = req.params.test_id;
@@ -272,7 +419,7 @@ module.exports = function(router) {
         });
     });
 
-    router.get('/:course_id/enabled_features', auth.validateJWTtoken, function(req, res, next) {
+    router.get('/:course_id/enabled_features', function(req, res, next) {
         queries.getCoursesEnabledFeatures(req.params.course_id).then(function (enabled_features) {
             res.json(enabled_features);
         }).catch(next);

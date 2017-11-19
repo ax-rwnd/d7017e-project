@@ -11,8 +11,7 @@ const ADMIN_FILTER = "username email admin tokens courses";
 
 
 module.exports = function (router) {
-
-    router.get('/', auth.validateJWTtoken, function (req, res, next) {
+    router.get('/', function (req, res, next) {
         var ids = req.query.ids;
         if (!ids) {
             res.sendStatus(404);
@@ -33,7 +32,7 @@ module.exports = function (router) {
     });
 
 
-    router.get('/me', auth.validateJWTtoken, function (req, res, next) {
+    router.get('/me', function (req, res, next) {
         queries.getUser(req.user.id, PRIVILEGED_FILTER).then(function (user) {
             res.json(user);
         })
@@ -42,7 +41,7 @@ module.exports = function (router) {
         });
     });
 
-    router.get('/:user_id', auth.validateJWTtoken, function (req, res, next) {
+    router.get('/:user_id', function (req, res, next) {
         var user_id = req.params.user_id;
         var filter = (req.user.admin === true)
             ? ADMIN_FILTER
@@ -56,7 +55,7 @@ module.exports = function (router) {
         });
     });
 
-    router.delete('/:user_id', auth.validateJWTtoken, function (req, res, next) {
+    router.delete('/:user_id', function (req, res, next) {
         var user_id = req.params.user_id;
         console.log(req.user.admin);
         if (req.user.admin === true){
@@ -75,12 +74,12 @@ module.exports = function (router) {
         }
     });
 
-    router.get('/:user_id/submissions', auth.validateJWTtoken, function (req, res, next) {
+    router.get('/:user_id/submissions', function (req, res, next) {
         var user_id = req.params.user_id;
         res.send("/users/" + user_id + "/submissions GET Endpoint");
     });
 
-    router.get('/:user_id/courses', auth.validateJWTtoken, function (req, res, next) {
+    router.get('/:user_id/courses', function (req, res, next) {
         var user_id = req.params.user_id;
         queries.getUserCourses(user_id, "name description").then(function (courses) {
             return res.json(courses);
@@ -90,12 +89,12 @@ module.exports = function (router) {
         });
     });
 
-    router.post('/:user_id/courses', auth.validateJWTtoken, function (req, res, next) {
+    router.post('/:user_id/courses', function (req, res, next) {
         var user_id = req.params.user_id;
         res.send("/users/" + user_id + "/courses POST Endpoint");
     });
 
-    router.get('/:user_id/courses/:course_id/submissions', auth.validateJWTtoken, function (req, res, next) {
+    router.get('/:user_id/courses/:course_id/submissions', function (req, res, next) {
         var user_id = req.params.user_id;
         var course_id = req.params.course_id;
         res.send("/users/" + user_id + "/courses/" + course_id + "/submissions GET Endpoint");

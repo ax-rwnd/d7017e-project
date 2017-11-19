@@ -21,6 +21,7 @@ var assignmentSchema = new Schema({
     },
     languages: [String]
 });
+assignmentSchema.index({name: 'text', description: 'text'}, {weights: {name: 5, description: 1}});
 
 var testSchema = new Schema({
     stdout: {type: String, required: true},
@@ -35,8 +36,11 @@ var userSchema = new Schema({
     tokens: [{type: String, required: false}],
     courses: [{type: Schema.Types.ObjectId, ref: 'Course', required: false}],
     teaching: [{type: Schema.Types.ObjectId, ref: 'Course', required: false}],
+    invited: [{type: Schema.Types.ObjectId, ref: 'Course', required: false}],
+    pending: [{type: Schema.Types.ObjectId, ref: 'Course', required: false}],
     providers: [{type: String, required: true}] //LTU, KTH etc.
 });
+userSchema.index({username: 'text', email: 'text'});
 
 //user code submissions
 var draftSchema = new Schema({
@@ -47,36 +51,37 @@ var draftSchema = new Schema({
 });
 
 var courseSchema = new Schema({
-    course_code: {type: String, required: true},
+    course_code: {type: String, required: false},
     name: {type: String, required: true},
     description: {type: String, required: false},
-    hidden: { type: Boolean, required: true },  //public or private course
+    hidden: {type: Boolean, required: true},  //public or private course
+    autojoin: {type: Boolean, default: false},
     teachers: [{ type: Schema.Types.ObjectId, ref: 'User', required: false }],
     students: [{ type: Schema.Types.ObjectId, ref: 'User', required: false }],
+    invited: [{type: Schema.Types.ObjectId, ref: 'User', required: false}],
+    pending: [{type: Schema.Types.ObjectId, ref: 'User', required: false}],
     assignments: [{ type: Schema.Types.ObjectId, ref: 'Assignment', required: false }],
     features: [{ type: Schema.Types.ObjectId, ref: 'Features', required: true }], //progress, badges etc.
     enabled_features: {
         badges: Boolean,
-        progress: Boolean
+        progressbar: Boolean,
+        leaderboard: Boolean,
+        adventuremap: Boolean
     }
 });
+courseSchema.index({course_code: 'text', name: 'text', description: 'text'}, {weights: {course_code: 10, name: 5, description: 1}});
 
 /*
 * Feature schemas
 */
 
-//a general gamification badge
-var badgeSchema = new Schema({
-    icon: {type: String, required: true},   //path to an icon image file
-    title: {type: String, required: true},
-    description: {type: String, required: true}
-});
-
 //a course-specific badge. Needs reference to a course, badge and goals that "unlocks" it.
-var courseBadgeSchema = new Schema({
+var badgeSchema = new Schema({
     course_id: { type: Schema.Types.ObjectId, ref: 'Course', required: true},
-    badge_id: { type: Schema.Types.ObjectId, ref: 'Badge', required: true},
-    //Goals that "unlocks" the badge. This can be other badge(s), assignment(s) etc.
+    icon: {type: String, required: true},   //name of an icon image file
+    title: {type: String, required: true},
+    description: {type: String, required: true},
+    //Goals that "unlocks" the badge. This can be other Badge(s), Assignment(s) etc.
     goals: {
         badges: [{ type: Schema.Types.ObjectId, ref: 'Badge', required: false}],
         assignments:
@@ -106,9 +111,8 @@ var User = mongoose.model('User', userSchema);
 var Draft = mongoose.model('Draft', draftSchema);
 var Course = mongoose.model('Course', courseSchema);
 var Badge = mongoose.model('Badge', badgeSchema);
-var CourseBadge = mongoose.model('CourseBadge', courseBadgeSchema);
 var Features = mongoose.model('Features', featuresSchema);
 var models = {Assignment: Assignment, Test: Test, User: User, Draft: Draft, Course: Course,
-    Badge: Badge, CourseBadge: CourseBadge, Features: Features};
+    Badge: Badge, Features: Features};
 
 module.exports = models;

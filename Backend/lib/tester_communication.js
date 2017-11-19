@@ -17,14 +17,12 @@ function validateCode(user_id, lang, code, assignment_id, res) {
 
         if(!tests.hasOwnProperty('tests') || tests.tests === undefined) {
             logger.error('Assignment', assignment_id, 'did not have tests object.');
-            res.sendStatus(500);
-            return;
+            return res.sendStatus(500);
         }
 
         if(!tests.tests.hasOwnProperty('io') || tests.tests.io === undefined) {
             logger.error('Assignment', assignment_id, 'did not have io list.');
-            res.sendStatus(500);
-            return;
+            return res.sendStatus(500);
         }
 
         tests.tests.io.forEach(function(test) {
@@ -43,7 +41,7 @@ function validateCode(user_id, lang, code, assignment_id, res) {
             }
         }
 
-        if(config.get('App.environment') != 'development') {
+        if(config.get('App.environment') === 'production') {
             throw new Error('Remove `rejectUnauthorized` for production in '+ module.filename);
         }
 
@@ -65,7 +63,7 @@ function validateCode(user_id, lang, code, assignment_id, res) {
                     logger.error('Tester returned', response.statusCode);
                 }
                 logger.error(error);
-                res.sendStatus(500);
+                res.sendStatus(response.statusCode);
             } else {
 
                 body.user_id = user_id;
@@ -87,10 +85,10 @@ function validateCode(user_id, lang, code, assignment_id, res) {
 function getTesterLanguages() {
     return new Promise(function (resolve, reject){
 
-        if(config.get('App.environment') != 'development') {
+        if(config.get('App.environment') === 'production') {
             throw new Error('Remove `rejectUnauthorized` for production in '+ module.filename);
         }
-        
+
         request({
             url: config.get('Tester.tester_url')+'/languages',
             method: 'GET',

@@ -1,11 +1,12 @@
 'use strict';
 var util = require('util');
 // This file defines enums for easy error handling
+var config = require('config');
 
 function APIError(message, httpCode, errorCode) {
     this.name = this.constructor.name;
     this.message = message;
-    this. httpCode = httpCode;
+    this.httpCode = httpCode;
     this.errorCode = errorCode;
 
     //include stack trace in error object
@@ -32,7 +33,10 @@ module.exports = {
     INSUFFICIENT_PERMISSION: new APIError("You don't have the required permissions for these fields.", 403, 7015),
     DRAFT_NOT_SAVED: new APIError("Draft not saved", 500, 7016),
     BADGE_DO_NOT_EXIST: new APIError("Badge doesn't exist", 404, 7017),
-    COURSEBADGE_DO_NOT_EXIST: new APIError("Course doesn't exist", 404, 7018),
+    // 7018
     FEATURE_DO_NOT_EXIST: new APIError("Course doesn't exist", 404, 7019),
-    TEST_NOT_CREATED: new APIError("Assignment not created", 500, 7020)
+    TEST_NOT_CREATED: new APIError("Assignment not created", 500, 7020),
+    BAD_QUERY_STRUCTURE: new APIError('Bad input. Expected: "?query=XYZ"', 400, 7021),
+    TOO_SHORT_QUERY: new APIError('Bad input. Expected query with length atleast 3', 400, 7022),
+    USER_ALREADY_IN_COURSE: new APIError('User is already a member of this course', 400, 7023)
 };
