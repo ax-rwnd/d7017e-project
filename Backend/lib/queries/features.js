@@ -9,7 +9,7 @@ var Badge = require('../../models/schemas').Badge;
 var Features = require('../../models/schemas').Features;
 var CourseBadge = require('../../models/schemas').CourseBadge;
 var errors = require('../errors.js');
-var logger = require('../../logger.js');
+var logger = require('../logger.js');
 
 function createBadge(data) {
     let badge = new Badge(data);

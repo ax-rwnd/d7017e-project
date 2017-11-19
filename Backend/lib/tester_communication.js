@@ -6,7 +6,7 @@ var request = require('request');
 var queries = require('../lib/queries/queries');
 var queries_features = require('../lib/queries/features');
 var features = require('../features/features');
-var logger = require('../logger');
+var logger = require('./logger');
 var config = require('config');
 
 //Retrieve tests from db and send them to Tester with the format accepted by Tester.

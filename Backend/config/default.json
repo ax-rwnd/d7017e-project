@@ -34,6 +34,12 @@
             "name": "error",
             "level": "error",
             "json": false
+        },
+        "serverError":{ //Log settings for logging ONLY error logs in a errors.log file
+            "filename": "serverErrors.log",
+            "name": "serverError",
+            "level": "serverError",
+            "json": false
         }
     }
 }

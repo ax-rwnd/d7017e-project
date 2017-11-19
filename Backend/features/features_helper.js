@@ -2,7 +2,7 @@
 
 var mongoose = require('mongoose'); //Database communication
 var queries = require('../lib/queries/features');
-var logger = require('../logger');
+var logger = require('../lib/logger');
 
 //see if all mandatory tests are passed
 function passAllMandatoryTests(data) {

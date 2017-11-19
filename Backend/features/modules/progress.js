@@ -2,7 +2,7 @@
 
 var queries = require('../../lib/queries/features');
 var helper = require('../features_helper');
-var logger = require('../../logger');
+var logger = require('../../lib/logger');
 
 function init(emitter, name) {
     emitter.on('handleFeatures', function(data) {

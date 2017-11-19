@@ -8,9 +8,8 @@ var passport = require('passport'); //authentication
 var expressHbs = require('express-handlebars');
 var cors = require('cors');
 var config = require('config');
-var logger = require('./logger'); //Use Logger
+var logger = require('./lib/logger'); //Use Logger
 var errors = require('./lib/errors.js');
-var morgan = require('morgan');
 var fs = require('fs');
 var crypto = require('crypto');
 
@@ -35,7 +34,8 @@ config.App.environment = app.get('env');
 
 initApp();
 
-app.use(morgan('dev'));
+
+//app.use(logger.initializeMorgan()); //Initialize morgan with logger
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
     extended: true
@@ -107,7 +107,8 @@ app.use(function (err, req, res, next) {
 // Function to initiate the app/server into development- or production mode. (depends on NODE_ENV)
 function initApp() {
     let dbConfig = config.get('Mongo.dbConfig'); //Get mongo database config
-    console.log("Server running in " + app.get('env') + " mode.");
+    logger.initializeLogger(app);
+    logger.log("info","Server running in " + app.get('env') + " mode.");
     mongoose.connect(dbConfig.host+":"+dbConfig.port+'/'+dbConfig.database_name, { useMongoClient: true }); // Connect to development- or production database);
 }
 
