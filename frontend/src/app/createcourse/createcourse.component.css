@@ -11,9 +11,14 @@
   overflow: scroll;
 }
 
-label {
+.label-norm {
   font-weight: normal;
   font-size: medium;
+}
+
+.label-bold {
+  font-size: medium;
+  font-weight: bold;
 }
 
 .preview {
@@ -29,18 +34,33 @@ label {
   overflow: scroll;
 }
 
+.glyphicon {
+  font-size: 1.1em;
+}
+
+.question {
+  margin-left: -0.5em;
+  border: none;
+  background-color: transparent;
+  color: #133756;
+}
+
 .set-checkbox-margin {
   margin-top: 5%;
   margin-left: -2em;
 }
 
 .set-margin {
-  margin-top: 38em;
+  margin-top: 2em;
   margin-bottom: 5%;
-  margin-left: 2%;
 }
 
 .required {
   color: red;
   font-size: medium;
+}
+
+.user-list {
+  margin-bottom: 10px;
+  background-color: rgba(29,117,175,0.27);
 }
