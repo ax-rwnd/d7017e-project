@@ -53,7 +53,6 @@ const FIELDS = {
 
 //get all tests related to a specific assignment.
 function getTestsFromAssignment(assignmentID, callback) {
-    console.log(assignmentID);
     Assignment.findById(assignmentID)
     .populate({
         path: 'tests.io',
@@ -62,6 +61,10 @@ function getTestsFromAssignment(assignmentID, callback) {
         path: 'optional_tests.io',
         model: 'Test'
     }).lean().exec(function (err, assignmentObject) {
+        /*if (!assignmentObject) {
+            console.log("assignment not found!")
+            throw errors.ASSIGNMENT_DOES_NOT_EXIST;
+        } */    //THIS ERROR NEEDS TO BE THROWN AND HANDLED
         let json = {};
         json.tests = assignmentObject.tests;
         json.optional_tests = assignmentObject.optional_tests;
