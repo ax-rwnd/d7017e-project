@@ -121,7 +121,7 @@ function deleteUser(id) {
 }
 
 function setRefreshToken(userObject, token) {
-    // Iterate through refresh token array and expired tokens
+    // Iterate through refresh token array and remove expired tokens
     var i = userObject.tokens.length;
     while (i--) {
         jwt.verify(userObject.tokens[i], config.get('App.secret'), function(err, payload) {

@@ -14,7 +14,6 @@ var auth = require('../lib/authentication.js');
 
 var errors = require('../lib/errors.js');
 var jwt = require('jsonwebtoken');
-var parseXml = require('xml2js').parseString;
 var https = require('https');
 var config = require('config');
 
@@ -69,7 +68,7 @@ module.exports = function (router) {
         var ticket = req.query.ticket;
         var service = req.query.service;
 
-        var url = config.get('Auth.cas_url') + 'serviceValidate?service=' + service + '&ticket=' + ticket;
+        var url = config.get('Auth.cas_url') + 'serviceValidate?service=' + service + '&ticket=' + ticket + '&format=json';
 
         var requ = https.get(url, function (resu) {
             var output = '';
@@ -79,43 +78,40 @@ module.exports = function (router) {
             });
 
             resu.on('end', function() {
-                parseXml(output, function (err, result){
-                    // Parse the CAS XML response
-                    var success = result['cas:serviceResponse']['cas:authenticationSuccess'];
+                var result = JSON.parse(output);
+                var profile = result.serviceResponse.authenticationSuccess;
+                if (profile) {
+                    // Extract the username and email
+                    var user = {username: profile.user, email: profile.attributes.mail};
+                    console.log(user);
 
-                    if (success) {
-                        // Extract the username from the XML parse
-                        var user = {username: success[0]['cas:user'][0]};
-                        //var user.username = success[0]['cas:user'][0];
-
-                        console.log("Hitta eller gör användare");
-                        queries.findOrCreateUser(user).then(function (userObject) {
-                            console.log("User found");
-                            var refToken = create_refresh_token(userObject._id);
-                            console.log(refToken);
-                            queries.setRefreshToken(userObject, refToken);
-                            console.log("Efter Ref token save");
-                            res.json({
-                                access_token: create_access_token(userObject._id, userObject.admin),
-                                access_expires_in: config.get('Auth.access_ttl'),
-                                refresh_token: refToken,
-                                refresh_expires_in: config.get('Auth.refresh_ttl'),
-                                token_type: config.get('Auth.auth_header_prefix')
-                            });
-                        })
-                        .catch(function (err) {
-                            console.log("Error");
-                            next(err);
+                    console.log("Hitta eller gör användare");
+                    queries.findOrCreateUser(user).then(function (userObject) {
+                        console.log("User found");
+                        var refToken = create_refresh_token(userObject._id);
+                        console.log(refToken);
+                        queries.setRefreshToken(userObject, refToken);
+                        console.log("Efter Ref token save");
+                        res.json({
+                            access_token: create_access_token(userObject._id, userObject.admin),
+                            access_expires_in: config.get('Auth.access_ttl'),
+                            refresh_token: refToken,
+                            refresh_expires_in: config.get('Auth.refresh_ttl'),
+                            token_type: config.get('Auth.auth_header_prefix')
                         });
+                    })
+                    .catch(function (err) {
+                        console.log("Error");
+                        next(err);
+                    });
 
-                    } else {
-                        // Extract the error code from the XML parse
-                        var error = result['cas:serviceResponse']['cas:authenticationFailure'][0].$.code;
-                        console.log(error);
-                        next(error);
-                        //res.json({error: error});
-                    }
-                });
+                } else {
+                    // Extract the error code
+                    var error = result.serviceResponse.authenticationFailure.code;
+                    console.log(error);
+                    next(error);
+                    //res.json({error: error});
+                }
             });
         });
     });
