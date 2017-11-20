@@ -104,6 +104,17 @@ export class CourseService {
       }
     }
   }
+  UpdateCourse(courseId) {
+    // Fetches the course with the given id from backend and replace the current version
+    // Returns a promise
+
+    const promise = new Promise((resolve, reject) => {
+      updateCourseFeatures(courseId, this.backendService, this)
+        .then(resolve)
+        .catch(reject);
+    });
+    return promise;
+  }
   GetProgress(courseId) {
     // Returns progress for a course
     const course = this.GetCourse(courseId);
@@ -140,6 +151,40 @@ function updateCourses(response, backendService, courseService, assignmentServic
   return Promise.all(promiseArray);
 }
 
+function updateCourseFeatures(courseId, backendService, courseService) {
+  // Updates the features of the given course
+  // Returns a promise
+
+  const index = getCourseIndex(courseId, courseService);
+  const currentCourse = courseService.GetCourse(courseId);
+  return backendService.getFeaturesCourseMe(courseId)
+    .then(featureResponse => {
+      const rewards = handleFeatureResponse(featureResponse);
+      const progress = newProgress(featureResponse.total_assignments, featureResponse.completed_assignments);
+      const course = newCourse(currentCourse.id, currentCourse.name, currentCourse.code,
+        currentCourse.course_info, rewards, progress);
+      courseService.courses[index] = course;
+    })
+    .catch( err => {
+      const rewards = newRewards(false, false, false, false);
+      const progress = newProgress(0, 0);
+      const course = newCourse(currentCourse.id, currentCourse.name, currentCourse.code,
+        currentCourse.course_info, rewards, progress);
+      courseService.courses[index] = course;
+    });
+}
+
+function getCourseIndex(courseId, courseService) {
+  // Returns the index of the given course
+  let i;
+  for (i = 0; i < courseService.courses.length; i++) {
+    if (courseService.courses[i].id === courseId) {
+      return i;
+    }
+  }
+  return 0;
+}
+
 function handleFeatureResponse(response: any) {
   let progress;
   const score = false;
@@ -152,7 +197,6 @@ function handleFeatureResponse(response: any) {
   }
   if (response.badges !== undefined) {
     badges = [];
-    console.log(response.badges);
     for (let i = 0; i < response.badges.length; i++) {
       if (response.badges[i] === '59ff02b9d86066321c71afce') {
         badges[badges.length] = 'bronze_medal_badge';
