@@ -15,42 +15,37 @@
         <h2>Latest</h2>
         <!-- The head panel -->
         <div class="gamification-block shadow panel panel-default" *ngFor="let course of courses">
+
           <div class="panel-heading gamification-header">
             <!-- Course panel title -->
             <div [routerLink]="['/courses', course.id]" class="pointer"><h4>{{course.code}} - {{course.name}}</h4></div>
           </div>
+
           <!-- 'Main' body panel -->
           <div class="panel-body">
-            <div *ngIf="course.rewards.badges != false" class="col-md-3" style="padding-left: 2em;">
-              <!-- Panel for badge start -->
-              <div class="gamification-block panel panel-default">
-                <div class="panel-heading gamification-header">
-                  Badge
-                </div>
-                <div class="panel-body">
-                  <img class="img-center" src="../../assets/images/{{course.rewards.badges[course.rewards.badges.length - 1]}}.png">
-                </div>
-              </div>
-              <!-- Panel for badge end -->
-            </div>
             <div class="col-md-5">
+              <app-mod-badges-single [courseCode]="course.id"></app-mod-badges-single>
               <app-mod-progressbar [courseCode]="course.id"></app-mod-progressbar>
+
               <!-- Assignment panel start -->
               <div class="gamification-block panel panel-default">
                 <div class="panel-heading gamification-header">
                   Current Assignment
                 </div>
+
                 <div class="panel-body">
                   <div class="assignment">Assignment 1</div>
                 </div>
               </div>
-              <!-- Assignment panel start -->
+              <!-- Assignment panel end -->
+
             </div>
             <!-- column for progress and assignment end -->
+
             <div class="col-md-4">
-              <!-- TODO: app-mod-leaderboard should be subclassed for this view -->
-              <app-mod-leaderboard [courseCode]="course.id"></app-mod-leaderboard> <!-- this should be related to the assignment, so should probably have some kind of input -->
+              <app-mod-leaderboard [courseCode]="course.id"></app-mod-leaderboard>
             </div>
+
           </div>
         </div>
       </div>
