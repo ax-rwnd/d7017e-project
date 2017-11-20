@@ -21,7 +21,7 @@ module.exports = function(router) {
     router.get('/', function (req, res, next) {
         var ids = req.query.ids;
 
-        var filter = (req.user.admin === true)
+        var filter = (req.user.access === "admin")
             ? ADMIN_FILTER
             : BASIC_FILTER;
 
@@ -105,7 +105,7 @@ module.exports = function(router) {
         queries.getUser(req.user.id, "teaching").then(function (userObject) {
             if (userObject.teaching.indexOf(course_id) !== -1) {
                 roll = "teacher";
-            } else if (req.user.admin) {
+            } else if (req.user.access === "admin") {
                 roll = "admin";
             } else {
                 roll = "student";
@@ -152,7 +152,7 @@ module.exports = function(router) {
         queries.getUser(req.user.id, "teaching")
         .then(function (userObject) {
             // admins and teachers can invite students
-            if (req.user.admin || userObject.teaching.indexOf(course_id) !== -1) {
+            if (req.user.access === "admin" || userObject.teaching.indexOf(course_id) !== -1) {
                 return queries.addCourseStudent(course_id, student_id);
             } else {
                 // TODO: use a better error
@@ -604,7 +604,7 @@ module.exports = function(router) {
         queries.getUser(req.user.id, "teaching").then(function (userObject) {
             if (userObject.teaching.indexOf(course_id) !== -1) {
                 roll = "teacher";
-            } else if (req.user.admin) {
+            } else if (req.user.access === "admin") {
                 roll = "admin";
             } else {
                 roll = "student";

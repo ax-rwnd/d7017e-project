@@ -173,9 +173,10 @@ function findOrCreateUser(profile) {
     var username = profile.username;
     var email = profile.email || "";
     var admin = profile.admin || false;
+    var access = profile.access || "basic";
     return User.findOne({username: username}).then(function (user) {
         if (!user) {
-            var newUser = new User({username: username, email: email, admin: admin, courses: [], tokens: []});
+            var newUser = new User({username: username, email: email, admin: admin, access: access, courses: [], tokens: []});
             return newUser.save().then(function (createdUser) {
                 if (!createdUser) {
                     console.log("Error: User not created");
