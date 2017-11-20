@@ -1,8 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit, ViewChild, TemplateRef} from '@angular/core';
 import { trigger, state, style, animate, transition } from '@angular/animations';
 import { HeadService } from '../services/head.service';
 import {FormGroup, FormControl, Validators } from '@angular/forms';
 import {BackendService} from '../services/backend.service';
+import { BsModalService } from 'ngx-bootstrap/modal';
+import { BsModalRef } from 'ngx-bootstrap/modal/modal-options.class';
 
 @Component({
   selector: 'app-createcourse',
@@ -21,47 +23,114 @@ import {BackendService} from '../services/backend.service';
 export class CreatecourseComponent implements OnInit {
   sidebarState: any;
   content: string;
-  body: any;
   form: FormGroup;
   errorMessage: string;
+  name: any;
+  students: any[];
+  modalRef: BsModalRef;
+  badgesDesc = 'The student will receive badges for completing assignments or tasks.';
+  progDesc = 'The student will be able to see progress depending on how many assignments have been completed.';
+  advmapDesc = 'The student will have an adventure map there different paths can be unlocked by completing assignments or tasks.'; //
+  leadbDesc = 'The course will have a leaderboard that shows scores for each students in the course.';
 
-  constructor(private headService: HeadService, private backendService: BackendService) {
+  @ViewChild('inviteStudentModal') inviteModal: TemplateRef<any>;
+
+  constructor(private headService: HeadService, private backendService: BackendService, private modalService: BsModalService) {
     this.headService.stateChange.subscribe(sidebarState => { this.sidebarState = sidebarState; }); // subscribe to the state value head provides
   }
-
+  // for the hypertext
   onChange(c) {
     this.content = c;
   }
 
-  submitCourse() {
+  findCourseCode(event: KeyboardEvent) { // might be used to check if course-code already exist
+    // if (e.which <= 90 && e.which >= 48)
+    // a/A : 65, z/Z: 90, å/Å:221, ä/Ä: 222, ö/Ö:192
+    //  || (event.which === 90 || event.which === 221 || event.which === 192
+    if ((<HTMLInputElement>event.target).value.length > 5 && (event.which >= 65 && event.which <= 90)) { // start search first when entire code is written
+      this.backendService.getSearch((<HTMLInputElement>event.target).value)
+        .then(
+          result => {
+            console.log(result);
+            displayStudents(result['courses']); // array of possible results
+          })
+        .catch(err => console.error('Something went wrong with getSearch', err));
+    }
+  }
+
+  findStudent() {
+    const search = this.form.value.search;
+    // check so length is at least 3
+    if (search.length > 2) {
+      this.backendService.getSearch(search)
+        .then(
+          result => {
+            console.log(result);
+            this.students = result['users'];
+            //displayStudents(result['users']); // array of possible results
+          })
+        .catch(err => console.error('Something went wrong with getSearch', err));
+    }
+  }
+
+  submitCourse() { // checka course code
     // First check so no required fields are empty
     if ( this.form.value.name === '' || this.content === '' ) { // Since desc can't be in the form-group defined own required message
       this.errorMessage = '* Please fill in all required fields';
       window.scrollTo({ left: 0, top: 0, behavior: 'smooth' }); // go to top of page smoothly if error occur
     } else {
-      const enabled_features = {'badges': this.form.value.badges, 'progress': this.form.value.progress};
-      const courseID = this.backendService.postNewCourse(this.form.value.name, this.content, !this.form.value.hidden, this.form.value.code, enabled_features);
-      console.log('Post course, got back:', courseID);
+      this.errorMessage = '';
+      // badges, progressbar, leaderboard, adventuremap
+      const enabled_features: Object = {'progressbar': this.form.value.progress, 'badges': this.form.value.badges,
+      'leaderboard': this.form.value.leaderboard, 'adventuremap': this.form.value.map};
+      this.backendService.postNewCourse(this.form.value.name, this.content, !this.form.value.nothidden, this.form.value.code, enabled_features)
+        .then( response => {
+          // add course to list of own courses
+          // after that go to modal inviting students
+          // after that, go to the home page maybe?
+          console.log('Post course, got back id:', response['_id']);
+          const courseId = response['_id'];
+          //this.form = createSearchForm(); // for invites, not yet implemented
+          //this.openModal(this.inviteModal);
+        })
+        .catch(err => console.error('Something went when creating the course:', err));
     }
   }
-
+  openModal(modal) {
+    this.modalRef = this.modalService.show(modal);
+  }
+  invite(id) {
+    console.log(id);
+  }
   ngOnInit() {
     this.sidebarState = this.headService.getCurrentState();
-    this.form = createForm();
+    this.form = createCourseForm();
     this.content = '';
-    this.body = '{}';
     this.errorMessage = '';
+    this.students = []; // should be empty list
   }
 }
 
-function createForm() {
+function createSearchForm() {
+  return new FormGroup({
+    search: new FormControl('')
+  });
+}
+
+function createCourseForm() {
   return new FormGroup({
     name: new FormControl('', Validators.required),
     code: new FormControl(''),
     progress: new FormControl(false),
     badges: new FormControl(false),
-    map: new FormControl({value: false, disabled: true}), // temporary disabled, not implemented in database yet?
-    leaderboard: new FormControl({value: false, disabled: true}), // temporary disabled, not implemented in database yet?
-    hidden: new FormControl(true), // will by default be set true
+    map: new FormControl(false),
+    leaderboard: new FormControl(false),
+    nothidden: new FormControl(true), // will by default be set to public
   });
+}
+
+function displayStudents(result) {
+  for (let i = 0; i < result.length; i++) {
+    console.log('Found user:', result[i].username);
+  }
 }
