@@ -50,7 +50,7 @@ export class BackendService {
 
     return this.http.post(environment.backend_ip + endpoint, body, {responseType: 'text'})
                 .toPromise()
-                .then(response => JSON.parse(response as string))
+                .then(response => response)
                 .catch(err => console.error('API Post failed in ' + endpoint + ' error ', err));
   }
 
@@ -194,6 +194,24 @@ export class BackendService {
     // name, description, hidden, course_code, enabled_features
     const body = {'name': name, 'description': desc, 'hidden': hidden, 'course_code': course_code, 'enabled_features': en_feat};
     return this.apiPost('/api/courses', body);
+  }
+
+  inviteStudentToCourse(course_id: ObjectID, student_id: ObjectID) {
+    const body = {'student_id': student_id};
+    return this.apiPost('/api/courses/' + course_id + '/students/invite', body);
+  }
+
+  requestJoinCourse(course_id: ObjectID, student_id: ObjectID) {
+    const body = {'student_id': student_id};
+    return this.apiPost('/api/courses/' + course_id + '/students/pending', body);
+  }
+
+  getMyInvites() {
+    return this.apiGet('/api/users/courses/invite');
+  }
+
+  getPendingUsers(course_id) {
+    return this.apiGet('/api/courses/' + course_id + '/students/pending');
   }
 
   login(ticket: string, service: string) {

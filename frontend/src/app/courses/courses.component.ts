@@ -51,16 +51,20 @@ export class CoursesComponent implements OnInit {
       } else {
         this.assignmentGroups = this.assignmentService.courseAssignments['default'];
       }
+      this.backendService.getPendingUsers(this.currentCourse.id)
+        .then(response => console.log('pending', response));
     });
   }
 
   ngOnInit() {
     this.sidebarState = this.headService.getCurrentState();
-    console.log('code', this.currentCourse.code);
+    console.log('course', this.currentCourse);
     console.log('assignmentGroup', this.assignmentService.courseAssignments[this.currentCourse.id]);
     console.log('all assignmentGroups', this.assignmentService.courseAssignments);
-    this.possibleStudents = [{name: 'asdfgh-3', id: '0'}, {name: 'qwerty-2', id: '1'}];
+    this.possibleStudents = [];
+    // this.possibleStudents = [{name: 'asdfgh-3', id: '0'}, {name: 'qwerty-2', id: '1'}];
     this.form = this.fb.group(this.defaultForm);
+
     /*if (this.assignmentService.courseAssignments[this.currentCourse.code] !== undefined) {
       this.assignmentGroups = this.assignmentService.courseAssignments[this.currentCourse.code];
     } else {
@@ -82,8 +86,10 @@ export class CoursesComponent implements OnInit {
   openModal(modal) {
     this.modalRef = this.modalService.show(modal);
   }
-  invite(id) {
-    console.log(id);
+  invite(student_id) {
+    console.log(student_id);
+    this.backendService.inviteStudentToCourse(this.currentCourse.id, student_id)
+      .then(response => console.log(response));
   }
   search() {
     console.log(this.form.value.search);

@@ -122,7 +122,7 @@ export class CreateassignmentComponent implements OnInit {
     const that = this;
     this.backendService.createAssignment(this.courseId, this.assignmentName, this.content, this.languages)
       .then(function (response){
-        const assignmentId = response;
+        const assignmentId = JSON.parse(response as string);
         console.log('assignmentId', assignmentId._id);
         for (const test in that.unitTests) {
           that.backendService.createTest(that.courseId, that.unitTests, assignmentId._id);

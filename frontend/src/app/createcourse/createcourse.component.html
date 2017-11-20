@@ -5,36 +5,42 @@
       <div class="row">
         <div class="col-md-6">
           <div class="form-group">
-            <label for="code" >Course code</label>
-            <input type="text" class="form-control" id="code" formControlName="code" placeholder="Ex D0009E" ngModel>
+            <label class="label-norm" for="code">Course code</label>
+            <!-- (keyup)="findCourseCode($event)" -->
+            <input type="text"  class="form-control" id="code" formControlName="code" placeholder="Ex D0009E" ngModel>
           </div>
         </div>
         <div class="col-md-6">
           <div class="form-group">
-            <label for="name">Course name</label> <span class="required">*</span>
+            <label class="label-norm" for="name">Course name</label> <span class="required">*</span>
             <input type="text" class="form-control" id="name" formControlName="name" placeholder="Ex Introduktion till programmering" ngModel>
           </div>
         </div>
       </div>
       <div class="form-group">
-        <label for="features">Features</label>
+        <label class="label-bold" for="features">Features</label>
         <div id="features" class="form-check">
-          <label class="form-check-label">
+          <label class="label-norm form-check-label">
             <input class="form-check-input" formControlName="badges" type="checkbox"> Badges
+            <button type="button" class="question" tooltip="{{badgesDesc}}"><span class="glyphicon glyphicon-question-sign"></span></button>
           </label>
-          <label class="form-check-label">
-            <span style="display:inline-block; width: 0.5em;"></span> <input class="form-check-input" formControlName="progress" type="checkbox"> Progressbar
+          <label class="label-norm form-check-label">
+            <span style="display:inline-block; width: 0.5em;"></span> <input class="form-checabelbelbelbel-input" formControlName="progress" type="checkbox"> Progressbar
+            <button type="button" class="question" tooltip="{{progDesc}}">
+              <span class="glyphicon glyphicon-question-sign"></span></button>
           </label>
-          <label class="form-check-label">
+          <label class="label-norm form-check-label">
             <span style="display:inline-block; width: 0.5em;"></span> <input class="form-check-input" formControlName="map" type="checkbox"> Adventure map
+            <button type="button" class="question" tooltip="{{advmapDesc}}"><span class="glyphicon glyphicon-question-sign"></span></button>
           </label>
-          <label class="form-check-label">
+          <label class="label-norm form-check-label">
             <span style="display:inline-block; width: 0.5em;"></span> <input class="form-check-input" formControlName="leaderboard" type="checkbox"> Leaderboard
+            <button type="button" class="question" tooltip="{{leadbDesc}}"><span class="glyphicon glyphicon-question-sign"></span></button>
           </label>
         </div>
       </div>
       <div class="form-group">
-        <label for="desc">Course description</label> <span class="required">*</span>
+        <label class="label-norm" for="desc">Course description</label> <span class="required">*</span>
         <div id="desc">
           <tabset>
             <tab heading="Write" id="tab1">
@@ -56,11 +62,42 @@
         </div>
         <div class="col-md-2">
           <div class="form-check set-checkbox-margin">
-            <label class="form-check-label">
-              <input class="form-check-input" formControlName="hidden" type="checkbox"> Make public
+            <label class="label-norm form-check-label">
+              <input class="form-check-input" formControlName="nothidden" type="checkbox"> Make public
             </label>
           </div>
         </div>
       </div>
     </form>
 </div>
+
+<ng-template #inviteStudentModal>
+  <div class="modal-header">
+    <h4 class="modal-title pull-left">Invite students</h4>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <form (ngSubmit)="findStudent()" [formGroup]="form" novalidate>
+      <div class="form-group">
+        <label for="search">Search term</label>
+        <input type="text" class="form-control" id="search" formControlName="search" ngModel required>
+      </div>
+      <button class="btn" type="submit">Search</button>
+    </form>
+  </div>
+  <div class="modal-body">
+    <div class="well-sm user-list" *ngFor="let student of students">
+      <div class="row">
+        <div class="col-md-10">
+          <h4>{{student.username}}</h4>
+        </div>
+        <div class="col-md-2"> <button class="btn" (click)="invite(student._id)">Invite</button> </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+  </div>
+</ng-template>
+
