@@ -59,7 +59,10 @@ export class UserComponent implements OnInit {
     this.user = this.userService.userInfo;
     this.statistics = false;
     this.form = this.fb.group(this.defaultForm);
-    this.possibleCourses = [{name: 'course 1', id: '0'}, {name: 'course 2', id: '1'}];
+    this.possibleCourses = [];
+    this.backendService.getMyInvites()
+      .then(response => console.log(response));
+    // this.possibleCourses = [{name: 'course 1', id: '0'}, {name: 'course 2', id: '1'}];
   }
   toggleStatistics() {
     this.statistics = !this.statistics;
@@ -75,9 +78,27 @@ export class UserComponent implements OnInit {
   }
   searchCourse() {
     console.log(this.form.value);
+    this.possibleCourses = [];
+    this.backendService.getSearch(this.form.value.search)
+      .then(response => {
+        console.log('response', response);
+        const courses = response['courses'];
+        for (let i = 0; i < courses.length; i++) {
+          console.log(courses[i]);
+          let name = '';
+          if (courses[i]['course_code'] !== undefined) {
+            name = courses[i]['course_code'];
+          } else {
+            name = courses[i]['name'];
+          }
+          this.possibleCourses[i] = {name: name, id: courses[i]['_id']};
+        }
+      });
   }
-  join(id) {
-    console.log(id);
+  join(course_id) {
+    console.log(course_id);
+    this.backendService.requestJoinCourse(course_id, new ObjectID(this.userService.userInfo.id))
+      .then(response => console.log(response));
   }
 
   getMe() {
