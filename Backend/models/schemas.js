@@ -36,8 +36,6 @@ var userSchema = new Schema({
     tokens: [{type: String, required: false}],
     courses: [{type: Schema.Types.ObjectId, ref: 'Course', required: false}],
     teaching: [{type: Schema.Types.ObjectId, ref: 'Course', required: false}],
-    invited: [{type: Schema.Types.ObjectId, ref: 'Course', required: false}],
-    pending: [{type: Schema.Types.ObjectId, ref: 'Course', required: false}],
     providers: [{type: String, required: true}] //LTU, KTH etc.
 });
 userSchema.index({username: 'text', email: 'text'});
@@ -50,6 +48,12 @@ var draftSchema = new Schema({
     lang: { type: String, required: false }
 });
 
+var joinRequests = new Schema({
+    inviteType: {type: String, required: true},
+    user: {type: Schema.Types.ObjectId, ref: 'User', required: true},
+    course: {type: Schema.Types.ObjectId, ref: 'Course', required: true}
+});
+
 var courseSchema = new Schema({
     course_code: {type: String, required: false},
     name: {type: String, required: true},
@@ -58,8 +62,6 @@ var courseSchema = new Schema({
     autojoin: {type: Boolean, default: false},
     teachers: [{ type: Schema.Types.ObjectId, ref: 'User', required: false }],
     students: [{ type: Schema.Types.ObjectId, ref: 'User', required: false }],
-    invited: [{type: Schema.Types.ObjectId, ref: 'User', required: false}],
-    pending: [{type: Schema.Types.ObjectId, ref: 'User', required: false}],
     assignments: [{ type: Schema.Types.ObjectId, ref: 'Assignment', required: false }],
     features: [{ type: Schema.Types.ObjectId, ref: 'Features', required: true }], //progress, badges etc.
     enabled_features: {
@@ -109,10 +111,11 @@ var Assignment = mongoose.model('Assignment', assignmentSchema);
 var Test = mongoose.model('Test', testSchema);
 var User = mongoose.model('User', userSchema);
 var Draft = mongoose.model('Draft', draftSchema);
+var JoinRequests = mongoose.model('JoinRequests', joinRequests);
 var Course = mongoose.model('Course', courseSchema);
 var Badge = mongoose.model('Badge', badgeSchema);
 var Features = mongoose.model('Features', featuresSchema);
-var models = {Assignment: Assignment, Test: Test, User: User, Draft: Draft, Course: Course,
+var models = {Assignment: Assignment, Test: Test, User: User, Draft: Draft, JoinRequests: JoinRequests, Course: Course,
     Badge: Badge, Features: Features};
 
 module.exports = models;
