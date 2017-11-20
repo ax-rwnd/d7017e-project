@@ -33,6 +33,7 @@ var userSchema = new Schema({
 	username: {type: String, required: true},
     email: {type: String, required: false},
     admin: {type: Boolean, required: true},
+    access: {type: String, enum: ['admin', 'advanced', 'basic'], required: false}, //change to required: true later
     tokens: [{type: String, required: false}],
     courses: [{type: Schema.Types.ObjectId, ref: 'Course', required: false}],
     teaching: [{type: Schema.Types.ObjectId, ref: 'Course', required: false}],

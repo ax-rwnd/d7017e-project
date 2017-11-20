@@ -9,7 +9,7 @@
     },
     // APP config module
     "App": {
-        "title": "d7017e-backend",
+        "title": "d7017e-backend-default",
         "port": 18000
     },
     // Auth config module

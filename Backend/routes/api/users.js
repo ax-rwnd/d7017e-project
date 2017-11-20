@@ -20,7 +20,7 @@ module.exports = function (router) {
         }
 
         var id_array = ids.split(',');
-        var filter = (req.user.admin === true)
+        var filter = (req.user.access === "admin")
             ? ADMIN_FILTER
             : BASIC_FILTER;
 
@@ -44,7 +44,7 @@ module.exports = function (router) {
 
     router.get('/:user_id', function (req, res, next) {
         var user_id = req.params.user_id;
-        var filter = (req.user.admin === true)
+        var filter = (req.user.access === "admin")
             ? ADMIN_FILTER
             : BASIC_FILTER;
 
@@ -58,8 +58,8 @@ module.exports = function (router) {
 
     router.delete('/:user_id', function (req, res, next) {
         var user_id = req.params.user_id;
-        console.log(req.user.admin);
-        if (req.user.admin === true){
+        console.log(req.user.access);
+        if (req.user.access === "admin"){
             queries.deleteUser(user_id).then(function (err) {
                 if (err) {
                     next(err);
