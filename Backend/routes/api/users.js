@@ -1,6 +1,7 @@
 'use strict';
 
 var request = require('request');
+var mongoose = require('mongoose');
 var queries = require('../../lib/queries/queries');
 var errors = require('../../lib/errors.js');
 var auth = require('../../lib/authentication.js');
@@ -92,6 +93,80 @@ module.exports = function (router) {
     router.post('/:user_id/courses', function (req, res, next) {
         var user_id = req.params.user_id;
         res.send("/users/" + user_id + "/courses POST Endpoint");
+    });
+
+
+    // TODO
+    // Documentation
+    // TESTS
+    //
+    // User can get all invites he currently got to courses.
+    router.get('/courses/invite', function (req, res, next) {
+        queries.getUserInvites(req.user.id, "invite")
+        .then(function (userInvites) {
+            return res.json(userInvites);
+        })
+        .catch(function (error) {
+            return next(error);
+        });
+    });
+
+    // TODO
+    // Documentation
+    // TESTS
+    //
+    // User can get all courses he's asked to join.
+    router.get('/courses/pending', function (req, res, next) {
+        queries.getUserInvites(req.user.id, "pending")
+        .then(function (userInvites) {
+            return res.json(userInvites);
+        })
+        .catch(function (error) {
+            return next(error);
+        });
+    });
+
+    // TODO
+    // Documentation
+    // TESTS
+    //
+    // User can get his status to :course_id.
+    // Status can be teacher, student, invited, pending or nothing.
+    router.get('/courses/:course_id/status', function (req, res, next) {
+        var course_id = req.params.course_id;
+
+        if (!mongoose.Types.ObjectId.isValid(course_id)) {
+            return next(errors.BAD_INPUT);
+        }
+
+        queries.getUser(req.user.id, "teaching courses")
+        .then(function (userObject) {
+            if (userObject.teaching.indexOf(course_id) !== -1) {
+                return "Teacher";
+            }
+            if (userObject.courses.indexOf(course_id) !== -1) {
+                return "Student";
+            }
+            return queries.getInvitesCourseUser(req.user.id, course_id)
+            .then(function (userInvites) {
+                if (userInvites.length === 2) {
+                    return "Invited";
+                }
+                if (userInvites.length === 1) {
+                    if (userInvites[0].inviteType === "invite") {
+                        return "Invited";
+                    }
+                    return "Pending";
+                }
+                return "Nothing";
+            });
+        })
+        .then(function (status) {
+            return res.json({status: status});
+        })
+        .catch(function (error) {
+            return next(error);
+        });
     });
 
     router.get('/:user_id/courses/:course_id/submissions', function (req, res, next) {

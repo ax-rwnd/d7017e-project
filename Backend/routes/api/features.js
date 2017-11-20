@@ -4,7 +4,7 @@ var request = require('request');
 var features = require('../../lib/queries/features');
 var errors = require('../../lib/errors.js');
 var auth = require('../../lib/authentication.js');
-var logger = require('../../logger.js');
+var logger = require('../../lib/logger.js');
 
 module.exports = function(router) {
 

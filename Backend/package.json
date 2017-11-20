@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "test": "NODE_ENV=test mocha",
+    "test": "cross-env NODE_ENV=test mocha",
     "start": "forever start ./bin/www",
     "stop": "forever stopall"
   },
@@ -12,12 +12,14 @@
     "body-parser": "^1.18.2",
     "config": "^1.28.1",
     "cors": "^2.8.4",
+    "cross-env": "latest",
     "debug": "~2.2.0",
     "events-async": "^1.1.0",
     "express": "^4.16.1",
     "express-handlebars": "^3.0.0",
     "forever": "~0.15.3",
     "jsonwebtoken": "^8.1.0",
+    "mocha": "^4.0.1",
     "mongoose": "^4.13.1",
     "morgan": "^1.9.0",
     "request": "^2.83.0",

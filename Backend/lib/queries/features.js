@@ -8,7 +8,7 @@ var User = require('../../models/schemas').User;
 var Badge = require('../../models/schemas').Badge;
 var Features = require('../../models/schemas').Features;
 var errors = require('../errors.js');
-var logger = require('../../logger.js');
+var logger = require('../logger.js');
 
 function createBadge(data) {
     let badge = new Badge(data);
@@ -57,15 +57,11 @@ function getCourseByAssignmentID(assignment_id) {
 }
 
 function getNumberOfAssignments(course_id) {
-    return new Promise((resolve, reject) => {
-        let c = getCourseByID(course_id).then(function(course) {
-            if(course === null){
-                reject(errors.COURSE_DO_NOT_EXIST);
-            }
-            resolve(course.assignments.length);
-        }).catch(function(err) {
-            reject(err);
-        });
+    return getCourseByID(course_id).then(function(course) {
+        if(course === null){
+            throw errors.COURSE_DO_NOT_EXIST;
+        }
+        return course.assignments.length;
     });
 }
 
@@ -99,7 +95,7 @@ function updateFeatureProgress(user_id, features_id, assignment_id, data) {
     return Features.update({'_id': features_id, 'user': user_id, 'progress.assignment': assignment_id}, {'$set': {'progress.$': data}}, { runValidators: true }).then(function(result) {
         if(result.n === 0) {
             return Features.update({'_id': features_id, 'user': user_id}, {'$addToSet': {'progress': data}}, { runValidators: true }).then(function(result) {
-                return;
+                return result;
             });
         }
     });
@@ -136,7 +132,7 @@ async function getFeaturesOfCourse(course_id) {
     json.features = [];
     for(let feature_id of course.features) {
         let feature = await getFeatureByID(feature_id);
-        feature.completed_assignments = await getNumberOfCompletedAssignmentsByFeatureID(feature_id);
+        feature.completed_assignments = feature.progress.length;
         json.features.push(feature);
     }
 
@@ -152,17 +148,17 @@ async function getFeatureOfUserID(course_id, user_id) {
         try {
             feature = await getFeatureByID(feature_id);
         } catch (err) {
-            logger.warn('Feature '+feature_id+' in course '+course._id+' is null and should be removed!');
+            logger.log("warn",'Feature '+feature_id+' in course '+course._id+' is null and should be removed!');
             continue;
         }
 
         if(feature === null) {
-            logger.warn('Feature '+feature_id+' in course '+course._id+' is null and should be removed!');
+            logger.log("warn",'Feature '+feature_id+' in course '+course._id+' is null and should be removed!');
         } else {
             if(feature.user == (user_id)) {
 
                 feature.total_assignments = await getNumberOfAssignments(course_id);
-                feature.completed_assignments = await getNumberOfCompletedAssignmentsByFeatureID(feature._id);
+                feature.completed_assignments = feature.progress.length;
 
                 return feature;
             }
@@ -175,7 +171,7 @@ async function getFeatureOfUserID(course_id, user_id) {
     let feature = await getFeatureByID(new_feature._id);
 
     feature.total_assignments = await getNumberOfAssignments(course_id);
-    feature.completed_assignments = await getNumberOfCompletedAssignmentsByFeatureID(feature._id);
+    feature.completed_assignments = feature.progress.length;
 
     return feature;
 }
@@ -191,6 +187,5 @@ exports.createFeature = createFeature;
 exports.getFeatureByID = getFeatureByID;
 exports.updateFeatureProgress = updateFeatureProgress;
 exports.addBadgeToFeature = addBadgeToFeature;
-exports.getNumberOfCompletedAssignmentsByFeatureID = getNumberOfCompletedAssignmentsByFeatureID;
 exports.getFeaturesOfCourse = getFeaturesOfCourse;
 exports.getFeatureOfUserID = getFeatureOfUserID;

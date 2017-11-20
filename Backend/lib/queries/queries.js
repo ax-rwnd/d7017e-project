@@ -6,9 +6,10 @@ var Course = require('../../models/schemas').Course;
 var Test = require('../../models/schemas').Test;
 var User = require('../../models/schemas').User;
 var Draft = require('../../models/schemas').Draft;
+var JoinRequests = require('../../models/schemas').JoinRequests;
 var errors = require('../errors.js');
 var mongoose = require('mongoose');
-var logger = require('../../logger.js');
+var logger = require('../logger.js');
 var jwt = require('jsonwebtoken');
 var config = require('config');
 
@@ -17,8 +18,8 @@ const FIELDS = {
     COURSE: {
         MODEL: require('../../models/schemas').Course,
         BASE_FIELDS: "course_code name description",
-        ADMIN: "course_code name description teachers students assignments",
-        TEACHER: "course_code name description students assignments",
+        ADMIN: "course_code name description autojoin teachers students invited pending assignments",
+        TEACHER: "course_code name description autojoin teachers students invited pending assignments",
         STUDENT: "course_code name description assignments",
         POPULATE_FIELDS: "teachers students assignments"
     },
@@ -229,10 +230,164 @@ function getCourses(fields, admin, id_array) {
 
 }
 
-function createCourse(name, description, hidden, course_code, enabled_features) {
+function checkIfUserExist(user_id) {
+    if (!mongoose.Types.ObjectId.isValid(user_id)) {
+            throw errors.INVALID_ID;
+    }
+    return User.count({_id: user_id})
+    .then(function(count) {
+        if (count === 0) {
+            throw errors.USER_NOT_FOUND;
+        }
+    });
+}
+
+// Checks if user_id is teacher in course_id.
+// If user is teacher of course, will return courseobject with teachers field and all optionalCourseFields
+function checkIfTeacherOrAdmin(user_id, course_id, admin, optionalCourseFieldsToReturn) {
+    return Course.findById(course_id, "teachers" + ("" || " " + optionalCourseFieldsToReturn))
+    .then(function (courseObject) {
+        if (!courseObject) {
+            throw errors.COURSE_DOES_NOT_EXIST;
+        }
+        if (!(courseObject.teachers.indexOf(user_id) !== -1 || admin)) {
+            throw errors.INSUFFICIENT_PERMISSION;
+        }
+        return courseObject;
+    });
+}
+
+// Checks if user_id is already enrolled in a course(student or teacher).
+// If user already in course will throw error.
+function checkIfUserAlreadyInCourseObject(user_id, courseObject) {
+    if (courseObject.students.indexOf(user_id) !== -1
+    || courseObject.teachers.indexOf(user_id) !== -1) {
+        throw errors.USER_ALREADY_IN_COURSE;
+    }
+}
+
+// Same as checkIfUserNotInCourseObject but queries the course fields Teachers and Students.
+function checkIfUserAlreadyInCourse(user_id, course_id, optionalCourseFieldsToReturn) {
+    return Course.findById(course_id, "teachers students" + ("" || " " + optionalCourseFieldsToReturn))
+    .then(function (courseObject) {
+        if (courseObject.students.indexOf(user_id) !== -1
+        || courseObject.teachers.indexOf(user_id) !== -1) {
+            throw errors.USER_ALREADY_IN_COURSE;
+        }
+        return courseObject;
+    });
+}
+
+function checkIfRequestAlreadySent(user_id, course_id, type) {
+    return JoinRequests.count({inviteType: type, user: user_id, course: course_id})
+    .then(function (count) {
+        if (count !== 0) {
+            throw errors.INVITE_ALREADY_SENT;
+        }
+    });
+}
+
+function createRequestToCourse(user_id, course_id, type) {
+    var invite = new JoinRequests({inviteType: type, user: user_id, course: course_id});
+    return invite.save();
+}
+
+function findAndRemoveRequest(user_id, course_id, type) {
+    return JoinRequests.findOneAndRemove({inviteType: type, user: user_id, course: course_id})
+    .then(function(deletedInvite) {
+        if (!deletedInvite) {
+            throw errors.NO_INVITE_FOUND;
+        }
+    });
+}
+
+function checkIfUserInCourseAndNotTeacherObject(user_id, courseObject) {
+    if (courseObject.teachers.indexOf(user_id) !== -1) {
+        throw errors.USER_IS_ALREADY_TEACHER;
+    }
+    if (courseObject.students.indexOf(user_id) === -1) {
+        throw errors.USER_NOT_IN_COURSE;
+    }
+}
+
+function checkIfUserIsTeacherObject(user_id, courseObject) {
+    if (courseObject.teachers.indexOf(user_id) === -1) {
+        throw errors.USER_IS_NOT_TEACHER;
+    }
+}
+
+function addTeacherToCourse(user_id, course_id) {
+    return Course.update(
+        {_id: course_id},
+        {$addToSet: {teachers: user_id}, $pull: {students: user_id}},
+        {runValidators: true}
+    )
+    .then(function() {
+        return User.update(
+            {_id: user_id},
+            {$addToSet: {teaching: course_id}, $pull: {courses: course_id}},
+            {runValidators: true}
+        );
+    });
+}
+
+function removeTeacherFromCourse(user_id, course_id) {
+    return Course.update(
+        {_id: course_id},
+        {$addToSet: {students: user_id}, $pull: {teachers: user_id}},
+        {runValidators: true}
+    )
+    .then(function() {
+        return User.update(
+            {_id: user_id},
+            {$addToSet: {courses: course_id}, $pull: {teaching: course_id}},
+            {runValidators: true}
+        );
+    });
+}
+
+function removeStudentFromCourse(user_id, course_id) {
+    return Course.update(
+        {_id: course_id},
+        {$pull: {students: user_id}},
+        {runValidators: true}
+    ).then(function (updated) {
+        if (updated.nModified === 0) {
+            throw errors.USER_IS_NOT_STUDENT;
+        }
+        return User.update(
+            {_id: user_id},
+            {$pull: {courses: course_id}},
+            {runValidators: true}
+        );
+    });
+}
+
+
+function getCourseInvites(course_id, type) {
+    return JoinRequests.find({inviteType: type, course: course_id}, "user -_id").populate("user", "username email");
+}
+
+function getUserInvites(user_id, type) {
+    return JoinRequests.find({inviteType: type, user: user_id}, "course -_id").populate("course", "name course_code");
+}
+
+function getInvitesCourseUser(user_id, course_id) {
+    return JoinRequests.find({user: user_id, course: course_id});
+}
+
+function returnPromiseForChainStart() {
+    return new Promise(function (resolve) {
+        resolve();
+    });
+}
+
+function createCourse(name, description, hidden, course_code, enabled_features, autojoin, teacher) {
     course_code = course_code || '';
     enabled_features = enabled_features || {};
-    var newCourse = new Course({name: name, description: description, course_code: course_code, hidden: hidden, teachers: [], students: [], assignments: [], features: [], enabled_features: enabled_features});
+    autojoin = autojoin || false;
+    var teachers = [teacher];
+    var newCourse = new Course({name: name, description: description, course_code: course_code, hidden: hidden, autojoin: autojoin, teachers: teachers, students: [], assignments: [], features: [], enabled_features: enabled_features});
     return newCourse.save().then(function (createdCourse) {
         if (!createdCourse) {
             console.log("Error: Course not created");
@@ -457,6 +612,7 @@ function populateObject(mongooseObject, schema, wantedFields) {
     }
 }
 
+
 function getCourse(courseid, roll, fields) {
     var wantedFields = fields || FIELDS.COURSE[roll.toUpperCase()];
     wantedFields = wantedFields.replace(/,/g, " ");
@@ -512,39 +668,76 @@ function getCoursesEnabledFeatures(course_id) {
     });
 }
 
-function searchDB(query, user_id) {
+function searchDB(query, categories, user_id) {
     return getAssignmentIDsByUser(user_id).then(assignment_ids => {
 
         let promises = [];
+        let json = {
+            courses: [],
+            assignments: [],
+            users: []
+        };
 
-        promises.push(Course.find({$text: {$search: query}, 'students': user_id, 'hidden': false}, {score: {$meta: "textScore"}})
-            .select('-__v -hidden -features -assignments -students -enabled_features')
-            .sort({score: {$meta: "textScore"}})
-            .limit(20).then(docs => {
-                return {'courses': docs};
-            }).catch(err => {
-                logger.error(err);
-            }));
+        if(categories) {
+            categories = categories.split(',');
 
-        promises.push(Assignment.find({$text: {$search: query}, '_id': assignment_ids, 'hidden': false}, {score: {$meta: "textScore"}})
-            .select('-__v -tests -optional_tests -hidden -languages')
-            .sort({score: {$meta: "textScore"}})
-            .limit(20).then(docs => {
-                return {'assignments': docs};
-            }).catch(err => {
-                logger.error(err);
-            }));
-        promises.push(User.find({$text: {$search: query}}, {score: {$meta: "textScore"}})
-            .select('-__v -tokens -providers')
-            .sort({score: {$meta: "textScore"}})
-            .limit(20).then(docs => {
-                return {'users': docs};
-            }).catch(err => {
-                logger.error(err);
-            }));
+            if (categories.indexOf('courses') !== -1) {
+                promises.push(searchDBCourses(query, user_id));
+            }
+            if (categories.indexOf('assignments') !== -1) {
+                promises.push(searchDBAssignments(query, assignment_ids));
+            }
+            if (categories.indexOf('users') !== -1) {
+                promises.push(searchDBUsers(query));
+            }
+        } else {
+            promises.push(searchDBCourses(query, user_id));
+            promises.push(searchDBAssignments(query, assignment_ids));
+            promises.push(searchDBUsers(query));
+        }
 
-        return Promise.all(promises);
+        return Promise.all(promises).then(function(results) {
+
+            for(let result of results) {
+                for(var key in result) json[key] = result[key];
+            }
+
+            return json;
+        });
     });
+}
+
+function searchDBCourses(query, user_id) {
+    return Course.find({$text: {$search: query}, 'students': user_id, 'hidden': false}, {score: {$meta: "textScore"}})
+        .select('-__v -hidden -features -assignments -students -enabled_features')
+        .sort({score: {$meta: "textScore"}})
+        .limit(20).then(docs => {
+            return {'courses': docs};
+        }).catch(err => {
+            logger.log("error",err);
+        });
+}
+
+function searchDBAssignments(query, assignment_ids) {
+    return Assignment.find({$text: {$search: query}, '_id': assignment_ids, 'hidden': false}, {score: {$meta: "textScore"}})
+        .select('-__v -tests -optional_tests -hidden -languages')
+        .sort({score: {$meta: "textScore"}})
+        .limit(20).then(docs => {
+            return {'assignments': docs};
+        }).catch(err => {
+            logger.log("error",err);
+        });
+}
+
+function searchDBUsers(query) {
+    return User.find({$text: {$search: query}}, {score: {$meta: "textScore"}})
+        .select('-__v -tokens -providers')
+        .sort({score: {$meta: "textScore"}})
+        .limit(20).then(docs => {
+            return {'users': docs};
+        }).catch(err => {
+            logger.log("error",err);
+        });
 }
 
 // Helper function for searchDB()
@@ -602,3 +795,19 @@ exports.saveCode = saveCode;
 exports.getCode = getCode;
 exports.getCoursesEnabledFeatures = getCoursesEnabledFeatures;
 exports.searchDB = searchDB;
+exports.checkIfTeacherOrAdmin = checkIfTeacherOrAdmin;
+exports.checkIfUserAlreadyInCourseObject = checkIfUserAlreadyInCourseObject;
+exports.checkIfUserAlreadyInCourse = checkIfUserAlreadyInCourse;
+exports.checkIfRequestAlreadySent = checkIfRequestAlreadySent;
+exports.createRequestToCourse = createRequestToCourse;
+exports.checkIfUserExist = checkIfUserExist;
+exports.findAndRemoveRequest = findAndRemoveRequest;
+exports.returnPromiseForChainStart = returnPromiseForChainStart;
+exports.checkIfUserInCourseAndNotTeacherObject = checkIfUserInCourseAndNotTeacherObject;
+exports.addTeacherToCourse = addTeacherToCourse;
+exports.removeTeacherFromCourse = removeTeacherFromCourse;
+exports.removeStudentFromCourse = removeStudentFromCourse;
+exports.checkIfUserIsTeacherObject = checkIfUserIsTeacherObject;
+exports.getCourseInvites = getCourseInvites;
+exports.getUserInvites = getUserInvites;
+exports.getInvitesCourseUser = getInvitesCourseUser;

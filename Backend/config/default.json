@@ -9,7 +9,8 @@
     },
     // APP config module
     "App": {
-        "title": "d7017e-backend"
+        "title": "d7017e-backend",
+        "port": 18000
     },
     // Auth config module
     "Auth": {
@@ -33,6 +34,12 @@
             "filename": "errors.log",
             "name": "error",
             "level": "error",
+            "json": false
+        },
+        "serverError":{ //Log settings for logging ONLY error logs in a errors.log file
+            "filename": "serverErrors.log",
+            "name": "serverError",
+            "level": "serverError",
             "json": false
         }
     },

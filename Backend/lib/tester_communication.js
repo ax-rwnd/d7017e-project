@@ -6,7 +6,7 @@ var request = require('request');
 var queries = require('../lib/queries/queries');
 var queries_features = require('../lib/queries/features');
 var features = require('../features/features');
-var logger = require('../logger');
+var logger = require('./logger');
 var config = require('config');
 
 //Retrieve tests from db and send them to Tester with the format accepted by Tester.
@@ -16,12 +16,12 @@ function validateCode(user_id, lang, code, assignment_id, res) {
     queries.getTestsFromAssignment(assignment_id, function(tests) {
 
         if(!tests.hasOwnProperty('tests') || tests.tests === undefined) {
-            logger.error('Assignment', assignment_id, 'did not have tests object.');
+            logger.log("error",'Assignment', assignment_id, 'did not have tests object.');
             return res.sendStatus(500);
         }
 
         if(!tests.tests.hasOwnProperty('io') || tests.tests.io === undefined) {
-            logger.error('Assignment', assignment_id, 'did not have io list.');
+            logger.log("error",'Assignment', assignment_id, 'did not have io list.');
             return res.sendStatus(500);
         }
 
@@ -60,9 +60,9 @@ function validateCode(user_id, lang, code, assignment_id, res) {
         }, function (error, response, body) {
             if(error || response.statusCode != 200) {
                 if(response) {
-                    logger.error('Tester returned', response.statusCode);
+                    logger.log("error",'Tester returned', response.statusCode);
                 }
-                logger.error(error);
+                logger.log("error",error);
                 res.sendStatus(response.statusCode);
             } else {
 

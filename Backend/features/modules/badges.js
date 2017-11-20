@@ -2,7 +2,7 @@
 
 var queries = require('../../lib/queries/features');
 var helper = require('../features_helper');
-var logger = require('../../logger');
+var logger = require('../../lib/logger');
 
 
 function init(emitter, name) {
@@ -13,7 +13,7 @@ function init(emitter, name) {
                 json[name] = result;
                 resolve(json);
             }).catch(function(err) {
-                logger.error(err);
+                logger.log("error",err);
             });
         });
     });
@@ -74,7 +74,7 @@ function calcBadge(badges, progress, badge) {
 
     // Compare badges
     if(!helper.arrayContainsArray(badges, badge.goals.badges)) {
-        logger.warn('Badges failed badge');
+        logger.log("warn",'Badges failed badge');
         return;
     }
 
@@ -89,7 +89,7 @@ function calcBadge(badges, progress, badge) {
             }
         }
         if(assignment_progress === undefined) {
-            logger.warn("Assignment required for Badge as not yet been done");
+            logger.log("warn","Assignment required for Badge as not yet been done");
             return;
         }
 
@@ -102,7 +102,7 @@ function calcBadge(badges, progress, badge) {
                 }
             }
             if(passed === false) {
-                logger.warn("Required test for badge was not completed");
+                logger.log("warn","Required test for badge was not completed");
                 return;
             }
         }
@@ -110,7 +110,7 @@ function calcBadge(badges, progress, badge) {
         // Compare code size
         if("code_size" in assignment) {
             if(assignment.code_size < assignment_progress.code_size) {
-                logger.warn("Code size was larger than required for Badge");
+                logger.log("warn","Code size was larger than required for Badge");
                 return;
             }
         }
