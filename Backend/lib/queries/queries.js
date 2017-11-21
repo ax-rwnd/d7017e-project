@@ -394,10 +394,13 @@ function createCourse(name, description, hidden, course_code, enabled_features, 
     var newCourse = new Course({name: name, description: description, course_code: course_code, hidden: hidden, autojoin: autojoin, teachers: teachers, students: [], assignments: [], features: [], enabled_features: enabled_features});
     return newCourse.save().then(function (createdCourse) {
         if (!createdCourse) {
-            console.log("Error: Course not created");
-            //ERROR?!
+            throw errors.COURSE_NOT_CREATED;
         }
-        return createdCourse;
+        return User.update(
+            {_id: teacher},
+            {$addToSet: {teaching: createdCourse._id}},
+            {runValidators: true}
+        ).then(_ => createdCourse);
     });
 }
 
