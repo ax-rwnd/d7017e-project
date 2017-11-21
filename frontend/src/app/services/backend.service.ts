@@ -84,15 +84,21 @@ export class BackendService {
 
   getCourses() {
     // Get all courses for display on frontend
-    // TODO: this is not yet implemented according to wiki
+    // TODO: this route is completely untested
 
     return this.apiGet('/api/courses');
   }
 
   getMyCourses() {
-    // Get courses for the logged in user
+    // Get courses that the logged in user is participating in as a 'student'
 
-    return this.apiGet('/api/courses/me');
+    return this.apiGet('/api/users/me/courses');
+  }
+
+  getMyTeachedCourses() {
+    // Get courses that the current user has write permissions for, i.e. as a 'teacher'
+
+    return this.apiGet('/api/users/me/teaching');
   }
 
   getUserCourses(id: string) {
