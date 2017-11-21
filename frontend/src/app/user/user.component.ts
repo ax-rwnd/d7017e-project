@@ -102,22 +102,13 @@ export class UserComponent implements OnInit {
   }
 
   getMe() {
-    // console.log(this.backendService.getUser(new ObjectID('59f84c545747361ba848b238')));
+    // Grab my info
+
     return this.backendService.getMe().then(resp => {
       console.log(resp);
     }).catch(err => {
       console.log(err);
     });
-    /*
-    this.http.get(environment.backend_ip + '/api/courses/me').subscribe(
-      data => {
-        console.log(data);
-      },
-      err => {
-        console.log(err);
-        console.log('something went shit in getMe');
-      }
-    );*/
   }
 
   postBadge() {
