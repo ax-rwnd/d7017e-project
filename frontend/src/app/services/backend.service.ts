@@ -212,7 +212,7 @@ export class BackendService {
     return this.apiPost('/api/courses/' + course_id + '/students/invite', body);
   }
 
-  requestJoinCourse(course_id: ObjectID, student_id: ObjectID) {
+  postJoinRequest(course_id: ObjectID, student_id: ObjectID) {
     // Send a request to join a course
 
     const body = {'student_id': student_id};
