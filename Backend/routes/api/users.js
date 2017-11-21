@@ -42,6 +42,20 @@ module.exports = function (router) {
         });
     });
 
+    router.get('/me/courses', function (req, res, next) {
+        queries.getUserCourses(req.user.id, "name description course_code").then(function (courses) {
+            return res.json(courses);
+        })
+        .catch(next);
+    });
+
+    router.get('/me/teaching', function (req, res, next) {
+        queries.getUserTeacherCourses(req.user.id, "name description course_code").then(function (courses) {
+            return res.json(courses);
+        })
+        .catch(next);
+    });
+
     router.get('/:user_id', function (req, res, next) {
         var user_id = req.params.user_id;
         var filter = (req.user.access === "admin")

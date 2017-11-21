@@ -6,6 +6,7 @@ var queries = require('../../lib/queries/queries');
 var errors = require('../../lib/errors.js');
 var auth = require('../../lib/authentication.js');
 var testerCom = require('../../lib/tester_communication');
+var logger = require('../../lib/logger');
 
 var Assignment = require('../../models/schemas').Assignment;
 var Test = require('../../models/schemas').Test;
@@ -85,6 +86,7 @@ module.exports = function(router) {
     // Would force frontend to send userid. courses/me takes user id from token.
     // Frontend is most likely in possesion of userid. Therefore both is possible.
     router.get('/me', function (req, res, next) {
+        logger.log('warn', '/api/courses/me is deprecated. Use /api/users/me/courses instead.');
         queries.getUserCourses(req.user.id, "name description course_code").then(function (courses) {
             return res.json(courses);
         })

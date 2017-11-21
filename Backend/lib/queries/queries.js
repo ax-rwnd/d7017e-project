@@ -412,6 +412,17 @@ function getUserCourses(id, fields) {
     });
 }
 
+function getUserTeacherCourses(id, fields) {
+    var wantedFields = fields || "name description hidden teachers students assignments course_code";
+
+    return User.findById(id, "teaching").populate("teaching", wantedFields).then(function (courseList) {
+        if (!courseList) {
+            throw errors.NO_COURSES_EXISTS;
+        }
+        return courseList;
+    });
+}
+
 function getCourseStudents(id, fields) {
     var wantedFields = fields || "username email admin courses providers";
 
@@ -783,6 +794,7 @@ exports.deleteUser = deleteUser;
 exports.getCourses = getCourses;
 exports.createCourse = createCourse;
 exports.getUserCourses = getUserCourses;
+exports.getUserTeacherCourses = getUserTeacherCourses;
 exports.getCourseStudents = getCourseStudents;
 exports.addCourseStudent = addCourseStudent;
 exports.getCourseTeachers = getCourseTeachers;
