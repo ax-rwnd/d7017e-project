@@ -1,15 +1,15 @@
 import { Component, OnInit } from '@angular/core';
-import {ActivatedRoute} from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { BsModalRef } from 'ngx-bootstrap/modal/modal-options.class';
 
-import {CourseService} from '../services/course.service';
+import { CourseService } from '../services/course.service';
 import { trigger, state, style, animate, transition } from '@angular/animations';
 import { HeadService } from '../services/head.service';
 import { AssignmentService } from '../services/assignment.service';
-import {FormBuilder, FormGroup} from '@angular/forms';
-import {BackendService} from '../services/backend.service';
+import { FormBuilder, FormGroup } from '@angular/forms';
+import { BackendService } from '../services/backend.service';
 
 
 @Component({
@@ -32,7 +32,6 @@ export class CoursesComponent implements OnInit {
   sidebarState; // state of sidebar
   progress: any;
   currentCourse: any;
-  currentAssignment: any;
   possibleStudents: any[];
   form: FormGroup;
   modalRef: BsModalRef;
@@ -43,14 +42,23 @@ export class CoursesComponent implements OnInit {
   constructor(private courseService: CourseService, private route: ActivatedRoute, private headService: HeadService,
               private fb: FormBuilder, private assignmentService: AssignmentService, private modalService: BsModalService,
               private backendService: BackendService) {
-    this.headService.stateChange.subscribe(sidebarState => { this.sidebarState = sidebarState; });
-    this.route.params.subscribe( params => {
-      this.currentCourse = this.courseService.GetCourse(params['course']);
+
+    // Subscribe to the sidebar state
+    this.headService.stateChange.subscribe(sidebarState => {
+      this.sidebarState = sidebarState; });
+
+    this.route.params.subscribe( (params: any) => {
+      // Grab the current course
+      this.currentCourse = this.courseService.GetCourse(params.course);
+
+      // Assign groups for assignments
       if (this.assignmentService.courseAssignments[this.currentCourse.id] !== undefined) {
         this.assignmentGroups = this.assignmentService.courseAssignments[this.currentCourse.id];
       } else {
         this.assignmentGroups = this.assignmentService.courseAssignments['default'];
       }
+
+      // Get a list of the users waiting to join the course
       this.backendService.getPendingUsers(this.currentCourse.id)
         .then(response => console.log('pending', response));
     });
@@ -58,48 +66,40 @@ export class CoursesComponent implements OnInit {
 
   ngOnInit() {
     this.sidebarState = this.headService.getCurrentState();
-    console.log('course', this.currentCourse);
-    console.log('assignmentGroup', this.assignmentService.courseAssignments[this.currentCourse.id]);
-    console.log('all assignmentGroups', this.assignmentService.courseAssignments);
     this.possibleStudents = [];
-    // this.possibleStudents = [{name: 'asdfgh-3', id: '0'}, {name: 'qwerty-2', id: '1'}];
     this.form = this.fb.group(this.defaultForm);
-
-    /*if (this.assignmentService.courseAssignments[this.currentCourse.code] !== undefined) {
-      this.assignmentGroups = this.assignmentService.courseAssignments[this.currentCourse.code];
-    } else {
-      this.assignmentGroups = this.assignmentService.courseAssignments['default'];
-    }*/
-    // this.currentAssignment = this.assignmentGroups[0].groups[0].assignments[0].name;
   }
-
-  getCourseElement(number) {
-    //todo
-    //fetch the correct assignment/lab from the course
-    if (this.assignmentGroups[0].groups[0].assignments[number-1].available != false){
-      this.currentAssignment = this.assignmentGroups[0].groups[0].assignments[number-1].name;
-    }}
 
   getProgress() {
+    // Retrieve progress from courseService
+    // TODO: deprecated?
+
     return (this.courseService.GetProgress(this.currentCourse.id));
   }
+
   openModal(modal) {
+    // Open a modal dialog box
+
     this.modalRef = this.modalService.show(modal);
   }
+
   invite(student_id) {
-    console.log(student_id);
-    this.backendService.inviteStudentToCourse(this.currentCourse.id, student_id)
-      .then(response => console.log(response));
+    // Invite a student to this course
+
+    this.backendService.postInvitationToCourse(this.currentCourse.id, student_id)
+      .then(response => console.error(response));
   }
+
   search() {
-    console.log(this.form.value.search);
+    // Perform a search for students through the backend
+
     this.possibleStudents = [];
     this.backendService.getSearch(this.form.value.search)
-      .then(response => {
-        const users = response['users'];
-        for (let i = 0; i < users.length; i++) {
-          console.log(users[i]);
-          this.possibleStudents[i] = {name: users[i]['username'], id: users[i]['_id']};
+      .then((response: any) => {
+
+        // Populate matches
+        for (const user of response.users as any[]) {
+          this.possibleStudents.push({name: user.username, id: user._id});
         }
       });
   }

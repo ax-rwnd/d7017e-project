@@ -205,7 +205,7 @@ export class BackendService {
     return this.apiPost('/api/courses', body);
   }
 
-  inviteStudentToCourse(course_id: ObjectID, student_id: ObjectID) {
+  postInvitationToCourse(course_id: ObjectID, student_id: ObjectID) {
     // Send an invitation for a student to join a course
 
     const body = {'student_id': student_id};
