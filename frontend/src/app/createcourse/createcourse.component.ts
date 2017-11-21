@@ -75,26 +75,29 @@ export class CreatecourseComponent implements OnInit {
     }
   }
 
-  submitCourse() { // checka course code
-    // First check so no required fields are empty
-    if ( this.form.value.name === '' || this.content === '' ) { // Since desc can't be in the form-group defined own required message
+  submitCourse() {
+    // Create a new course with some parameters from the page
+
+    if ( this.form.value.name === '' || this.content === '' ) {
+      // Since desc can't be in the form-group defined own required message
       this.errorMessage = '* Please fill in all required fields';
       window.scrollTo({ left: 0, top: 0, behavior: 'smooth' }); // go to top of page smoothly if error occur
+
     } else {
       this.errorMessage = '';
+
       // badges, progressbar, leaderboard, adventuremap
-      const enabled_features: Object = {'progressbar': this.form.value.progress, 'badges': this.form.value.badges,
-      'leaderboard': this.form.value.leaderboard, 'adventuremap': this.form.value.map};
-      this.backendService.postNewCourse(this.form.value.name, this.content, !this.form.value.nothidden, this.form.value.code, enabled_features, this.form.value.autojoin)
-        .then( response => {
-          console.log('Course response:', response);
-          console.log('Response type is:', typeof response);
-          const resp: any = response;
-          const body = JSON.parse(resp);
-          const courseId = body['_id'];
+      const enabled_features: Object = {'progressbar': this.form.value.progress,
+        'badges': this.form.value.badges, 'leaderboard': this.form.value.leaderboard,
+        'adventuremap': this.form.value.map};
+
+      this.backendService.postNewCourse(this.form.value.name, this.content,
+        !this.form.value.nothidden, this.form.value.code, enabled_features, this.form.value.autojoin)
+        .then( (response: any) => {
+          // Handle response from backend
+
+          const courseId = response._id;
           console.log('Got back id:', courseId);
-          //this.form = createSearchForm(); // for invites, not yet implemented
-          //this.openModal(this.inviteModal);
         })
         .catch(err => console.error('Something went wrong when creating the course:', err));
     }

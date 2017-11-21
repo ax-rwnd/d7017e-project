@@ -40,27 +40,27 @@ export class BackendService {
     // Send a get request to the endpoint
 
     return this.http.get(environment.backend_ip + endpoint)
-                .toPromise()
-                .then(response => response)
-                .catch(err => console.error('API Get failed in ' + endpoint + ' error', err));
+      .toPromise()
+      .then(response => response)
+      .catch(err => console.error('API Get failed in ' + endpoint + ' error', err));
   }
 
   private apiPost(endpoint, body) {
     // Send a post request to the endpoint
 
-    return this.http.post(environment.backend_ip + endpoint, body, {responseType: 'text'})
-                .toPromise()
-                .then(response => response)
-                .catch(err => console.error('API Post failed in ' + endpoint + ' error ', err));
+    return this.http.post(environment.backend_ip + endpoint, body, {responseType: 'json'})
+      .toPromise()
+      .then(response => response)
+      .catch(err => console.error('API Post failed in ' + endpoint + ' error ', err));
   }
 
   private apiPut(endpoint, body) {
     // Send a put request to the endpoint
 
-    return this.http.put(environment.backend_ip + endpoint, body, {responseType: 'text'})
-                .toPromise()
-                .then(response => response)
-                .catch(err => console.error('API Put failed in ' + endpoint + ' error ', err));
+    return this.http.put(environment.backend_ip + endpoint, body, {responseType: 'json'})
+      .toPromise()
+      .then(response => response)
+      .catch(err => console.error('API Put failed in ' + endpoint + ' error ', err));
   }
 
   addUserToCourse(course_id: ObjectID, student_id: ObjectID) {
@@ -190,39 +190,56 @@ export class BackendService {
     return this.apiGet('/api/search?query=' + query);
   }
 
-  postNewCourse(name: string, desc: string, hidden: boolean, course_code: string, en_feat: Object, autojoin: boolean) { // post a new course to data base
-    // name, description, hidden, course_code, enabled_features
-    const body = {'name': name, 'description': desc, 'hidden': hidden, 'course_code': course_code, 'enabled_features': en_feat, 'autojoin': autojoin};
+  postNewCourse(name: string, desc: string, hidden: boolean, course_code: string,
+    en_feat: Object, autojoin: boolean) {
+    // Post a new course to database
+
+    const body = {'name': name, 'description': desc, 'hidden': hidden,
+      'course_code': course_code, 'enabled_features': en_feat, 'autojoin': autojoin};
     return this.apiPost('/api/courses', body);
   }
 
   inviteStudentToCourse(course_id: ObjectID, student_id: ObjectID) {
+    // Send an invitation for a student to join a course
+
     const body = {'student_id': student_id};
     return this.apiPost('/api/courses/' + course_id + '/students/invite', body);
   }
 
   requestJoinCourse(course_id: ObjectID, student_id: ObjectID) {
+    // Send a request to join a course
+
     const body = {'student_id': student_id};
     return this.apiPost('/api/courses/' + course_id + '/students/pending', body);
   }
 
   getMyInvites() {
+    // Find invites for me
+
     return this.apiGet('/api/users/courses/invite');
   }
 
   getPendingUsers(course_id) {
+    // Get the users waiting to join a course
+
     return this.apiGet('/api/courses/' + course_id + '/students/pending');
   }
 
   getCoursesById(user_id: string) {
+    // Get the courses that a student i taking
+
     return this.apiGet('/api/users/' + user_id + '/courses');
   }
 
   getUserCourseStatus(course_id: string) {
+    // Retrieves if you're an admin, a teacher or a student in a course
+
     return this.apiGet('/api/users/courses/' + course_id + '/status');
   }
 
   login(ticket: string, service: string) {
+    // TODO: is this still relevant?
+
     return this.apiGet('/auth/login/ltu?ticket=' + ticket + '&service=' + service);
   }
 }
