@@ -66,17 +66,20 @@ export class CoursesComponent implements OnInit {
 
   ngOnInit() {
     this.sidebarState = this.headService.getCurrentState();
-    console.log('course', this.currentCourse);
-    console.log('assignmentGroup', this.assignmentService.courseAssignments[this.currentCourse.id]);
-    console.log('all assignmentGroups', this.assignmentService.courseAssignments);
     this.possibleStudents = [];
     this.form = this.fb.group(this.defaultForm);
   }
 
   getProgress() {
+    // Retrieve progress from courseService
+    // TODO: deprecated?
+
     return (this.courseService.GetProgress(this.currentCourse.id));
   }
+
   openModal(modal) {
+    // Open a modal dialog box
+
     this.modalRef = this.modalService.show(modal);
   }
 
@@ -84,7 +87,7 @@ export class CoursesComponent implements OnInit {
     // Invite a student to this course
 
     this.backendService.postInvitationToCourse(this.currentCourse.id, student_id)
-    .then(response => console.log(response));
+      .then(response => console.error(response));
   }
 
   search() {
