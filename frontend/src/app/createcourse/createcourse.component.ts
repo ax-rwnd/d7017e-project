@@ -29,9 +29,11 @@ export class CreatecourseComponent implements OnInit {
   students: any[];
   modalRef: BsModalRef;
   badgesDesc = 'The student will receive badges for completing assignments or tasks.';
-  progDesc = 'The student will be able to see progress depending on how many assignments have been completed.';
+  progDesc = 'The student will be able to see progress depending on amount of completed assignments.';
   advmapDesc = 'The student will have an adventure map there different paths can be unlocked by completing assignments or tasks.'; //
   leadbDesc = 'The course will have a leaderboard that shows scores for each students in the course.';
+  publicDesc = 'Make the course public on create. Can later be changed.';
+  autojoinDesc = 'Students will be able to join the course freely.';
 
   @ViewChild('inviteStudentModal') inviteModal: TemplateRef<any>;
 
@@ -73,27 +75,31 @@ export class CreatecourseComponent implements OnInit {
     }
   }
 
-  submitCourse() { // checka course code
-    // First check so no required fields are empty
-    if ( this.form.value.name === '' || this.content === '' ) { // Since desc can't be in the form-group defined own required message
+  submitCourse() {
+    // Create a new course with some parameters from the page
+
+    if ( this.form.value.name === '' || this.content === '' ) {
+      // Since desc can't be in the form-group defined own required message
       this.errorMessage = '* Please fill in all required fields';
       window.scrollTo({ left: 0, top: 0, behavior: 'smooth' }); // go to top of page smoothly if error occur
+
     } else {
       this.errorMessage = '';
+
       // badges, progressbar, leaderboard, adventuremap
-      const enabled_features: Object = {'progressbar': this.form.value.progress, 'badges': this.form.value.badges,
-      'leaderboard': this.form.value.leaderboard, 'adventuremap': this.form.value.map};
-      this.backendService.postNewCourse(this.form.value.name, this.content, !this.form.value.nothidden, this.form.value.code, enabled_features)
-        .then( response => {
-          // add course to list of own courses
-          // after that go to modal inviting students
-          // after that, go to the home page maybe?
-          console.log('Post course, got back id:', response['_id']);
-          const courseId = response['_id'];
-          //this.form = createSearchForm(); // for invites, not yet implemented
-          //this.openModal(this.inviteModal);
+      const enabled_features: Object = {'progressbar': this.form.value.progress,
+        'badges': this.form.value.badges, 'leaderboard': this.form.value.leaderboard,
+        'adventuremap': this.form.value.map};
+
+      this.backendService.postNewCourse(this.form.value.name, this.content,
+        !this.form.value.nothidden, this.form.value.code, enabled_features, this.form.value.autojoin)
+        .then( (response: any) => {
+          // Handle response from backend
+
+          const courseId = response._id;
+          console.log('Got back id:', courseId);
         })
-        .catch(err => console.error('Something went when creating the course:', err));
+        .catch(err => console.error('Something went wrong when creating the course:', err));
     }
   }
   openModal(modal) {
@@ -125,7 +131,8 @@ function createCourseForm() {
     badges: new FormControl(false),
     map: new FormControl(false),
     leaderboard: new FormControl(false),
-    nothidden: new FormControl(true), // will by default be set to public
+    nothidden: new FormControl(false), // will by default be set to public
+    autojoin: new FormControl(false),
   });
 }
 
