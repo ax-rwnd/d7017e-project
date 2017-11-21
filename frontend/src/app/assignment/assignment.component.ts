@@ -78,6 +78,8 @@ export class AssignmentComponent implements OnInit, OnDestroy {
     if (this.hasPassed()) {
       this.status = 'Completed';
     }
+    this.tests = [];
+    this.testStrings = [];
     // this.getTests();
     // Use getTests as soon as backend routes are working
     this.tests = [
@@ -131,6 +133,7 @@ export class AssignmentComponent implements OnInit, OnDestroy {
     const course_id = new ObjectID(this.assignment['course_id']);
     this.backendService.getCourseAssignmentTests(course_id, assignment_id).then(data => {
       this.tests = data;
+      this.testStrings = this.formatTests(this.tests);
     });
   }
 
