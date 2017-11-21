@@ -190,9 +190,9 @@ export class BackendService {
     return this.apiGet('/api/search?query=' + query);
   }
 
-  postNewCourse(name: string, desc: string, hidden: boolean, course_code: string, en_feat: Object) { // post a new course to data base
+  postNewCourse(name: string, desc: string, hidden: boolean, course_code: string, en_feat: Object, autojoin: boolean) { // post a new course to data base
     // name, description, hidden, course_code, enabled_features
-    const body = {'name': name, 'description': desc, 'hidden': hidden, 'course_code': course_code, 'enabled_features': en_feat};
+    const body = {'name': name, 'description': desc, 'hidden': hidden, 'course_code': course_code, 'enabled_features': en_feat, 'autojoin': autojoin};
     return this.apiPost('/api/courses', body);
   }
 
@@ -212,6 +212,14 @@ export class BackendService {
 
   getPendingUsers(course_id) {
     return this.apiGet('/api/courses/' + course_id + '/students/pending');
+  }
+
+  getCoursesById(user_id: string) {
+    return this.apiGet('/api/users/' + user_id + '/courses');
+  }
+
+  getUserCourseStatus(course_id: string) {
+    return this.apiGet('/api/users/courses/' + course_id + '/status');
   }
 
   login(ticket: string, service: string) {
