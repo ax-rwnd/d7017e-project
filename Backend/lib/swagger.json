@@ -1,27 +1,33 @@
 {
   "swagger" : "2.0",
   "info" : {
-    "description" : "This is a simple API for total world dominance!!!",
+    "description" : "Backend API",
     "version" : "1.0.0",
-    "title" : "Simple Inventory API",
-    "contact" : {
-      "email" : "you@your-company.com"
-    },
-    "license" : {
-      "name" : "Apache 2.0",
-      "url" : "http://www.apache.org/licenses/LICENSE-2.0.html"
-    }
+    "title" : "Learning As A Service"
   },
   "host" : "virtserver.swaggerhub.com",
   "basePath" : "/oribabky/gppz/1.0.0",
   "tags" : [ {
     "name" : "auth",
-    "description" : "user authentication"
+    "description" : "endpoints involving user authentication"
   }, {
-    "name" : "courses"
+    "name" : "courses",
+    "description" : "endpoints involving courses"
   }, {
     "name" : "tester",
-    "description" : "endpoints to communicate with tester"
+    "description" : "endpoints involving the Tester software"
+  }, {
+    "name" : "tests",
+    "description" : "endpoints involving tests for code submissions"
+  }, {
+    "name" : "assignments",
+    "description" : "endpoints involving course assignments"
+  }, {
+    "name" : "features",
+    "description" : "endpoints involving course features, progressbar etc"
+  }, {
+    "name" : "badges",
+    "description" : "endpoints involving course badges"
   } ],
   "schemes" : [ "https" ],
   "paths" : {
@@ -45,10 +51,7 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "ok",
-            "schema" : {
-              "$ref" : "#/definitions/Login"
-            }
+            "description" : "ok"
           }
         }
       }
@@ -61,10 +64,7 @@
         "parameters" : [ ],
         "responses" : {
           "200" : {
-            "description" : "ok",
-            "schema" : {
-              "$ref" : "#/definitions/Login"
-            }
+            "description" : "ok"
           }
         }
       }
@@ -92,7 +92,7 @@
           "200" : {
             "description" : "ok",
             "schema" : {
-              "$ref" : "#/definitions/Testerlanguages"
+              "$ref" : "#/definitions/Response_Testerlanguages"
             }
           },
           "401" : {
@@ -134,20 +134,17 @@
         "summary" : "create a course",
         "parameters" : [ {
           "in" : "body",
-          "name" : "name, description, hidden",
+          "name" : "name, hidden",
           "required" : true,
           "schema" : {
-            "$ref" : "#/definitions/Course"
+            "$ref" : "#/definitions/Body_Course"
           }
         } ],
         "responses" : {
           "200" : {
             "description" : "ok",
             "schema" : {
-              "type" : "array",
-              "items" : {
-                "$ref" : "#/definitions/Course"
-              }
+              "$ref" : "#/definitions/Course"
             }
           },
           "401" : {
@@ -192,10 +189,9 @@
         "parameters" : [ {
           "name" : "course_id",
           "in" : "path",
-          "description" : "ID of course (not course code) to return",
+          "description" : "ID of course (not course code)",
           "required" : true,
-          "type" : "integer",
-          "format" : "int64"
+          "type" : "string"
         } ],
         "responses" : {
           "200" : {
@@ -223,8 +219,67 @@
           "in" : "path",
           "description" : "ID of course (not course code)",
           "required" : true,
-          "type" : "integer",
-          "format" : "int64"
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "ok",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "$ref" : "#/definitions/User"
+              }
+            }
+          },
+          "401" : {
+            "description" : "token expired"
+          },
+          "500" : {
+            "description" : "internal server error"
+          }
+        }
+      },
+      "put" : {
+        "tags" : [ "courses" ],
+        "summary" : "add student(s) to the course",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "course_id",
+          "in" : "path",
+          "description" : "ID of course (not course code)",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "ok",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "$ref" : "#/definitions/User"
+              }
+            }
+          },
+          "401" : {
+            "description" : "token expired"
+          },
+          "500" : {
+            "description" : "internal server error"
+          }
+        }
+      }
+    },
+    "/api/courses/{course_id}/teachers" : {
+      "get" : {
+        "tags" : [ "courses" ],
+        "summary" : "find all teachers teaching a specific course",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "course_id",
+          "in" : "path",
+          "description" : "ID of course (not course code)",
+          "required" : true,
+          "type" : "string"
         } ],
         "responses" : {
           "200" : {
@@ -246,24 +301,16 @@
       }
     },
     "/api/courses/{course_id}/assignments" : {
-      "post" : {
+      "get" : {
         "tags" : [ "assignments" ],
-        "summary" : "create assignment in a course",
+        "summary" : "get all assignments from a course",
         "produces" : [ "application/json" ],
         "parameters" : [ {
           "name" : "course_id",
           "in" : "path",
-          "description" : "ID of course (not course code) to return",
+          "description" : "ID of course (not course code)",
           "required" : true,
-          "type" : "integer",
-          "format" : "int64"
-        }, {
-          "in" : "body",
-          "name" : "name, description, hidden",
-          "required" : true,
-          "schema" : {
-            "$ref" : "#/definitions/Assignment"
-          }
+          "type" : "string"
         } ],
         "responses" : {
           "200" : {
@@ -273,6 +320,382 @@
               "items" : {
                 "$ref" : "#/definitions/Assignment"
               }
+            }
+          },
+          "401" : {
+            "description" : "token expired"
+          },
+          "500" : {
+            "description" : "internal server error"
+          }
+        }
+      },
+      "post" : {
+        "tags" : [ "assignments" ],
+        "summary" : "create assignment in a course",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "course_id",
+          "in" : "path",
+          "description" : "ID of course (not course code)",
+          "required" : true,
+          "type" : "string"
+        }, {
+          "in" : "body",
+          "name" : "name, hidden",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/definitions/Body_Assignment"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "ok",
+            "schema" : {
+              "$ref" : "#/definitions/Assignment"
+            }
+          },
+          "401" : {
+            "description" : "token expired"
+          },
+          "500" : {
+            "description" : "internal server error"
+          }
+        }
+      }
+    },
+    "/api/courses/{course_id}/assignments/{assignment_id}/tests" : {
+      "post" : {
+        "tags" : [ "tests" ],
+        "summary" : "create test in an assignment",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "course_id",
+          "in" : "path",
+          "description" : "ID of course (not course code)",
+          "required" : true,
+          "type" : "string"
+        }, {
+          "name" : "assignment_id",
+          "in" : "path",
+          "description" : "ID of assignment",
+          "required" : true,
+          "type" : "string"
+        }, {
+          "in" : "body",
+          "name" : "no fields required",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/Test"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "ok",
+            "schema" : {
+              "$ref" : "#/definitions/Test"
+            }
+          },
+          "401" : {
+            "description" : "token expired"
+          },
+          "500" : {
+            "description" : "internal server error"
+          }
+        }
+      }
+    },
+    "/api/courses/{course_id}/assignments/{assignment_id}/tests/{test_id}" : {
+      "get" : {
+        "tags" : [ "tests" ],
+        "summary" : "get a specific test from an assignment",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "course_id",
+          "in" : "path",
+          "description" : "ID of course (not course code)",
+          "required" : true,
+          "type" : "string"
+        }, {
+          "name" : "assignment_id",
+          "in" : "path",
+          "description" : "ID of assignment",
+          "required" : true,
+          "type" : "string"
+        }, {
+          "name" : "test_id",
+          "in" : "path",
+          "description" : "ID of test",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "ok",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "$ref" : "#/definitions/Test"
+              }
+            }
+          },
+          "401" : {
+            "description" : "token expired"
+          },
+          "500" : {
+            "description" : "internal server error"
+          }
+        }
+      }
+    },
+    "/api/courses/{course_id}/assignments/{assignment_id}/submit" : {
+      "post" : {
+        "tags" : [ "tester" ],
+        "summary" : "submit code to tester for validation",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "course_id",
+          "in" : "path",
+          "description" : "ID of course (not course code)",
+          "required" : true,
+          "type" : "string"
+        }, {
+          "name" : "assignment_id",
+          "in" : "path",
+          "description" : "ID of assignment",
+          "required" : true,
+          "type" : "string"
+        }, {
+          "in" : "body",
+          "name" : "lang, code",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/definitions/Body_Submit"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "ok",
+            "schema" : {
+              "$ref" : "#/definitions/Response_TesterResult"
+            }
+          },
+          "401" : {
+            "description" : "token expired"
+          },
+          "500" : {
+            "description" : "internal server error"
+          }
+        }
+      }
+    },
+    "/api/courses/{course_id}/assignments/{assignment_id}/save" : {
+      "post" : {
+        "tags" : [ "assignments" ],
+        "summary" : "save user draft in an assignment",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "course_id",
+          "in" : "path",
+          "description" : "ID of course (not course code)",
+          "required" : true,
+          "type" : "string"
+        }, {
+          "name" : "assignment_id",
+          "in" : "path",
+          "description" : "ID of assignment",
+          "required" : true,
+          "type" : "string"
+        }, {
+          "in" : "body",
+          "name" : "no fields required",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/Body_Save"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "ok",
+            "schema" : {
+              "$ref" : "#/definitions/Draft"
+            }
+          },
+          "401" : {
+            "description" : "token expired"
+          },
+          "500" : {
+            "description" : "internal server error"
+          }
+        }
+      }
+    },
+    "/api/courses/{course_id}/assignments/{assignment_id}/draft" : {
+      "get" : {
+        "tags" : [ "assignments" ],
+        "summary" : "get a user draft in an assignment",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "course_id",
+          "in" : "path",
+          "description" : "ID of course (not course code)",
+          "required" : true,
+          "type" : "string"
+        }, {
+          "name" : "assignment_id",
+          "in" : "path",
+          "description" : "ID of assignment",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "ok",
+            "schema" : {
+              "$ref" : "#/definitions/Draft"
+            }
+          },
+          "401" : {
+            "description" : "token expired"
+          },
+          "500" : {
+            "description" : "internal server error"
+          }
+        }
+      }
+    },
+    "/api/courses/{course_id}/enabled_features" : {
+      "get" : {
+        "tags" : [ "courses" ],
+        "summary" : "get all enabled features in a course",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "course_id",
+          "in" : "path",
+          "description" : "ID of course (not course code)",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "ok",
+            "schema" : {
+              "$ref" : "#/definitions/Response_EnabledFeatures"
+            }
+          },
+          "401" : {
+            "description" : "token expired"
+          },
+          "500" : {
+            "description" : "internal server error"
+          }
+        }
+      }
+    },
+    "/api/features/features/{course_id}" : {
+      "get" : {
+        "tags" : [ "features" ],
+        "summary" : "get all features in a course",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "course_id",
+          "in" : "path",
+          "description" : "ID of course (not course code)",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "ok",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "$ref" : "#/definitions/Features"
+              }
+            }
+          },
+          "401" : {
+            "description" : "token expired"
+          },
+          "500" : {
+            "description" : "internal server error"
+          }
+        }
+      }
+    },
+    "/api/features/feature/{course_id}/me" : {
+      "get" : {
+        "tags" : [ "features" ],
+        "summary" : "get features for a user in a course",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "course_id",
+          "in" : "path",
+          "description" : "ID of course (not course code)",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "ok",
+            "schema" : {
+              "$ref" : "#/definitions/Features"
+            }
+          },
+          "401" : {
+            "description" : "token expired"
+          },
+          "500" : {
+            "description" : "internal server error"
+          }
+        }
+      }
+    },
+    "/api/features/badge" : {
+      "post" : {
+        "tags" : [ "badges" ],
+        "summary" : "create a badge in a course",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "course_id, icon, title, description",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/definitions/Body_Badge"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "ok",
+            "schema" : {
+              "$ref" : "#/definitions/Badge"
+            }
+          },
+          "401" : {
+            "description" : "token expired"
+          },
+          "500" : {
+            "description" : "internal server error"
+          }
+        }
+      },
+      "put" : {
+        "tags" : [ "badges" ],
+        "summary" : "get features for a user in a course",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "course_id, icon, title, description",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/definitions/Body_Badge"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "ok",
+            "schema" : {
+              "$ref" : "#/definitions/Badge"
             }
           },
           "401" : {
@@ -292,13 +715,15 @@
       "properties" : {
         "name" : {
           "type" : "string",
-          "format" : "uuid",
           "example" : "introduction to self-awareness"
         },
         "description" : {
           "type" : "string",
-          "format" : "uuid",
           "example" : "Very vague course"
+        },
+        "autojoin" : {
+          "type" : "boolean",
+          "example" : false
         },
         "hidden" : {
           "type" : "boolean",
@@ -324,12 +749,10 @@
       "properties" : {
         "username" : {
           "type" : "string",
-          "format" : "uuid",
           "example" : "Sam"
         },
         "email" : {
           "type" : "string",
-          "format" : "uuid",
           "example" : "Sam@hotmail.com"
         },
         "admin" : {
@@ -357,12 +780,10 @@
       "properties" : {
         "name" : {
           "type" : "string",
-          "format" : "uuid",
           "example" : "Recursive Bounce"
         },
         "description" : {
           "type" : "string",
-          "format" : "uuid",
           "example" : "look at chapter 8 recursion for hints on how to build recursive functions"
         },
         "hidden" : {
@@ -379,11 +800,10 @@
     },
     "Test" : {
       "type" : "object",
-      "required" : [ "stdout" ],
       "properties" : {
         "stdout" : {
           "type" : "string",
-          "example" : "hello world\\n"
+          "example" : "hello world"
         },
         "stdin" : {
           "type" : "string",
@@ -391,47 +811,191 @@
         },
         "args" : {
           "type" : "array",
+          "example" : [ "55", "42", "1", "-99" ],
           "items" : {
-            "type" : "string",
-            "example" : ""
+            "type" : "string"
           }
         }
       }
     },
-    "Login" : {
+    "Badge" : {
       "type" : "object",
-      "required" : [ "admin", "username" ],
+      "required" : [ "course_id", "description", "icon", "title" ],
       "properties" : {
-        "username" : {
+        "course_id" : {
           "type" : "string",
-          "format" : "uuid",
-          "example" : "Sam"
+          "example" : "5a0c3b8dbb3d4c06df6f6862"
         },
-        "email" : {
+        "icon" : {
           "type" : "string",
-          "format" : "uuid",
-          "example" : "Sam@hotmail.com"
+          "example" : "frontend/badges/cool_badge.jpg"
         },
-        "admin" : {
-          "type" : "boolean",
-          "example" : true
+        "title" : {
+          "type" : "string",
+          "example" : "badge of madness"
         },
-        "courses" : {
+        "description" : {
+          "type" : "string",
+          "example" : "this badge is earned through countless hours of programming"
+        },
+        "goals" : {
+          "$ref" : "#/definitions/Badge_goals"
+        }
+      }
+    },
+    "Draft" : {
+      "required" : [ "assignment", "user" ],
+      "properties" : {
+        "user" : {
+          "type" : "string",
+          "example" : "5a0aac5edd0d661f04f462bc"
+        },
+        "assignment" : {
+          "type" : "string",
+          "example" : "5a0ed1cf1bc63d529223a167"
+        },
+        "code" : {
+          "type" : "string",
+          "example" : "int myFunc(a, b){return a*b}"
+        },
+        "lang" : {
+          "type" : "string",
+          "example" : "java"
+        },
+        "_id" : {
+          "type" : "string",
+          "example" : "5a12afe0bc88c426981e68fa"
+        }
+      }
+    },
+    "Features" : {
+      "type" : "object",
+      "required" : [ "user" ],
+      "properties" : {
+        "user" : {
+          "$ref" : "#/definitions/User"
+        },
+        "progress" : {
           "type" : "array",
           "items" : {
-            "$ref" : "#/definitions/Course"
+            "$ref" : "#/definitions/Features_progress"
           }
         },
-        "providers" : {
+        "badges" : {
           "type" : "array",
           "items" : {
-            "type" : "string",
-            "example" : ""
+            "$ref" : "#/definitions/Badge"
           }
         }
       }
     },
-    "Testerlanguages" : {
+    "Body_Course" : {
+      "type" : "object",
+      "required" : [ "hidden", "name" ],
+      "properties" : {
+        "course_code" : {
+          "type" : "string",
+          "example" : "m7011e"
+        },
+        "name" : {
+          "type" : "string",
+          "example" : "introduction to self-awareness"
+        },
+        "description" : {
+          "type" : "string",
+          "example" : "Very vague course.."
+        },
+        "hidden" : {
+          "type" : "boolean",
+          "example" : false
+        },
+        "autojoin" : {
+          "type" : "boolean",
+          "example" : false
+        },
+        "enabled_features" : {
+          "$ref" : "#/definitions/Response_EnabledFeatures"
+        }
+      }
+    },
+    "Body_Submit" : {
+      "type" : "object",
+      "required" : [ "code", "lang" ],
+      "properties" : {
+        "lang" : {
+          "type" : "string",
+          "example" : "python3"
+        },
+        "code" : {
+          "type" : "string",
+          "example" : "print('hello world!')"
+        }
+      }
+    },
+    "Body_Assignment" : {
+      "type" : "object",
+      "required" : [ "hidden", "name" ],
+      "properties" : {
+        "name" : {
+          "type" : "string",
+          "example" : "Recursive bounce"
+        },
+        "description" : {
+          "type" : "string",
+          "example" : "look at chapter 8 recursion for hints on how to build recursive functions"
+        },
+        "hidden" : {
+          "type" : "boolean",
+          "example" : false
+        },
+        "languages" : {
+          "type" : "array",
+          "example" : [ "python27", "python3", "java" ],
+          "items" : {
+            "type" : "string"
+          }
+        }
+      }
+    },
+    "Body_Save" : {
+      "type" : "object",
+      "properties" : {
+        "code" : {
+          "type" : "string",
+          "example" : "hello wo"
+        },
+        "lang" : {
+          "type" : "string",
+          "example" : "python27"
+        }
+      }
+    },
+    "Body_Badge" : {
+      "type" : "object",
+      "required" : [ "course_id", "description", "icon", "title" ],
+      "properties" : {
+        "course_id" : {
+          "type" : "string",
+          "example" : "59f991991ac36c0762eb46af"
+        },
+        "icon" : {
+          "type" : "string",
+          "example" : "frontend/badges/cool_badge.jpg"
+        },
+        "title" : {
+          "type" : "string",
+          "example" : "badge of madness"
+        },
+        "description" : {
+          "type" : "string",
+          "example" : "this badge is earned through countless hours of programming"
+        },
+        "goals" : {
+          "$ref" : "#/definitions/Body_Badge_goals"
+        }
+      }
+    },
+    "Response_Testerlanguages" : {
       "properties" : {
         "languages" : {
           "type" : "array",
@@ -441,6 +1005,54 @@
           }
         }
       }
+    },
+    "Response_TesterResult" : {
+      "properties" : {
+        "results" : {
+          "$ref" : "#/definitions/Response_TesterResult_results"
+        },
+        "user_id" : {
+          "type" : "string",
+          "example" : "5a0aac5edd0d661f04f462bc"
+        },
+        "assignment_id" : {
+          "type" : "string",
+          "example" : "5a0c3e4bbb3d4c06df6f6863"
+        },
+        "course_id" : {
+          "type" : "string",
+          "example" : "5a0c3b8dbb3d4c06df6f6862"
+        },
+        "passed" : {
+          "type" : "boolean",
+          "example" : true
+        },
+        "features" : {
+          "$ref" : "#/definitions/Response_TesterResult_features"
+        }
+      }
+    },
+    "Response_EnabledFeatures" : {
+      "type" : "object",
+      "properties" : {
+        "badges" : {
+          "type" : "boolean",
+          "example" : true
+        },
+        "progressbar" : {
+          "type" : "boolean",
+          "example" : true
+        },
+        "leaderboard" : {
+          "type" : "boolean",
+          "example" : false
+        },
+        "adventuremap" : {
+          "type" : "boolean",
+          "example" : false
+        }
+      },
+      "description" : "Older courses may not be updated with all properties, suggested is to assume the missing fiels to false until updated."
     },
     "Assignment_tests" : {
       "properties" : {
@@ -452,6 +1064,165 @@
         },
         "lint" : {
           "type" : "boolean"
+        }
+      }
+    },
+    "Badge_goals_assignments" : {
+      "required" : [ "assignment" ],
+      "properties" : {
+        "assignment" : {
+          "$ref" : "#/definitions/Assignment"
+        },
+        "tests" : {
+          "type" : "array",
+          "items" : {
+            "$ref" : "#/definitions/Test"
+          }
+        },
+        "code_size" : {
+          "type" : "number",
+          "example" : 255.0
+        }
+      }
+    },
+    "Badge_goals" : {
+      "properties" : {
+        "badges" : {
+          "type" : "array",
+          "items" : {
+            "$ref" : "#/definitions/Badge"
+          }
+        },
+        "assignments" : {
+          "type" : "array",
+          "items" : {
+            "$ref" : "#/definitions/Badge_goals_assignments"
+          }
+        }
+      },
+      "description" : "properties that unlocks the badge, may be other badges or assignments etc"
+    },
+    "Features_progress" : {
+      "required" : [ "assignment", "code_size", "tests", "timing" ],
+      "properties" : {
+        "assignment" : {
+          "$ref" : "#/definitions/Assignment"
+        },
+        "tests" : {
+          "type" : "array",
+          "items" : {
+            "$ref" : "#/definitions/Test"
+          }
+        },
+        "timing" : {
+          "type" : "number",
+          "example" : 1900.0
+        },
+        "code_size" : {
+          "type" : "number",
+          "example" : 138.0
+        }
+      }
+    },
+    "Body_Badge_goals" : {
+      "properties" : {
+        "badges" : {
+          "type" : "array",
+          "example" : [ "59f991991ac36c0762eb46af", "59f991991ac36c0762eb46af" ],
+          "items" : {
+            "type" : "string"
+          }
+        },
+        "assignments" : {
+          "type" : "array",
+          "example" : [ "59f991991ac36c0762eb46sd", "59f991991ac36c0762eb46sd" ],
+          "items" : {
+            "type" : "string"
+          }
+        }
+      }
+    },
+    "Response_TesterResult_results_io" : {
+      "properties" : {
+        "id" : {
+          "type" : "string",
+          "example" : "5a0c5821381e9620a804d253"
+        },
+        "ok" : {
+          "type" : "boolean",
+          "example" : true
+        },
+        "stderror" : {
+          "type" : "string",
+          "example" : "stacktrace...."
+        },
+        "time" : {
+          "type" : "number",
+          "example" : 4.8555035E7
+        }
+      }
+    },
+    "Response_TesterResult_results_prepare" : {
+      "properties" : {
+        "ok" : {
+          "type" : "boolean",
+          "example" : true
+        },
+        "error" : {
+          "type" : "string",
+          "example" : "Syntax error: ..."
+        }
+      }
+    },
+    "Response_TesterResult_results" : {
+      "properties" : {
+        "io" : {
+          "type" : "array",
+          "items" : {
+            "$ref" : "#/definitions/Response_TesterResult_results_io"
+          }
+        },
+        "prepare" : {
+          "$ref" : "#/definitions/Response_TesterResult_results_prepare"
+        },
+        "code_size" : {
+          "type" : "number",
+          "example" : 20.0
+        },
+        "optional_tests" : {
+          "type" : "array",
+          "items" : {
+            "$ref" : "#/definitions/Test"
+          }
+        },
+        "lint" : {
+          "type" : "string",
+          "example" : "/tmp/tmp-217d234NkgcSmd.tmp:1:21: W292 no newline at the end of file"
+        }
+      }
+    },
+    "Response_TesterResult_features_progress" : {
+      "properties" : {
+        "total" : {
+          "type" : "number",
+          "example" : 2.0
+        },
+        "completed" : {
+          "type" : "number",
+          "example" : 1.0
+        }
+      }
+    },
+    "Response_TesterResult_features" : {
+      "properties" : {
+        "badges" : {
+          "type" : "array",
+          "items" : {
+            "$ref" : "#/definitions/Badge"
+          }
+        },
+        "progress" : {
+          "$ref" : "#/definitions/Response_TesterResult_features_progress"
         }
       }
     }
