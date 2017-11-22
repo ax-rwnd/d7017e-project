@@ -865,8 +865,5 @@ exports.checkIfUserIsTeacherObject = checkIfUserIsTeacherObject;
 exports.getCourseInvites = getCourseInvites;
 exports.getUserInvites = getUserInvites;
 exports.getInvitesCourseUser = getInvitesCourseUser;
-<<<<<<< HEAD
-=======
 exports.getAssignmentTests = getAssignmentTests;
 exports.getUserPopulated = getUserPopulated;
->>>>>>> 1521a225b2236b3da526bfcb359f72c14c19c6fb
