@@ -8,9 +8,9 @@ var languages = requireDir('./languages');
 
 const timeout = 5000; // ms
 
-function result(id, ok, stderr, time) {
+function result(id, ok, stdout, stderr, time) {
     // Build a result struct
-    return {id:id, ok:ok, stderr:stderr, time:time};
+    return {id:id, ok:ok, stdout:stdout, stderr:stderr, time:time};
 }
 
 async function runTests(request) {
@@ -82,18 +82,18 @@ async function runTest(test, executable, langModule) {
         let output = await validateAndRun(executable, test, langModule);
         if (output.stdout !== test.stdout) {
             // TODO: tell them what broke our expectations
-            return new result(test.id, false, output.stderr, output.time);
+            return new result(test.id, false, output.stdout, output.stderr, output.time);
         } else {
             // test succeeded
-            return new result(test.id, true, output.stderr, output.time);
+            return new result(test.id, true, output.stdout, output.stderr, output.time);
         }
     } catch (e) {
         // SIGTERM is sent to the child process on timeout
         if (e.signal == 'SIGTERM') {
             console.log('Execution timed out on test:', test.id);
-            return new result(test.id, false, 'Your test was aborted', undefined);
+            return new result(test.id, false, '', 'Your test was aborted', undefined);
         } else {
-            return new result(test.id, false, e.message, undefined);
+            return new result(test.id, false, '', e.message, undefined);
             //throw e;
         }
     }

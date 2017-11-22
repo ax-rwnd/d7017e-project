@@ -31,8 +31,8 @@ describe('language tests', function() {
         const expected = {
             results: {
                 io: [
-                    {id: 0, ok: true, stderr: 'debug\n'},
-                    {id: 1, ok: false, stderr: 'debug\n'}
+                    {id: 0, ok: true, stdout: 'hello world\n', stderr: 'debug\n'},
+                    {id: 1, ok: false, stdout: 'hello world\n', stderr: 'debug\n'}
                 ],
                 prepare: '',
                 code_size: 60,
@@ -80,8 +80,8 @@ describe('language tests', function() {
         const expected = {
             results: {
                 io: [
-                    {id: 0, ok: true, stderr: 'debug\n'},
-                    {id: 1, ok: false, stderr: 'debug\n'}
+                    {id: 0, ok: true, stdout: 'hello world\n', stderr: 'debug\n'},
+                    {id: 1, ok: false, stdout: 'hello world\n', stderr: 'debug\n'}
                 ],
                 prepare: '',
                 code_size: 64,
@@ -129,8 +129,8 @@ describe('language tests', function() {
         const expected = {
             results: {
                 io: [
-                    {id: 0, ok: true, stderr: ''},
-                    {id: 1, ok: false, stderr: ''}
+                    {id: 0, ok: true, stdout: '5\n', stderr: ''},
+                    {id: 1, ok: false, stdout: '', stderr: ''}
                 ],
                 prepare: '',
                 code_size: 111
@@ -177,8 +177,8 @@ describe('language tests', function() {
         const expected = {
             results: {
                 io: [
-                    {id: 0, ok: true, stderr: ''},
-                    {id: 1, ok: false, stderr: ''}
+                    {id: 0, ok: true, stdout: 'Hello World', stderr: ''},
+                    {id: 1, ok: false, stdout: 'Hello World', stderr: ''}
                 ],
                 prepare: '',
                 code_size: 64
