@@ -260,7 +260,7 @@ export class BackendService {
     return this.apiPut('/api/courses/' + course_id + '/students/invite', {'student_id': student_id});
   }
   declineInvite(course_id: ObjectID) {
-    return this.apiDelete('/api/courses' + course_id + '/students/invite');
+    return this.apiDelete('/api/courses/' + course_id + '/students/invite');
   }
 
   getCoursesById(user_id: string) {
