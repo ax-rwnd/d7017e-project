@@ -25,6 +25,11 @@
         <app-mod-badges [courseCode]="currentCourse.id"></app-mod-badges>
 
         <app-mod-leaderboard [courseCode]="currentCourse.id"></app-mod-leaderboard>
+        <div class="col-lg-6">
+          <div *ngFor="let g of assignmentGroups">
+            <app-assignment-group [assignmentGroup]="g" [courseCode]="currentCourse.id"></app-assignment-group>
+          </div>
+        </div>
       </span>
       <ng-template #teacherView></ng-template>
     </div>
