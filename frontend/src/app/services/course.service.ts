@@ -22,13 +22,9 @@ export class CourseService {
     return newCourse(id, name, code, course_info, newRewards(progValue, scoreValue, badgesArr, lbArr), progress_assignments);
   }
   GetCourse(courseId) {
-    for (let i = 0; i < this.courses.length; i++) {
-      if (this.courses[i].id === courseId) {
-        return this.courses[i];
-      } else if (this.teaching[i].id === courseId) {
-        return this.teaching[i];
-      }
-    }
+    const parti = this.courses.find((current) => current.id === courseId);
+    const teach = this.teaching.find((current) => current.id === courseId);
+    return (parti === undefined) ? teach : parti;
   }
   AddCourse(course) {
     this.courses[this.courses.length] = course;
