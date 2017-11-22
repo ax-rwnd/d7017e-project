@@ -708,7 +708,7 @@ function searchDB(query, categories, user_id) {
 }
 
 function searchDBCourses(query, user_id) {
-    return Course.find({$text: {$search: query}, 'students': user_id, 'hidden': false}, {score: {$meta: "textScore"}})
+    return Course.find({$text: {$search: '\"'+query+'\"'}, 'students': user_id, 'hidden': false}, {score: {$meta: "textScore"}})
         .select('-__v -hidden -features -assignments -students -enabled_features')
         .sort({score: {$meta: "textScore"}})
         .limit(20).then(docs => {
@@ -719,7 +719,7 @@ function searchDBCourses(query, user_id) {
 }
 
 function searchDBAssignments(query, assignment_ids) {
-    return Assignment.find({$text: {$search: query}, '_id': assignment_ids, 'hidden': false}, {score: {$meta: "textScore"}})
+    return Assignment.find({$text: {$search: '\"'+query+'\"'}, '_id': assignment_ids, 'hidden': false}, {score: {$meta: "textScore"}})
         .select('-__v -tests -optional_tests -hidden -languages')
         .sort({score: {$meta: "textScore"}})
         .limit(20).then(docs => {
@@ -730,7 +730,7 @@ function searchDBAssignments(query, assignment_ids) {
 }
 
 function searchDBUsers(query) {
-    return User.find({$text: {$search: query}}, {score: {$meta: "textScore"}})
+    return User.find({$text: {$search: '\"'+query+'\"'}}, {score: {$meta: "textScore"}})
         .select('-__v -tokens -providers')
         .sort({score: {$meta: "textScore"}})
         .limit(20).then(docs => {
