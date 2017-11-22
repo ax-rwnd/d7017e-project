@@ -66,10 +66,10 @@ var courseSchema = new Schema({
     assignments: [{ type: Schema.Types.ObjectId, ref: 'Assignment', required: false }],
     features: [{ type: Schema.Types.ObjectId, ref: 'Features', required: true }], //progress, badges etc.
     enabled_features: {
-        badges: Boolean,
-        progressbar: Boolean,
-        leaderboard: Boolean,
-        adventuremap: Boolean
+        badges: {type: Boolean, required: true},
+        progressbar: {type: Boolean, required: true},
+        leaderboard: {type: Boolean, required: true},
+        adventuremap: {type: Boolean, required: true}
     }
 });
 courseSchema.index({course_code: 'text', name: 'text', description: 'text'}, {weights: {course_code: 10, name: 5, description: 1}});
