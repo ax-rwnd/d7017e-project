@@ -3,35 +3,32 @@
   <div class="container">
     <div class="col-lg-6">
       <h1>
-        {{currentCourse.code}}
+        {{currentCourse.code}} - {{currentCourse.name}}
       </h1>
       <button type="button" class="btn" id="createNewAssignment" [routerLink]="['/courses', currentCourse.id, 'createNewAssignment']">Create New Assignment</button>
       <button type="button" class="btn" (click)="openModal(inviteStudentModal)">Invite student to course</button>
 
-      <markdown [data]="currentCourse.course_info"></markdown>
+      <span *ngIf="teachCourses.indexOf(currentCourse) === -1; else teacherView">
+        <markdown [data]="currentCourse.course_info"></markdown>
 
-      <app-mod-progressbar [courseCode]="currentCourse.id"></app-mod-progressbar>
+        <app-mod-progressbar [courseCode]="currentCourse.id"></app-mod-progressbar>
 
-      <!--<app-mod-adventuremap ></app-mod-adventuremap>-->
-
-      <div class="gamification-block panel panel-default" *ngIf="currentCourse.rewards.score !== false">
-        <div class="panel-heading gamification-header">
-          Score
+        <div class="gamification-block panel panel-default" *ngIf="currentCourse.rewards.score !== false">
+          <div class="panel-heading gamification-header">
+            Score
+          </div>
+          <div class="panel-body">
+            {{currentCourse.rewards.score}}
+          </div>
         </div>
-        <div class="panel-body">
-          {{currentCourse.rewards.score}}
-        </div>
-      </div>
 
-      <app-mod-badges [courseCode]="currentCourse.id"></app-mod-badges>
+        <app-mod-badges [courseCode]="currentCourse.id"></app-mod-badges>
 
-      <app-mod-leaderboard [courseCode]="currentCourse.id"></app-mod-leaderboard>
+        <app-mod-leaderboard [courseCode]="currentCourse.id"></app-mod-leaderboard>
+      </span>
+      <ng-template #teacherView></ng-template>
     </div>
-    <div class="col-lg-6">
-      <div *ngFor="let g of assignmentGroups">
-        <app-assignment-group [assignmentGroup]="g" [courseCode]="currentCourse.id"></app-assignment-group>
-      </div>
-    </div>
+
   </div>
 
 </div>
