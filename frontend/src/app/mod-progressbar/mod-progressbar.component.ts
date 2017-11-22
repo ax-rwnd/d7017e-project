@@ -11,6 +11,7 @@ export class ModProgressbarComponent extends GameelementComponent implements OnI
   @Input() courseCode: string;
   private maxAssignments: number;
   private currentAssignments: number;
+  private progress: number;
 
   ngOnInit() {
     this.currentAssignments = 0;
@@ -28,6 +29,14 @@ export class ModProgressbarComponent extends GameelementComponent implements OnI
     this.backendService.getFeaturesCourseMe(this.courseCode).then((data: any) => {
       this.currentAssignments = data.completed_assignments;
       this.maxAssignments = data.total_assignments;
+
+      // Set progress
+      if (this.maxAssignments === 0) {
+        this.progress = 1;
+      } else {
+        this.progress = this.currentAssignments / this.maxAssignments;
+      }
+      this.progress *= 100;
     });
   }
 
