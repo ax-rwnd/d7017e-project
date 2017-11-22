@@ -9,7 +9,7 @@
 
   <div class="container">
     <div class="row">
-      <div class="container">
+      <div class="container col-lg-9">
         <!-- Title -->
         <h2>Latest</h2>
         <!-- The head panel -->
@@ -47,6 +47,36 @@
 
           </div>
         </div>
+      </div>
+      <div class="col-lg-3">
+        <h2>Join requests</h2>
+        <div *ngFor="let p of pending">
+          <div class="row">
+            <div class="col-md-10" *ngIf="p.course['course_code'] !== undefined">
+              <h4>{{p.course['course_code']}}</h4>
+            </div>
+            <div class="col-md-10" *ngIf="p.course['course_code'] === undefined">
+              <h4>{{p.course['name']}}</h4>
+            </div>
+            <div class="col-md-2">
+              <button (click)="cancelRequest(p.course['_id'])" class="btn btn-danger">Cancel</button>
+            </div>
+          </div>
+        </div>
+        <h2>Invites</h2>
+        <div *ngFor="let i of invites">
+          <div class="row">
+            <div class="col-md-10" *ngIf="i.course['course_code'] !== undefined">
+              <h4>{{i.course['course_code']}}</h4>
+            </div>
+            <div class="col-md-8" *ngIf="i.course['course_code'] === undefined">
+              <h4>{{i.course['name']}}</h4>
+            </div>
+            <div class="col-md-4">
+              <button (click)="acceptInvite(i.course['_id'])" class="btn btn-success">Accept</button>
+              <button (click)="declineInvite(i.course['_id'])" class="btn btn-danger">Decline</button>
+            </div>
+          </div>
       </div>
     </div>
   </div>
