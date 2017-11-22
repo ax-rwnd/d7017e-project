@@ -15,6 +15,14 @@ var config = require('config');
 
 
 const FIELDS = {
+    USER: {
+        MODEL: require('../../models/schemas').User,
+        BASE_FIELDS: "username email admin access courses teaching providers",
+        ADMIN: "username email admin access courses teaching providers",
+        TEACHER: "username email admin access courses teaching providers",
+        STUDENT: "username email admin access courses teaching providers",
+        POPULATE_FIELDS: "courses teaching"
+    },
     COURSE: {
         MODEL: require('../../models/schemas').Course,
         BASE_FIELDS: "course_code name description",
@@ -46,6 +54,12 @@ const FIELDS = {
         MODEL: require('../../models/schemas').Test,
         BASE_FIELDS: "stdout stdin args",
         POPULATE_FIELDS: ""
+    },
+    TEACHING: {
+        BASE_FIELDS: "course_code name description"
+    },
+    COURSES: {
+        BASE_FIELDS: "course_code name description"
     }
 };
 
@@ -87,6 +101,22 @@ function getUser(id, fields) {
             throw errors.USER_NOT_FOUND;
         }
         return user;
+    });
+}
+
+function getUserPopulated(user_id, roll, fields) {
+    var wantedFields = fields || FIELDS.USER[roll.toUpperCase()];
+    wantedFields = wantedFields.replace(/,/g, " ");
+
+    return User.findById(user_id, wantedFields)
+    .then(function (userObject) {
+        if (!userObject) {
+            throw errors.USER_NOT_FOUND;
+        }
+        return populateObject(userObject, "user", wantedFields)
+        .then(function(populatedUser) {
+            return populatedUser[0];
+        });
     });
 }
 
@@ -545,6 +575,16 @@ function getTest(id, fields) {
     });
 }
 
+function getAssignmentTests(course_id, assignment_id) {
+    return Assignment.findById(assignment_id, "tests").populate("tests.io")
+    .then(function (assignmentObject) {
+        if (!assignmentObject) {
+            throw errors.ASSIGNMENT_DOES_NOT_EXIST;
+        }
+        return assignmentObject;
+    });
+}
+
 function createAssignment(name, description, hidden, languages, course_id) {
     var newAssignment = new Assignment({name: name, description: description, hidden: hidden, tests: {io: [], lint: false}, optionaal_tests: {io: [], lint: false}, languages: languages});
     return newAssignment.save().then(function (createdAssignment) {
@@ -607,20 +647,15 @@ function checkPermission(wantedFields, collection, roll) {
 // Populates all wanted fields which is a Ref.
 // Needs to be specified in FIELDS
 function populateObject(mongooseObject, schema, wantedFields) {
-    console.log(mongooseObject);
-    console.log(schema);
     console.log(wantedFields);
     var fieldsToPopulateArray = FIELDS[schema.toUpperCase()].POPULATE_FIELDS.split(" ");
     var populatePromises = [];
     var model = FIELDS[schema.toUpperCase()].MODEL;
     fieldsToPopulateArray.forEach(function(element) {
-        console.log("LOOP");
         if (wantedFields.indexOf(element) !== -1) {
-            console.log(element);
             populatePromises.push(model.populate(mongooseObject, {path: element, select: FIELDS[element.toUpperCase()].BASE_FIELDS}));
         }
     });
-    console.log(populatePromises);
     if (populatePromises.length === 0) {
         return new Promise((resolve, reject) => {
             resolve([mongooseObject]);
@@ -830,3 +865,5 @@ exports.checkIfUserIsTeacherObject = checkIfUserIsTeacherObject;
 exports.getCourseInvites = getCourseInvites;
 exports.getUserInvites = getUserInvites;
 exports.getInvitesCourseUser = getInvitesCourseUser;
+exports.getAssignmentTests = getAssignmentTests;
+exports.getUserPopulated = getUserPopulated;

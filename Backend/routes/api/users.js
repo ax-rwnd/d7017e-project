@@ -34,7 +34,7 @@ module.exports = function (router) {
 
 
     router.get('/me', function (req, res, next) {
-        queries.getUser(req.user.id, PRIVILEGED_FILTER).then(function (user) {
+        queries.getUserPopulated(req.user.id, "Admin").then(function (user) {
             res.json(user);
         })
         .catch(function(err) {

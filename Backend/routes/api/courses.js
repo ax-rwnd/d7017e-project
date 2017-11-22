@@ -678,7 +678,21 @@ module.exports = function(router) {
     router.get('/:course_id/assignments/:assignment_id/tests', function (req, res, next) {
         var course_id = req.params.course_id;
         var assignment_id = req.params.assignment_id;
-        res.send("/courses/" + course_id + "/assignments/" + assignment_id + "/tests GET Endpoint");
+
+        if (!mongoose.Types.ObjectId.isValid(assignment_id) || !mongoose.Types.ObjectId.isValid(course_id)) {
+            return next(errors.BAD_INPUT);
+        }
+
+        queries.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.admin)
+        .then(function () {
+            return queries.getAssignmentTests(course_id, assignment_id);
+        })
+        .then(function (assignmentTests) {
+            return res.json(assignmentTests);
+        })
+        .catch(function (error) {
+            return next(error);
+        });
     });
 
     router.post('/:course_id/assignments/:assignment_id/tests', function (req, res, next) {
