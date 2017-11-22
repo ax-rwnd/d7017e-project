@@ -119,7 +119,7 @@ export class CreateassignmentComponent implements OnInit {
         const assignmentId = response._id;
         console.warn('assignmentId was', assignmentId);
         for (const test of this.unitTests) {
-          this.backendService.createTest(this.courseId, this.unitTests, assignmentId);
+          this.backendService.createTest(this.courseId, test, assignmentId);
         }
       });
   }
