@@ -6,7 +6,7 @@ import {AssignmentService} from './assignment.service';
 @Injectable()
 export class CourseService {
   courses: Course[];
-  teaching: Object[];
+  teaching: Course[];
   updated = false;
   constructor(private backendService: BackendService, private assignmentService: AssignmentService) {
     this.courses = [];
@@ -25,6 +25,8 @@ export class CourseService {
     for (let i = 0; i < this.courses.length; i++) {
       if (this.courses[i].id === courseId) {
         return this.courses[i];
+      } else if (this.teaching[i].id === courseId) {
+        return this.teaching[i];
       }
     }
   }
