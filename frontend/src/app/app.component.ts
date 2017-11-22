@@ -33,6 +33,7 @@ class Course {
 export class AppComponent implements OnInit {
   sidebarState;
   courses: any;
+  teachCourses: any;
 
   constructor(private headService: HeadService, private courseService: CourseService) {
     this.headService.stateChange.subscribe(sidebarState => { this.sidebarState = sidebarState; });
@@ -41,6 +42,7 @@ export class AppComponent implements OnInit {
   ngOnInit() {
     this.sidebarState = 'inactive';
     this.courses = this.courseService.courses;
+    this.teachCourses = this.courseService.teaching;
   }
 
 }

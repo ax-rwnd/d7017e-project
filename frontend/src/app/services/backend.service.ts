@@ -182,7 +182,7 @@ export class BackendService {
   getCourseAssignmentTests(course_id: ObjectID, assignment_id: ObjectID) {
     // Get all tests of a specific assignment
 
-    return this.apiGet('/api/courses/' + course_id.get() + '/assignments/' + assignment_id.get() + '/tests/');
+    return this.apiGet('/api/courses/' + course_id.get() + '/assignments/' + assignment_id.get() + '/tests');
   }
 
   postNewBadge(icon: string, title: string, description: string) {

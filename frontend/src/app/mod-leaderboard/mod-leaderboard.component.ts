@@ -36,7 +36,7 @@ export class ModLeaderboardComponent extends GameelementComponent implements OnC
       });
 
       // Sort and filter out low-scoring students
-      leaderList = leaderList.sort( (a: any, b: any) => a.score < b.score ? -1 : a.score < b.score ? 1 : 0);
+      leaderList = leaderList.sort( (a: any, b: any) => a.score < b.score ? 1 : 0);
       this.leaderList = leaderList.slice(0, 5);
     })
       .catch(err => console.error('Leaderboard update failed', err));

@@ -1,13 +1,24 @@
 <router-outlet>
   <!-- This is the sidebar -->
   <div id="menu" class="sidebar" [@sidebar]="sidebarState"><!-- sidebar collapse width [ngStyle]="setSidebar"() -->
-    <div class="courseTitle"> COURSES</div>
+    <div class="courseTitle"> Courses</div>
     <ul class="nav nav-pills nav-stacked"> <!-- iterates over a list of courses -->
       <li [routerLinkActive]="['active']" *ngFor="let course of courses">
         <a routerLink="/courses/{{course.id}}">
           <span *ngIf="course.code; else courseName">{{course.code}} <!-- control if course.id exist --></span>
           <ng-template #courseName>
             {{course.name | slice:0:20}}{{course.name > 20 ? '' : '...'}}
+          </ng-template>
+        </a>
+      </li>
+    </ul>
+    <div class="courseTitle"> My courses</div>
+    <ul class="nav nav-pills nav-stacked"> <!-- iterates over a list of courses -->
+      <li [routerLinkActive]="['active']" *ngFor="let course of teachCourses">
+        <a routerLink="/courses/{{course.id}}">
+          <span *ngIf="course.code; else courseName">{{course.code}} <!-- control if course.id exist --></span>
+          <ng-template #courseName>
+            {{course.name | slice:0:20}}{{course.name > 20 ? '...' : ''}} <!-- if true dots, else nothing -->
           </ng-template>
         </a>
       </li>

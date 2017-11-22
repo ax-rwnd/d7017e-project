@@ -27,6 +27,7 @@ import { BackendService } from '../services/backend.service';
 })
 export class CoursesComponent implements OnInit {
   assignmentGroups: AssignmentGroup[];
+  teachCourses: any;
   assignments: string[];
   exercises: string[];
   sidebarState; // state of sidebar
@@ -65,6 +66,7 @@ export class CoursesComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.teachCourses = this.courseService.teaching;
     this.sidebarState = this.headService.getCurrentState();
     this.possibleStudents = [];
     this.form = this.fb.group(this.defaultForm);

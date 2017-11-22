@@ -82,21 +82,21 @@ export class AssignmentComponent implements OnInit, OnDestroy {
     this.testStrings = [];
     // this.getTests();
     // Use getTests as soon as backend routes are working
-    this.tests = [
-        {
-        '_id': '59e4cb34d679e102ff66b865',
-        'stdin': '',
-        'stdout': 'hello world\n',
-        'args': [],
-        '__v': 0},
-        {
-          '_id': '59e4cb34d679e102ff66b865',
-          'stdin': 'test',
-          'stdout': 'hello world again\n',
-          'args': [],
-          '__v': 1},
-    ];
-    this.testStrings = this.formatTests(this.tests);
+    // this.tests = [
+    //     {
+    //     '_id': '59e4cb34d679e102ff66b865',
+    //     'stdin': '',
+    //     'stdout': 'hello world\n',
+    //     'args': [],
+    //     '__v': 0},
+    //     {
+    //       '_id': '59e4cb34d679e102ff66b865',
+    //       'stdin': 'test',
+    //       'stdout': 'hello world again\n',
+    //       'args': [],
+    //       '__v': 1},
+    // ];
+    // this.testStrings = this.formatTests(this.tests);
 
     // Periodically save a draft of the code
     this.draftSubscription = Observable.interval(30 * 1000).subscribe(x => {
@@ -170,7 +170,7 @@ export class AssignmentComponent implements OnInit, OnDestroy {
   hasPassed() {
     // returns true if we have passed the assignment already
     for (let prog of this.currentCourse.rewards.progress) {
-      if (prog.assignment === this.assignment.id) {
+      if (prog.assignment._id === this.assignment.id) {
         return true;
       }
     }
