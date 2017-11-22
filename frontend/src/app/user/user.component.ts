@@ -31,26 +31,22 @@ import {AssignmentService} from '../services/assignment.service';
 export class UserComponent implements OnInit {
   user: any;
   statistics: boolean;
-  sidebarState: any; // get current state
+  sidebarState: any;
   courses: any;
   modalRef: BsModalRef;
   form: FormGroup;
   defaultForm = {
     search: ''
-    /*name: ['', [Validators.required]],
-    code: ['', [Validators.required]],
-    course_info: ['', [Validators.required]],
-    progress: [false, []],
-    score: [false, []],
-    badges: [false, []],
-    leaderboard: [false, []],*/
   };
   possibleCourses: any[];
 
   constructor(private http: HttpClient, private route: ActivatedRoute, private headService: HeadService, private userService: UserService,
               private modalService: BsModalService, private backendService: BackendService, private courseService: CourseService,
               private fb: FormBuilder, public auth: AuthService, private assignmentService: AssignmentService) {
-    this.headService.stateChange.subscribe(sidebarState => { this.sidebarState = sidebarState; }); // subscribe to the state value head provides
+
+    // Subscrive to the header state
+    this.headService.stateChange.subscribe(sidebarState => {
+      this.sidebarState = sidebarState; });
   }
 
   ngOnInit() {
@@ -62,12 +58,15 @@ export class UserComponent implements OnInit {
     this.possibleCourses = [];
     this.backendService.getMyInvites()
       .then(response => console.log(response));
-    // this.possibleCourses = [{name: 'course 1', id: '0'}, {name: 'course 2', id: '1'}];
   }
+
   toggleStatistics() {
     this.statistics = !this.statistics;
   }
+
   openModal(modal) {
+    // Opens a modal dialog
+
     this.form = this.fb.group(this.defaultForm);
     this.possibleCourses = [];
     this.modalRef = this.modalService.show(modal);
@@ -86,59 +85,49 @@ export class UserComponent implements OnInit {
         }
       });
   }
+
   createCourse() {
-    const course = this.courseService.CreateCourse('10000', this.form.value.name, this.form.value.code,
-      this.form.value.info, this.form.value.progress, this.form.value.score, this.form.value.badges, this.form.value.leaderboard);
+    // Adds a course to the course service
+
+    const course = this.courseService.CreateCourse('10000', this.form.value.name,
+      this.form.value.code, this.form.value.info, this.form.value.progress,
+      this.form.value.score, this.form.value.badges, this.form.value.leaderboard);
     this.courseService.AddCourse(course);
   }
+
   searchCourse() {
-    console.log(this.form.value);
+    // Find a course to join
+
     this.possibleCourses = [];
     this.backendService.getSearch(this.form.value.search)
-      .then(response => {
-        console.log('response', response);
-        const courses = response['courses'];
-        for (let i = 0; i < courses.length; i++) {
-          console.log(courses[i]);
-          let name = '';
-          if (courses[i]['course_code'] !== undefined) {
-            name = courses[i]['course_code'];
+      .then((response: any) => {
+
+        // Assign the correct identifier for the course
+        for (const course of response.courses as any[]) {
+          console.log('course', course);
+          if (course.course_code !== undefined) {
+            this.possibleCourses.push({name: course.course_code, id: course._id});
           } else {
-            name = courses[i]['name'];
+            this.possibleCourses.push({name: course.name, id: course._id});
           }
-          this.possibleCourses[i] = {name: name, id: courses[i]['_id']};
         }
       });
   }
+
   join(course_id) {
-    console.log(course_id);
-    this.backendService.requestJoinCourse(course_id, new ObjectID(this.userService.userInfo.id))
+    // Join a course
+
+    this.backendService.postJoinRequest(course_id, new ObjectID(this.userService.userInfo.id))
       .then(response => console.log(response));
   }
 
   getMe() {
-    // console.log(this.backendService.getUser(new ObjectID('59f84c545747361ba848b238')));
+    // Grab my info
+
     return this.backendService.getMe().then(resp => {
       console.log(resp);
     }).catch(err => {
       console.log(err);
     });
-    /*
-    this.http.get(environment.backend_ip + '/api/courses/me').subscribe(
-      data => {
-        console.log(data);
-      },
-      err => {
-        console.log(err);
-        console.log('something went shit in getMe');
-      }
-    );*/
-  }
-
-  postBadge() {
-    this.backendService.postNewBadge('bronze_medal_badge', 'A test task from API', 'Totally new, whoa.');
-  }
-  getProgress(courseId) {
-    return this.courseService.GetProgress(courseId);
   }
 }

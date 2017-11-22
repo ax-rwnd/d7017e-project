@@ -75,11 +75,11 @@ export class AssignmentComponent implements OnInit, OnDestroy {
     }
 
     this.status = 'Not Completed';
-    for (let prog of this.currentCourse.rewards.progress) {
-      if (prog.assignment === this.assignment.id) {
-        this.status = 'Completed';
-      }
+    if (this.hasPassed()) {
+      this.status = 'Completed';
     }
+    this.tests = [];
+    this.testStrings = [];
     // this.getTests();
     // Use getTests as soon as backend routes are working
     this.tests = [
@@ -133,6 +133,7 @@ export class AssignmentComponent implements OnInit, OnDestroy {
     const course_id = new ObjectID(this.assignment['course_id']);
     this.backendService.getCourseAssignmentTests(course_id, assignment_id).then(data => {
       this.tests = data;
+      this.testStrings = this.formatTests(this.tests);
     });
   }
 
@@ -164,6 +165,16 @@ export class AssignmentComponent implements OnInit, OnDestroy {
 
   setFeedback(fb) {
     this.feedback = fb;
+  }
+
+  hasPassed() {
+    // returns true if we have passed the assignment already
+    for (let prog of this.currentCourse.rewards.progress) {
+      if (prog.assignment === this.assignment.id) {
+        return true;
+      }
+    }
+    return false;
   }
 
   // Handle the response from a code submission. Update the feedback div and update the course progress
@@ -203,11 +214,16 @@ export class AssignmentComponent implements OnInit, OnDestroy {
 
     if (value['passed']) {
       this.status = 'Completed';
-      // TODO update course progress
+
+      // Refresh the course
+      this.courseService.UpdateCourse(this.currentCourse.id)
+        .then(response => {
+          // Once the course has been updated, get it
+          this.currentCourse = this.courseService.GetCourse(this.currentCourse.id);
+        });
     } else {
       this.status = 'Not Completed';
     }
-
   }
 
   setLanguage(language: string) {

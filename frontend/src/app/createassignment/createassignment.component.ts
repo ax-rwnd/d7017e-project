@@ -7,7 +7,7 @@ import titleContains = until.titleContains;
 import {FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { BsModalRef } from 'ngx-bootstrap/modal/modal-options.class';
-import {ActivatedRoute} from "@angular/router";
+import {ActivatedRoute} from '@angular/router';
 
 @Component({
   selector: 'app-createassignment',
@@ -70,6 +70,8 @@ export class CreateassignmentComponent implements OnInit {
   }
 
   createTest() {
+    // TODO: read the documentation and update the input here
+
     if (this.testType === 'io') {
       this.unitTests.push([this.testType, this.form.value.ioInput, this.form.value.ioOutput]);
     } else {
@@ -108,24 +110,16 @@ export class CreateassignmentComponent implements OnInit {
   }
 
   submitNewAssignment() {
-    /*this.backendService.createAssignment(this.courseId, this.assignmentName, this.content, this.languages)
-      .then( response => {
-        console.log(response);
-        const assignmentId = response['description'];
-        console.log('asdasdasd', assignmentId);
-        for (const test in this.unitTests) {
-          this.backendService.createTest(this.courseId, test, response);
-        }
-      }).catch(err => {console.error('failed to get ', err);
-      });
-      */
-    const that = this;
+    // Submits the assignment to the backend
+    // TODO: this function should work, but requires more testing, the backend
+    //  could not serve the correct response
+
     this.backendService.createAssignment(this.courseId, this.assignmentName, this.content, this.languages)
-      .then(function (response){
-        const assignmentId = JSON.parse(response as string);
-        console.log('assignmentId', assignmentId._id);
-        for (const test in that.unitTests) {
-          that.backendService.createTest(that.courseId, that.unitTests, assignmentId._id);
+      .then((response: any) => {
+        const assignmentId = response._id;
+        console.warn('assignmentId was', assignmentId);
+        for (const test of this.unitTests) {
+          this.backendService.createTest(this.courseId, test, assignmentId);
         }
       });
   }
