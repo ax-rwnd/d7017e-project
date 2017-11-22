@@ -111,6 +111,8 @@ export class AssignmentComponent implements OnInit, OnDestroy {
 
   // Submit code to backend for testing
   submitCode() {
+    this.feedback = [];
+
     const user_id = new ObjectID(this.userid);
     const assignment_id = new ObjectID(this.assignment['id']);
     const course_id = new ObjectID(this.assignment['course_id']);
