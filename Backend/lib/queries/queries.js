@@ -15,6 +15,14 @@ var config = require('config');
 
 
 const FIELDS = {
+    USER: {
+        MODEL: require('../../models/schemas').User,
+        BASE_FIELDS: "username email admin access courses teaching providers",
+        ADMIN: "username email admin access courses teaching providers",
+        TEACHER: "username email admin access courses teaching providers",
+        STUDENT: "username email admin access courses teaching providers",
+        POPULATE_FIELDS: "courses teaching"
+    },
     COURSE: {
         MODEL: require('../../models/schemas').Course,
         BASE_FIELDS: "course_code name description",
@@ -46,6 +54,12 @@ const FIELDS = {
         MODEL: require('../../models/schemas').Test,
         BASE_FIELDS: "stdout stdin args",
         POPULATE_FIELDS: ""
+    },
+    TEACHING: {
+        BASE_FIELDS: "course_code name description"
+    },
+    COURSES: {
+        BASE_FIELDS: "course_code name description"
     }
 };
 
@@ -53,7 +67,6 @@ const FIELDS = {
 
 //get all tests related to a specific assignment.
 function getTestsFromAssignment(assignmentID, callback) {
-    console.log(assignmentID);
     Assignment.findById(assignmentID)
     .populate({
         path: 'tests.io',
@@ -62,6 +75,10 @@ function getTestsFromAssignment(assignmentID, callback) {
         path: 'optional_tests.io',
         model: 'Test'
     }).lean().exec(function (err, assignmentObject) {
+        /*if (!assignmentObject) {
+            console.log("assignment not found!")
+            throw errors.ASSIGNMENT_DOES_NOT_EXIST;
+        } */    //THIS ERROR NEEDS TO BE THROWN AND HANDLED
         let json = {};
         json.tests = assignmentObject.tests;
         json.optional_tests = assignmentObject.optional_tests;
@@ -84,6 +101,22 @@ function getUser(id, fields) {
             throw errors.USER_NOT_FOUND;
         }
         return user;
+    });
+}
+
+function getUserPopulated(user_id, roll, fields) {
+    var wantedFields = fields || FIELDS.USER[roll.toUpperCase()];
+    wantedFields = wantedFields.replace(/,/g, " ");
+
+    return User.findById(user_id, wantedFields)
+    .then(function (userObject) {
+        if (!userObject) {
+            throw errors.USER_NOT_FOUND;
+        }
+        return populateObject(userObject, "user", wantedFields)
+        .then(function(populatedUser) {
+            return populatedUser[0];
+        });
     });
 }
 
@@ -173,9 +206,10 @@ function findOrCreateUser(profile) {
     var username = profile.username;
     var email = profile.email || "";
     var admin = profile.admin || false;
+    var access = profile.access || "basic";
     return User.findOne({username: username}).then(function (user) {
         if (!user) {
-            var newUser = new User({username: username, email: email, admin: admin, courses: [], tokens: []});
+            var newUser = new User({username: username, email: email, admin: admin, access: access, courses: [], tokens: []});
             return newUser.save().then(function (createdUser) {
                 if (!createdUser) {
                     console.log("Error: User not created");
@@ -390,10 +424,13 @@ function createCourse(name, description, hidden, course_code, enabled_features, 
     var newCourse = new Course({name: name, description: description, course_code: course_code, hidden: hidden, autojoin: autojoin, teachers: teachers, students: [], assignments: [], features: [], enabled_features: enabled_features});
     return newCourse.save().then(function (createdCourse) {
         if (!createdCourse) {
-            console.log("Error: Course not created");
-            //ERROR?!
+            throw errors.COURSE_NOT_CREATED;
         }
-        return createdCourse;
+        return User.update(
+            {_id: teacher},
+            {$addToSet: {teaching: createdCourse._id}},
+            {runValidators: true}
+        ).then(_ => createdCourse);
     });
 }
 
@@ -401,6 +438,17 @@ function getUserCourses(id, fields) {
     var wantedFields = fields || "name description hidden teachers students assignments course_code";
 
     return User.findById(id, "courses").populate("courses", wantedFields).then(function (courseList) {
+        if (!courseList) {
+            throw errors.NO_COURSES_EXISTS;
+        }
+        return courseList;
+    });
+}
+
+function getUserTeacherCourses(id, fields) {
+    var wantedFields = fields || "name description hidden teachers students assignments course_code";
+
+    return User.findById(id, "teaching").populate("teaching", wantedFields).then(function (courseList) {
         if (!courseList) {
             throw errors.NO_COURSES_EXISTS;
         }
@@ -527,6 +575,16 @@ function getTest(id, fields) {
     });
 }
 
+function getAssignmentTests(course_id, assignment_id) {
+    return Assignment.findById(assignment_id, "tests").populate("tests.io")
+    .then(function (assignmentObject) {
+        if (!assignmentObject) {
+            throw errors.ASSIGNMENT_DOES_NOT_EXIST;
+        }
+        return assignmentObject;
+    });
+}
+
 function createAssignment(name, description, hidden, languages, course_id) {
     var newAssignment = new Assignment({name: name, description: description, hidden: hidden, tests: {io: [], lint: false}, optionaal_tests: {io: [], lint: false}, languages: languages});
     return newAssignment.save().then(function (createdAssignment) {
@@ -589,20 +647,15 @@ function checkPermission(wantedFields, collection, roll) {
 // Populates all wanted fields which is a Ref.
 // Needs to be specified in FIELDS
 function populateObject(mongooseObject, schema, wantedFields) {
-    console.log(mongooseObject);
-    console.log(schema);
     console.log(wantedFields);
     var fieldsToPopulateArray = FIELDS[schema.toUpperCase()].POPULATE_FIELDS.split(" ");
     var populatePromises = [];
     var model = FIELDS[schema.toUpperCase()].MODEL;
     fieldsToPopulateArray.forEach(function(element) {
-        console.log("LOOP");
         if (wantedFields.indexOf(element) !== -1) {
-            console.log(element);
             populatePromises.push(model.populate(mongooseObject, {path: element, select: FIELDS[element.toUpperCase()].BASE_FIELDS}));
         }
     });
-    console.log(populatePromises);
     if (populatePromises.length === 0) {
         return new Promise((resolve, reject) => {
             resolve([mongooseObject]);
@@ -779,6 +832,7 @@ exports.deleteUser = deleteUser;
 exports.getCourses = getCourses;
 exports.createCourse = createCourse;
 exports.getUserCourses = getUserCourses;
+exports.getUserTeacherCourses = getUserTeacherCourses;
 exports.getCourseStudents = getCourseStudents;
 exports.addCourseStudent = addCourseStudent;
 exports.getCourseTeachers = getCourseTeachers;
@@ -811,3 +865,8 @@ exports.checkIfUserIsTeacherObject = checkIfUserIsTeacherObject;
 exports.getCourseInvites = getCourseInvites;
 exports.getUserInvites = getUserInvites;
 exports.getInvitesCourseUser = getInvitesCourseUser;
+<<<<<<< HEAD
+=======
+exports.getAssignmentTests = getAssignmentTests;
+exports.getUserPopulated = getUserPopulated;
+>>>>>>> 1521a225b2236b3da526bfcb359f72c14c19c6fb

@@ -6,6 +6,7 @@ var queries = require('../../lib/queries/queries');
 var errors = require('../../lib/errors.js');
 var auth = require('../../lib/authentication.js');
 var testerCom = require('../../lib/tester_communication');
+var logger = require('../../lib/logger');
 
 var Assignment = require('../../models/schemas').Assignment;
 var Test = require('../../models/schemas').Test;
@@ -21,7 +22,7 @@ module.exports = function(router) {
     router.get('/', function (req, res, next) {
         var ids = req.query.ids;
 
-        var filter = (req.user.admin === true)
+        var filter = (req.user.access === "admin")
             ? ADMIN_FILTER
             : BASIC_FILTER;
 
@@ -85,6 +86,7 @@ module.exports = function(router) {
     // Would force frontend to send userid. courses/me takes user id from token.
     // Frontend is most likely in possesion of userid. Therefore both is possible.
     router.get('/me', function (req, res, next) {
+        logger.log('warn', '/api/courses/me is deprecated. Use /api/users/me/courses instead.');
         queries.getUserCourses(req.user.id, "name description course_code").then(function (courses) {
             return res.json(courses);
         })
@@ -105,7 +107,7 @@ module.exports = function(router) {
         queries.getUser(req.user.id, "teaching").then(function (userObject) {
             if (userObject.teaching.indexOf(course_id) !== -1) {
                 roll = "teacher";
-            } else if (req.user.admin) {
+            } else if (req.user.access === "admin") {
                 roll = "admin";
             } else {
                 roll = "student";
@@ -152,7 +154,7 @@ module.exports = function(router) {
         queries.getUser(req.user.id, "teaching")
         .then(function (userObject) {
             // admins and teachers can invite students
-            if (req.user.admin || userObject.teaching.indexOf(course_id) !== -1) {
+            if (req.user.access === "admin" || userObject.teaching.indexOf(course_id) !== -1) {
                 return queries.addCourseStudent(course_id, student_id);
             } else {
                 // TODO: use a better error
@@ -604,7 +606,7 @@ module.exports = function(router) {
         queries.getUser(req.user.id, "teaching").then(function (userObject) {
             if (userObject.teaching.indexOf(course_id) !== -1) {
                 roll = "teacher";
-            } else if (req.user.admin) {
+            } else if (req.user.access === "admin") {
                 roll = "admin";
             } else {
                 roll = "student";
@@ -676,7 +678,21 @@ module.exports = function(router) {
     router.get('/:course_id/assignments/:assignment_id/tests', function (req, res, next) {
         var course_id = req.params.course_id;
         var assignment_id = req.params.assignment_id;
-        res.send("/courses/" + course_id + "/assignments/" + assignment_id + "/tests GET Endpoint");
+
+        if (!mongoose.Types.ObjectId.isValid(assignment_id) || !mongoose.Types.ObjectId.isValid(course_id)) {
+            return next(errors.BAD_INPUT);
+        }
+
+        queries.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.admin)
+        .then(function () {
+            return queries.getAssignmentTests(course_id, assignment_id);
+        })
+        .then(function (assignmentTests) {
+            return res.json(assignmentTests);
+        })
+        .catch(function (error) {
+            return next(error);
+        });
     });
 
     router.post('/:course_id/assignments/:assignment_id/tests', function (req, res, next) {

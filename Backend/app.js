@@ -86,7 +86,7 @@ app.use(function (err, req, res, next) {
     }
 
     //console.log(err);
-    res.status(err.httpCode).send("HTTP error: " + err.httpCode + " " + err.message);
+    res.status(err.httpCode).send(err.message);
 });
 
 app.use(function (err, req, res, next) {
@@ -95,12 +95,12 @@ app.use(function (err, req, res, next) {
     }
 
     //console.log(err);
-    res.status(err.httpCode).send("HTTP error: " + err.httpCode + " " + err.message);
+    res.status(err.httpCode).send(err.message);
 });
 
 app.use(function (err, req, res, next) {
     if (err.name === "CastError") {
-        return res.status(400).send("HTTP error: 400 Bad Input");
+        return res.status(400).send("Bad Input");
     }
     //logger.log('error', err.);
 
@@ -109,8 +109,7 @@ app.use(function (err, req, res, next) {
         delete err.stack;
     }
 */
-    //console.log(err);
-    res.status(500).send("HTTP error: 500 Internal server error");
+    res.status(500).send("Internal server error");
 });
 
 // Function to initiate the app/server into development- or production mode. (depends on NODE_ENV)

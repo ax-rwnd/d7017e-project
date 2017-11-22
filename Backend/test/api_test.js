@@ -412,6 +412,39 @@ describe('/api', () => {
             });
         });
 
+        describe('GET /api/users/me/courses', () => {
+            let route = '/api/users/me/courses';
+            it_rejects_unauthorized_get(route);
+
+            it('gets a list of courses for the fake user', () => {
+                return request(runner.server)
+                    .get(route)
+                    .set('Authorization', 'Bearer ' + access_tokens.user)
+                    .expect(200)
+                    .then(res => {
+                        assert(Array.isArray(res.body.courses), 'not an array');
+                        assert(res.body.courses.length > 0, 'array is empty');
+                    });
+            });
+        });
+
+        describe('GET /api/users/me/teaching', () => {
+            let route = '/api/users/me/teaching';
+            it_rejects_unauthorized_get(route);
+
+            it('gets a list of courses for the fake user', () => {
+                return request(runner.server)
+                    .get(route)
+                    .set('Authorization', 'Bearer ' + access_tokens.user)
+                    .expect(200)
+                    .then(res => {
+                        let courses = res.body.teaching;
+                        assert(Array.isArray(courses), 'not an array');
+                        assert(courses.length > 0, 'array is empty');
+                    });
+            });
+        });
+
         describe('GET /api/users/:user_id', () => {
             it('gets some user information', () => {
                 return request(runner.server)

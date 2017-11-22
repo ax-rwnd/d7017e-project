@@ -20,7 +20,7 @@ module.exports = function (router) {
         }
 
         var id_array = ids.split(',');
-        var filter = (req.user.admin === true)
+        var filter = (req.user.access === "admin")
             ? ADMIN_FILTER
             : BASIC_FILTER;
 
@@ -34,7 +34,7 @@ module.exports = function (router) {
 
 
     router.get('/me', function (req, res, next) {
-        queries.getUser(req.user.id, PRIVILEGED_FILTER).then(function (user) {
+        queries.getUserPopulated(req.user.id, "Admin").then(function (user) {
             res.json(user);
         })
         .catch(function(err) {
@@ -42,9 +42,23 @@ module.exports = function (router) {
         });
     });
 
+    router.get('/me/courses', function (req, res, next) {
+        queries.getUserCourses(req.user.id, "name description course_code").then(function (courses) {
+            return res.json(courses);
+        })
+        .catch(next);
+    });
+
+    router.get('/me/teaching', function (req, res, next) {
+        queries.getUserTeacherCourses(req.user.id, "name description course_code").then(function (courses) {
+            return res.json(courses);
+        })
+        .catch(next);
+    });
+
     router.get('/:user_id', function (req, res, next) {
         var user_id = req.params.user_id;
-        var filter = (req.user.admin === true)
+        var filter = (req.user.access === "admin")
             ? ADMIN_FILTER
             : BASIC_FILTER;
 
@@ -58,8 +72,8 @@ module.exports = function (router) {
 
     router.delete('/:user_id', function (req, res, next) {
         var user_id = req.params.user_id;
-        console.log(req.user.admin);
-        if (req.user.admin === true){
+        console.log(req.user.access);
+        if (req.user.access === "admin"){
             queries.deleteUser(user_id).then(function (err) {
                 if (err) {
                     next(err);

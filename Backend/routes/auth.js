@@ -23,46 +23,15 @@ function create_refresh_token(id) {
     }, config.get('App.secret'), {expiresIn: config.get('Auth.refresh_ttl')});
 }
 
-function create_access_token(id, admin) {
+function create_access_token(id, admin, access) {
     return jwt.sign({
         id: id,
-        admin: admin
+        admin: admin,
+        access: access
     }, config.get('App.secret'), {expiresIn: config.get('Auth.access_ttl')});
 }
 
 module.exports = function (router) {
-
-    /*
-     * /ROUTE/TO/POST/CODE        THIS NEEDS A PROPER ROUTE
-     */
-
-    /*router.post('/ROUTE/TO/POST/CODE', function(req, res) {
-            var lang = req.body.lang;
-        var code = req.body.code;
-        var assignment_id = req.body.assignment_id;
-
-        testerCom.validateCode(lang, code, assignment_id);
-    }*/
-
-
-    /*
-     * /login/ Endpoints
-     */
-
-
-    // passport.use(new CasStrategy({
-    //     version: 'CAS3.0',
-    //     ssoBaseURL: 'https://weblogon.ltu.se/cas',
-    //     serverBaseURL: 'http://127.0.0.1:8000'//BACKEND_IP
-    // }, function (profile, done) {
-    //     console.log(profile);
-    //     queries.findOrCreateUser(profile).then(function (user) {
-    //         return done(null, user);
-    //     }).catch(function (err) {
-    //         return done(err);
-    //     });
-    // }));
-
     router.get('/login/ltu', function (req, res, next){
         console.log("Login route");
         var ticket = req.query.ticket;
@@ -83,17 +52,21 @@ module.exports = function (router) {
                 if (profile) {
                     // Extract the username and email
                     var user = {username: profile.user, email: profile.attributes.mail};
+
+                    if (profile.attributes.affiliation.indexOf("student") !== -1) {
+                        user.access = 'basic';
+                    } else if (profile.attributes.affiliation.indexOf("teacher") !== -1) {
+                        user.access = 'advanced';
+                    }
                     console.log(user);
 
-                    console.log("Hitta eller gör användare");
                     queries.findOrCreateUser(user).then(function (userObject) {
-                        console.log("User found");
                         var refToken = create_refresh_token(userObject._id);
                         console.log(refToken);
                         queries.setRefreshToken(userObject, refToken);
-                        console.log("Efter Ref token save");
+                        
                         res.json({
-                            access_token: create_access_token(userObject._id, userObject.admin),
+                            access_token: create_access_token(userObject._id, userObject.admin, userObject.access),
                             access_expires_in: config.get('Auth.access_ttl'),
                             refresh_token: refToken,
                             refresh_expires_in: config.get('Auth.refresh_ttl'),
@@ -120,12 +93,14 @@ module.exports = function (router) {
         router.get('/login/fake', (req, res, next) => {
             let admin = req.query.admin === 'true';
             let role = admin ? 'admin' : 'student';
+            let access = admin ? 'admin' : 'basic';
             if (req.query.suffix !== 'string') {
                 req.query.suffix = '00';
             }
             let profile = {
                 username: `fake-${role}-${req.query.suffix}`,
                 admin: admin,
+                access: access,
                 teaching: []
             };
             queries.findOrCreateUser(profile)
