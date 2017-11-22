@@ -63,6 +63,15 @@ export class BackendService {
       .catch(err => console.error('API Put failed in ' + endpoint + ' error ', err));
   }
 
+  private apiDelete(endpoint) {
+    // Send a put request to the endpoint
+
+    return this.http.delete(environment.backend_ip + endpoint)
+      .toPromise()
+      .then(response => response)
+      .catch(err => console.error('API Delete failed in ' + endpoint + ' error ', err));
+  }
+
   addUserToCourse(course_id: ObjectID, student_id: ObjectID) {
   // Add a student to a course.
 
@@ -238,6 +247,20 @@ export class BackendService {
     // Get the users waiting to join a course
 
     return this.apiGet('/api/courses/' + course_id + '/students/pending');
+  }
+
+  getMyPendingRequests() {
+    return this.apiGet('/api/users/courses/pending');
+  }
+
+  cancelPendingJoin(course_id: ObjectID) {
+    return this.apiDelete('/api/courses/' + course_id + '/students/pending');
+  }
+  acceptInvite(course_id: ObjectID, student_id: ObjectID) {
+    return this.apiPut('/api/courses/' + course_id + '/students/invite', {'student_id': student_id});
+  }
+  declineInvite(course_id: ObjectID) {
+    return this.apiDelete('/api/courses' + course_id + '/students/invite');
   }
 
   getCoursesById(user_id: string) {
