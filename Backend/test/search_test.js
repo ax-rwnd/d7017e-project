@@ -142,21 +142,4 @@ describe('/search', () => {
                 });
         });
     });
-
-    describe('GET /api/search', () => {
-
-        it('Search courses', () => {
-
-            let query = '?query=GOLANG';
-            let route = '/api/search';
-
-            return request(runner.server)
-                .get(route+query)
-                .set('Authorization', 'Bearer ' + access_token)
-                .expect(200)
-                .then(res => {
-                    console.log(res.body);
-                });
-        });
-    });
 });
