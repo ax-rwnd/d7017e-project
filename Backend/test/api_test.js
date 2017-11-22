@@ -48,8 +48,7 @@ describe('/api', () => {
     let access_tokens;
     let user_id;
     let admin_id;
-    // intro programmering
-    let course_id = '59f6f88b1ac36c0762eb46a9';
+    let course_id;
     let assignment_id;
     let test_id;
 
@@ -104,17 +103,17 @@ describe('/api', () => {
         describe('POST /api/courses', () => {
             let route = '/api/courses';
             it_rejects_unauthorized_post(route);
-
+            let assignment = {
+                name: 'Introduction to Automated Testing in JavaScript',
+                description: 'In this course you will use Mocha and supertest to create automated tests for NodeJS applications.',
+                hidden: false,
+                course_code: 'D00testingE',
+                enabled_features: {badges: true}
+            };
             it('returns the new id', () => {
                 return request(runner.server)
                     .post(route)
-                    .send({
-                        name: 'Introduction to Automated Testing in JavaScript',
-                        description: 'In this course you will use Mocha and supertest to create automated tests for NodeJS applications.',
-                        hidden: false,
-                        course_code: 'D00testingE',
-                        enabled_features: {badges: true}
-                    })
+                    .send(assignment)
                     .set('Authorization', 'Bearer ' + access_tokens.admin)
                     .expect(200)
                     .then(res => {
@@ -141,56 +140,44 @@ describe('/api', () => {
         });
 
         describe('GET /api/courses/:course_id', () => {
-            let route = '/api/courses/' + course_id;
-            it_rejects_unauthorized_get(route);
-
             it('finds the course', () => {
                 return request(runner.server)
-                    .get(route)
+                    .get('/api/courses/' + course_id)
                     .set('Authorization', 'Bearer ' + access_tokens.user)
                     .expect(200)
                     .then(res => {
-                        assert.equal(res.body.name, "Introduktion till programmering");
+                        assert.equal(res.body.name, 'Introduction to Automated Testing in JavaScript');
                     });
             });
         });
 
         describe('GET /api/courses/:course_id/students', () => {
-            let route = '/api/courses/' + course_id + '/students';
-            it_rejects_unauthorized_get(route);
-
-            it('returns a non-empty list of students', () => {
+            it('returns a list of students', () => {
                 return request(runner.server)
-                    .get(route)
+                    .get('/api/courses/' + course_id + '/students')
                     .set('Authorization', 'Bearer ' + access_tokens.user)
                     .expect(200)
                     .then(res => {
                         assert(Array.isArray(res.body.students), 'not an array');
-                        assert(res.body.students.length > 0, 'array is empty');
                     });
             });
         });
 
         describe('PUT /api/courses/:course_id/students', () => {
-            let route = '/api/courses/' + course_id + '/students';
-
             it('succeeds if you are a teacher with valid input', () => {
                 return request(runner.server)
-                    .put(route)
+                    .put('/api/courses/' + course_id + '/students')
                     .send({
-                        student_id: '59fc236a2b731410888bf8f2'
-                    }).set('Authorization', 'Bearer ' + access_tokens.user)
+                        student_id: user_id
+                    }).set('Authorization', 'Bearer ' + access_tokens.admin)
                     .expect(200);
             });
         });
 
         describe('GET /api/courses/:course_id/teachers', () => {
-            let route = '/api/courses/' + course_id + '/teachers';
-            it_rejects_unauthorized_get(route);
-
             it('returns a non-empty list of teachers', () => {
                 return request(runner.server)
-                    .get(route)
+                    .get('/api/courses/' + course_id + '/teachers')
                     .set('Authorization', 'Bearer ' + access_tokens.user)
                     .expect(200)
                     .then(res => {
@@ -201,11 +188,9 @@ describe('/api', () => {
         });
 
         describe('POST /api/courses/:course_id/assignments', () => {
-            let route = '/api/courses/' + course_id + '/assignments';
-
             it('returns an assignment id', () => {
                 return request(runner.server)
-                    .post(route)
+                    .post('/api/courses/' + course_id + '/assignments')
                     .send({
                         name: 'Introduktion till tester',
                         description: 'Skriv tester med mocha',
@@ -222,12 +207,9 @@ describe('/api', () => {
         });
 
         describe('GET /api/courses/:course_id/assignments', () => {
-            let route = '/api/courses/' + course_id + '/assignments';
-            it_rejects_unauthorized_get(route);
-
             it('returns a non-empty list of assignments', () => {
                 return request(runner.server)
-                    .get(route)
+                    .get('/api/courses/' + course_id + '/assignments')
                     .set('Authorization', 'Bearer ' + access_tokens.user)
                     .expect(200)
                     .then(res => {
@@ -238,11 +220,9 @@ describe('/api', () => {
         });
 
         describe('POST /api/courses/:course_id/assignments/:assignment_id/tests', () => {
-
             it('returns a test id', () => {
-                let route = '/api/courses/' + course_id + '/assignments/' + assignment_id + '/tests';
                 return request(runner.server)
-                    .post(route)
+                    .post('/api/courses/' + course_id + '/assignments/' + assignment_id + '/tests')
                     .send({
                         stdout: 'Output',
                         stdin: 'Input',
@@ -259,12 +239,9 @@ describe('/api', () => {
         });
 
         describe('GET /api/courses/:course_id/assignments/:assignment_id/tests/:test_id', () => {
-
             it('returns a test object', () => {
-                let route = '/api/courses/' + course_id + '/assignments/' + assignment_id + '/tests/' + test_id;
-                it_rejects_unauthorized_get(route);
                 return request(runner.server)
-                    .get(route)
+                    .get('/api/courses/' + course_id + '/assignments/' + assignment_id + '/tests/' + test_id)
                     .set('Authorization', 'Bearer ' + access_tokens.user)
                     .expect(200)
                     .then(res => {
@@ -278,11 +255,8 @@ describe('/api', () => {
 
             it('run assignments tests', () => {
                 let assignment_id_test = '59f8a2a81ac36c0762eb46ae';
-
-                let route = '/api/courses/' + course_id + '/assignments/' + assignment_id_test + '/submit';
-                it_rejects_unauthorized_post(route);
                 return request(runner.server)
-                    .post(route)
+                    .post('/api/courses/' + course_id + '/assignments/' + assignment_id_test + '/submit')
                     .set('Authorization', 'Bearer ' + access_tokens.user)
                     .send({
                         'lang': 'python3',
@@ -298,12 +272,8 @@ describe('/api', () => {
         describe('POST /:course_id/assignments/:assignment_id/save', () => {
             it('saves an empty draft to the database', () => {
                 let assignment_id = '59f8a2a81ac36c0762eb46ae';
-
-                let route = '/api/courses/' + course_id + '/assignments/' + assignment_id + '/save';
-
-                it_rejects_unauthorized_post(route);
                 return request(runner.server)
-                    .post(route)
+                    .post('/api/courses/' + course_id + '/assignments/' + assignment_id + '/save')
                     .set('Authorization', 'Bearer ' + access_tokens.user)
                     .send()
                     .expect(200)
@@ -315,24 +285,19 @@ describe('/api', () => {
             });
             it('saves a draft to the database', () => {
                 let assignment_id = '59f8a2a81ac36c0762eb46ae';
-
-                let route = '/api/courses/' + course_id + '/assignments/' + assignment_id + '/save';
-
-                let lang = 'python3';
-                let code = 'print(\"hello world\")\n';
-                it_rejects_unauthorized_post(route);
+                let draft = {
+                    lang: 'python3',
+                    code: 'print(\"hello world\")\n'
+                };
                 return request(runner.server)
-                    .post(route)
+                    .post('/api/courses/' + course_id + '/assignments/' + assignment_id + '/save')
                     .set('Authorization', 'Bearer ' + access_tokens.user)
-                    .send({
-                        'lang': lang,
-                        'code': code
-                    })
+                    .send(draft)
                     .expect(200)
                     .then(res => {
                         assert(assignment_id == res.body.assignment, 'response does not contain the correct assignment_id');
-                        assert(lang == res.body.lang, 'response does not contain the correct lang');
-                        assert(code == res.body.code, 'response does not contain the correct code');
+                        assert(draft.lang == res.body.lang, 'response does not contain the correct lang');
+                        assert(draft.code == res.body.code, 'response does not contain the correct code');
                     });
             });
         });
@@ -341,13 +306,10 @@ describe('/api', () => {
             it('retrieves a draft from the database', () => {
                 let assignment_id = '59f8a2a81ac36c0762eb46ae';
 
-                let route = '/api/courses/' + course_id + '/assignments/' + assignment_id + '/draft';
-
                 let lang = 'python3';
                 let code = 'print(\"hello world\")\n';
-                it_rejects_unauthorized_get(route);
                 return request(runner.server)
-                    .get(route)
+                    .get('/api/courses/' + course_id + '/assignments/' + assignment_id + '/draft')
                     .set('Authorization', 'Bearer ' + access_tokens.user)
                     .send()
                     .expect(200)
@@ -360,11 +322,8 @@ describe('/api', () => {
             it('retrieves a non-existing draft from the database', () => {
                 let assignment_id = '59f8a2a81ac36c0762eb32be';
 
-                let route = '/api/courses/' + course_id + '/assignments/' + assignment_id + '/draft';
-
-                it_rejects_unauthorized_get(route);
                 return request(runner.server)
-                    .get(route)
+                    .get('/api/courses/' + course_id + '/assignments/' + assignment_id + '/draft')
                     .set('Authorization', 'Bearer ' + access_tokens.user)
                     .send()
                     .expect(200)
@@ -377,12 +336,9 @@ describe('/api', () => {
         });
 
         describe('GET /api/courses/:course_id/enabled_features', () => {
-            let route = '/api/courses/' + course_id + '/enabled_features';
-            it_rejects_unauthorized_get(route);
-
             it('returns a non-empty list of enabled_features', () => {
                 return request(runner.server)
-                    .get(route)
+                    .get('/api/courses/' + course_id + '/enabled_features')
                     .set('Authorization', 'Bearer ' + access_tokens.user)
                     .expect(200)
                     .then(res => {

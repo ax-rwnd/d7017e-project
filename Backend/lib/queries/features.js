@@ -82,7 +82,10 @@ function createFeature(user_id, course_id) {
 }
 
 function getFeatureByID(features_id) {
-    return Features.findById(features_id).lean().then(function(feature) {
+    return Features.findById(features_id)
+    .populate({path: 'user', model: 'User'})
+    .lean()
+    .then(function(feature) {
         if(feature === null) {
             throw errors.FEATURE_DO_NOT_EXIST;
         }
@@ -127,11 +130,28 @@ async function getFeaturesOfCourse(course_id) {
 
     json.total_assignments = await getNumberOfAssignments(course_id);
 
-    let course = await Course.findById(course_id);
+    let course = await Course.findById(course_id)
+    .populate({
+        path: 'features', model:'Features',
+        populate: [
+            {
+                path: 'user', model: 'User'
+            },{
+                path: 'badges', model: 'Badge'
+            },{
+                path: 'progress.tests.test', model: 'Test'
+            },{
+                path: 'progress.assignment', model: 'Assignment'
+            },{
+                path: 'progress.assignment.optional_tests.io', model: 'Test'
+            },{
+                path: 'progress.assignment.tests.io', model: 'Test'
+            }
+        ]}).lean();
 
     json.features = [];
-    for(let feature_id of course.features) {
-        let feature = await getFeatureByID(feature_id);
+    for (let feature of course.features) {
+        delete feature.user.tokens;
         feature.completed_assignments = feature.progress.length;
         json.features.push(feature);
     }
@@ -140,11 +160,36 @@ async function getFeaturesOfCourse(course_id) {
 }
 
 async function getFeatureOfUserID(course_id, user_id) {
-    let course = await Course.findById(course_id);
+    let course = await Course.findById(course_id)
+    .populate({
+        path: 'features', model:'Features',
+        populate: [
+            {
+                path: 'user', model: 'User'
+            },{
+                path: 'badges', model: 'Badge'
+            },{
+                path: 'progress.tests.test', model: 'Test'
+            },{
+                path: 'progress.assignment', model: 'Assignment'
+            },{
+                path: 'progress.assignment.optional_tests.io', model: 'Test'
+            },{
+                path: 'progress.assignment.tests.io', model: 'Test'
+            }
+        ]}).lean();
 
-    for(let feature_id of course.features) {
+    for(let feature of course.features) {
 
-        let feature;
+        if(feature.user._id == user_id) {
+            delete feature.user.tokens;
+            feature.total_assignments = await getNumberOfAssignments(course_id);
+            feature.completed_assignments = feature.progress.length;
+
+            return feature;
+        }
+
+        /*let feature;
         try {
             feature = await getFeatureByID(feature_id);
         } catch (err) {
@@ -162,7 +207,7 @@ async function getFeatureOfUserID(course_id, user_id) {
 
                 return feature;
             }
-        }
+        }*/
     }
 
     // User had no feature in that course create it

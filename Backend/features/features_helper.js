@@ -25,7 +25,7 @@ async function getFeature(user_id, assignment_id) {
         if(feature === null) {
             logger.log("warn",'Feature '+feature_item+' in course '+course._id+' is null and should be removed!');
         } else {
-            if(feature.user.equals(user_id)) {
+            if(feature.user._id.equals(user_id)) {
                 return feature;
             }
         }
