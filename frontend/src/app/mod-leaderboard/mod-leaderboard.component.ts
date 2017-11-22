@@ -32,7 +32,7 @@ export class ModLeaderboardComponent extends GameelementComponent implements OnC
 
       // Get list of students
       let leaderList = students.map(student => {
-        return {name: student._id, score: student.completed_assignments};
+        return {name: student.user.username, score: student.completed_assignments};
       });
 
       // Sort and filter out low-scoring students
