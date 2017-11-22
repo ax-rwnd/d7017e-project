@@ -39,6 +39,8 @@ export class UserComponent implements OnInit {
     search: ''
   };
   possibleCourses: any[];
+  pending: any;
+  invites: any;
 
   constructor(private http: HttpClient, private route: ActivatedRoute, private headService: HeadService, private userService: UserService,
               private modalService: BsModalService, private backendService: BackendService, private courseService: CourseService,
@@ -56,12 +58,25 @@ export class UserComponent implements OnInit {
     this.statistics = false;
     this.form = this.fb.group(this.defaultForm);
     this.possibleCourses = [];
-    this.backendService.getMyInvites()
-      .then(response => console.log(response));
+    this.getPending();
+    this.getInvites();
   }
 
   toggleStatistics() {
     this.statistics = !this.statistics;
+  }
+
+  cancelRequest(course_id) {
+    console.log('request id', course_id);
+    this.backendService.cancelPendingJoin(course_id)
+      .then(success => {
+        console.log(success);
+        this.backendService.getMyPendingRequests()
+        .then(response => {
+          this.pending = response;
+        });
+      })
+      .catch(err => console.log('error', err));
   }
 
   openModal(modal) {
@@ -116,9 +131,39 @@ export class UserComponent implements OnInit {
 
   join(course_id) {
     // Join a course
-
     this.backendService.postJoinRequest(course_id, new ObjectID(this.userService.userInfo.id))
-      .then(response => console.log(response));
+      .then(response => {
+        console.log(response);
+        this.getPending();
+      });
+  }
+  acceptInvite(course_id) {
+    this.backendService.acceptInvite(course_id, new ObjectID(this.userService.userInfo.id))
+      .then(response => {
+        console.log(response);
+        this.getInvites();
+      });
+  }
+  declineInvite(course_id) {
+    this.backendService.declineInvite(course_id)
+      .then(response => {
+        console.log(response);
+        this.getInvites();
+      });
+  }
+  getPending() {
+    this.backendService.getMyPendingRequests()
+      .then(pending => {
+        this.pending = pending;
+        console.log('pending', this.pending);
+      });
+  }
+  getInvites() {
+    this.backendService.getMyInvites()
+      .then(response => {
+        this.invites = response;
+        console.log('invites', this.invites);
+      });
   }
 
   getMe() {
