@@ -78,7 +78,7 @@ function getTeachCourses(backendService, courseService) {
     // iterate over all courses and get all info for each course
     for (let i = 0; i < teachCourses.length; i++) {
       backendService.getCourse(teachCourses[i]._id).then( course => {
-        const code = course.hasOwnProperty('course_code') ? '' : course['course_code'];
+        const code = course.hasOwnProperty('course_code') ? course['course_code'] : '';
         courseService.teaching.push(newTeachCourse(course['_id'], course['name'], code, course['description'], course['hidden'], course['enabled_features'], course['students'], course['teachers'], course['autojoin']));
       });
     }
