@@ -69,7 +69,22 @@ export class UserComponent implements OnInit {
   }
   openModal(modal) {
     this.form = this.fb.group(this.defaultForm);
+    this.possibleCourses = [];
     this.modalRef = this.modalService.show(modal);
+    this.backendService.getCourses()
+      .then(response => {
+        const courses = response['courses'];
+        for (let i = 0; i < courses.length; i++) {
+          console.log(courses[i]);
+          let name = '';
+          if (courses[i]['course_code'] !== undefined) {
+            name = courses[i]['course_code'];
+          } else {
+            name = courses[i]['name'];
+          }
+          this.possibleCourses[i] = {name: name, id: courses[i]['_id']};
+        }
+      });
   }
   createCourse() {
     const course = this.courseService.CreateCourse('10000', this.form.value.name, this.form.value.code,

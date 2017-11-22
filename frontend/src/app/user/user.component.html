@@ -107,19 +107,19 @@
 
 <ng-template #searchCourseModal>
   <div class="modal-header">
-    <h4 class="modal-title pull-left">Find course</h4>
+    <h4 class="modal-title pull-left">Join course</h4>
     <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
       <span aria-hidden="true">&times;</span>
     </button>
   </div>
-  <form (ngSubmit)="searchCourse()" [formGroup]="form" novalidate>
+  <!--<form (ngSubmit)="searchCourse()" [formGroup]="form" novalidate>
     <div class="modal-body">
       <div class="form-group">
         <label for="search">Search term</label>
         <input type="text" class="form-control" id="search" formControlName="search" ngModel required>
       </div>
       <button class="btn" type="submit">Search</button>
-    </div>
+    </div>-->
     <div class="modal-body">
         <div class="well-sm course-list" *ngFor="let p of possibleCourses">
           <div class="row">
@@ -133,5 +133,5 @@
     <div class="modal-footer">
 
     </div>
-  </form>
+  <!--</form>-->
 </ng-template>
