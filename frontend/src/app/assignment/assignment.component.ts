@@ -170,7 +170,7 @@ export class AssignmentComponent implements OnInit, OnDestroy {
   hasPassed() {
     // returns true if we have passed the assignment already
     for (let prog of this.currentCourse.rewards.progress) {
-      if (prog.assignment === this.assignment.id) {
+      if (prog.assignment._id === this.assignment.id) {
         return true;
       }
     }
