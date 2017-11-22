@@ -56,7 +56,7 @@ describe('/search', () => {
                 .set('Authorization', 'Bearer ' + access_token)
                 .expect(400)
                 .then(res => {
-                    assert(res.error.text == 'HTTP error: 400 Bad input. Expected: "?query=XYZ"', 'query was misspelled');
+                    assert(res.error.text == 'Bad input. Expected: "?query=XYZ"', 'query was misspelled');
                 });
         });
     });
@@ -73,7 +73,7 @@ describe('/search', () => {
                 .set('Authorization', 'Bearer ' + access_token)
                 .expect(400)
                 .then(res => {
-                    assert(res.error.text == 'HTTP error: 400 Bad input. Expected query with length atleast '+config.get('Search.min_query_length'), 'Too short query data');
+                    assert(res.error.text == 'Bad input. Expected query with length atleast '+config.get('Search.min_query_length'), 'Too short query data');
                 });
         });
     });
@@ -122,6 +122,40 @@ describe('/search', () => {
                     assert(Array.isArray(res.body.users), 'Property users was not an array');
 
                     assert(res.body.assignments.length == 0, 'Property assignments was not empty');
+                });
+        });
+    });
+
+    describe('GET /api/search', () => {
+
+        it('Search with hyphen', () => {
+
+            let query = '?query=henhar-3';
+            let route = '/api/search';
+
+            return request(runner.server)
+                .get(route+query)
+                .set('Authorization', 'Bearer ' + access_token)
+                .expect(200)
+                .then(res => {
+                    assert(res.body.users.length == 1, 'Wrong number of users where found');
+                });
+        });
+    });
+
+    describe('GET /api/search', () => {
+
+        it('Search courses', () => {
+
+            let query = '?query=GOLANG';
+            let route = '/api/search';
+
+            return request(runner.server)
+                .get(route+query)
+                .set('Authorization', 'Bearer ' + access_token)
+                .expect(200)
+                .then(res => {
+                    console.log(res.body);
                 });
         });
     });
