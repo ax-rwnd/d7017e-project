@@ -24,7 +24,7 @@ var assignmentSchema = new Schema({
 assignmentSchema.index({name: 'text', description: 'text'}, {weights: {name: 5, description: 1}});
 
 var testSchema = new Schema({
-    stdout: {type: String, required: true},
+    stdout: {type: String, default: ''},
     stdin: String,
     args: [String]
 });
