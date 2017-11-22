@@ -133,6 +133,16 @@ module.exports = function(router) {
 
     });
 
+    router.put('/:course_id', function (req, res, next) {
+        var course_id = req.params.course_id;
+
+        queries.updateCourse(course_id, req.body).then(function (course) {
+            return res.json(course);
+        })
+        .catch(function(err) {
+            next(err);
+        });
+    });
 
 
     router.get('/:course_id/students', function (req, res, next) {
