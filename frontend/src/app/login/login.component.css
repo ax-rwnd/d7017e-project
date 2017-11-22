@@ -4,10 +4,10 @@
 }
 
 .jumbotron {
-  background-image: url("/assets/images/bronze_medal_badge.png");
+  background-image: url("/assets/images/cake_badge.png");
   background-position: 0px 0px;
   background-repeat: repeat;
-  animation: animatedBackground 4s linear infinite;
+  animation: animatedBackground 16s linear infinite;
 }
 
 @keyframes animatedBackground {

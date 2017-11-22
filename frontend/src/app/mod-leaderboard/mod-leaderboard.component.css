@@ -1,0 +1,13 @@
+.leaderboard {
+  overflow: hidden;
+}
+
+.leadertable {
+  table-layout:fixed;
+}
+
+.leadertable td {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
