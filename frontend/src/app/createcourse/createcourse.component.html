@@ -75,6 +75,20 @@
     </form>
 </div>
 
+<ng-template #courseCreated>
+  <div class="modal-header">
+    <h4 class="modal-title pull-left">Course created</h4>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <p>You can see your course on the user page or in the menu to the left.</p>
+  </div>
+  <div class="modal-footer">
+  </div>
+</ng-template>
+
 <ng-template #inviteStudentModal>
   <div class="modal-header">
     <h4 class="modal-title pull-left">Invite students</h4>

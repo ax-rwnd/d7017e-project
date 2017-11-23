@@ -35,7 +35,7 @@ export class CreatecourseComponent implements OnInit {
   publicDesc = 'Make the course public on create. Can later be changed.';
   autojoinDesc = 'Students will be able to join the course freely.';
 
-  @ViewChild('inviteStudentModal') inviteModal: TemplateRef<any>;
+  @ViewChild('courseCreated') inviteModal: TemplateRef<any>;
 
   constructor(private headService: HeadService, private backendService: BackendService, private modalService: BsModalService) {
     this.headService.stateChange.subscribe(sidebarState => { this.sidebarState = sidebarState; }); // subscribe to the state value head provides
@@ -77,7 +77,6 @@ export class CreatecourseComponent implements OnInit {
 
   submitCourse() {
     // Create a new course with some parameters from the page
-
     if ( this.form.value.name === '' || this.content === '' ) {
       // Since desc can't be in the form-group defined own required message
       this.errorMessage = '* Please fill in all required fields';
@@ -95,9 +94,10 @@ export class CreatecourseComponent implements OnInit {
         !this.form.value.nothidden, this.form.value.code, enabled_features, this.form.value.autojoin)
         .then( (response: any) => {
           // Handle response from backend
-
           const courseId = response._id;
           console.log('Got back id:', courseId);
+          // this.form = createSearchForm(); // for invites, not yet implemented
+          this.openModal(this.inviteModal);
         })
         .catch(err => console.error('Something went wrong when creating the course:', err));
     }
