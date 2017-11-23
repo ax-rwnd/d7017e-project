@@ -712,12 +712,8 @@ module.exports = function(router) {
         var stdin = req.body.stdin;
         var args = req.body.args;
         var lint = req.body.lint;
-        console.log("Got in tests");
-        console.log(req.body);
 
         queries.createTest(stdout, stdin, args, lint, assignment_id).then(function (test) {
-            console.log("Return in tests");
-            console.log(test);
             return res.json(test);
         })
         .catch(function (err) {

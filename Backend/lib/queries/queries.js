@@ -635,19 +635,8 @@ function createAssignment(name, description, hidden, languages, course_id) {
 }
 
 function createTest(stdout, stdin, args, lint, assignment_id) {
-
-    console.log("createTest");
-    console.log(stdout);
-    console.log(stdin);
-    console.log(args);
-    console.log(lint);
-    console.log(assignment_id);
-
-
     var newTest = new Test({stdout: stdout, stdin: stdin, args: args});
 
-    console.log('newTest');
-    console.log(newTest);
     return newTest.save().then(function (createdTest) {
         if (!createdTest) {
             console.log("Error: Test not created");
