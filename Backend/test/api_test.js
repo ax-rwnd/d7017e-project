@@ -224,8 +224,8 @@ describe('/api', () => {
                 return request(runner.server)
                     .post('/api/courses/' + course_id + '/assignments/' + assignment_id + '/tests')
                     .send({
-                        stdout: 'Output',
-                        stdin: 'Input',
+                        stdout: 'hej\n',
+                        stdin: '',
                         args: [],
                         lint: true
                     })

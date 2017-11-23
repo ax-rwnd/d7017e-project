@@ -269,13 +269,13 @@ module.exports = function(router) {
     // TODO
     // Documentation
     // Test
-    // 
+    //
     // Admin and teacher of course can remove an already made invite.
     // User can decline (remove) an recieved invite to :course_id.
     router.delete('/:course_id/students/invite', function (req, res, next) {
         var course_id = req.params.course_id;
         var student_id = req.body.student_id;
-        
+
         if (!student_id) {
             student_id = req.user.id;
         }
@@ -306,7 +306,7 @@ module.exports = function(router) {
             return next(error);
         });
     });
-    
+
 
     // TODO
     // Documentation
@@ -330,7 +330,7 @@ module.exports = function(router) {
         .catch(function (error) {
             return next(error);
         });
-    });    
+    });
 
 
     // TODO
@@ -338,7 +338,7 @@ module.exports = function(router) {
     // TEST
     //
     // A student asks to join a course. If the course got autojoin he will be added as a student to the course.
-    // If course does not have autojoin a request to join will be created. 
+    // If course does not have autojoin a request to join will be created.
     router.post('/:course_id/students/pending', function (req, res, next) {
         var course_id = req.params.course_id;
 
@@ -702,8 +702,12 @@ module.exports = function(router) {
         var stdin = req.body.stdin;
         var args = req.body.args;
         var lint = req.body.lint;
+        console.log("Got in tests");
+        console.log(req.body);
 
         queries.createTest(stdout, stdin, args, lint, assignment_id).then(function (test) {
+            console.log("Return in tests");
+            console.log(test);
             return res.json(test);
         })
         .catch(function (err) {
