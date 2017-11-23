@@ -434,6 +434,33 @@ function createCourse(name, description, hidden, course_code, enabled_features, 
     });
 }
 
+function updateCourse(id, body) {
+    return Course.findById(id, "course_code name description hidden autojoin enabled_features").then(function (course) {
+        if (!course) {
+            throw errors.COURSE_DOES_NOT_EXIST;
+        }
+        var updateObj = {};
+
+        if (body.hasOwnProperty('course_code')) updateObj.course_code = body.course_code;
+        if (body.hasOwnProperty('name')) updateObj.name = body.name;
+        if (body.hasOwnProperty('description')) updateObj.description = body.description;
+        if (body.hasOwnProperty('hidden')) updateObj.hidden = body.hidden;
+        if (body.hasOwnProperty('autojoin')) updateObj.autojoin = body.autojoin;
+        if (body.hasOwnProperty('enabled_features')) {
+            updateObj.enabled_features = course.enabled_features;
+            if (body.enabled_features.hasOwnProperty('badges')) updateObj.enabled_features.badges = body.enabled_features.badges;
+            if (body.enabled_features.hasOwnProperty('progressbar')) updateObj.enabled_features.progressbar = body.enabled_features.progressbar;
+            if (body.enabled_features.hasOwnProperty('leaderboard')) updateObj.enabled_features.leaderboard = body.enabled_features.leaderboard;
+            if (body.enabled_features.hasOwnProperty('adventuremap')) updateObj.enabled_features.adventuremap = body.enabled_features.adventuremap;
+        }
+
+        return Course.update(
+            {_id: id},
+            {$set: updateObj}
+        );
+    });
+}
+
 function getUserCourses(id, fields) {
     var wantedFields = fields || "name description hidden teachers students assignments course_code";
 
@@ -879,3 +906,4 @@ exports.getUserInvites = getUserInvites;
 exports.getInvitesCourseUser = getInvitesCourseUser;
 exports.getAssignmentTests = getAssignmentTests;
 exports.getUserPopulated = getUserPopulated;
+exports.updateCourse = updateCourse;
