@@ -1,7 +1,6 @@
 <app-head></app-head>
 
 <div id="cont" class="content" [@content]="sidebarState">
-  <!--<button class="btn" (click)="openModal(courseModal)">Create course</button>-->
   <button class="btn" routerLink="./createCourse">Create course</button>
   <!--<p><a class="userlinks" (click)="toggleStatistics()">Statistics</a></p>-->
   <button type="button" class="btn" (click)="openModal(searchCourseModal)">Find course to join</button>
@@ -10,7 +9,7 @@
     <div class="row">
       <div class="container col-lg-9">
         <!-- Title -->
-        <h2>Latest</h2>
+        <h2>Courses</h2>
         <!-- The head panel -->
         <div class="gamification-block shadow panel panel-default" *ngFor="let course of courses">
 
@@ -46,6 +45,46 @@
 
           </div>
         </div>
+        <br> <!-- add some space -->
+        <!-- Title -->
+        <h2>My Courses</h2>
+        <!-- The head panel -->
+        <div class="gamification-block shadow panel panel-default" *ngFor="let course of courses">
+
+          <div class="panel-heading gamification-header">
+            <!-- Course panel title -->
+            <div [routerLink]="['/courses', course.id]" class="pointer"><h4>{{course.code}} - {{course.name}}</h4></div>
+          </div>
+
+          <!-- 'Main' body panel -->
+          <div class="panel-body">
+            <div class="col-md-5">
+              <app-mod-badges-single [courseCode]="course.id"></app-mod-badges-single>
+              <app-mod-progressbar [courseCode]="course.id"></app-mod-progressbar>
+
+              <!-- Assignment panel start -->
+              <div class="gamification-block panel panel-default">
+                <div class="panel-heading gamification-header">
+                  Current Assignment
+                </div>
+
+                <div class="panel-body">
+                  <div class="assignment">Assignment 1</div>
+                </div>
+              </div>
+              <!-- Assignment panel end -->
+
+            </div>
+            <!-- column for progress and assignment end -->
+
+            <div class="col-md-4">
+              <app-mod-leaderboard [courseCode]="course.id"></app-mod-leaderboard>
+            </div>
+
+          </div>
+        </div>
+
+
       </div>
       <div class="col-lg-3">
         <h2>Join requests</h2>
@@ -86,54 +125,6 @@
 
 </div>
 
-<ng-template #courseModal>
-  <!--<div class="modal-header">
-    <h4 class="modal-title pull-left">Create course</h4>
-    <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
-  <form (ngSubmit)="createCourse()" [formGroup]="form" novalidate>
-    <div class="modal-body">
-      <div class="form-group">
-        <label for="name">Course name</label>
-        <input type="text" class="form-control" id="name" formControlName="name" ngModel required>
-      </div>
-
-      <div class="form-group">
-        <label for="code">Course code</label>
-        <input type="text" class="form-control" id="code" formControlName="code" ngModel required>
-      </div>
-
-      <div class="form-group">
-        <label for="course_info">Course info</label>
-        <input type="text" class="form-control" id="course_info" formControlName="course_info" ngModel required>
-      </div>
-      <hr>
-      <label>Gamification elements</label>
-      <div class="form-group">
-        <label class="checkbox-inline">
-          <input type="checkbox" formControlName="progress" ngModel> Progress
-        </label>
-        <label class="checkbox-inline">
-          <input type="checkbox" formControlName="score" ngModel> Score
-        </label>
-        <label class="checkbox-inline">
-          <input type="checkbox" formControlName="badges" ngModel> Badges
-        </label>
-        <label class="checkbox-inline">
-          <input type="checkbox" formControlName="leaderboard" ngModel> Leaderboard
-        </label>
-
-      </div>
-
-    </div>
-    <div class="modal-footer">
-      <button type="submit" class="btn" (click)="modalRef.hide()">Submit</button>
-
-    </div>
-  </form>-->
-</ng-template>
 
 <ng-template #searchCourseModal>
   <div class="modal-header">

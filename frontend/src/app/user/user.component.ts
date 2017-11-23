@@ -33,6 +33,7 @@ export class UserComponent implements OnInit {
   statistics: boolean;
   sidebarState: any;
   courses: any;
+  teachCourses: any;
   modalRef: BsModalRef;
   form: FormGroup;
   defaultForm = {
@@ -52,6 +53,7 @@ export class UserComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.teachCourses = this.courseService.teaching;
     this.courses = this.courseService.courses;
     this.sidebarState = this.headService.getCurrentState();
     this.user = this.userService.userInfo;
