@@ -1,0 +1,34 @@
+.pointer {
+  cursor: pointer;
+}
+
+.padding-top {
+  padding-top: 0.8em;
+}
+
+.goto-button {
+  background-color: #133756;
+  color: white;
+  border: none;
+  font-weight: normal;
+  font-size: medium;
+}
+
+.hide {
+  display: none;
+}
+
+.shadow {
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.gamification-block {
+  background-color: rgba(29, 117, 175, 0.27);
+  width: 95%;
+}
+
+.gamification-header {
+  background-color: #133756;
+  color: white;
+  font-weight: bold;
+}
