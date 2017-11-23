@@ -39,10 +39,13 @@ export class AppComponent implements OnInit {
     this.headService.stateChange.subscribe(sidebarState => { this.sidebarState = sidebarState; });
   }
 
-  ngOnInit() {
+  displayCourseName(name: string): string {
+    return (name.length > 20) ? name.substr(0, 19) + '...' : name;
+  }
+
+   ngOnInit() {
     this.sidebarState = 'inactive';
     this.courses = this.courseService.courses;
     this.teachCourses = this.courseService.teaching;
   }
-
 }

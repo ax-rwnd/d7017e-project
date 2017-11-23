@@ -3,7 +3,7 @@
   <div class="container">
     <div class="col-lg-6">
       <h1>
-        {{currentCourse.code}} - {{currentCourse.name}}
+        <span *ngIf="currentCourse.code">{{currentCourse.code}} - </span> {{currentCourse.name}}
       </h1>
       <button type="button" class="btn" id="createNewAssignment" [routerLink]="['/courses', currentCourse.id, 'createNewAssignment']">Create New Assignment</button>
       <button type="button" class="btn" (click)="openModal(inviteStudentModal)">Invite student to course</button>
