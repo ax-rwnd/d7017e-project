@@ -7,7 +7,6 @@
 
 body {
   color: black;
-  font-family: Tahoma, Geneva, sans-serif;
   padding-top: 30px;
 }
 
@@ -52,36 +51,35 @@ body {
 .nav-pills > li > a {
   color: white;
   transition: background-color 0.5s ease-out,
-              margin 0.2s ease-out,
-              border 0.5s ease-out;
-  border-style: solid;
-  border-color: #133756;
+              color 0.5s ease-out,
+              margin 0.2s ease-out;
+  border: none;
   background-color: #133756;
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
-  border-right: 0;
 }
 
 .nav-pills > li > a:hover {
   color: white;
   background-color: #0f2837;
-  margin-right: 0.4em;
-  border-style: solid;
-  border-color: #0f2837;
+  margin-right: 1em;
+  border: none;
 }
 
 .nav-pills > li.active > a,
 .nav-pills > li.active > a:hover,
-.nav-pills > li.active > a:focus {
+.nav-pills > li.active > a:focus{
+  margin-right: 1em;
+  color: darkgray;
   background-color: #133756;
-  border-style: none;
+  border: none;
 }
 
 /* navbar Default modifications down below*/
 .navbar-default {
   background-color: #133756;
   border-radius: 0px;
-  border-style: none;
+  border: none;
   margin-bottom: 0;
 }
 /* navbar Title */
