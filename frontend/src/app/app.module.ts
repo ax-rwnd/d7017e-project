@@ -52,6 +52,7 @@ import { ModProgressbarComponent } from './mod-progressbar/mod-progressbar.compo
 import { CreatecourseComponent } from './createcourse/createcourse.component';
 import { ModBadgesComponent } from './mod-badges/mod-badges.component';
 import { ModBadgesSingleComponent } from './mod-badges/mod-badges-single.component';
+import { UserPanelsComponent } from './user-panels/user-panels.component';
 
 
 const appRoutes: Routes = [
@@ -87,6 +88,7 @@ const appRoutes: Routes = [
     CreatecourseComponent,
     ModBadgesComponent,
     ModBadgesSingleComponent,
+    UserPanelsComponent,
   ],
   imports: [
     BrowserModule,
