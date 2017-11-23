@@ -3,66 +3,27 @@
     <div class="navbar-header">
       <a class="navbar-brand">
         <!-- When click the menu button, toggle the sidebar -->
-        <button type="button" class="menubtn" (click)="toggleState($event)">
+        <button type="button" class="menubtn" (click)="toggleState()">
           <span class="glyphicon glyphicon-menu-hamburger" ></span></button>
       </a>
       <!-- Title of header -->
       <span class="navbar-brand" routerLink="/user">Frontend</span>
     </div>
     <ul class="nav navbar-nav navbar-right">
-      <li><a>
-        <span class="glyphicon glyphicon-bell"></span>
-      </a></li>
-      <li (click)="toggleUserDropDown($event)"><a> <!-- [routerLinkActive]="['active']" -->
-        <!-- Start, display the ltu id, from server, if however token expires, display Unknown instead -->
-        <span class="glyphicon glyphicon-user"></span>
-        <span *ngIf="userID;else noID">{{userID}}</span>
+      <li routerLink="/user"><a>
+        <span class="glyphicon glyphicon-user size"></span>
+        <span style="display:inline-block; width: 0.1em;"></span>
+        <span *ngIf="user.userName;else noID">{{user.userName}}</span>
         <ng-template #noID>Unknown</ng-template>
-        <!-- End of userID -->
-        <span style="display:inline-block; width: 0.5em;"></span>
-        <label *ngIf="isDropDown()"><span class="glyphicon glyphicon-menu-up"></span></label>
-        <label *ngIf="!isDropDown()"><span class="glyphicon glyphicon-menu-down"></span></label>
-        <!-- Start of the userdropdowb -->
-        <div class="userDropBox" [@userDropBox]="stateDropDown"> <!-- [style.display]="isDropDown() ? 'block': 'none'" -->
-          <div class="userOption" [@userOption]="stateDropDown" routerLink="/user">
-            <span class="glyphicon glyphicon-user"></span> <span style="display:inline-block; width: 0.5em;"></span>
-            <a class="linkDropbox">Profile</a> <!-- (click)="profileModal.show()" -->
-          </div>
-          <div class="userOption" [@userOption]="stateDropDown">
-            <span class="glyphicon glyphicon-edit"></span> <span style="display:inline-block; width: 0.5em;"></span> Statistics
-          </div>
-          <div class="userOption" [@userOption]="stateDropDown">
-            <span class="glyphicon glyphicon-cog"></span> <span style="display:inline-block; width: 0.5em;"></span> Settings
-          </div>
-          <div class="userOption" [@userOption]="stateDropDown" routerLink="/">
-            <span class="glyphicon glyphicon-log-out"></span> <span style="display:inline-block; width: 0.5em;"></span>
-            <a class="linkDropbox" (click)="logout()">Log out</a>
-          </div>
-        </div>
-        <!-- End of the userdropdown menu -->
+      </a></li>
+      <li (click)="logout()"><a>
+        <span class="glyphicon glyphicon-log-out size"></span>
+        <span style="display:inline-block; width: 0.1em;"></span>
+        Log out
       </a></li>
     </ul>
   </div>
 </nav>
-
-<!-- Modal that may be for future use -->
-<div class="modal fade" bsModal #profileModal="bs-modal" [config]="{backdrop: 'static'}"
-     tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-sm">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h4 class="modal-title pull-left">Profile</h4>
-        <button type="button" class="close pull-right" aria-label="Close" (click)="profileModal.hide()">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        Some profile information might be needed here
-        Or something.
-      </div>
-    </div>
-  </div>
-</div>
 
 
 
