@@ -3,7 +3,7 @@
     <h4 class="pull-left">
       <span *ngIf="course.code">{{course.code}} - </span> {{course.name}}
     </h4>
-    <button class="btn pull-right" [routerLink]="['/courses', course.id]">Go to course</button>
+    <button class="btn btn-primary pull-right" [routerLink]="['/courses', course.id]">Go to course</button>
   </div>
   <div class="panel-body" [collapse]="collapsed"> <!-- [ngClass]="{hide: collapsed}" -->
     <ng-content></ng-content>

@@ -1,11 +1,10 @@
 <app-head></app-head>
 
 <div id="cont" class="content" [@content]="sidebarState">
-  <button class="btn" routerLink="./createCourse">Create course</button>
-  <!--<p><a class="userlinks" (click)="toggleStatistics()">Statistics</a></p>-->
-  <button type="button" class="btn" (click)="openModal(searchCourseModal)">Find course to join</button>
-
   <div class="container">
+    <button class="btn" routerLink="./createCourse">Create course</button>
+    <!--<p><a class="userlinks" (click)="toggleStatistics()">Statistics</a></p>-->
+    <button type="button" class="btn" (click)="openModal(searchCourseModal)">Find course to join</button>
     <div class="row">
       <div class="container col-lg-9">
         <!-- Title -->
