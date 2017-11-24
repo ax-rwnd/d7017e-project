@@ -9,8 +9,9 @@
       <!-- Title of header -->
       <span class="navbar-brand" routerLink="/user">Frontend</span>
     </div>
+
     <ul class="nav navbar-nav navbar-right">
-      <li routerLink="/user"><a>
+      <li routerLink="/user"><a class="userID-display">
         <span class="glyphicon glyphicon-user size"></span>
         <span style="display:inline-block; width: 0.1em;"></span>
         <span *ngIf="user.userName;else noID">{{user.userName}}</span>
