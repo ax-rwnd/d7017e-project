@@ -141,8 +141,8 @@
           }
         } ],
         "responses" : {
-          "200" : {
-            "description" : "ok",
+          "201" : {
+            "description" : "created",
             "schema" : {
               "type" : "array",
               "items" : {
@@ -266,8 +266,8 @@
           }
         } ],
         "responses" : {
-          "200" : {
-            "description" : "ok",
+          "201" : {
+            "description" : "created",
             "schema" : {
               "type" : "array",
               "items" : {

@@ -8,16 +8,14 @@ var Test = require('../models/schemas').Test;
 var request = require('request');
 var queries = require('../lib/queries/queries.js');
 var auth = require('../lib/authentication.js');
-
-//var passport = require('passport');
-//var CasStrategy = require('passport-cas').Strategy;
-
 var errors = require('../lib/errors.js');
+var constants = require('../lib/constants.js');
+var logger = require('../lib/logger.js');
+
 var jwt = require('jsonwebtoken');
 var https = require('https');
 var config = require('config');
-var constants = require('../lib/constants.js');
-var logger = require('../lib/logger.js');
+
 
 function create_refresh_token(id) {
     return jwt.sign({
