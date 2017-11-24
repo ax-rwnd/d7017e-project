@@ -25,10 +25,9 @@ function create_refresh_token(id) {
     }, config.get('App.secret'), {expiresIn: config.get('Auth.refresh_ttl')});
 }
 
-function create_access_token(id, admin, access) {
+function create_access_token(id, access) {
     return jwt.sign({
         id: id,
-        //admin: admin,
         access: access,
     }, config.get('App.secret'), {expiresIn: config.get('Auth.access_ttl')});
 }
@@ -67,7 +66,7 @@ module.exports = function (router) {
                         queries.setRefreshToken(userObject, refToken);
 
                         res.json({
-                            access_token: create_access_token(userObject._id, userObject.admin, userObject.access),
+                            access_token: create_access_token(userObject._id, userObject.access),
                             access_expires_in: config.get('Auth.access_ttl'),
                             refresh_token: refToken,
                             refresh_expires_in: config.get('Auth.refresh_ttl'),
@@ -106,7 +105,7 @@ module.exports = function (router) {
             queries.findOrCreateUser(profile)
             .then(user => {
                 res.json({
-                    access_token: create_access_token(user._id, user.admin, user.access),
+                    access_token: create_access_token(user._id, user.access),
                     token_type: config.get('Auth.auth_header_prefix'),
                     scope: '',
                     expires_in: config.get('Auth.access_ttl')
