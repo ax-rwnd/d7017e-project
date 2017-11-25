@@ -5,7 +5,7 @@ import { Component, OnInit, OnChanges, ViewChild, AfterViewInit, Input } from '@
 @Component({
   selector: 'app-mod-adventuremap',
   templateUrl: './mod-adventuremap.component.html',
-  styleUrls: ['../gameelement/gameelement.component.css', './mod-adventuremap.component.css']
+  styleUrls: ['../gameelement/gameelement.component.css']
 })
 export class ModAdventuremapComponent extends GameelementComponent implements OnInit, OnChanges, AfterViewInit {
   @ViewChild('mapCanvas') mapCanvas;
