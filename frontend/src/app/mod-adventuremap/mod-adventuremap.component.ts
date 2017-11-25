@@ -1,4 +1,5 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { GameelementComponent } from '../gameelement/gameelement.component';
+import { Component, OnInit, OnChanges, ViewChild, AfterViewInit, Input } from '@angular/core';
 
 
 @Component({
@@ -6,32 +7,68 @@ import { Component, OnInit, Input } from '@angular/core';
   templateUrl: './mod-adventuremap.component.html',
   styleUrls: ['../gameelement/gameelement.component.css', './mod-adventuremap.component.css']
 })
-export class ModAdventuremapComponent implements OnInit {
-	
-	@Input() assignments: Assignment;
+export class ModAdventuremapComponent extends GameelementComponent implements OnInit, OnChanges, AfterViewInit {
+  @ViewChild('mapCanvas') mapCanvas;
+  @Input() courseCode: string;
+
+  private assignments: any[];
+  private context: CanvasRenderingContext2D;
 
   ngOnInit() {
-  	test();
   }
-}
 
-function getCourseElement(number) {
-    //todo
-    //fetch the correct assignment/lab from the course
-    
-   }
+  ngOnChanges() {
+    this.drawMap();
+  }
 
-function test(){
-	const a = [];
-  	for (let i=0; i<4; i++){
-  		a[i] = {id: i, name: 'name s', available: true}
-  	}
-  	this.assignments = a;
-		//console.log('see amount', this.assignmentz);
-}
+  ngAfterViewInit() {
+    this.loadAssignments();
+    const canvas = this.mapCanvas.nativeElement;
+    this.context = canvas.getContext('2d');
+    this.drawMap();
+  }
 
-interface Assignment {
-	id: number;
-	name: string;
-	available: boolean;
+  drawMap() {
+    // Render one frame of the game map
+
+    if (this.context === undefined) {
+      console.warn('drawMap was called before initialization.');
+      return;
+    }
+    const ctx = this.context;
+
+    ctx.fillStyle = 'white';
+    ctx.fillRect(0, 0, 200, 200);
+
+    if (this.assignments !== undefined) {
+      console.error('loading assignments');
+
+      for (let i = 0; i < this.assignments.length; i++) {
+
+        // Connect dots
+        if (i < this.assignments.length - 1) {
+          ctx.beginPath();
+          ctx.lineWidth = 1;
+          ctx.fillStyle = 'black';
+          ctx.moveTo(10 + 20 * i, 10);
+          ctx.lineTo(10 + 20 * (i + 1), 10);
+          ctx.stroke();
+        }
+
+        // Draw dot
+        ctx.beginPath();
+        ctx.arc(10 + 20 * i, 10, 4, 0, 2 * Math.PI, false);
+        ctx.fillStyle = 'red';
+        ctx.fill();
+        ctx.stroke();
+      }
+    }
+  }
+
+  loadAssignments() {
+    this.backendService.getCourseAssignments(this.courseCode).then((data: any) => {
+      this.assignments = data.assignments;
+      this.drawMap();
+    });
+  }
 }

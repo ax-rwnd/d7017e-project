@@ -46,13 +46,16 @@ import {AuthService} from './services/Auth/Auth.service';
 import {Http, HttpModule} from '@angular/http';
 import { ScrollerDirective } from './scroller.directive';
 import { AssignmentGroupComponent } from './assignment-group/assignment-group.component';
+import { CreatecourseComponent } from './createcourse/createcourse.component';
+import { UserPanelsComponent } from './user-panels/user-panels.component';
+
+// Modular game components
 import { GameelementComponent } from './gameelement/gameelement.component';
 import { ModLeaderboardComponent } from './mod-leaderboard/mod-leaderboard.component';
 import { ModProgressbarComponent } from './mod-progressbar/mod-progressbar.component';
-import { CreatecourseComponent } from './createcourse/createcourse.component';
+import { ModAdventuremapComponent } from './mod-adventuremap/mod-adventuremap.component';
 import { ModBadgesComponent } from './mod-badges/mod-badges.component';
 import { ModBadgesSingleComponent } from './mod-badges/mod-badges-single.component';
-import { UserPanelsComponent } from './user-panels/user-panels.component';
 
 
 const appRoutes: Routes = [
@@ -82,13 +85,14 @@ const appRoutes: Routes = [
     CreateassignmentComponent,
     ScrollerDirective,
     AssignmentGroupComponent,
+    CreatecourseComponent,
+    UserPanelsComponent,
     GameelementComponent,
     ModLeaderboardComponent,
     ModProgressbarComponent,
-    CreatecourseComponent,
     ModBadgesComponent,
     ModBadgesSingleComponent,
-    UserPanelsComponent,
+    ModAdventuremapComponent,
   ],
   imports: [
     BrowserModule,
