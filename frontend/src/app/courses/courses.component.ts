@@ -39,6 +39,12 @@ export class CoursesComponent implements OnInit {
   defaultForm = {
     search: ''
   };
+  selectedBadge: string;
+  badges: Array<Object> = [
+    {key: 'bronze_medal_badge', name: 'Bronze medal'},
+    {key: 'silver_medal_badge', name: 'Silver medal'},
+    {key: 'gold_medal_badge', name: 'Gold medal'}
+  ];
 
   constructor(private courseService: CourseService, private route: ActivatedRoute, private headService: HeadService,
               private fb: FormBuilder, private assignmentService: AssignmentService, private modalService: BsModalService,
@@ -51,12 +57,14 @@ export class CoursesComponent implements OnInit {
     this.route.params.subscribe( (params: any) => {
       // Grab the current course
       this.currentCourse = this.courseService.GetCourse(params.course);
-
+      console.log('course', this.currentCourse);
       // Assign groups for assignments
       if (this.assignmentService.courseAssignments[this.currentCourse.id] !== undefined) {
         this.assignmentGroups = this.assignmentService.courseAssignments[this.currentCourse.id];
+        console.log('assignments', this.assignmentGroups);
       } else {
         this.assignmentGroups = this.assignmentService.courseAssignments['default'];
+        console.log('assignments', this.assignmentGroups);
       }
 
       // Get a list of the users waiting to join the course
@@ -70,6 +78,7 @@ export class CoursesComponent implements OnInit {
     this.sidebarState = this.headService.getCurrentState();
     this.possibleStudents = [];
     this.form = this.fb.group(this.defaultForm);
+    this.selectedBadge = 'bronze_medal_badge';
   }
 
   getProgress() {

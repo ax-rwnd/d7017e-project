@@ -45,6 +45,7 @@
       </h1>
       <button type="button" class="btn" id="createNewAssignment" [routerLink]="['/courses', currentCourse.id, 'createNewAssignment']">Create New Assignment</button>
       <button type="button" class="btn" (click)="openModal(inviteStudentModal)">Invite student to course</button>
+      <button type="button" class="btn" (click)="openModal(createBadge)">Create badge</button>
     </ng-template>
     <!-- Teacher view END -->
   </div>
@@ -79,4 +80,36 @@
     </div>
     <div class="modal-footer">
     </div>
+</ng-template>
+
+<ng-template #createBadge>
+  <div class="modal-header">
+    <h4 class="modal-title pull-left">Create badge</h4>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <h3>Select badge</h3>
+    <div class="form-group">
+      <select class="form-control" type="number" [(ngModel)]="selectedBadge">
+        <option *ngFor="let badge of badges" [ngValue]="badge['key']">{{badge['name']}}</option>
+      </select>
+    </div>
+    <div>
+      <img src="../../assets/images/{{selectedBadge}}.png"/>
+    </div>
+  </div>
+  <div class="modal-body">
+    <h3>
+      Add goals
+    </h3>
+    <div class="form-group">
+      <select class="form-control" type="number" [(ngModel)]="selectedBadge">
+        <option *ngFor="let badge of badges" [ngValue]="badge['key']">{{badge['name']}}</option>
+      </select>
+    </div>
+  </div>
+  <div class="modal-footer">
+  </div>
 </ng-template>
