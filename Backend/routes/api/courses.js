@@ -4,6 +4,7 @@ var request = require('request');
 var mongoose = require('mongoose');
 var queries = require('../../lib/queries/queries');
 var errors = require('../../lib/errors.js');
+var typecheck = require('../../lib/typecheck.js');
 var auth = require('../../lib/authentication.js');
 var testerCom = require('../../lib/tester_communication');
 var logger = require('../../lib/logger');
@@ -732,6 +733,10 @@ module.exports = function(router) {
         var stdin = req.body.stdin;
         var args = req.body.args;
         var lint = req.body.lint;
+
+        if (!mongoose.Types.ObjectId.isValid(assignment_id) || !mongoose.Types.ObjectId.isValid(course_id) || !typecheck.isString(stdout) || !typecheck.isString(stdin) || !Array.isArray(args)) {
+            return next(errors.BAD_INPUT);
+        }
 
         queries.createTest(stdout, stdin, args, lint, assignment_id).then(function (test) {
             return res.status(201).json(test);
