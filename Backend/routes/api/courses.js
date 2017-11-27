@@ -7,6 +7,7 @@ var errors = require('../../lib/errors.js');
 var auth = require('../../lib/authentication.js');
 var testerCom = require('../../lib/tester_communication');
 var logger = require('../../lib/logger');
+var features = require('../../lib/queries/features');
 
 var Assignment = require('../../models/schemas').Assignment;
 var Test = require('../../models/schemas').Test;
@@ -580,7 +581,7 @@ module.exports = function(router) {
         });
     });
 
-
+    // Return all assignemnts from a course
     router.get('/:course_id/assignments', function (req, res, next) {
         var course_id = req.params.course_id;
 
@@ -592,6 +593,7 @@ module.exports = function(router) {
         });
     });
 
+    // Creates an assignment for a course
     router.post('/:course_id/assignments', function (req, res, next) {
         var course_id = req.params.course_id;
         var name = req.body.name;
@@ -607,11 +609,16 @@ module.exports = function(router) {
         });
     });
 
+    // Return assgnemnt bases on permissions
     router.get('/:course_id/assignments/:assignment_id', function (req, res, next) {
         var roll;
         var course_id = req.params.course_id;
         var assignment_id = req.params.assignment_id;
         var wantedFields = req.query.fields || null;
+
+        if (!mongoose.Types.ObjectId.isValid(course_id) || !mongoose.Types.ObjectId.isValid(assignment_id)) {
+            return next(errors.BAD_INPUT);
+        }
 
         queries.getUser(req.user.id, "teaching").then(function (userObject) {
             if (userObject.teaching.indexOf(course_id) !== -1) {
@@ -738,5 +745,40 @@ module.exports = function(router) {
         queries.getCoursesEnabledFeatures(req.params.course_id).then(function (enabled_features) {
             res.json(enabled_features);
         }).catch(next);
+    });
+
+    router.get('/:course_id/features', function(req, res, next) {
+        features.getFeaturesOfCourse(req.params.course_id).then(function(progress) {
+            return res.json(progress);
+        }).catch(next);
+    });
+
+    router.get('/:course_id/features/me', function(req, res, next) {
+        features.getFeatureOfUserID(req.params.course_id, req.user.id).then(function(progress) {
+            return res.json(progress);
+        }).catch(next);
+    });
+
+    router.post('/badges', function (req, res, next) {
+        features.createBadge(req.body).then(function(badge) {
+            return res.json(badge);
+        }).catch(next);
+    });
+
+    router.get('/badges/:badge_id', function (req, res, next) {
+        features.getBadge(req.params.badge_id).then(function(badge) {
+            return res.json(badge);
+        }).catch(next);
+    });
+
+    router.put('/badges/:badge_id', function(req, res, next) {
+        features.updateBadge(req.params.badge_id, req.body).then(function(badge) {
+            return res.json(badge);
+        }).catch(next);
+    });
+
+    router.delete('/badges/:badge_id', function(req, res, next) {
+        // TODO
+        return res.sendStatus(501);
     });
 };
