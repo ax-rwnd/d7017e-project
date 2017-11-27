@@ -703,6 +703,7 @@ module.exports = function(router) {
         });
     });
 
+    // Get tests belonging to a specific assingment
     router.get('/:course_id/assignments/:assignment_id/tests', function (req, res, next) {
         var course_id = req.params.course_id;
         var assignment_id = req.params.assignment_id;
@@ -723,6 +724,7 @@ module.exports = function(router) {
         });
     });
 
+    // Post test to a specified assignment
     router.post('/:course_id/assignments/:assignment_id/tests', function (req, res, next) {
         var course_id = req.params.course_id;
         var assignment_id = req.params.assignment_id;
