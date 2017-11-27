@@ -1,43 +1,56 @@
 <app-head></app-head>
 <div id="cont" class="content" [@content]="sidebarState">
   <div class="container">
-    <div class="col-lg-6">
+    <!-- START of the student view -->
+    <span *ngIf="teachCourses.indexOf(currentCourse) === -1; else teacherView"> <!-- Could switch this do for ex a bool or something -->
+      <!-- This view below is for students, the view for the teacher is in teacherView down below -->
+      <div class="col-lg-6">
+        <!-- Title of the student page-->
+        <h1>
+          <span *ngIf="currentCourse.code">{{currentCourse.code}} - </span> {{currentCourse.name}}
+        </h1>
+          <!-- Display the course description, markdown style -->
+          <markdown [data]="currentCourse.course_info"></markdown>
+
+          <!-- Feature progress bar -->
+          <app-mod-progressbar [courseCode]="currentCourse.id"></app-mod-progressbar>
+
+          <!-- Score board -->
+          <div class="gamification-block panel panel-default" *ngIf="currentCourse.rewards.score !== false">
+            <div class="panel-heading gamification-header">
+              Score
+            </div>
+            <div class="panel-body">
+              {{currentCourse.rewards.score}}
+            </div>
+          </div>
+          <!-- Features, display if defined for course -->
+          <app-mod-badges [courseCode]="currentCourse.id"></app-mod-badges>
+          <app-mod-leaderboard [courseCode]="currentCourse.id"></app-mod-leaderboard>
+          <app-mod-adventuremap [courseCode]="currentCourse.id"></app-mod-adventuremap>
+      </div>
+      <!-- Next column, for assignments group -->
+      <div class="col-lg-6">
+        This too
+        <div *ngFor="let g of assignmentGroups">
+          <app-assignment-group [assignmentGroup]="g" [courseCode]="currentCourse.id"></app-assignment-group>
+        </div>
+      </div>
+      <!-- End of assignments group -->
+    </span>
+    <!-- END of the student view, START of the teacher view -->
+    <ng-template #teacherView>
       <h1>
         <span *ngIf="currentCourse.code">{{currentCourse.code}} - </span> {{currentCourse.name}}
       </h1>
       <button type="button" class="btn" id="createNewAssignment" [routerLink]="['/courses', currentCourse.id, 'createNewAssignment']">Create New Assignment</button>
       <button type="button" class="btn" (click)="openModal(inviteStudentModal)">Invite student to course</button>
-
-      <span *ngIf="teachCourses.indexOf(currentCourse) === -1; else teacherView">
-        <markdown [data]="currentCourse.course_info"></markdown>
-
-        <app-mod-progressbar [courseCode]="currentCourse.id"></app-mod-progressbar>
-
-        <div class="gamification-block panel panel-default" *ngIf="currentCourse.rewards.score !== false">
-          <div class="panel-heading gamification-header">
-            Score
-          </div>
-          <div class="panel-body">
-            {{currentCourse.rewards.score}}
-          </div>
-        </div>
-
-        <app-mod-badges [courseCode]="currentCourse.id"></app-mod-badges>
-
-        <app-mod-leaderboard [courseCode]="currentCourse.id"></app-mod-leaderboard>
-        <app-mod-adventuremap [courseCode]="currentCourse.id"></app-mod-adventuremap>
-      </span>
-      <ng-template #teacherView></ng-template>
-    </div>
-    <div class="col-lg-6">
-      <div *ngFor="let g of assignmentGroups">
-        <app-assignment-group [assignmentGroup]="g" [courseCode]="currentCourse.id"></app-assignment-group>
-      </div>
-    </div>
+    </ng-template>
+    <!-- Teacher view END -->
   </div>
-
 </div>
 
+<!-- Modal for invitation of student to course -->
 <ng-template #inviteStudentModal>
   <div class="modal-header">
     <h4 class="modal-title pull-left">Invite students</h4>
