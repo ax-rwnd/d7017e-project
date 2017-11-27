@@ -34,7 +34,7 @@ export class CourseService {
       this.backendService.getMyCourses()
         .then(response => {
           console.log('getCoursesForUser', response);
-          getTeachCourses(this.backendService, this);
+         // getTeachCourses(response, this.backendService, this);
           updateCourses(response, this.backendService, this, this.assignmentService)
             .then(resolve)
             .catch(reject);
@@ -43,6 +43,20 @@ export class CourseService {
     });
     return promise;
   }
+  GetAllTeachingCourses() {
+    const promise = new Promise((resolve, reject) => {
+      this.backendService.getMyTeachedCourses()
+        .then( response => {
+          console.log('getTeacherCourse:', response);
+          getTeachCourses(response, this.backendService, this)
+            .then(resolve)
+            .catch(reject);
+        })
+        .catch(reject);
+    });
+    return promise;
+  }
+
   UpdateCourseProgress(courseId, progress) {
     // Updates the progress field of the course, not to be confused with reward.progress
     let i;
@@ -70,17 +84,20 @@ export class CourseService {
   }
 }
 
-function getTeachCourses(backendService, courseService) {
-  backendService.getMyTeachedCourses().then( response => {
-    const teachCourses = response['teaching'];
-    // iterate over all courses and get all info for each course
-    for (let i = 0; i < teachCourses.length; i++) {
-      backendService.getCourse(teachCourses[i]._id).then( course => {
-        const code = course.hasOwnProperty('course_code') ? course['course_code'] : '';
-        courseService.teaching.push(newTeachCourse(course['_id'], course['name'], code, course['description'], course['hidden'], course['enabled_features'], course['students'], course['teachers'], course['autojoin']));
-      });
-    }
-  });
+function getTeachCourses(response, backendService, courseService) {
+  const courses = response.teaching;
+  const promiseArray = [];
+  console.log('Teachresponse:', response);
+  for (let i = 0; i < courses.length; i++) {
+    console.log('Course:', courses[i]._id)
+    promiseArray.push(backendService.getCourse(courses[i]._id)
+      .then(course => {
+          const code = course.hasOwnProperty('course_code') ? course['course_code'] : '';
+          courseService.teaching.push(newTeachCourse(course['_id'], course['name'], code, course['description'], course['hidden'], course['enabled_features'], course['students'], course['teachers'], course['autojoin'], course['assignments']));
+        })
+      .catch());
+  }
+  return Promise.all(promiseArray);
 }
 
 function updateCourses(response, backendService, courseService, assignmentService) {
@@ -171,7 +188,7 @@ function handleFeatureResponse(response: any) {
   return newRewards(progress, score, badges, leaderboard);
 }
 
-function newTeachCourse(id, name, code, course_desc, hidden, en_feat, students, teachers, autojoin) {
+function newTeachCourse(id, name, code, course_desc, hidden, en_feat, students, teachers, autojoin, assigs) {
   return {
     id: id,
     name: name,
@@ -182,6 +199,7 @@ function newTeachCourse(id, name, code, course_desc, hidden, en_feat, students, 
     students: students,
     teachers: teachers,
     autojoin: autojoin,
+    assignments: assigs,
   };
 }
 
