@@ -238,6 +238,19 @@ describe('/api', () => {
             });
         });
 
+        describe('GET /api/courses/:course_id/assignments/:assignment_id/tests', () => {
+            it('returns a non-empty list of tests and a lint bool', () => {
+                return request(runner.server)
+                    .get('/api/courses/' + course_id + '/assignments/' + assignment_id + '/tests')
+                    .set('Authorization', 'Bearer ' + access_tokens.admin)
+                    .expect(200)
+                    .then(res => {
+                        assert(Array.isArray(res.body.tests.io), 'not an array');
+                        assert(res.body.tests.io.length > 0, 'array is empty');
+                    });
+            });
+        });
+
         describe('GET /api/courses/:course_id/assignments/:assignment_id/tests/:test_id', () => {
             it('returns a test object', () => {
                 return request(runner.server)
