@@ -611,7 +611,7 @@ module.exports = function(router) {
         });
     });
 
-    // Return assgnemnt bases on permissions
+    // Return assignment bases on permissions
     router.get('/:course_id/assignments/:assignment_id', function (req, res, next) {
         var roll;
         var course_id = req.params.course_id;
@@ -631,15 +631,11 @@ module.exports = function(router) {
                 roll = "student";
             }
             if (!queries.checkPermission(wantedFields, "assignments", roll)) {
-                return next(errors.INSUFFICIENT_PERMISSION);
+                throw errors.INSUFFICIENT_PERMISSION;
             }
-            queries.getAssignment(assignment_id, roll, wantedFields).then(function (assignmentObject) {
-                return res.json(assignmentObject);
-            });
-        })
-        .catch(function (err) {
-            next(err);
-        });
+            return queries.getAssignment(assignment_id, roll, wantedFields)
+            .then(res.json);
+        }).catch(next);
     });
 
 /*
@@ -743,43 +739,50 @@ module.exports = function(router) {
         });
     });
 
+    // Return enabled_features of a course
     router.get('/:course_id/enabled_features', function(req, res, next) {
         queries.getCoursesEnabledFeatures(req.params.course_id).then(function (enabled_features) {
             res.json(enabled_features);
         }).catch(next);
     });
 
+    // Return all features of a course
     router.get('/:course_id/features', function(req, res, next) {
         features.getFeaturesOfCourse(req.params.course_id).then(function(progress) {
             return res.json(progress);
         }).catch(next);
     });
 
+    // Return feature of user in a course
     router.get('/:course_id/features/me', function(req, res, next) {
         features.getFeatureOfUserID(req.params.course_id, req.user.id).then(function(progress) {
             return res.json(progress);
         }).catch(next);
     });
 
-    router.post('/badges', function (req, res, next) {
+    // Create badge
+    router.post('/:course_id/badges', function (req, res, next) {
         features.createBadge(req.body).then(function(badge) {
             return res.json(badge);
         }).catch(next);
     });
 
-    router.get('/badges/:badge_id', function (req, res, next) {
+    // Get a badge by id
+    router.get('/:course_id/badges/:badge_id', function (req, res, next) {
         features.getBadge(req.params.badge_id).then(function(badge) {
             return res.json(badge);
         }).catch(next);
     });
 
-    router.put('/badges/:badge_id', function(req, res, next) {
+    // Update a badge by id
+    router.put('/:course_id/badges/:badge_id', function(req, res, next) {
         features.updateBadge(req.params.badge_id, req.body).then(function(badge) {
             return res.json(badge);
         }).catch(next);
     });
 
-    router.delete('/badges/:badge_id', function(req, res, next) {
+    // Delete a badge by id
+    router.delete('/:course_id/badges/:badge_id', function(req, res, next) {
         // TODO
         return res.sendStatus(501);
     });
