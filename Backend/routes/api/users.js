@@ -68,7 +68,6 @@ module.exports = function (router) {
 
     router.delete('/:user_id', function (req, res, next) {
         var user_id = req.params.user_id;
-        console.log(req.user.access);
         if (req.user.access === constants.ACCESS.ADMIN){
             queries.deleteUser(user_id).then(function (err) {
                 if (err) {

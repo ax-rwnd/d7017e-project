@@ -142,9 +142,11 @@ function getUsers(id_array, fields) {
 }
 
 function deleteUser(id) {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+            throw errors.INVALID_ID;
+    }
     return User.findById(id).then(function (user) {
         if (!user) {
-            console.log("deleteUser: User not found");
             throw errors.USER_NOT_FOUND;
         }
         User.deleteOne(user, function (err) {
