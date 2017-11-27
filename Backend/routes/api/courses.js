@@ -8,6 +8,7 @@ var typecheck = require('../../lib/typecheck.js');
 var auth = require('../../lib/authentication.js');
 var testerCom = require('../../lib/tester_communication');
 var logger = require('../../lib/logger');
+var features = require('../../lib/queries/features');
 
 var Assignment = require('../../models/schemas').Assignment;
 var Test = require('../../models/schemas').Test;
@@ -599,7 +600,7 @@ module.exports = function(router) {
         });
     });
 
-
+    // Return all assignemnts from a course
     router.get('/:course_id/assignments', function (req, res, next) {
         var course_id = req.params.course_id;
 
@@ -611,6 +612,7 @@ module.exports = function(router) {
         });
     });
 
+    // Creates an assignment for a course
     router.post('/:course_id/assignments', function (req, res, next) {
         var course_id = req.params.course_id;
         var name = req.body.name;
@@ -626,11 +628,16 @@ module.exports = function(router) {
         });
     });
 
+    // Return assignment bases on permissions
     router.get('/:course_id/assignments/:assignment_id', function (req, res, next) {
         var roll;
         var course_id = req.params.course_id;
         var assignment_id = req.params.assignment_id;
         var wantedFields = req.query.fields || null;
+
+        if (!mongoose.Types.ObjectId.isValid(course_id) || !mongoose.Types.ObjectId.isValid(assignment_id)) {
+            return next(errors.BAD_INPUT);
+        }
 
         queries.getUser(req.user.id, "teaching").then(function (userObject) {
             if (userObject.teaching.indexOf(course_id) !== -1) {
@@ -641,15 +648,11 @@ module.exports = function(router) {
                 roll = "student";
             }
             if (!queries.checkPermission(wantedFields, "assignments", roll)) {
-                return next(errors.INSUFFICIENT_PERMISSION);
+                throw errors.INSUFFICIENT_PERMISSION;
             }
-            queries.getAssignment(assignment_id, roll, wantedFields).then(function (assignmentObject) {
-                return res.json(assignmentObject);
-            });
-        })
-        .catch(function (err) {
-            next(err);
-        });
+            return queries.getAssignment(assignment_id, roll, wantedFields)
+            .then(res.json);
+        }).catch(next);
     });
 
 /*
@@ -759,9 +762,51 @@ module.exports = function(router) {
         });
     });
 
+    // Return enabled_features of a course
     router.get('/:course_id/enabled_features', function(req, res, next) {
         queries.getCoursesEnabledFeatures(req.params.course_id).then(function (enabled_features) {
             res.json(enabled_features);
         }).catch(next);
+    });
+
+    // Return all features of a course
+    router.get('/:course_id/features', function(req, res, next) {
+        features.getFeaturesOfCourse(req.params.course_id).then(function(progress) {
+            return res.json(progress);
+        }).catch(next);
+    });
+
+    // Return feature of user in a course
+    router.get('/:course_id/features/me', function(req, res, next) {
+        features.getFeatureOfUserID(req.params.course_id, req.user.id).then(function(progress) {
+            return res.json(progress);
+        }).catch(next);
+    });
+
+    // Create badge
+    router.post('/:course_id/badges', function (req, res, next) {
+        features.createBadge(req.body).then(function(badge) {
+            return res.json(badge);
+        }).catch(next);
+    });
+
+    // Get a badge by id
+    router.get('/:course_id/badges/:badge_id', function (req, res, next) {
+        features.getBadge(req.params.badge_id).then(function(badge) {
+            return res.json(badge);
+        }).catch(next);
+    });
+
+    // Update a badge by id
+    router.put('/:course_id/badges/:badge_id', function(req, res, next) {
+        features.updateBadge(req.params.badge_id, req.body).then(function(badge) {
+            return res.json(badge);
+        }).catch(next);
+    });
+
+    // Delete a badge by id
+    router.delete('/:course_id/badges/:badge_id', function(req, res, next) {
+        // TODO
+        return res.sendStatus(501);
     });
 };

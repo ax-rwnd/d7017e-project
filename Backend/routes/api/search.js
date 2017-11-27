@@ -9,6 +9,11 @@ var config = require('config');
 
 module.exports = function(router) {
 
+    // Search in database. It is possible to specify categories (users, courses, assignments)
+    // Result:
+    //  query on all users,
+    //  query on courses the user is taking,
+    //  query on assignments the user is taking
     router.get('/', function(req, res, next) {
 
         if (!('query' in req.query)) {
