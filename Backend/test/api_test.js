@@ -151,6 +151,17 @@ describe('/api', () => {
             });
         });
 
+        describe('PUT /api/courses/:course_id', () => {
+            it('modifies the course code successfully', () => {
+                return request(runner.server)
+                    .put('/api/courses/' + course_id)
+                    .send({
+                        course_code: 'DtestingtestingE'
+                    }).set('Authorization', 'Bearer ' + access_tokens.admin)
+                    .expect(200);
+            });
+        });
+
         describe('GET /api/courses/:course_id/students', () => {
             it('returns a list of students', () => {
                 return request(runner.server)
