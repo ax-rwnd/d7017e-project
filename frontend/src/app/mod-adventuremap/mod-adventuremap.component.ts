@@ -11,24 +11,69 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
   @ViewChild('mapCanvas') mapCanvas;
   @Input() courseCode: string;
 
+  private userProgress: any;
+
   private assignments: any[];
+  private selectedAssignment: any;
+  private assignmentText: string;
+
+  private canvas: any;
   private context: CanvasRenderingContext2D;
 
   ngOnInit() {
   }
 
   ngOnChanges() {
-    this.drawMap();
+    this.update();
   }
 
   ngAfterViewInit() {
-    this.loadAssignments();
-    const canvas = this.mapCanvas.nativeElement;
-    this.context = canvas.getContext('2d');
-    this.drawMap();
+    this.canvas = this.mapCanvas.nativeElement;
+    this.context = this.canvas.getContext('2d');
+    this.update();
   }
 
-  drawMap() {
+  update() {
+    this.loadAssignments()
+      .then( () => {
+        this.selectedAssignment = this.assignments[this.userProgress.completed_assignments];
+        this.assignmentText = (this.selectedAssignment === undefined) ?
+                              'Pick an assignment' : this.selectedAssignment.name;
+
+        this.drawMap();
+      });
+  }
+
+  loadAssignments() {
+    // Load assingments for the map
+
+    return new Promise( (resolve: any, reject: any) => {
+      this.loadProgress()
+        .then( () => {
+          this.backendService.getCourseAssignments(this.courseCode).then((data: any) => {
+            this.assignments = data.assignments;
+            resolve(data.assignments);
+          });
+        })
+        .catch( (err) => {
+          console.error('failed loading progress in adventuremap', err);
+          reject(err);
+        });
+    });
+  }
+
+  loadProgress() {
+    // Load the user's course progress
+
+    return new Promise((resolve: any, reject: any) => {
+      this.backendService.getFeaturesCourseMe(this.courseCode).then( (data: any) => {
+        this.userProgress = data;
+        resolve(this.userProgress);
+      });
+    });
+  }
+
+drawMap() {
     // Render one frame of the game map
 
     if (this.context === undefined) {
@@ -38,12 +83,12 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
     const ctx = this.context;
 
     ctx.fillStyle = 'white';
-    ctx.fillRect(0, 0, 200, 200);
+    ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
     if (this.assignments !== undefined) {
-      console.error('loading assignments');
 
       for (let i = 0; i < this.assignments.length; i++) {
+        const current = this.assignments[i];
 
         // Connect dots
         if (i < this.assignments.length - 1) {
@@ -58,17 +103,20 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
         // Draw dot
         ctx.beginPath();
         ctx.arc(10 + 20 * i, 10, 4, 0, 2 * Math.PI, false);
-        ctx.fillStyle = 'red';
+
+        // TODO: this is dependent on the linearity of the responses
+        // perhaps it could be done better with cooperation from backend
+        if (this.selectedAssignment !== undefined &&
+            this.selectedAssignment._id === current._id) {
+          ctx.fillStyle = 'blue';
+        } else if (this.userProgress.completed_assignments >= i) {
+          ctx.fillStyle = 'red';
+        } else {
+          ctx.fillStyle = 'gray';
+        }
         ctx.fill();
         ctx.stroke();
       }
     }
-  }
-
-  loadAssignments() {
-    this.backendService.getCourseAssignments(this.courseCode).then((data: any) => {
-      this.assignments = data.assignments;
-      this.drawMap();
-    });
   }
 }
