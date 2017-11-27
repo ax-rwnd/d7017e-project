@@ -48,7 +48,7 @@ export class CourseService {
       this.backendService.getMyTeachedCourses()
         .then( response => {
           console.log('getTeacherCourse:', response);
-          getTeachCourses(response, this.backendService, this)
+          getTeachCourses(response, this.backendService, this, this.assignmentService)
             .then(resolve)
             .catch(reject);
         })
@@ -84,7 +84,7 @@ export class CourseService {
   }
 }
 
-function getTeachCourses(response, backendService, courseService) {
+function getTeachCourses(response, backendService, courseService, assignmentService) {
   const courses = response.teaching;
   const promiseArray = [];
   console.log('Teachresponse:', response);
@@ -94,6 +94,7 @@ function getTeachCourses(response, backendService, courseService) {
       .then(course => {
           const code = course.hasOwnProperty('course_code') ? course['course_code'] : '';
           courseService.teaching.push(newTeachCourse(course['_id'], course['name'], code, course['description'], course['hidden'], course['enabled_features'], course['students'], course['teachers'], course['autojoin'], course['assignments']));
+          assignmentService.AddCourseAssignments(courses[i]._id, course['assignments']);
         })
       .catch());
   }
