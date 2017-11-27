@@ -5,7 +5,7 @@
     <div class="panel-body text-center">
       <canvas #mapCanvas width="200" height="200"></canvas>
 
-      <p>{{assignmentText}}</p>
+      <button type="button" class="btn" id="goToAssignment" [routerLink]="['/courses', courseCode, 'assignment', assignmentId]">{{assignmentText}}</button>
     </div>
 
   </div>

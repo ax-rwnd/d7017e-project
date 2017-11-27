@@ -24,6 +24,7 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
   private lastAssignment: any;
   private selectedAssignment: any;
   private assignmentText: string;
+  private assignmentId: string;
 
   // Shadow-DOM elements
   private canvas: any;
@@ -56,9 +57,7 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
         }
       }
 
-      // Update map
-      this.assignmentText = (this.selectedAssignment === undefined) ?
-                            'Pick an assignment' : this.selectedAssignment.name;
+      this.setTextValues();
       this.drawMap();
     },
     false);
@@ -67,13 +66,21 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
   onClick(ev: any) {
   }
 
+  setTextValues() {
+    // Set the assignment text and url
+      // Update map
+    this.assignmentText = (this.selectedAssignment === undefined) ?
+                          'Pick an assignment' : this.selectedAssignment.name;
+    this.assignmentId = (this.selectedAssignment === undefined) ?
+                        '' : this.selectedAssignment._id;
+  }
+
   update() {
     this.loadAssignments()
       .then( () => {
         this.selectedAssignment = this.assignments[this.userProgress.completed_assignments];
         this.lastAssignment = this.assignments[this.userProgress.completed_assignments];
-        this.assignmentText = (this.selectedAssignment === undefined) ?
-                              'Pick an assignment' : this.selectedAssignment.name;
+        this.setTextValues();
 
         this.drawMap();
       });
