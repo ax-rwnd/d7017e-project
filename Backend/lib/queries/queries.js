@@ -317,6 +317,24 @@ function checkIfUserAlreadyInCourse(user_id, course_id, optionalCourseFieldsToRe
     });
 }
 
+function checkIfAssignmentInCourse(assignment_id, course_id) {
+    return Course.findById(course_id)
+    .then(function (courseObject) {
+        var assignmentFound = false;
+
+        courseObject.assignments.forEach(function(element) {
+            if (element._id === assignment_id) {
+                assignmentFound = true;
+            }
+        })
+        if (courseObject.students.indexOf(user_id) !== -1
+        || courseObject.teachers.indexOf(user_id) !== -1) {
+            throw errors.USER_ALREADY_IN_COURSE;
+        }
+        return courseObject;
+    });
+}
+
 function checkIfRequestAlreadySent(user_id, course_id, type) {
     return JoinRequests.count({inviteType: type, user: user_id, course: course_id})
     .then(function (count) {
