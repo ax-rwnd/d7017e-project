@@ -8,34 +8,37 @@ var auth = require('../../lib/authentication.js');
 var constants = require('../../lib/constants.js');
 
 module.exports = function (router) {
+    // required query parameter `ids`:
+    // only get users whose ids appear in the comma separated string
     router.get('/', function (req, res, next) {
         var ids = req.query.ids;
         if (!ids) {
             res.sendStatus(404);
             return;
         }
-
         var id_array = ids.split(',');
+        for (let id of id_array) {
+            if (!mongoose.Types.ObjectId.isValid(id)) {
+                return next(errors.BAD_INPUT);
+            }
+        }
+
         var filter = (req.user.access === constants.ACCESS.ADMIN)
             ? constants.FIELDS.USER.ADMIN
             : constants.FIELDS.USER.BASE_FIELDS;
 
-        queries.getUsers(id_array, filter).then(function (users) {
+        queries.getUsers(id_array, filter)
+        .then(function (users) {
             res.json({users: users});
-        })
-        .catch(function (err) {
-            next(err);
-        });
+        }).catch(next);
     });
 
+    // returns the user object for the user that is currently logged in
     router.get('/me', function (req, res, next) {
-        queries.getUserPopulated(req.user.id, "Admin").then(function (user) {
-        //queries.getUser(req.user.id, constants.FIELDS.USER.PRIVILEGED).then(function (user) {
+        queries.getUserPopulated(req.user.id, "Admin")
+        .then(user => {
             res.json(user);
-        })
-        .catch(function(err) {
-            next(err);
-        });
+        }).catch(next);
     });
 
     router.get('/me/courses', function (req, res, next) {
@@ -68,7 +71,6 @@ module.exports = function (router) {
 
     router.delete('/:user_id', function (req, res, next) {
         var user_id = req.params.user_id;
-        console.log(req.user.access);
         if (req.user.access === constants.ACCESS.ADMIN){
             queries.deleteUser(user_id).then(function (err) {
                 if (err) {

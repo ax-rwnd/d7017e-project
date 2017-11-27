@@ -136,15 +136,31 @@ module.exports = function(router) {
 
     });
 
+    // Modify course with id :course_id
+    // Must be teacher or higher
     router.put('/:course_id', function (req, res, next) {
-        var course_id = req.params.course_id;
+        let course_id = req.params.course_id;
+        if (!mongoose.Types.ObjectId.isValid(course_id)) {
+            return next(errors.BAD_INPUT);
+        }
 
-        queries.updateCourse(course_id, req.body).then(function (course) {
-            return res.json(course);
-        })
-        .catch(function(err) {
-            next(err);
-        });
+        let b = req.body;
+        let clean_b = {};
+        if (b.hasOwnProperty('course_code')) clean_b.course_code = b.course_code;
+        if (b.hasOwnProperty('name')) clean_b.name = b.name;
+        if (b.hasOwnProperty('description')) clean_b.description = b.description;
+        if (b.hasOwnProperty('hidden')) clean_b.hidden = b.hidden;
+        if (b.hasOwnProperty('autojoin')) clean_b.autojoin = b.autojoin;
+        // note that ALL fields in enabled_features are allowed
+        if (b.hasOwnProperty('enabled_features')) clean_b.enabled_features = b.enabled_features;
+
+        queries.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
+        .then(() => {
+            return queries.updateCourse(course_id, clean_b);
+        }).then(() => {
+            // send an empty response
+            res.json({});
+        }).catch(next);
     });
 
 
@@ -690,6 +706,7 @@ module.exports = function(router) {
         });
     });
 
+    // Get tests belonging to a specific assingment
     router.get('/:course_id/assignments/:assignment_id/tests', function (req, res, next) {
         var course_id = req.params.course_id;
         var assignment_id = req.params.assignment_id;
@@ -710,6 +727,7 @@ module.exports = function(router) {
         });
     });
 
+    // Post test to a specified assignment
     router.post('/:course_id/assignments/:assignment_id/tests', function (req, res, next) {
         var course_id = req.params.course_id;
         var assignment_id = req.params.assignment_id;

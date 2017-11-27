@@ -151,6 +151,17 @@ describe('/api', () => {
             });
         });
 
+        describe('PUT /api/courses/:course_id', () => {
+            it('modifies the course code successfully', () => {
+                return request(runner.server)
+                    .put('/api/courses/' + course_id)
+                    .send({
+                        course_code: 'DtestingtestingE'
+                    }).set('Authorization', 'Bearer ' + access_tokens.admin)
+                    .expect(200);
+            });
+        });
+
         describe('GET /api/courses/:course_id/students', () => {
             it('returns a list of students', () => {
                 return request(runner.server)
@@ -234,6 +245,19 @@ describe('/api', () => {
                     .then(res => {
                         assert(ObjectId.isValid(res.body._id), 'response is not a valid ObjectId');
                         test_id = res.body._id;
+                    });
+            });
+        });
+
+        describe('GET /api/courses/:course_id/assignments/:assignment_id/tests', () => {
+            it('returns a non-empty list of tests and a lint bool', () => {
+                return request(runner.server)
+                    .get('/api/courses/' + course_id + '/assignments/' + assignment_id + '/tests')
+                    .set('Authorization', 'Bearer ' + access_tokens.admin)
+                    .expect(200)
+                    .then(res => {
+                        assert(Array.isArray(res.body.tests.io), 'not an array');
+                        assert(res.body.tests.io.length > 0, 'array is empty');
                     });
             });
         });

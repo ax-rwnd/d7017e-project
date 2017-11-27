@@ -76,7 +76,6 @@ app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 //Route not found.
 app.use(function (req, res, next) {
-    console.log("Not found");
     next(errors.NOT_FOUND);
 });
 
@@ -85,7 +84,7 @@ app.use(function (err, req, res, next) {
         return next(err);
     }
 
-    //console.log(err);
+    logger.log("error", err.message);
     res.status(err.httpCode).send(err.message);
 });
 
@@ -94,21 +93,22 @@ app.use(function (err, req, res, next) {
         return next(err);
     }
 
-    //console.log(err);
+    logger.log("error", err);
     res.status(err.httpCode).send(err.message);
 });
 
 app.use(function (err, req, res, next) {
     if (err.name === "CastError") {
+        logger.log("error", err);
         return res.status(400).send("Bad Input");
     }
-    //logger.log('error', err.);
 
 /*
     if (req.app.get('env') !== 'development') {
         delete err.stack;
     }
 */
+    logger.log("serverError", err);
     res.status(500).send("Internal server error");
 });
 
