@@ -44,8 +44,8 @@ exports.validateJWTtoken = function (req, res, next) {
                     throw new AuthorizationError("Invalid token", 401, 6005);
                 }
             }
-            if (!payload.hasOwnProperty('admin')) {
-                throw new AuthorizationError("Expect access token. Recieved refresh token.", 401, 6006);
+            if (!payload.hasOwnProperty('access')) {
+                throw new AuthorizationError("Expected access token. Received refresh token.", 401, 6006);
             }
 
             req.user = payload;
@@ -88,7 +88,7 @@ exports.validateRefToken = function (req, res, next) {
                     throw new AuthorizationError("Invalid token", 401, 6005);
                 }
             }
-            if (payload.hasOwnProperty('admin')) {
+            if (payload.hasOwnProperty('access')) {
                 throw new AuthorizationError("Expected refresh token. Received access token.", 401, 6006);
             }
 

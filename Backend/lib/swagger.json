@@ -141,8 +141,8 @@
           }
         } ],
         "responses" : {
-          "200" : {
-            "description" : "ok",
+          "201" : {
+            "description" : "created",
             "schema" : {
               "$ref" : "#/definitions/Course"
             }
@@ -349,8 +349,8 @@
           }
         } ],
         "responses" : {
-          "200" : {
-            "description" : "ok",
+          "201" : {
+            "description" : "created",
             "schema" : {
               "$ref" : "#/definitions/Assignment"
             }
@@ -390,8 +390,8 @@
           }
         } ],
         "responses" : {
-          "200" : {
-            "description" : "ok",
+          "201" : {
+            "description" : "created",
             "schema" : {
               "$ref" : "#/definitions/Test"
             }
@@ -515,8 +515,8 @@
           }
         } ],
         "responses" : {
-          "200" : {
-            "description" : "ok",
+          "201" : {
+            "description" : "created",
             "schema" : {
               "$ref" : "#/definitions/Draft"
             }

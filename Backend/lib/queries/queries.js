@@ -12,8 +12,9 @@ var mongoose = require('mongoose');
 var logger = require('../logger.js');
 var jwt = require('jsonwebtoken');
 var config = require('config');
+var constants = require('../constants.js');
 
-
+/* MOVED TO LIB/CONSTANTS.JS
 const FIELDS = {
     USER: {
         MODEL: require('../../models/schemas').User,
@@ -61,7 +62,7 @@ const FIELDS = {
     COURSES: {
         BASE_FIELDS: "course_code name description"
     }
-};
+};*/
 
 // var Assignment, User, Test = require('../../models/schemas.js');
 
@@ -86,18 +87,16 @@ function getTestsFromAssignment(assignmentID, callback) {
     });
 }
 
-
-
-
 function getUser(id, fields) {
+    // CHANGE TO USE CONSTANTS.JS INSTEAD
     var wantedFields = fields || "username email admin tokens courses teaching providers";
     // Check validity of id
     if (!mongoose.Types.ObjectId.isValid(id)) {
-            throw errors.INVALID_ID;
+        throw errors.INVALID_ID;
     }
     return User.findById(id, wantedFields).then(function (user) {
         if (!user) {
-            console.log("User not found");
+            logger.log("User not found");
             throw errors.USER_NOT_FOUND;
         }
         return user;
@@ -105,7 +104,7 @@ function getUser(id, fields) {
 }
 
 function getUserPopulated(user_id, roll, fields) {
-    var wantedFields = fields || FIELDS.USER[roll.toUpperCase()];
+    var wantedFields = fields || constants.FIELDS.USER[roll.toUpperCase()];
     wantedFields = wantedFields.replace(/,/g, " ");
 
     return User.findById(user_id, wantedFields)
@@ -121,6 +120,7 @@ function getUserPopulated(user_id, roll, fields) {
 }
 
 function getUsers(id_array, fields) {
+    // CHANGE TO USE CONSTANTS.JS INSTEAD
     var wantedFields = fields || "username email admin tokens courses teaching providers";
     var promises = [];
     for (var i = 0; i < id_array.length; i++) {
@@ -221,8 +221,10 @@ function findOrCreateUser(profile) {
     });
 }
 
-function getCourses(fields, admin, id_array) {
+function getCourses(fields, access, id_array) {
+    // CHANGE TO USE CONSTANTS.JS INSTEAD
     var wantedFields = fields || "name description hidden teachers students assignments";
+    var admin = (access === constants.ACCESS.ADMIN);
     if (!id_array){
        if (admin) {
             return Course.find({}, wantedFields).then(function (courseList) {
@@ -278,7 +280,8 @@ function checkIfUserExist(user_id) {
 
 // Checks if user_id is teacher in course_id.
 // If user is teacher of course, will return courseobject with teachers field and all optionalCourseFields
-function checkIfTeacherOrAdmin(user_id, course_id, admin, optionalCourseFieldsToReturn) {
+function checkIfTeacherOrAdmin(user_id, course_id, access, optionalCourseFieldsToReturn) {
+    var admin = (access === constants.ACCESS.ADMIN);
     return Course.findById(course_id, "teachers" + ("" || " " + optionalCourseFieldsToReturn))
     .then(function (courseObject) {
         if (!courseObject) {
@@ -559,7 +562,7 @@ function getCourseAssignments(id, fields) {
 }
 
 function getAssignment(assignment_id, roll, fields) {
-    var wantedFields = fields || FIELDS.ASSIGNMENTS[roll.toUpperCase()];
+    var wantedFields = fields || constants.FIELDS.ASSIGNMENTS[roll.toUpperCase()];
     wantedFields = wantedFields.replace(/,/g, " ");
 
     return Assignment.findById(assignment_id, wantedFields)
@@ -660,7 +663,7 @@ function createTest(stdout, stdin, args, lint, assignment_id) {
 
 // Should be able to check permissions for all collections. As long FIELDS value is added.
 function checkPermission(wantedFields, collection, roll) {
-    var permissionFields = FIELDS[collection.toUpperCase()][roll.toUpperCase()];
+    var permissionFields = constants.FIELDS[collection.toUpperCase()][roll.toUpperCase()];
     if (wantedFields) {
         wantedFields = wantedFields.split(",");
         wantedFields.forEach(function(element) {
@@ -676,12 +679,12 @@ function checkPermission(wantedFields, collection, roll) {
 // Needs to be specified in FIELDS
 function populateObject(mongooseObject, schema, wantedFields) {
     console.log(wantedFields);
-    var fieldsToPopulateArray = FIELDS[schema.toUpperCase()].POPULATE_FIELDS.split(" ");
+    var fieldsToPopulateArray = constants.FIELDS[schema.toUpperCase()].POPULATE_FIELDS.split(" ");
     var populatePromises = [];
-    var model = FIELDS[schema.toUpperCase()].MODEL;
+    var model = constants.FIELDS[schema.toUpperCase()].MODEL;
     fieldsToPopulateArray.forEach(function(element) {
         if (wantedFields.indexOf(element) !== -1) {
-            populatePromises.push(model.populate(mongooseObject, {path: element, select: FIELDS[element.toUpperCase()].BASE_FIELDS}));
+            populatePromises.push(model.populate(mongooseObject, {path: element, select: constants.FIELDS[element.toUpperCase()].BASE_FIELDS}));
         }
     });
     if (populatePromises.length === 0) {
@@ -695,7 +698,7 @@ function populateObject(mongooseObject, schema, wantedFields) {
 
 
 function getCourse(courseid, roll, fields) {
-    var wantedFields = fields || FIELDS.COURSE[roll.toUpperCase()];
+    var wantedFields = fields || constants.FIELDS.COURSE[roll.toUpperCase()];
     wantedFields = wantedFields.replace(/,/g, " ");
 
     return Course.findById(courseid, wantedFields)

@@ -11,7 +11,9 @@ var features = require('../../lib/queries/features');
 
 var Assignment = require('../../models/schemas').Assignment;
 var Test = require('../../models/schemas').Test;
+var constants = require('../../lib/constants.js');
 
+// CHANGE THIS TO USE THE CONSTANTS.JS INSTEAD
 const BASIC_FILTER = "name description course_code enabled_features";
 const ADMIN_FILTER = "name description course_code teachers students assignments features enabled_features hidden";
 
@@ -23,12 +25,12 @@ module.exports = function(router) {
     router.get('/', function (req, res, next) {
         var ids = req.query.ids;
 
-        var filter = (req.user.access === "admin")
+        var filter = (req.user.access === constants.ACCESS.ADMIN)
             ? ADMIN_FILTER
             : BASIC_FILTER;
 
         if (!ids) {
-            queries.getCourses(filter, req.user.admin).then(function (courses) {
+            queries.getCourses(filter, req.user.access).then(function (courses) {
                 return res.json({courses: courses});
             })
             .catch(function (err) {
@@ -36,7 +38,7 @@ module.exports = function(router) {
             });
         } else {
             var id_array = ids.split(',');
-            queries.getCourses(filter, req.user.admin, id_array).then(function (courses) {
+            queries.getCourses(filter, req.user.access, id_array).then(function (courses) {
                 return res.json({courses: courses});
             })
             .catch(function (err) {
@@ -74,7 +76,7 @@ module.exports = function(router) {
         // TODO: check permissions
 
         queries.createCourse(name, desc, hidden, course_code, enabled_features, autojoin, teacher).then(function (course) {
-            return res.json(course);
+            return res.status(201).json(course);
         })
         .catch(function (err) {
             next(err);
@@ -108,7 +110,7 @@ module.exports = function(router) {
         queries.getUser(req.user.id, "teaching").then(function (userObject) {
             if (userObject.teaching.indexOf(course_id) !== -1) {
                 roll = "teacher";
-            } else if (req.user.access === "admin") {
+            } else if (req.user.access === constants.ACCESS.ADMIN) {
                 roll = "admin";
             } else {
                 roll = "student";
@@ -165,7 +167,7 @@ module.exports = function(router) {
         queries.getUser(req.user.id, "teaching")
         .then(function (userObject) {
             // admins and teachers can invite students
-            if (req.user.access === "admin" || userObject.teaching.indexOf(course_id) !== -1) {
+            if (req.user.access === constants.ACCESS.ADMIN || userObject.teaching.indexOf(course_id) !== -1) {
                 return queries.addCourseStudent(course_id, student_id);
             } else {
                 // TODO: use a better error
@@ -192,7 +194,7 @@ module.exports = function(router) {
             return next(errors.BAD_INPUT);
         }
 
-        queries.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.admin)
+        queries.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
         .then(function () {
             return queries.getCourseInvites(course_id, "invite");
         })
@@ -226,7 +228,7 @@ module.exports = function(router) {
         // Invite already sent check then
         // Create Invite and add to db
         // Thrown errors will halt execution.
-        queries.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.admin, "students teachers")
+        queries.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access, "students teachers")
         .then(function (courseObject) {
             return queries.checkIfUserAlreadyInCourseObject(student_id, courseObject);
         })
@@ -304,7 +306,7 @@ module.exports = function(router) {
             if (student_id === req.user.id) {
                 return queries.findAndRemoveRequest(student_id, course_id, "invite");
             } else {
-                return queries.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.admin)
+                return queries.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
                 .then(function () {
                   return queries.findAndRemoveRequest(student_id, course_id, "invite");
                 });
@@ -331,7 +333,7 @@ module.exports = function(router) {
             return next(errors.BAD_INPUT);
         }
 
-        queries.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.admin)
+        queries.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
         .then(function () {
             return queries.getCourseInvites(course_id, "pending");
         })
@@ -404,7 +406,7 @@ module.exports = function(router) {
         // Check if request exists if so remove it then
         // Add user to course
         // Thrown errors will halt execution
-        queries.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.admin)
+        queries.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
         .then(function () {
             return queries.findAndRemoveRequest(student_id, course_id, "pending");
         })
@@ -451,7 +453,7 @@ module.exports = function(router) {
                     return res.sendStatus(200);
                 });
             } else {
-                return queries.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.admin)
+                return queries.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
                 .then(function () {
                     return queries.findAndRemoveRequest(student_id, course_id, "pending");
                 })
@@ -498,7 +500,7 @@ module.exports = function(router) {
                     return res.sendStatus(200);
                 });
             } else {
-                return queries.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.admin)
+                return queries.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
                 .then(function () {
                     return queries.removeStudentFromCourse(student_id, course_id);
                 })
@@ -516,7 +518,7 @@ module.exports = function(router) {
     router.get('/:course_id/teachers', function (req, res, next) {
         var course_id = req.params.course_id;
 
-        queries.getCourseTeachers(course_id, "username email").then(function (teachers) {
+        queries.getCourseTeachers(course_id, constants.FIELDS.TEACHERS.BASE_FIELDS).then(function (teachers) {
             return res.json(teachers);
         })
         .catch(function (err) {
@@ -538,7 +540,7 @@ module.exports = function(router) {
             return next(errors.BAD_INPUT);
         }
 
-        queries.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.admin, "students teachers")
+        queries.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access, "students teachers")
         .then(function (courseObject) {
             return queries.checkIfUserInCourseAndNotTeacherObject(teacher_id, courseObject);
         })
@@ -566,7 +568,7 @@ module.exports = function(router) {
             return next(errors.BAD_INPUT);
         }
 
-        queries.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.admin)
+        queries.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
         .then(function (courseObject) {
             return queries.checkIfUserIsTeacherObject(teacher_id, courseObject);
         })
@@ -602,7 +604,7 @@ module.exports = function(router) {
         var languages = req.body.languages;
 
         queries.createAssignment(name, desc, hidden, languages, course_id).then(function (assignment) {
-            return res.json(assignment);
+            return res.status(201).json(assignment);
         })
         .catch(function (err) {
             next(err);
@@ -623,7 +625,7 @@ module.exports = function(router) {
         queries.getUser(req.user.id, "teaching").then(function (userObject) {
             if (userObject.teaching.indexOf(course_id) !== -1) {
                 roll = "teacher";
-            } else if (req.user.access === "admin") {
+            } else if (req.user.access === constants.ACCESS.ADMIN) {
                 roll = "admin";
             } else {
                 roll = "student";
@@ -673,7 +675,7 @@ module.exports = function(router) {
         var lang = req.body.lang || "";
 
         queries.saveCode(req.user.id, assignment_id, code, lang).then(function (draft) {
-            res.json(draft);
+            res.status(201).json(draft);
         })
         .catch(function (err) {
             next(err);
@@ -721,7 +723,7 @@ module.exports = function(router) {
         var lint = req.body.lint;
 
         queries.createTest(stdout, stdin, args, lint, assignment_id).then(function (test) {
-            return res.json(test);
+            return res.status(201).json(test);
         })
         .catch(function (err) {
             next(err);

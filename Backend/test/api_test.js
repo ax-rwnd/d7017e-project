@@ -115,7 +115,7 @@ describe('/api', () => {
                     .post(route)
                     .send(assignment)
                     .set('Authorization', 'Bearer ' + access_tokens.admin)
-                    .expect(200)
+                    .expect(201)
                     .then(res => {
                         assert(ObjectId.isValid(res.body._id), 'response is not a valid ObjectId');
                         course_id = res.body._id;
@@ -198,7 +198,7 @@ describe('/api', () => {
                         languages: 'javascript'
                     })
                     .set('Authorization', 'Bearer ' + access_tokens.user)
-                    .expect(200)
+                    .expect(201)
                     .then(res => {
                         assert(ObjectId.isValid(res.body._id), 'response is not a valid ObjectId');
                         assignment_id = res.body._id;
@@ -230,7 +230,7 @@ describe('/api', () => {
                         lint: true
                     })
                     .set('Authorization', 'Bearer ' + access_tokens.user)
-                    .expect(200)
+                    .expect(201)
                     .then(res => {
                         assert(ObjectId.isValid(res.body._id), 'response is not a valid ObjectId');
                         test_id = res.body._id;
@@ -276,7 +276,7 @@ describe('/api', () => {
                     .post('/api/courses/' + course_id + '/assignments/' + assignment_id + '/save')
                     .set('Authorization', 'Bearer ' + access_tokens.user)
                     .send()
-                    .expect(200)
+                    .expect(201)
                     .then(res => {
                         assert(assignment_id == res.body.assignment, 'response does not contain the correct assignment_id');
                         assert(res.body.lang == "", 'response param lang is not empty');
@@ -293,7 +293,7 @@ describe('/api', () => {
                     .post('/api/courses/' + course_id + '/assignments/' + assignment_id + '/save')
                     .set('Authorization', 'Bearer ' + access_tokens.user)
                     .send(draft)
-                    .expect(200)
+                    .expect(201)
                     .then(res => {
                         assert(assignment_id == res.body.assignment, 'response does not contain the correct assignment_id');
                         assert(draft.lang == res.body.lang, 'response does not contain the correct lang');
