@@ -39,7 +39,8 @@
         <br> <!-- add some space -->
         <!-- Title -->
         <h2>My Courses</h2>
-        <span *ngFor="let course of teachCourses">          <app-user-panels [course]="course"></app-user-panels>
+        <span *ngFor="let course of teachCourses">
+          <app-user-panels [course]="course"></app-user-panels>
         </span>
 
       </div>
@@ -78,8 +79,7 @@
     </div>
   </div>
 
-  <app-statistics *ngIf="statistics"></app-statistics>
-
+  </div>
 </div>
 
 <ng-template #searchCourseModal>
@@ -107,8 +107,6 @@
           </div>
         </div>
     </div>
-    <div class="modal-footer">
-
-    </div>
+    <div class="modal-footer"></div>
   <!--</form>-->
 </ng-template>
