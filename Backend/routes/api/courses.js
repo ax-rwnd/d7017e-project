@@ -26,7 +26,7 @@ module.exports = function(router) {
     // If admin get all
     // If teacher or student get all not hidden courses.
     // Also get hidden courses if teacher/student of it?
-    /*
+    
     router.get('/', function (req, res, next) {
         var ids = req.query.ids;
 
@@ -52,7 +52,7 @@ module.exports = function(router) {
         }
 
         //Need user object from token verify for admin check.
-        
+        /*
         if (user.admin) {
             queries.getCourses("name description", user.admin).then(function (courses) {
                 return res.json(courses);
@@ -61,10 +61,11 @@ module.exports = function(router) {
                 next(err);
             });
         }
+        */
         
         
     });
-*/
+
     // TODO:
     // Tests
     // Documentation
@@ -72,7 +73,7 @@ module.exports = function(router) {
     //
     // Returns BASE_FIELDS of every course in db.
     // If course is "hidden" only Admin and members of the course can see it.
-   
+/*   
     router.get('/', function (req, res, next) {
 
         var p;
@@ -91,9 +92,9 @@ module.exports = function(router) {
         })
         .catch(next);
     });
+*/
 
 
-/*
     // Create new course
     // Admin/teachers can create unlimited courses
     // Students limited to 3 courses?
@@ -116,8 +117,8 @@ module.exports = function(router) {
             next(err);
         });
     });
-*/
 
+/*
     // TODO:
     // Tests
     // Documentation
@@ -197,7 +198,7 @@ module.exports = function(router) {
         .catch(next);
         
     });
-
+*/
 
     // SHOULD BE REMOVED
     router.get('/me', function (req, res, next) {
