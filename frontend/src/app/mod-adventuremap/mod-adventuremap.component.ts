@@ -11,10 +11,14 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
   @ViewChild('mapCanvas') mapCanvas;
   @Input() courseCode: string;
 
-  // Style cosntants
+  // Style constants
+  protected readonly width = 200;
+  protected readonly height = 200;
   private readonly borderThickness = 2;
   private readonly lineThickness = 1;
   private readonly radius = 4;
+  private readonly sensitivity = this.radius;
+  private img = new Image(this.width, this.height);
 
   // Backend state
   private userProgress: any;
@@ -31,6 +35,12 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
   private context: CanvasRenderingContext2D;
 
   ngOnInit() {
+    // Setup the viewport to reload once the image has loaded
+    this.img.onload = () => {
+      this.drawMap();
+    };
+
+    this.img.src = '/assets/images/ck4.gif';
   }
 
   ngOnChanges() {
@@ -48,22 +58,17 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
       const x = ev.clientX - rect.left;
       const y = ev.clientY - rect.top;
 
-      for (const a of this.assignments) {
-        const dx = x - a.x;
-        const dy = y - a.y;
-        if (Math.sqrt(dx * dx + dy * dy) < 10) {
-          console.warn('selected:', a);
-          this.selectedAssignment = a;
-        }
-      }
+      // Hittest the nodes
+      this.selectedAssignment = this.assignments.find( (el) => {
+        const dx = x - el.x;
+        const dy = y - el.y;
+        return (Math.sqrt(dx * dx + dy * dy) < this.sensitivity);
+      });
 
       this.setTextValues();
       this.drawMap();
     },
     false);
-  }
-
-  onClick(ev: any) {
   }
 
   setTextValues() {
@@ -131,8 +136,12 @@ drawMap() {
     }
     const ctx = this.context;
 
+    // Clear previous
     ctx.fillStyle = 'white';
     ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+    // Draw background
+    ctx.drawImage(this.img, 0, 0, this.canvas.width, this.canvas.height);
 
     if (this.assignments !== undefined) {
 

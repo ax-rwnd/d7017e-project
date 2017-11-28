@@ -3,9 +3,12 @@
   <div>
 
     <div class="panel-body text-center">
-      <canvas #mapCanvas width="200" height="200"></canvas>
+      <canvas #mapCanvas width="{{width}}" height="{{height}}"></canvas>
 
-      <button type="button" class="btn" id="goToAssignment" [routerLink]="['/courses', courseCode, 'assignment', assignmentId]">{{assignmentText}}</button>
+      <div>
+      <p *ngIf="selectedAssignment === undefined">Pick an assignment</p>
+      <button *ngIf="selectedAssignment !== undefined" type="button" class="btn" id="goToAssignment" [routerLink]="['/courses', courseCode, 'assignment', assignmentId]">{{assignmentText}}</button>
+      </div>
     </div>
 
   </div>
