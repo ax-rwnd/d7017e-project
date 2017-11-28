@@ -94,7 +94,7 @@ module.exports = function(router) {
         .catch(next);
     });
 */
-
+/*
 
     // Create new course
     // Admin/teachers can create unlimited courses
@@ -118,9 +118,9 @@ module.exports = function(router) {
             next(err);
         });
     });
+*/
 
 
-/*
     // TODO:
     // Tests
     // Documentation
@@ -151,7 +151,7 @@ module.exports = function(router) {
         })
         .catch(next);      
     });
-*/
+
 
     // SHOULD BE REMOVED
     router.get('/me', function (req, res, next) {
@@ -746,7 +746,9 @@ module.exports = function(router) {
                 throw errors.INSUFFICIENT_PERMISSION;
             }
             return queries.getAssignment(assignment_id, roll, wantedFields)
-            .then(res.json);
+            .then(function (assignmentObject) {
+                return res.json(assignmentObject);
+            });
         }).catch(next);
     });
 
