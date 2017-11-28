@@ -32,7 +32,7 @@ export class AssignmentComponent implements OnInit, OnDestroy {
   theme: string;
   languages: string[];
   language: string;
-  status: string;
+  status: boolean;
   sidebarState; // state of sidebar
   userid: string;
   feedback: string[];
@@ -74,9 +74,9 @@ export class AssignmentComponent implements OnInit, OnDestroy {
       this.content = '';
     }
 
-    this.status = 'Not Completed';
+    this.status = false;
     if (this.hasPassed()) {
-      this.status = 'Completed';
+      this.status = true;
     }
     this.tests = [];
     this.testStrings = [];
@@ -215,7 +215,7 @@ export class AssignmentComponent implements OnInit, OnDestroy {
     this.setFeedback(feedback);
 
     if (value['passed']) {
-      this.status = 'Completed';
+      this.status = true;
 
       // Refresh the course
       this.courseService.UpdateCourse(this.currentCourse.id)
@@ -224,7 +224,7 @@ export class AssignmentComponent implements OnInit, OnDestroy {
           this.currentCourse = this.courseService.GetCourse(this.currentCourse.id);
         });
     } else {
-      this.status = 'Not Completed';
+      this.status = false;
     }
   }
 
