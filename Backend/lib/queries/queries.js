@@ -462,6 +462,20 @@ function updateCourse(id, set_props) {
     });
 }
 
+function deleteCourse(id) {
+    return Course.findById(id)
+    .then(course => {
+        // features
+        // assignments
+        for (let ass_id of course.assignments) {
+            //deleteAssignment(ass_id);
+        }
+        // students
+        // teachers
+        // TODO: members
+    });
+}
+
 function getUserCourses(id, fields) {
     var wantedFields = fields || "name description hidden teachers students assignments course_code";
 
@@ -896,3 +910,4 @@ exports.getInvitesCourseUser = getInvitesCourseUser;
 exports.getAssignmentTests = getAssignmentTests;
 exports.getUserPopulated = getUserPopulated;
 exports.updateCourse = updateCourse;
+exports.deleteCourse = deleteCourse;

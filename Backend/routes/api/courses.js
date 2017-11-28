@@ -129,12 +129,20 @@ module.exports = function(router) {
         });
     });
 
-
-
     // Deletes course with id :course_id
     // Only admin and teacher of course can delete course
     router.delete('/:course_id', function (req, res, next) {
-
+        var course_id = req.params.course_id;
+        if (!mongoose.Types.ObjectId.isValid(course_id)) {
+            return next(errors.BAD_INPUT);
+        }
+        queries.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
+        .then(() => {
+            return queries.deleteCourse(course_id);
+        }).then(() => {
+            // respond with empty body
+            res.json({});
+        }).catch(next);
     });
 
     // Modify course with id :course_id
