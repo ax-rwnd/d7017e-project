@@ -28,8 +28,6 @@ import { BackendService } from '../services/backend.service';
 export class CoursesComponent implements OnInit {
   assignmentGroups: AssignmentGroup[];
   teachCourses: any;
-  assignments: string[];
-  exercises: string[];
   sidebarState; // state of sidebar
   progress: any;
   currentCourse: any;
@@ -45,6 +43,7 @@ export class CoursesComponent implements OnInit {
     {key: 'silver_medal_badge', name: 'Silver medal'},
     {key: 'gold_medal_badge', name: 'Gold medal'}
   ];
+  selectedAssignments: any[];
 
   constructor(private courseService: CourseService, private route: ActivatedRoute, private headService: HeadService,
               private fb: FormBuilder, private assignmentService: AssignmentService, private modalService: BsModalService,
@@ -71,6 +70,7 @@ export class CoursesComponent implements OnInit {
       this.backendService.getPendingUsers(this.currentCourse.id)
         .then(response => console.log('pending', response));
     });
+    console.log('flat ', this.flattenAssignments());
   }
 
   ngOnInit() {
@@ -79,6 +79,7 @@ export class CoursesComponent implements OnInit {
     this.possibleStudents = [];
     this.form = this.fb.group(this.defaultForm);
     this.selectedBadge = 'bronze_medal_badge';
+    this.selectedAssignments = [{'assignment': this.flattenAssignments()[0], 'possible': this.flattenAssignments()}];
   }
 
   getProgress() {
@@ -113,6 +114,24 @@ export class CoursesComponent implements OnInit {
           this.possibleStudents.push({name: user.username, id: user._id});
         }
       });
+  }
+
+  flattenAssignments() {
+    const assignments = [];
+    for (const group of this.assignmentGroups) {
+      for (const a of group.assignments) {
+        assignments.push(a);
+      }
+    }
+    return assignments;
+  }
+
+  removeGoal(index) {
+    this.selectedAssignments.splice(index, 1);
+  }
+
+  addGoal() {
+    this.selectedAssignments.push({'assignment': this.flattenAssignments()[0], 'possible': this.flattenAssignments()});
   }
 }
 

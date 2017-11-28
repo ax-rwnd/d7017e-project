@@ -46,6 +46,9 @@
       <button type="button" class="btn" id="createNewAssignment" [routerLink]="['/courses', currentCourse.id, 'createNewAssignment']">Create New Assignment</button>
       <button type="button" class="btn" (click)="openModal(inviteStudentModal)">Invite student to course</button>
       <button type="button" class="btn" (click)="openModal(createBadge)">Create badge</button>
+      <div *ngFor="let g of assignmentGroups">
+        <app-assignment-group [assignmentGroup]="g" [courseCode]="currentCourse.id"></app-assignment-group>
+      </div>
     </ng-template>
     <!-- Teacher view END -->
   </div>
@@ -92,7 +95,7 @@
   <div class="modal-body">
     <h3>Select badge</h3>
     <div class="form-group">
-      <select class="form-control" type="number" [(ngModel)]="selectedBadge">
+      <select class="form-control" [(ngModel)]="selectedBadge">
         <option *ngFor="let badge of badges" [ngValue]="badge['key']">{{badge['name']}}</option>
       </select>
     </div>
@@ -105,9 +108,14 @@
       Add goals
     </h3>
     <div class="form-group">
-      <select class="form-control" type="number" [(ngModel)]="selectedBadge">
-        <option *ngFor="let badge of badges" [ngValue]="badge['key']">{{badge['name']}}</option>
-      </select>
+      <div class="select-block" *ngFor="let selected of selectedAssignments; let i = index">
+        <button class="glyphicon glyphicon-minus btn btn-danger select-remove" (click)="removeGoal(i)"></button>
+        <select class="form-control select-list"  [(ngModel)]="selectedAssignments[i]['assignment']">
+          <option *ngFor="let assignment of selected['possible']" [ngValue]="assignment">{{assignment.name}}</option>
+        </select>
+        {{selectedAssignments[i].name}}
+      </div>
+      <button class="glyphicon glyphicon-plus btn btn-success" (click)="addGoal()"></button>
     </div>
   </div>
   <div class="modal-footer">
