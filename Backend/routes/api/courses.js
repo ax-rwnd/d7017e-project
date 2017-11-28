@@ -71,7 +71,7 @@ module.exports = function(router) {
     //
     // Returns BASE_FIELDS of every course in db.
     // If course is "hidden" only Admin and members of the course can see it.
-    /*
+   /* 
     router.get('/', function (req, res, next) {
 
         var p;
@@ -120,11 +120,12 @@ module.exports = function(router) {
     // TODO:
     // Tests
     // Documentation
+    // Should add creator as teacher in course?
     //
     // Create new course
     // Admin/teachers can create unlimited courses
     // Students limited to 3 courses?
-    /*
+/*    
     router.post('/', function (req, res, next) {
         //required
         var name, enabled_features;
@@ -133,10 +134,10 @@ module.exports = function(router) {
         var desc, course_code, hidden, autojoin;
 
         //req
-        //req.checkBody("name", "Must contain only letters and numbers").isAlphanumeric();
+        req.checkBody("name", "Must contain only letters and numbers").isAscii();
         name = req.body.name;
 
-        //req.checkBody("enabled_features", "Not a bool").isJSON();
+        //req.checkBody("enabled_features", "Not a bool").isEmpty();
         enabled_features = req.body.enabled_features;
 
         //opts
@@ -195,8 +196,8 @@ module.exports = function(router) {
         .catch(next);
         
     });
-*/
 
+*/
     // SHOULD BE REMOVED
     router.get('/me', function (req, res, next) {
         logger.log('warn', '/api/courses/me is deprecated. Use /api/users/me/courses instead.');
