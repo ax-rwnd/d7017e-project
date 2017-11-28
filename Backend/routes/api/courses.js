@@ -4,9 +4,12 @@ var request = require('request');
 var mongoose = require('mongoose');
 var queries = require('../../lib/queries/queries');
 var errors = require('../../lib/errors.js');
+var badInput = require('../../lib/badInputError.js');
+var typecheck = require('../../lib/typecheck.js');
 var auth = require('../../lib/authentication.js');
 var testerCom = require('../../lib/tester_communication');
 var logger = require('../../lib/logger');
+var features = require('../../lib/queries/features');
 
 var Assignment = require('../../models/schemas').Assignment;
 var Test = require('../../models/schemas').Test;
@@ -17,10 +20,12 @@ const BASIC_FILTER = "name description course_code enabled_features";
 const ADMIN_FILTER = "name description course_code teachers students assignments features enabled_features hidden";
 
 module.exports = function(router) {
+
     // Get all courses in db
     // If admin get all
     // If teacher or student get all not hidden courses.
     // Also get hidden courses if teacher/student of it?
+    
     router.get('/', function (req, res, next) {
         var ids = req.query.ids;
 
@@ -56,7 +61,36 @@ module.exports = function(router) {
             });
         }
         */
+        
     });
+
+    // TODO:
+    // Tests
+    // Documentation
+    // Query param to query multiple courses?
+    //
+    // Returns BASE_FIELDS of every course in db.
+    // If course is "hidden" only Admin and members of the course can see it.
+   /* 
+    router.get('/', function (req, res, next) {
+
+        var p;
+        if (req.user.access === "admin") {
+            p = queries.getAllCourses();
+        } else {
+            p = queries.getCourses1().then(function (courseArray) {
+                    return queries.getUsersHiddenCourses(req.user.id).then(function (hiddenCourses) {
+                        return courseArray.concat(hiddenCourses);
+                    });
+                });
+        }
+
+        p.then(function (courseArray) {
+            return res.json({courses: courseArray});
+        })
+        .catch(next);
+    });
+*/
 
 
     // Create new course
@@ -83,10 +117,88 @@ module.exports = function(router) {
     });
 
 
+    // TODO:
+    // Tests
+    // Documentation
+    // Should add creator as teacher in course?
+    //
+    // Create new course
+    // Admin/teachers can create unlimited courses
+    // Students limited to 3 courses?
+/*    
+    router.post('/', function (req, res, next) {
+        //required
+        var name, enabled_features;
 
-    // Should be user/:userid/courses ?
-    // Would force frontend to send userid. courses/me takes user id from token.
-    // Frontend is most likely in possesion of userid. Therefore both is possible.
+        //optional
+        var desc, course_code, hidden, autojoin;
+
+        //req
+        req.checkBody("name", "Must contain only letters and numbers").isAscii();
+        name = req.body.name;
+
+        //req.checkBody("enabled_features", "Not a bool").isEmpty();
+        enabled_features = req.body.enabled_features;
+
+        //opts
+        if (req.body.description) {
+            req.checkBody("description", "Must contain only ascii characters").isAscii();
+            desc = req.body.description;
+        } else {
+            desc = "";
+        }
+
+        if (req.body.description) {
+            req.checkBody("course_code", "Must contain only ascii characters").isAlphanumeric();
+            course_code = req.body.course_code;
+        } else {
+            course_code = "";
+        }
+
+        if (req.body.hidden) {
+            req.checkBody("hidden", "Must contain true or false").isBoolean();
+            hidden = req.body.hidden;
+        } else {
+            hidden = false;
+        }
+
+        if (req.body.autojoin) {
+            req.checkBody("autojoin", "Must contain true or false").isBoolean();
+            autojoin = req.body.autojoin;
+        } else {
+            autojoin = false;
+        }
+
+        var inputError = req.validationErrors();
+        if (inputError) {
+            return next(badInput.BAD_INPUT(inputError));            
+        }
+
+        var owner = req.user.id;
+
+        //TODO: REMOVE TEACHER IN OBJECT. WHEN TEST FIXED
+        var courseObject = {name: name, owner: owner, teachers: [owner], enabled_features: enabled_features, description: desc, 
+                            course_code: course_code, hidden: hidden, autojoin: autojoin};
+
+        var p;
+        if (req.user.access === "basic") {
+            p = queries.countOwnedCourses(req.user.id)
+                .then(function () {
+                    return queries.saveCourseObject(courseObject);
+                });
+        } else {
+            p = queries.saveCourseObject(courseObject);
+        }
+
+        p.then(function (savedCourse) {
+            return res.status(201).json(savedCourse);
+        })
+        .catch(next);
+        
+    });
+
+*/
+    // SHOULD BE REMOVED
     router.get('/me', function (req, res, next) {
         logger.log('warn', '/api/courses/me is deprecated. Use /api/users/me/courses instead.');
         queries.getUserCourses(req.user.id, "name description course_code").then(function (courses) {
@@ -598,7 +710,7 @@ module.exports = function(router) {
         });
     });
 
-
+    // Return all assignemnts from a course
     router.get('/:course_id/assignments', function (req, res, next) {
         var course_id = req.params.course_id;
 
@@ -610,6 +722,7 @@ module.exports = function(router) {
         });
     });
 
+    // Creates an assignment for a course
     router.post('/:course_id/assignments', function (req, res, next) {
         var course_id = req.params.course_id;
         var name = req.body.name;
@@ -625,11 +738,16 @@ module.exports = function(router) {
         });
     });
 
+    // Return assignment bases on permissions
     router.get('/:course_id/assignments/:assignment_id', function (req, res, next) {
         var roll;
         var course_id = req.params.course_id;
         var assignment_id = req.params.assignment_id;
         var wantedFields = req.query.fields || null;
+
+        if (!mongoose.Types.ObjectId.isValid(course_id) || !mongoose.Types.ObjectId.isValid(assignment_id)) {
+            return next(errors.BAD_INPUT);
+        }
 
         queries.getUser(req.user.id, "teaching").then(function (userObject) {
             if (userObject.teaching.indexOf(course_id) !== -1) {
@@ -640,15 +758,11 @@ module.exports = function(router) {
                 roll = "student";
             }
             if (!queries.checkPermission(wantedFields, "assignments", roll)) {
-                return next(errors.INSUFFICIENT_PERMISSION);
+                throw errors.INSUFFICIENT_PERMISSION;
             }
-            queries.getAssignment(assignment_id, roll, wantedFields).then(function (assignmentObject) {
-                return res.json(assignmentObject);
-            });
-        })
-        .catch(function (err) {
-            next(err);
-        });
+            return queries.getAssignment(assignment_id, roll, wantedFields)
+            .then(res.json);
+        }).catch(next);
     });
 
 /*
@@ -775,6 +889,10 @@ module.exports = function(router) {
         var args = req.body.args;
         var lint = req.body.lint;
 
+        if (!mongoose.Types.ObjectId.isValid(assignment_id) || !mongoose.Types.ObjectId.isValid(course_id) || !typecheck.isString(stdout) || !typecheck.isString(stdin) || !Array.isArray(args)) {
+            return next(errors.BAD_INPUT);
+        }
+
         queries.createTest(stdout, stdin, args, lint, assignment_id).then(function (test) {
             return res.status(201).json(test);
         })
@@ -796,9 +914,51 @@ module.exports = function(router) {
         });
     });
 
+    // Return enabled_features of a course
     router.get('/:course_id/enabled_features', function(req, res, next) {
         queries.getCoursesEnabledFeatures(req.params.course_id).then(function (enabled_features) {
             res.json(enabled_features);
         }).catch(next);
+    });
+
+    // Return all features of a course
+    router.get('/:course_id/features', function(req, res, next) {
+        features.getFeaturesOfCourse(req.params.course_id).then(function(progress) {
+            return res.json(progress);
+        }).catch(next);
+    });
+
+    // Return feature of user in a course
+    router.get('/:course_id/features/me', function(req, res, next) {
+        features.getFeatureOfUserID(req.params.course_id, req.user.id).then(function(progress) {
+            return res.json(progress);
+        }).catch(next);
+    });
+
+    // Create badge
+    router.post('/:course_id/badges', function (req, res, next) {
+        features.createBadge(req.body).then(function(badge) {
+            return res.json(badge);
+        }).catch(next);
+    });
+
+    // Get a badge by id
+    router.get('/:course_id/badges/:badge_id', function (req, res, next) {
+        features.getBadge(req.params.badge_id).then(function(badge) {
+            return res.json(badge);
+        }).catch(next);
+    });
+
+    // Update a badge by id
+    router.put('/:course_id/badges/:badge_id', function(req, res, next) {
+        features.updateBadge(req.params.badge_id, req.body).then(function(badge) {
+            return res.json(badge);
+        }).catch(next);
+    });
+
+    // Delete a badge by id
+    router.delete('/:course_id/badges/:badge_id', function(req, res, next) {
+        // TODO
+        return res.sendStatus(501);
     });
 };

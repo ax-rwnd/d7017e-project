@@ -96,16 +96,16 @@ describe('/features', () => {
         return auth().then(at => access_token = at);
     });
 
-    describe('GET /api/features/features/:course_id', () => {
+    describe('GET /api/:course_id/features/', () => {
 
 
         it('Get features for all users in course', () => {
 
             let course_id = '59f6f88b1ac36c0762eb46a9';
-            let route = '/api/features/features/';
+            let route = '/api/courses/'+course_id+'/features/';
 
             return request(runner.server)
-                .get(route+course_id)
+                .get(route)
                 .set('Authorization', 'Bearer ' + access_token)
                 .expect(200)
                 .then(res => {
@@ -114,15 +114,16 @@ describe('/features', () => {
         });
     });
 
-    describe('GET /api/features/feature/:course_id/me', () => {
+    describe('GET /api/courses/:course_id/features/me', () => {
 
         it('Get feature for user in course', () => {
 
+
             let course_id = '59f6f88b1ac36c0762eb46a9';
-            let route = '/api/features/feature';
+            let route = '/api/courses/'+course_id+'/features/me';
 
             return request(runner.server)
-                .get(route+'/'+course_id+'/me')
+                .get(route)
                 .set('Authorization', 'Bearer ' + access_token)
                 .expect(200)
                 .then(res => {
@@ -148,11 +149,11 @@ describe('/features', () => {
 
     let badge_id;
 
-    describe('POST /api/features/badge', () => {
+    describe('POST /api/courses/:course_id/badges', () => {
 
         it('Create a badge', () => {
 
-            let route = '/api/features/badge';
+            let route = '/api/courses/:course_id/badges';
 
             return request(runner.server)
                 .post(route)
@@ -166,16 +167,16 @@ describe('/features', () => {
         });
     });
 
-    describe('PUT /api/features/badge', () => {
+    describe('PUT /api/courses/:course_id/badges/:badge_id', () => {
 
         it('Update a badge', () => {
 
             badge.title = new_title;
 
-            let route = '/api/features/badge';
+            let route = '/api/courses/:course_id/badges/'+badge_id;
 
             return request(runner.server)
-                .put(route+'/'+badge_id)
+                .put(route)
                 .set('Authorization', 'Bearer ' + access_token)
                 .send(badge)
                 .set('Content-Type', 'application/json')
@@ -186,14 +187,14 @@ describe('/features', () => {
         });
     });
 
-    describe('GET /api/features/badge', () => {
+    describe('GET /api/courses/:course_id/badges/:badge_id', () => {
 
         it('Fetch a badge', () => {
 
-            let route = '/api/features/badge';
+            let route = '/api/courses/:course_id/badges/'+badge_id;
 
             return request(runner.server)
-                .put(route+'/'+badge_id)
+                .put(route)
                 .set('Authorization', 'Bearer ' + access_token)
                 .expect(200)
                 .then(res => {
@@ -203,7 +204,7 @@ describe('/features', () => {
 
     });
 
-    describe.skip('DELETE /api/features/badge/:badge_id', () => {
+    describe.skip('DELETE /api/courses/:course_id/badges/:badge_id', () => {
         it('TODO', () => {
         });
     });
