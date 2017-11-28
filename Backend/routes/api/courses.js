@@ -851,7 +851,11 @@ module.exports = function(router) {
             return next(errors.BAD_INPUT);
         }
 
-        queries.createTest(stdout, stdin, args, lint, assignment_id).then(function (test) {
+        queries.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.admin)
+        .then(function () {
+            return queries.createTest(stdout, stdin, args, lint, assignment_id);
+        })
+        .then(function (test) {
             return res.status(201).json(test);
         })
         .catch(function (err) {

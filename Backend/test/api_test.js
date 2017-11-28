@@ -240,7 +240,7 @@ describe('/api', () => {
                         args: [],
                         lint: true
                     })
-                    .set('Authorization', 'Bearer ' + access_tokens.user)
+                    .set('Authorization', 'Bearer ' + access_tokens.admin)
                     .expect(201)
                     .then(res => {
                         assert(ObjectId.isValid(res.body._id), 'response is not a valid ObjectId');
