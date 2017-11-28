@@ -123,7 +123,7 @@ The structure below is the following:
   getFeaturesCourseMe (course_id: string) {
     // Get feature state for a user in a course
 
-    return this.apiGet('/api/features/feature/' + course_id + '/me');
+    return this.apiGet('/api/courses/' + course_id + '/features/me');
   }
 
 // ---------- 2. USER(S) calls --------- //
@@ -201,7 +201,7 @@ The structure below is the following:
   getFeaturesCourse (course_id: string) {
     // Get features for all users in a course
 
-    return this.apiGet('/api/features/features/' + course_id);
+    return this.apiGet('/api/courses/' + course_id + '/features');
   }
 
   postNewBadge(icon: string, title: string, description: string) {
