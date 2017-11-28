@@ -71,6 +71,7 @@ function postCourseValidation(req) {
         throw badInput.BAD_INPUT(inputError);            
     }
 
+    // TODO: REMOVE TEACHER IN OBJECT. WHEN TEST FIXED
     var input = {name: name, owner: req.user.id, teachers: [req.user.id], enabled_features: enabled_features, description: description, 
                         course_code: course_code, hidden: hidden, autojoin: autojoin};
     return input;
