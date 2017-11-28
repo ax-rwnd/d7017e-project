@@ -4,6 +4,7 @@ var express = require('express'); //Routes package
 var mongoose = require('mongoose'); //Database communication
 mongoose.Promise = require('bluebird');
 var bodyParser = require('body-parser');
+var validator = require('express-validator');
 var expressHbs = require('express-handlebars');
 var cors = require('cors');
 var config = require('config');
@@ -42,6 +43,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
     extended: true
 }));
+app.use(validator());
 app.use(cors({origin: '*'}));
 
 //defining routes
@@ -80,12 +82,21 @@ app.use(function (req, res, next) {
 });
 
 app.use(function (err, req, res, next) {
-    if (err.name != "APIError") {
+    if (err.name !== "APIError") {
         return next(err);
     }
 
     logger.log("error", err.message);
     res.status(err.httpCode).send(err.message);
+});
+
+app.use(function (err, req, res, next) {
+    if (err.name !== "BadInputError") {
+        return next(err);
+    }
+
+    logger.log("error", err.message);
+    res.status(err.httpCode).json({message: err.message, badinput: err.inputErrors});
 });
 
 app.use(function (err, req, res, next) {

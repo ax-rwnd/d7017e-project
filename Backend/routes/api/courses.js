@@ -4,6 +4,7 @@ var request = require('request');
 var mongoose = require('mongoose');
 var queries = require('../../lib/queries/queries');
 var errors = require('../../lib/errors.js');
+var badInput = require('../../lib/badInputError.js');
 var auth = require('../../lib/authentication.js');
 var testerCom = require('../../lib/tester_communication');
 var logger = require('../../lib/logger');
@@ -17,10 +18,12 @@ const BASIC_FILTER = "name description course_code enabled_features";
 const ADMIN_FILTER = "name description course_code teachers students assignments features enabled_features hidden";
 
 module.exports = function(router) {
+
     // Get all courses in db
     // If admin get all
     // If teacher or student get all not hidden courses.
     // Also get hidden courses if teacher/student of it?
+    
     router.get('/', function (req, res, next) {
         var ids = req.query.ids;
 
@@ -56,7 +59,36 @@ module.exports = function(router) {
             });
         }
         */
+        
     });
+
+    // TODO:
+    // Tests
+    // Documentation
+    // Query param to query multiple courses?
+    //
+    // Returns BASE_FIELDS of every course in db.
+    // If course is "hidden" only Admin and members of the course can see it.
+    /*
+    router.get('/', function (req, res, next) {
+
+        var p;
+        if (req.user.access === "admin") {
+            p = queries.getAllCourses();
+        } else {
+            p = queries.getCourses1().then(function (courseArray) {
+                    return queries.getUsersHiddenCourses(req.user.id).then(function (hiddenCourses) {
+                        return courseArray.concat(hiddenCourses);
+                    });
+                });
+        }
+
+        p.then(function (courseArray) {
+            return res.json({courses: courseArray});
+        })
+        .catch(next);
+    });
+*/
 
 
     // Create new course
@@ -83,10 +115,87 @@ module.exports = function(router) {
     });
 
 
+    // TODO:
+    // Tests
+    // Documentation
+    //
+    // Create new course
+    // Admin/teachers can create unlimited courses
+    // Students limited to 3 courses?
+    /*
+    router.post('/', function (req, res, next) {
+        //required
+        var name, enabled_features;
 
-    // Should be user/:userid/courses ?
-    // Would force frontend to send userid. courses/me takes user id from token.
-    // Frontend is most likely in possesion of userid. Therefore both is possible.
+        //optional
+        var desc, course_code, hidden, autojoin;
+
+        //req
+        //req.checkBody("name", "Must contain only letters and numbers").isAlphanumeric();
+        name = req.body.name;
+
+        //req.checkBody("enabled_features", "Not a bool").isJSON();
+        enabled_features = req.body.enabled_features;
+
+        //opts
+        if (req.body.description) {
+            req.checkBody("description", "Must contain only ascii characters").isAscii();
+            desc = req.body.description;
+        } else {
+            desc = "";
+        }
+
+        if (req.body.description) {
+            req.checkBody("course_code", "Must contain only ascii characters").isAlphanumeric();
+            course_code = req.body.course_code;
+        } else {
+            course_code = "";
+        }
+
+        if (req.body.hidden) {
+            req.checkBody("hidden", "Must contain true or false").isBoolean();
+            hidden = req.body.hidden;
+        } else {
+            hidden = false;
+        }
+
+        if (req.body.autojoin) {
+            req.checkBody("autojoin", "Must contain true or false").isBoolean();
+            autojoin = req.body.autojoin;
+        } else {
+            autojoin = false;
+        }
+
+        var inputError = req.validationErrors();
+        if (inputError) {
+            return next(badInput.BAD_INPUT(inputError));            
+        }
+
+        var owner = req.user.id;
+
+        //TODO: REMOVE TEACHER IN OBJECT. WHEN TEST FIXED
+        var courseObject = {name: name, owner: owner, teachers: [owner], enabled_features: enabled_features, description: desc, 
+                            course_code: course_code, hidden: hidden, autojoin: autojoin};
+
+        var p;
+        if (req.user.access === "basic") {
+            p = queries.countOwnedCourses(req.user.id)
+                .then(function () {
+                    return queries.saveCourseObject(courseObject);
+                });
+        } else {
+            p = queries.saveCourseObject(courseObject);
+        }
+
+        p.then(function (savedCourse) {
+            return res.status(201).json(savedCourse);
+        })
+        .catch(next);
+        
+    });
+*/
+
+    // SHOULD BE REMOVED
     router.get('/me', function (req, res, next) {
         logger.log('warn', '/api/courses/me is deprecated. Use /api/users/me/courses instead.');
         queries.getUserCourses(req.user.id, "name description course_code").then(function (courses) {
