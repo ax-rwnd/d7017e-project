@@ -12,13 +12,13 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
   @Input() courseCode: string;
 
   // Style constants
-  protected readonly width = 200;
-  protected readonly height = 200;
+  protected width = 200;
+  protected height = 200;
   private readonly borderThickness = 2;
   private readonly lineThickness = 1;
   private readonly radius = 4;
   private readonly sensitivity = this.radius;
-  private img = new Image(this.width, this.height);
+  protected img = new Image(this.width, this.height);
 
   // Backend state
   private userProgress: any;
