@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
+import { ToastsManager } from 'ng2-toastr/ng2-toastr';
 
 export class ObjectID {
   // Defines a controlled type for mongoose object ids
@@ -34,7 +35,7 @@ export class BackendService {
   //  });
   // `
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private toastr: ToastsManager) { }
 /*
 Http requests:
 1. GET
@@ -48,7 +49,7 @@ Http requests:
     return this.http.get(environment.backend_ip + endpoint)
       .toPromise()
       .then(response => response)
-      .catch(err => console.error('API Get failed in ' + endpoint + ' error', err));
+      .catch(err => this.toastr.error(err.error));
   }
 
   private apiPost(endpoint, body) {
@@ -57,7 +58,7 @@ Http requests:
     return this.http.post(environment.backend_ip + endpoint, body, {responseType: 'json'})
       .toPromise()
       .then(response => response)
-      .catch(err => console.error('API Post failed in ' + endpoint + ' error ', err));
+      .catch(err => this.toastr.error(err.error));
   }
 
   private apiPut(endpoint, body) {
@@ -66,7 +67,7 @@ Http requests:
     return this.http.put(environment.backend_ip + endpoint, body, {responseType: 'json'})
       .toPromise()
       .then(response => response)
-      .catch(err => console.error('API Put failed in ' + endpoint + ' error ', err));
+      .catch(err => this.toastr.error(err.error));
   }
 
   private apiDelete(endpoint) {
@@ -75,7 +76,7 @@ Http requests:
     return this.http.delete(environment.backend_ip + endpoint)
       .toPromise()
       .then(response => response)
-      .catch(err => console.error('API Delete failed in ' + endpoint + ' error ', err));
+      .catch(err => this.toastr.error(err.error));
   }
 
 /*
