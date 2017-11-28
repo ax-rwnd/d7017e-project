@@ -10,6 +10,7 @@ import { HeadService } from '../services/head.service';
 import { AssignmentService } from '../services/assignment.service';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { BackendService } from '../services/backend.service';
+import { ToastService } from '../services/toast.service';
 
 
 @Component({
@@ -42,7 +43,7 @@ export class CoursesComponent implements OnInit {
 
   constructor(private courseService: CourseService, private route: ActivatedRoute, private headService: HeadService,
               private fb: FormBuilder, private assignmentService: AssignmentService, private modalService: BsModalService,
-              private backendService: BackendService) {
+              private backendService: BackendService, private toastService: ToastService) {
 
     // Subscribe to the sidebar state
     this.headService.stateChange.subscribe(sidebarState => {
@@ -61,7 +62,8 @@ export class CoursesComponent implements OnInit {
 
       // Get a list of the users waiting to join the course
       this.backendService.getPendingUsers(this.currentCourse.id)
-        .then(response => console.log('pending', response));
+        .then(response => console.log('pending', response))
+        .catch(err => console.error('Get pending users failed', err));
     });
   }
 
@@ -89,7 +91,8 @@ export class CoursesComponent implements OnInit {
     // Invite a student to this course
 
     this.backendService.postInvitationToCourse(this.currentCourse.id, student_id)
-      .then(response => console.error(response));
+      .then(response => this.toastService.success('Student invited!'))
+      .catch(err => console.error('Invitation failed', err));
   }
 
   search() {
@@ -103,7 +106,8 @@ export class CoursesComponent implements OnInit {
         for (const user of response.users as any[]) {
           this.possibleStudents.push({name: user.username, id: user._id});
         }
-      });
+      })
+      .catch(err => console.error('Search failed', err));
   }
 }
 

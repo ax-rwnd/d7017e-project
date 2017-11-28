@@ -8,6 +8,7 @@ import {FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { BsModalRef } from 'ngx-bootstrap/modal/modal-options.class';
 import {ActivatedRoute} from '@angular/router';
+import { ToastService } from '../services/toast.service';
 
 @Component({
   selector: 'app-createassignment',
@@ -47,7 +48,8 @@ export class CreateassignmentComponent implements OnInit {
   };
 
   constructor(private backendService: BackendService, private headService: HeadService,
-              private modalService: BsModalService, private fb: FormBuilder, private route: ActivatedRoute) {
+              private modalService: BsModalService, private fb: FormBuilder, private route: ActivatedRoute,
+              private toastService: ToastService) {
     this.route.params.subscribe(params => this.courseId = params['course']);
     this.headService.stateChange.subscribe(sidebarState => { this.sidebarState = sidebarState; });
   }
@@ -121,7 +123,9 @@ export class CreateassignmentComponent implements OnInit {
         for (const test of this.unitTests) {
           this.backendService.createTest(this.courseId, test, assignmentId);
         }
-      });
+        this.toastService.success('Assignment Created!');
+      })
+      .catch(err => console.error('Create assignment failed', err));
   }
 }
 

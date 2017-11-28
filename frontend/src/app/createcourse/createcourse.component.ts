@@ -7,6 +7,7 @@ import { BsModalService } from 'ngx-bootstrap/modal';
 import { BsModalRef } from 'ngx-bootstrap/modal/modal-options.class';
 import { ActivatedRoute } from '@angular/router';
 import {CourseService} from '../services/course.service';
+import { ToastService } from '../services/toast.service';
 
 @Component({
   selector: 'app-createcourse',
@@ -42,7 +43,7 @@ export class CreatecourseComponent implements OnInit {
   @ViewChild('courseCreated') courseModal: TemplateRef<any>; // Temporary solution, modal will pop up after course is created
 
   constructor(private headService: HeadService, private backendService: BackendService, private modalService: BsModalService,
-              private route: ActivatedRoute, private courseService: CourseService) {
+              private route: ActivatedRoute, private courseService: CourseService, private toastService: ToastService) {
     this.headService.stateChange.subscribe(sidebarState => { // subscribe to the state value head provides
       this.sidebarState = sidebarState;
     });
@@ -108,6 +109,7 @@ export class CreatecourseComponent implements OnInit {
     this.backendService.postNewCourse(this.form.value.name, this.content,
       !this.form.value.nothidden, this.form.value.code, enabled_features, this.form.value.autojoin)
       .then( (response: any) => {
+        this.toastService.success('Course created!');
         // Handle response from backend
         // newTeachCourse(id, name, code, course_desc, hidden, en_feat, students, teachers, autojoin, assigs) { }
         const courseId = response._id;
@@ -115,16 +117,17 @@ export class CreatecourseComponent implements OnInit {
         // this.form = createSearchForm(); // for invites, not yet implemented
         this.openModal(this.courseModal);
       })
-      .catch(err => console.error('Something went wrong when creating the course:', err));
+      .catch(err => console.error('Create course failed', err));
   }
 
   updateCourse(enabled_features: Object) {
     this.backendService.updateCourse(this.course.id, this.form.value.name, this.content,
       !this.form.value.nothidden, this.form.value.code, enabled_features, this.form.value.autojoin)
       .then((response: any) => { // when put, should get back empty object
+        this.toastService.success('Course updated!');
         console.log(response);
       })
-      .catch(err => console.error('Something went wrong when creating the course:', err));
+      .catch(err => console.error('Update course failed:', err));
   }
 
   openModal(modal) {
