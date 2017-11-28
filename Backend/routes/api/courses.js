@@ -4,6 +4,7 @@ var request = require('request');
 var mongoose = require('mongoose');
 var queries = require('../../lib/queries/queries');
 var errors = require('../../lib/errors.js');
+var permission = require('../../lib/permission.js');
 var badInput = require('../../lib/badInputError.js');
 var typecheck = require('../../lib/typecheck.js');
 var auth = require('../../lib/authentication.js');
@@ -25,7 +26,7 @@ module.exports = function(router) {
     // If admin get all
     // If teacher or student get all not hidden courses.
     // Also get hidden courses if teacher/student of it?
-    
+    /*
     router.get('/', function (req, res, next) {
         var ids = req.query.ids;
 
@@ -51,7 +52,7 @@ module.exports = function(router) {
         }
 
         //Need user object from token verify for admin check.
-        /*
+        
         if (user.admin) {
             queries.getCourses("name description", user.admin).then(function (courses) {
                 return res.json(courses);
@@ -60,10 +61,10 @@ module.exports = function(router) {
                 next(err);
             });
         }
-        */
+        
         
     });
-
+*/
     // TODO:
     // Tests
     // Documentation
@@ -71,7 +72,7 @@ module.exports = function(router) {
     //
     // Returns BASE_FIELDS of every course in db.
     // If course is "hidden" only Admin and members of the course can see it.
-   /* 
+   
     router.get('/', function (req, res, next) {
 
         var p;
@@ -90,9 +91,9 @@ module.exports = function(router) {
         })
         .catch(next);
     });
-*/
 
 
+/*
     // Create new course
     // Admin/teachers can create unlimited courses
     // Students limited to 3 courses?
@@ -115,7 +116,7 @@ module.exports = function(router) {
             next(err);
         });
     });
-
+*/
 
     // TODO:
     // Tests
@@ -125,7 +126,7 @@ module.exports = function(router) {
     // Create new course
     // Admin/teachers can create unlimited courses
     // Students limited to 3 courses?
-/*    
+  
     router.post('/', function (req, res, next) {
         //required
         var name, enabled_features;
@@ -197,7 +198,7 @@ module.exports = function(router) {
         
     });
 
-*/
+
     // SHOULD BE REMOVED
     router.get('/me', function (req, res, next) {
         logger.log('warn', '/api/courses/me is deprecated. Use /api/users/me/courses instead.');
@@ -406,6 +407,47 @@ module.exports = function(router) {
         });
     });
 
+/*
+    // TODO:
+    // Tests
+    // Documentation
+    //
+    //
+    router.put('/:course_id/members/invite', function (req, res, next) {
+        var course_id, user_id;
+
+        //req
+        req.checkParams("course_id", "Not a valid course id").isMongoId();
+        course_id = req.params.course_id;
+
+        //optional
+        if (!req.body.user_id) {
+            user_id = req.user.id;
+        } else {
+            req.checkBody("user_id", "Not a valid user id").isMongoId();
+            user_id = req.body.user_id;
+        }
+
+        var inputError = req.validationErrors();
+        if (inputError) {
+            return next(badInput.BAD_INPUT(inputError));            
+        }
+
+        var p;
+        if (user_id === req.user.id) {
+            p = queries.acceptInviteToCourse(user_id, course_id);
+        } else {
+            p = permission.checkIfTeacherOrAdmin(user_id, course_id, req.user.access).then(function () {
+                return queries.addMemberToCourse(user_id, course_id);
+            })
+        }
+
+        p.then(function () {
+            return res.status(201).json({});
+        })
+        .catch(next);
+    });
+*/
     // TODO
     // Documentation
     // Test

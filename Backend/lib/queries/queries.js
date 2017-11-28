@@ -912,7 +912,13 @@ function tempSaveMember (user_id, course_id) {
 
 function saveCourseObject(courseObject) {
     var course = new Course(courseObject);
-    return course.save();
+    return course.save().then(function (savedCourse) {
+        // TODO: FIX FEATURE FIELD. WHAT SHOULD IT ADD?
+        var memberObject = new CourseMember({role: "teacher", course: savedCourse._id, user: savedCourse.owner, features: "5a157a581154d36ecfcc7ab1"});
+        return memberObject.save().then(function () {
+            return savedCourse;
+        });
+    });
 }
 
 function countOwnedCourses(user_id) {
@@ -923,6 +929,30 @@ function countOwnedCourses(user_id) {
     });
 }
 
+function acceptInviteToCourse(user_id, course_id) {
+    return JoinRequests.findOneAndRemove({inviteType: "invite", user: user_id, course: course_id})
+    .then(function(deletedInvite) {
+        if (!deletedInvite) {
+            throw errors.NO_INVITE_FOUND;
+        }
+        // TODO: CHANGE FEATURE FIELD
+        var memberObject = new CourseMember({role: "student", course: course_id, user: user_id, features: "5a157a581154d36ecfcc7ab1"});
+        return memberObject.save();
+    });
+}
+
+function addMemberToCourse(user_id, course_id) {
+    return JoinRequests.findOneAndRemove({inviteType: "pending", user: user_id, course: course_id})
+    .then(function(deletedInvite) {
+        if (!deletedInvite) {
+            throw errors.NO_INVITE_FOUND;
+        }
+        // TODO: CHANGE FEATURE FIELD
+        var memberObject = new CourseMember({role: "student", course: course_id, user: user_id, features: "5a157a581154d36ecfcc7ab1"});
+        return memberObject.save();
+    });
+}
+
 exports.getUserCourses1 = getUserCourses1;
 exports.getCourses1 = getCourses1;
 exports.tempSaveMember = tempSaveMember;
@@ -930,6 +960,8 @@ exports.getAllCourses = getAllCourses;
 exports.getUsersHiddenCourses = getUsersHiddenCourses;
 exports.saveCourseObject = saveCourseObject;
 exports.countOwnedCourses = countOwnedCourses;
+exports.acceptInviteToCourse = acceptInviteToCourse;
+exports.addMemberToCourse = addMemberToCourse;
 
 exports.getTestsFromAssignment = getTestsFromAssignment;
 exports.findOrCreateUser = findOrCreateUser;
