@@ -905,12 +905,21 @@ module.exports = function(router) {
         });
     });
 
+    // Get specified assignment
     router.get('/:course_id/assignments/:assignment_id/tests/:test_id', function (req, res, next) {
         var course_id = req.params.course_id;
         var assignment_id = req.params.assignment_id;
         var test_id = req.params.test_id;
 
-        queries.getTest(test_id, "stdout stdin args").then(function (test) {
+        if (!mongoose.Types.ObjectId.isValid(assignment_id) || !mongoose.Types.ObjectId.isValid(course_id) || !mongoose.Types.ObjectId.isValid(test_id)) {
+            return next(errors.BAD_INPUT);
+        }
+
+        queries.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.admin)
+        .then(function () {
+            return queries.getTest(test_id, "stdout stdin args");
+        })
+        .then(function (test) {
             return res.json(test);
         })
         .catch(function (err) {
