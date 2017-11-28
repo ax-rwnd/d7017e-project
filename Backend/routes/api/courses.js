@@ -5,6 +5,7 @@ var mongoose = require('mongoose');
 var queries = require('../../lib/queries/queries');
 var errors = require('../../lib/errors.js');
 var permission = require('../../lib/permission.js');
+var inputValidation = require('../../lib/inputValidation.js');
 var badInput = require('../../lib/badInputError.js');
 var typecheck = require('../../lib/typecheck.js');
 var auth = require('../../lib/authentication.js');
@@ -118,85 +119,37 @@ module.exports = function(router) {
         });
     });
 
+
 /*
     // TODO:
     // Tests
     // Documentation
-    // Should add creator as teacher in course?
     //
     // Create new course
     // Admin/teachers can create unlimited courses
     // Students limited to 3 courses?
-  
     router.post('/', function (req, res, next) {
-        //required
-        var name, enabled_features;
-
-        //optional
-        var desc, course_code, hidden, autojoin;
-
-        //req
-        req.checkBody("name", "Must contain only letters and numbers").isAscii();
-        name = req.body.name;
-
-        //req.checkBody("enabled_features", "Not a bool").isEmpty();
-        enabled_features = req.body.enabled_features;
-
-        //opts
-        if (req.body.description) {
-            req.checkBody("description", "Must contain only ascii characters").isAscii();
-            desc = req.body.description;
-        } else {
-            desc = "";
+        try {
+            var input = inputValidation.postCourseValidation(req);
         }
-
-        if (req.body.description) {
-            req.checkBody("course_code", "Must contain only ascii characters").isAlphanumeric();
-            course_code = req.body.course_code;
-        } else {
-            course_code = "";
+        catch(error) {
+            return next(error);
         }
-
-        if (req.body.hidden) {
-            req.checkBody("hidden", "Must contain true or false").isBoolean();
-            hidden = req.body.hidden;
-        } else {
-            hidden = false;
-        }
-
-        if (req.body.autojoin) {
-            req.checkBody("autojoin", "Must contain true or false").isBoolean();
-            autojoin = req.body.autojoin;
-        } else {
-            autojoin = false;
-        }
-
-        var inputError = req.validationErrors();
-        if (inputError) {
-            return next(badInput.BAD_INPUT(inputError));            
-        }
-
-        var owner = req.user.id;
-
-        //TODO: REMOVE TEACHER IN OBJECT. WHEN TEST FIXED
-        var courseObject = {name: name, owner: owner, teachers: [owner], enabled_features: enabled_features, description: desc, 
-                            course_code: course_code, hidden: hidden, autojoin: autojoin};
-
+        
         var p;
         if (req.user.access === "basic") {
             p = queries.countOwnedCourses(req.user.id)
                 .then(function () {
-                    return queries.saveCourseObject(courseObject);
+                    return queries.saveCourseObject(input);
                 });
         } else {
-            p = queries.saveCourseObject(courseObject);
+            p = queries.saveCourseObject(input);
         }
 
         p.then(function (savedCourse) {
             return res.status(201).json(savedCourse);
         })
-        .catch(next);
-        
+        .catch(next);      
     });
 */
 
@@ -408,6 +361,7 @@ module.exports = function(router) {
         });
     });
 
+
 /*
     // TODO:
     // Tests
@@ -415,32 +369,20 @@ module.exports = function(router) {
     //
     //
     router.put('/:course_id/members/invite', function (req, res, next) {
-        var course_id, user_id;
-
-        //req
-        req.checkParams("course_id", "Not a valid course id").isMongoId();
-        course_id = req.params.course_id;
-
-        //optional
-        if (!req.body.user_id) {
-            user_id = req.user.id;
-        } else {
-            req.checkBody("user_id", "Not a valid user id").isMongoId();
-            user_id = req.body.user_id;
+        try {
+            var input = inputValidation.putMembersInviteValidation(req);
         }
-
-        var inputError = req.validationErrors();
-        if (inputError) {
-            return next(badInput.BAD_INPUT(inputError));            
+        catch(error) {
+            return next(error);
         }
 
         var p;
-        if (user_id === req.user.id) {
-            p = queries.acceptInviteToCourse(user_id, course_id);
+        if (input.user_id === req.user.id) {
+            p = queries.acceptInviteToCourse(input.user_id, input.course_id);
         } else {
-            p = permission.checkIfTeacherOrAdmin(user_id, course_id, req.user.access).then(function () {
-                return queries.addMemberToCourse(user_id, course_id);
-            })
+            p = permission.checkIfTeacherOrAdmin(input.user_id, input.course_id, req.user.access).then(function () {
+                        return queries.addMemberToCourse(input.user_id, input.course_id);
+                });
         }
 
         p.then(function () {
