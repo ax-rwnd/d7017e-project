@@ -11,5 +11,11 @@ export class ModAdventuremapLargeComponent extends ModAdventuremapComponent impl
   ngOnInit() {
     this.width = 512;
     this.height = 512;
+
+    // Setup the viewport to reload once the image has loaded
+    this.img.onload = () => {
+      this.drawMap();
+    };
+    this.img.src = '/assets/images/ck4.gif';
   }
 }
