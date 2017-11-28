@@ -11,12 +11,22 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
   @ViewChild('mapCanvas') mapCanvas;
   @Input() courseCode: string;
 
-  private userProgress: any;
+  // Style cosntants
+  private readonly borderThickness = 2;
+  private readonly lineThickness = 1;
+  private readonly radius = 4;
 
+  // Backend state
+  private userProgress: any;
   private assignments: any[];
+
+  // Frontend state
+  private lastAssignment: any;
   private selectedAssignment: any;
   private assignmentText: string;
+  private assignmentId: string;
 
+  // Shadow-DOM elements
   private canvas: any;
   private context: CanvasRenderingContext2D;
 
@@ -31,14 +41,46 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
     this.canvas = this.mapCanvas.nativeElement;
     this.context = this.canvas.getContext('2d');
     this.update();
+
+    // Allow users to select assignments
+    this.canvas.addEventListener('click', (ev: any) => {
+      const rect: any = (this as any).canvas.getBoundingClientRect();
+      const x = ev.clientX - rect.left;
+      const y = ev.clientY - rect.top;
+
+      for (const a of this.assignments) {
+        const dx = x - a.x;
+        const dy = y - a.y;
+        if (Math.sqrt(dx * dx + dy * dy) < 10) {
+          console.warn('selected:', a);
+          this.selectedAssignment = a;
+        }
+      }
+
+      this.setTextValues();
+      this.drawMap();
+    },
+    false);
+  }
+
+  onClick(ev: any) {
+  }
+
+  setTextValues() {
+    // Set the assignment text and url
+      // Update map
+    this.assignmentText = (this.selectedAssignment === undefined) ?
+                          'Pick an assignment' : this.selectedAssignment.name;
+    this.assignmentId = (this.selectedAssignment === undefined) ?
+                        '' : this.selectedAssignment._id;
   }
 
   update() {
     this.loadAssignments()
       .then( () => {
         this.selectedAssignment = this.assignments[this.userProgress.completed_assignments];
-        this.assignmentText = (this.selectedAssignment === undefined) ?
-                              'Pick an assignment' : this.selectedAssignment.name;
+        this.lastAssignment = this.assignments[this.userProgress.completed_assignments];
+        this.setTextValues();
 
         this.drawMap();
       });
@@ -51,8 +93,15 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
       this.loadProgress()
         .then( () => {
           this.backendService.getCourseAssignments(this.courseCode).then((data: any) => {
+            // TODO: temporary shim to implement coords
             this.assignments = data.assignments;
-            resolve(data.assignments);
+
+            for (let i = 0; i < data.assignments.length; i++) {
+              this.assignments[i].x = i * 10;
+              this.assignments[i].y = 10;
+            }
+
+            resolve(this.assignments);
           });
         })
         .catch( (err) => {
@@ -92,22 +141,27 @@ drawMap() {
 
         // Connect dots
         if (i < this.assignments.length - 1) {
+          const next = this.assignments[i + 1];
+
           ctx.beginPath();
           ctx.lineWidth = 1;
-          ctx.fillStyle = 'black';
-          ctx.moveTo(10 + 20 * i, 10);
-          ctx.lineTo(10 + 20 * (i + 1), 10);
+          ctx.strokeStyle = 'black';
+          ctx.moveTo(current.x, current.y);
+          ctx.lineTo(next.x, next.y);
           ctx.stroke();
         }
 
         // Draw dot
         ctx.beginPath();
-        ctx.arc(10 + 20 * i, 10, 4, 0, 2 * Math.PI, false);
+        ctx.arc(current.x, current.y, this.radius, 0, 2 * Math.PI, false);
 
         // TODO: this is dependent on the linearity of the responses
         // perhaps it could be done better with cooperation from backend
-        if (this.selectedAssignment !== undefined &&
-            this.selectedAssignment._id === current._id) {
+        ctx.strokeStyle = 'black';
+
+        // Set fill stule
+        if (this.lastAssignment !== undefined &&
+            this.lastAssignment._id === current._id) {
           ctx.fillStyle = 'blue';
         } else if (this.userProgress.completed_assignments >= i) {
           ctx.fillStyle = 'red';
@@ -115,6 +169,17 @@ drawMap() {
           ctx.fillStyle = 'gray';
         }
         ctx.fill();
+
+        // Set stroke style
+        if (this.selectedAssignment !== undefined &&
+          this.selectedAssignment._id === current._id) {
+          ctx.lineWidth = 2;
+          ctx.strokeStyle = 'green';
+        } else {
+          ctx.lineWidth = 1;
+          ctx.strokeStyle = 'black';
+        }
+
         ctx.stroke();
       }
     }

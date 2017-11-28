@@ -5,7 +5,7 @@
   <div id="feedback">
 
     <div id="points">
-      <h2>Status: {{status}}</h2>
+      <h2>Status: {{status ? 'Completed' : 'Not complete'}}</h2>
     </div>
 
     <!--
@@ -241,5 +241,5 @@
   </div>
 
 </div>
-<div id="footer"> <input type="submit" value="Next Assignment" class="btn"></div>
+<div id="footer"> <input type="submit" value="Next Assignment" class="btn {{status ? 'btn-primary' : 'btn-danger'}}"></div>
 </div>

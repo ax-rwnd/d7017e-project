@@ -3,20 +3,22 @@
   <!-- start of the form -->
     <form class="container" (ngSubmit)="submitCourse()" [formGroup]="form" novalidate>
       <!-- Title -->
-      <h2>Create course <span class="required">{{errorMessage}}</span></h2>
+      <h2 *ngIf="!course">Create course <span class="required">{{errorMessage}}</span></h2>
+      <h2 *ngIf="course">Update course <span class="required">{{errorMessage}}</span></h2>
+
       <div class="row">
         <div class="col-md-6">
           <!-- First input, for course code -->
           <div class="form-group">
             <label class="label-norm" for="code">Course code</label>
-            <input type="text"  class="form-control" id="code" formControlName="code" placeholder="Ex D0009E" ngModel>
+            <input type="text"  class="form-control" id="code" formControlName="code" placeholder="Ex D0009E" [(ngModel)]="form.value.code">
           </div>
         </div>
         <div class="col-md-6">
           <!-- Second input, for course name, should be required input -->
           <div class="form-group">
             <label class="label-norm" for="name">Course name</label> <span class="required">*</span>
-            <input type="text" class="form-control" id="name" formControlName="name" placeholder="Ex Introduction to programming" ngModel>
+            <input type="text" class="form-control" id="name" formControlName="name" placeholder="Ex Introduction to programming" [(ngModel)]="form.value.name">
           </div>
         </div>
       </div>
@@ -66,7 +68,7 @@
           <tabset>
             <tab heading="Write" id="tab1">
               <div class="assignmentDescription" appScroller>
-                <div ace-editor [(text)]="content" [mode]="'markdown'" [theme]="'eclipse'" [options]="{maxLines: 1000, printMargin: false}" [readOnly]="false" [autoUpdateContent]="true" [durationBeforeCallback]="1000"(textChanged)="onChange(content)"  style="min-height: 100%; width:100%; overflow: auto;"></div>
+                <div ace-editor [(text)]="content" [mode]="'markdown'" [theme]="'eclipse'" [options]="{maxLines: 1000, printMargin: false}" [readOnly]="false" [autoUpdateContent]="true" [durationBeforeCallback]="1000" (textChanged)="onChange(content)"  style="min-height: 100%; width:100%; overflow: auto;"></div>
               </div>
             </tab>
             <tab heading="Preview">
@@ -79,7 +81,10 @@
         <!-- End of course description -->
       </div>
       <div class="form-group">
-          <button type="submit" class="btn btn-primary">Create course</button>
+          <button type="submit" class="btn btn-primary">
+            <span *ngIf="!course">Create course</span>
+            <span *ngIf="course">Update course</span>
+          </button>
       </div>
     </form>
 </div>
