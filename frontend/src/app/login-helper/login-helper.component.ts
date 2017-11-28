@@ -32,20 +32,20 @@ export class LoginHelperComponent implements OnInit {
     this.login();
   }
   login() {
-    this.backendService.login(this.ticket, this.authURL).then(data => {
-      // TOKEN
-      this.token = (data['token_type'] + ' ' + data['access_token']);
-      localStorage.setItem('token', this.token);
-      // REFRESH TOKEN
-      this.refresh_token = (data['token_type'] + ' ' + data['refresh_token']);
-      localStorage.setItem('refresh_token', this.refresh_token);
-      // REDIRECT
-      window.location.href = this.oldURL;
-    }).catch(err => {
-      console.log(err);
-      console.log('something went shit in login-helper');
-      this.router.navigate(['/']);
-    });
+    this.backendService.login(this.ticket, this.authURL)
+      .then(data => {
+        // TOKEN
+        this.token = (data['token_type'] + ' ' + data['access_token']);
+        localStorage.setItem('token', this.token);
+        // REFRESH TOKEN
+        this.refresh_token = (data['token_type'] + ' ' + data['refresh_token']);
+        localStorage.setItem('refresh_token', this.refresh_token);
+        // REDIRECT
+        window.location.href = this.oldURL;
+      }).catch(err => {
+        console.error('Login failed', err);
+        this.router.navigate(['/']);
+      });
   }
 }
 

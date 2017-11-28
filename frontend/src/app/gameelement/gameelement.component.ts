@@ -35,7 +35,7 @@ export class GameelementComponent implements OnInit {
         this.elements = data;
       })
       .catch(err => {
-        console.error('Failed to get enabled status in modular gmae component', err);
+        console.error('Failed to get enabled status in modular game component', err);
         this.elements = {};
       });
   }
