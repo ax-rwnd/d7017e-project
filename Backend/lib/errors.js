@@ -45,5 +45,6 @@ module.exports = {
     USER_NOT_IN_COURSE: new APIError("User is not a member of this course", 400, 7027),
     USER_IS_NOT_TEACHER: new APIError("User is not teacher of course", 400, 7028),
     USER_IS_NOT_STUDENT: new APIError("User is not student in this course", 400, 7029),
-    COURSE_NOT_CREATED: new APIError("Course not created", 500, 7030)
+    COURSE_NOT_CREATED: new APIError("Course not created", 500, 7030),
+    ASSIGNMENT_NOT_IN_COURSE: new APIError("Course not created", 400, 7031),
 };

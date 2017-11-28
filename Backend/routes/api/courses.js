@@ -666,16 +666,18 @@ module.exports = function(router) {
     });
 */
 
-    //Submit code to tester
+    //submit user code to Tester service for code validation
     router.post('/:course_id/assignments/:assignment_id/submit', function(req, res) {
 
         var lang = req.body.lang;
         var code = req.body.code;
         var assignment_id = req.params.assignment_id;
+        //var course_id = req.params.
 
         testerCom.validateCode(req.user.id, lang, code, assignment_id, res);
     });
 
+    // TODO: SHOULD BE REMOVED ONCE NEW ROUTE PATH IS USED BY FRONTEND
     // Save draft to assignment
     // course_id not used, should route be changed? Implement some check?
     router.post('/:course_id/assignments/:assignment_id/save', function (req, res, next) {
@@ -691,12 +693,48 @@ module.exports = function(router) {
         });
     });
 
+    // save a user-draft (code) for an assignment
+    router.post('/:course_id/assignments/:assignment_id/draft', function (req, res, next) {
+        var assignment_id = req.params.assignment_id;
+        var course_id = req.params.course_id;
+        var code = req.body.code || "";
+        var lang = req.body.lang || "";
+
+        if (!mongoose.Types.ObjectId.isValid(assignment_id) || !mongoose.Types.ObjectId.isValid(course_id)) {
+            return next(errors.BAD_INPUT);
+        }
+
+        queries.checkIfAssignmentInCourse(assignment_id, course_id).then(function () {
+            queries.saveCode(req.user.id, assignment_id, code, lang).then(function (draft) {
+                return res.status(201).json(draft);
+            });
+        })
+        .catch(function (err) {
+            next(err);
+        });
+    });
+
     // Retrieve the saved assignment draft, will create and return an empty draft if it doesn't already exist.
     router.get('/:course_id/assignments/:assignment_id/draft', function (req, res, next) {
         var assignment_id = req.params.assignment_id;
+        var course_id = req.params.course_id;
 
-        queries.getCode(req.user.id, assignment_id).then(function (draft) {
-            res.json(draft);
+        if (!mongoose.Types.ObjectId.isValid(assignment_id) || !mongoose.Types.ObjectId.isValid(course_id)) {
+            return next(errors.BAD_INPUT);
+        }
+
+        /*queries.checkIfAssignmentInCourse(assignment_id, course_id).then(function () {
+            queries.getCode(req.user.id, assignment_id).then(function (draft) {
+                return res.json(draft);
+            });
+        })
+        .catch(function (err) {
+            next(err);
+        });*/
+        queries.checkIfAssignmentInCourse(assignment_id, course_id).then(function () {
+            queries.getCode(req.user.id, assignment_id).then(function (draft) {
+                return res.json(draft);
+            })
         })
         .catch(function (err) {
             next(err);

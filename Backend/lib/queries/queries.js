@@ -317,21 +317,19 @@ function checkIfUserAlreadyInCourse(user_id, course_id, optionalCourseFieldsToRe
     });
 }
 
+// TODO: WILL BE AFFECTED BY NEW ASSIGNMENT GROUPING
+// checks if an assignment is in the course or not
 function checkIfAssignmentInCourse(assignment_id, course_id) {
-    return Course.findById(course_id)
-    .then(function (courseObject) {
+    return Course.findById(course_id).then(function (courseObject) {
         var assignmentFound = false;
-
         courseObject.assignments.forEach(function(element) {
-            if (element._id === assignment_id) {
+            if (element == assignment_id) {
                 assignmentFound = true;
             }
-        })
-        if (courseObject.students.indexOf(user_id) !== -1
-        || courseObject.teachers.indexOf(user_id) !== -1) {
-            throw errors.USER_ALREADY_IN_COURSE;
+        });
+        if (assignmentFound === false) {
+            throw errors.ASSIGNMENT_NOT_IN_COURSE;
         }
-        return courseObject;
     });
 }
 
@@ -870,6 +868,22 @@ function getAssignmentIDsByUser(user_id) {
     });
 }
 
+// TODO: WILL BE AFFECTED BY NEW MEMBER SYSTEM
+// returns "teacher", "admin" or "student": the highest access level for a course
+function getHighestPermissionCourse(course_id, user_id) {
+    getUser(user_id, "teaching").then(function (userObject) {
+        var role = "";
+        if (userObject.teaching.indexOf(course_id) !== -1) {
+            role = "teacher";
+        } else if (userObject.access === constants.ACCESS.ADMIN) {
+            role = "admin";
+        } else {
+            role = "student";
+        }
+        return role;
+    });
+}
+
 exports.getTestsFromAssignment = getTestsFromAssignment;
 exports.findOrCreateUser = findOrCreateUser;
 exports.getUser = getUser;
@@ -898,6 +912,7 @@ exports.searchDB = searchDB;
 exports.checkIfTeacherOrAdmin = checkIfTeacherOrAdmin;
 exports.checkIfUserAlreadyInCourseObject = checkIfUserAlreadyInCourseObject;
 exports.checkIfUserAlreadyInCourse = checkIfUserAlreadyInCourse;
+exports.checkIfAssignmentInCourse = checkIfAssignmentInCourse;
 exports.checkIfRequestAlreadySent = checkIfRequestAlreadySent;
 exports.createRequestToCourse = createRequestToCourse;
 exports.checkIfUserExist = checkIfUserExist;
