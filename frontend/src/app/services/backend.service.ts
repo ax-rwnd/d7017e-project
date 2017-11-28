@@ -49,7 +49,10 @@ Http requests:
     return this.http.get(environment.backend_ip + endpoint)
       .toPromise()
       .then(response => response)
-      .catch(err => this.toastService.error(err.error));
+      .catch(err => {
+        this.toastService.error(err.error);
+        throw err;
+      });
   }
 
   private apiPost(endpoint, body) {
@@ -58,7 +61,10 @@ Http requests:
     return this.http.post(environment.backend_ip + endpoint, body, {responseType: 'json'})
       .toPromise()
       .then(response => response)
-      .catch(err => this.toastService.error(err.error));
+      .catch(err => {
+        this.toastService.error(err.error);
+        throw err;
+      });
   }
 
   private apiPut(endpoint, body) {
@@ -67,7 +73,10 @@ Http requests:
     return this.http.put(environment.backend_ip + endpoint, body, {responseType: 'json'})
       .toPromise()
       .then(response => response)
-      .catch(err => this.toastService.error(err.error));
+      .catch(err => {
+        this.toastService.error(err.error);
+        throw err;
+      });
   }
 
   private apiDelete(endpoint) {
@@ -76,7 +85,10 @@ Http requests:
     return this.http.delete(environment.backend_ip + endpoint)
       .toPromise()
       .then(response => response)
-      .catch(err => this.toastService.error(err.error));
+      .catch(err => {
+        this.toastService.error(err.error);
+        throw err;
+      });
   }
 
 /*
