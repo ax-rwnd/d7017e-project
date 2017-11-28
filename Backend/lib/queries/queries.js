@@ -3,6 +3,7 @@
 var schemas = require('../../models/schemas.js');
 var Assignment = require('../../models/schemas').Assignment;
 var Course = require('../../models/schemas').Course;
+var CourseMember = require('../../models/schemas').CourseMembers;
 var Test = require('../../models/schemas').Test;
 var User = require('../../models/schemas').User;
 var Draft = require('../../models/schemas').Draft;
@@ -223,6 +224,8 @@ function findOrCreateUser(profile) {
     });
 }
 
+
+
 function getCourses(fields, access, id_array) {
     // CHANGE TO USE CONSTANTS.JS INSTEAD
     var wantedFields = fields || "name description hidden teachers students assignments";
@@ -265,7 +268,6 @@ function getCourses(fields, access, id_array) {
         }
         return Promise.all(promises);
     }
-
 }
 
 function checkIfUserExist(user_id) {
@@ -865,6 +867,83 @@ function getAssignmentIDsByUser(user_id) {
         });
     });
 }
+
+function getUserCourses1(user_id) {
+    return CourseMember.find({user: user_id}).distinct('course');
+}
+
+function getCourses1() {
+    return Course.find({hidden: false}, constants.FIELDS.COURSE.BASE_FIELDS);
+}
+
+function getUsersHiddenCourses (user_id) {
+    return CourseMember.find({user: user_id}).distinct('course')
+    .then(function (idArray) {
+        return Course.find({_id: {$in: idArray}, hidden: true}, constants.FIELDS.COURSE.BASE_FIELDS);
+    });
+}
+
+function getAllCourses () {
+    return Course.find({}, constants.FIELDS.COURSE.BASE_FIELDS);
+}
+
+function tempSaveMember (user_id, course_id) {
+    var member = new CourseMember({role: "teacher", user: user_id, course: course_id});
+    return member.save();
+}
+
+function saveCourseObject(courseObject) {
+    var course = new Course(courseObject);
+    return course.save().then(function (savedCourse) {
+        // TODO: FIX FEATURE FIELD. WHAT SHOULD IT ADD?
+        var memberObject = new CourseMember({role: "teacher", course: savedCourse._id, user: savedCourse.owner, features: "5a157a581154d36ecfcc7ab1"});
+        return memberObject.save().then(function () {
+            return savedCourse;
+        });
+    });
+}
+
+function countOwnedCourses(user_id) {
+    return Course.count({owner: user_id}).then(function (count) {
+        if (count > 2) {
+            throw errors.MAXIMUM_AMOUNT_OF_COURSES;
+        }
+    });
+}
+
+function acceptInviteToCourse(user_id, course_id) {
+    return JoinRequests.findOneAndRemove({inviteType: "invite", user: user_id, course: course_id})
+    .then(function(deletedInvite) {
+        if (!deletedInvite) {
+            throw errors.NO_INVITE_FOUND;
+        }
+        // TODO: CHANGE FEATURE FIELD
+        var memberObject = new CourseMember({role: "student", course: course_id, user: user_id, features: "5a157a581154d36ecfcc7ab1"});
+        return memberObject.save();
+    });
+}
+
+function addMemberToCourse(user_id, course_id) {
+    return JoinRequests.findOneAndRemove({inviteType: "pending", user: user_id, course: course_id})
+    .then(function(deletedInvite) {
+        if (!deletedInvite) {
+            throw errors.NO_INVITE_FOUND;
+        }
+        // TODO: CHANGE FEATURE FIELD
+        var memberObject = new CourseMember({role: "student", course: course_id, user: user_id, features: "5a157a581154d36ecfcc7ab1"});
+        return memberObject.save();
+    });
+}
+
+exports.getUserCourses1 = getUserCourses1;
+exports.getCourses1 = getCourses1;
+exports.tempSaveMember = tempSaveMember;
+exports.getAllCourses = getAllCourses;
+exports.getUsersHiddenCourses = getUsersHiddenCourses;
+exports.saveCourseObject = saveCourseObject;
+exports.countOwnedCourses = countOwnedCourses;
+exports.acceptInviteToCourse = acceptInviteToCourse;
+exports.addMemberToCourse = addMemberToCourse;
 
 exports.getTestsFromAssignment = getTestsFromAssignment;
 exports.findOrCreateUser = findOrCreateUser;

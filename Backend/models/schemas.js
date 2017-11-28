@@ -55,12 +55,20 @@ var joinRequests = new Schema({
     course: {type: Schema.Types.ObjectId, ref: 'Course', required: true}
 });
 
+var courseMembers = new Schema({
+    role: {type: String, required: true},
+    course: {type: Schema.Types.ObjectId, ref: 'Course', required: true},
+    user: {type: Schema.Types.ObjectId, ref: 'User', required: true},
+    features: {type: Schema.Types.ObjectId, ref: 'Features', required: false}
+});
+
 var courseSchema = new Schema({
     course_code: {type: String, required: false},
     name: {type: String, required: true},
     description: {type: String, required: false},
-    hidden: {type: Boolean, required: true},  //public or private course
+    hidden: {type: Boolean, default: false},  //public or private course
     autojoin: {type: Boolean, default: false},
+    owner: {type: Schema.Types.ObjectId, ref: 'User', required: false},
     teachers: [{ type: Schema.Types.ObjectId, ref: 'User', required: false }],
     students: [{ type: Schema.Types.ObjectId, ref: 'User', required: false }],
     assignments: [{ type: Schema.Types.ObjectId, ref: 'Assignment', required: false }],
@@ -113,10 +121,11 @@ var Test = mongoose.model('Test', testSchema);
 var User = mongoose.model('User', userSchema);
 var Draft = mongoose.model('Draft', draftSchema);
 var JoinRequests = mongoose.model('JoinRequests', joinRequests);
+var CourseMembers = mongoose.model('CourseMembers', courseMembers);
 var Course = mongoose.model('Course', courseSchema);
 var Badge = mongoose.model('Badge', badgeSchema);
 var Features = mongoose.model('Features', featuresSchema);
-var models = {Assignment: Assignment, Test: Test, User: User, Draft: Draft, JoinRequests: JoinRequests, Course: Course,
-    Badge: Badge, Features: Features};
+var models = {Assignment: Assignment, Test: Test, User: User, Draft: Draft, 
+        JoinRequests: JoinRequests, CourseMembers: CourseMembers, Course: Course, Badge: Badge, Features: Features};
 
 module.exports = models;
