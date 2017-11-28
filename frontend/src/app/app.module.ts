@@ -39,6 +39,7 @@ import { HeadService } from './services/head.service';
 import {UserService} from './services/user.service';
 import {CourseService} from './services/course.service';
 import { AssignmentService } from './services/assignment.service';
+import { ToastService } from './services/toast.service';
 
 // AUTH
 import {AuthGuardService as AuthGuard} from './services/Auth/Auth-Guard.service';
@@ -132,6 +133,7 @@ const appRoutes: Routes = [
     UserService,
     CourseService,
     AssignmentService,
+    ToastService,
     {
       provide: ToastOptions,
       useClass: CustomOptions,
