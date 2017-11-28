@@ -31,3 +31,15 @@
   background-color: rgba(29,117,175,0.27);
 }
 
+.select-list {
+  width: 90%;
+  margin-left: 10%;
+}
+
+.select-remove {
+  float: left;
+}
+
+.select-block {
+  margin-bottom: 5px;
+}

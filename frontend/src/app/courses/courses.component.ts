@@ -29,8 +29,6 @@ import { ToastService } from '../services/toast.service';
 export class CoursesComponent implements OnInit {
   assignmentGroups: AssignmentGroup[];
   teachCourses: any;
-  assignments: string[];
-  exercises: string[];
   sidebarState; // state of sidebar
   progress: any;
   currentCourse: any;
@@ -40,6 +38,13 @@ export class CoursesComponent implements OnInit {
   defaultForm = {
     search: ''
   };
+  selectedBadge: string;
+  badges: Array<Object> = [
+    {key: 'bronze_medal_badge', name: 'Bronze medal'},
+    {key: 'silver_medal_badge', name: 'Silver medal'},
+    {key: 'gold_medal_badge', name: 'Gold medal'}
+  ];
+  selectedAssignments: any[];
 
   constructor(private courseService: CourseService, private route: ActivatedRoute, private headService: HeadService,
               private fb: FormBuilder, private assignmentService: AssignmentService, private modalService: BsModalService,
@@ -52,12 +57,14 @@ export class CoursesComponent implements OnInit {
     this.route.params.subscribe( (params: any) => {
       // Grab the current course
       this.currentCourse = this.courseService.GetCourse(params.course);
-
+      console.log('course', this.currentCourse);
       // Assign groups for assignments
       if (this.assignmentService.courseAssignments[this.currentCourse.id] !== undefined) {
         this.assignmentGroups = this.assignmentService.courseAssignments[this.currentCourse.id];
+        console.log('assignments', this.assignmentGroups);
       } else {
         this.assignmentGroups = this.assignmentService.courseAssignments['default'];
+        console.log('assignments', this.assignmentGroups);
       }
 
       // Get a list of the users waiting to join the course
@@ -65,6 +72,7 @@ export class CoursesComponent implements OnInit {
         .then(response => console.log('pending', response))
         .catch(err => console.error('Get pending users failed', err));
     });
+    console.log('flat ', this.flattenAssignments());
   }
 
   ngOnInit() {
@@ -72,6 +80,8 @@ export class CoursesComponent implements OnInit {
     this.sidebarState = this.headService.getCurrentState();
     this.possibleStudents = [];
     this.form = this.fb.group(this.defaultForm);
+    this.selectedBadge = 'bronze_medal_badge';
+    this.selectedAssignments = [{'assignment': this.flattenAssignments()[0], 'possible': this.flattenAssignments()}];
   }
 
   getProgress() {
@@ -108,6 +118,24 @@ export class CoursesComponent implements OnInit {
         }
       })
       .catch(err => console.error('Search failed', err));
+  }
+
+  flattenAssignments() {
+    const assignments = [];
+    for (const group of this.assignmentGroups) {
+      for (const a of group.assignments) {
+        assignments.push(a);
+      }
+    }
+    return assignments;
+  }
+
+  removeGoal(index) {
+    this.selectedAssignments.splice(index, 1);
+  }
+
+  addGoal() {
+    this.selectedAssignments.push({'assignment': this.flattenAssignments()[0], 'possible': this.flattenAssignments()});
   }
 }
 

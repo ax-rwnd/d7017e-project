@@ -1,4 +1,5 @@
 import {Component, OnInit, ViewChild, TemplateRef} from '@angular/core';
+import { Location } from '@angular/common';
 import { trigger, state, style, animate, transition } from '@angular/animations';
 import { HeadService } from '../services/head.service';
 import {FormGroup, FormControl, Validators } from '@angular/forms';
@@ -37,13 +38,14 @@ export class CreatecourseComponent implements OnInit {
   progDesc = 'The student will be able to see progress depending on amount of completed assignments.';
   advmapDesc = 'The student will have an adventure map there different paths can be unlocked by completing assignments or tasks.'; //
   leadbDesc = 'The course will have a leaderboard that shows scores for each students in the course.';
-  publicDesc = 'Make the course public on create. Can later be changed.';
-  autojoinDesc = 'Students will be able to join the course freely.';
+  publicDesc = 'Make the course public so students can see, request access or join the course.';
+  autojoinDesc = 'Students will be able to join the course freely so no request is required.';
 
   @ViewChild('courseCreated') courseModal: TemplateRef<any>; // Temporary solution, modal will pop up after course is created
 
   constructor(private headService: HeadService, private backendService: BackendService, private modalService: BsModalService,
-              private route: ActivatedRoute, private courseService: CourseService, private toastService: ToastService) {
+              private route: ActivatedRoute, private courseService: CourseService, private toastService: ToastService,
+              private _location: Location) {
     this.headService.stateChange.subscribe(sidebarState => { // subscribe to the state value head provides
       this.sidebarState = sidebarState;
     });
@@ -53,6 +55,11 @@ export class CreatecourseComponent implements OnInit {
       this.course = this.courseService.GetCourse(params.course);
     });
   }
+
+  goBack() {
+    this._location.back();
+  }
+
   // for the hypertext
   onChange(c) {
     this.content = c;
@@ -152,7 +159,7 @@ export class CreatecourseComponent implements OnInit {
   ngOnInit() {
     this.sidebarState = this.headService.getCurrentState();
     this.setForm();
-    this.content = this.course ? this.course.desc : '';
+    this.content = this.course ? this.course.desc : '## Header';
     this.errorMessage = '';
     this.students = []; // should be empty list
   }
