@@ -672,7 +672,11 @@ module.exports = function(router) {
         var lang = req.body.lang;
         var code = req.body.code;
         var assignment_id = req.params.assignment_id;
-        //var course_id = req.params.
+        var course_id = req.params.
+        
+        if (!mongoose.Types.ObjectId.isValid(assignment_id) || !mongoose.Types.ObjectId.isValid(course_id)) {
+            return next(errors.BAD_INPUT);
+        }
 
         testerCom.validateCode(req.user.id, lang, code, assignment_id, res);
     });
