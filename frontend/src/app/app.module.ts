@@ -2,6 +2,9 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
+import { ToastModule, ToastOptions } from 'ng2-toastr/ng2-toastr';
+import { CustomOptions } from './toastr-options';
+
 // NG-BOOTSTRAP
 import { AlertModule } from 'ngx-bootstrap';
 import { ButtonsModule } from 'ngx-bootstrap';
@@ -115,7 +118,8 @@ const appRoutes: Routes = [
     ModalModule.forRoot(),
     RouterModule.forRoot(
       appRoutes
-    )
+    ),
+    ToastModule.forRoot()
   ],
   providers: [
     {
@@ -128,6 +132,10 @@ const appRoutes: Routes = [
     UserService,
     CourseService,
     AssignmentService,
+    {
+      provide: ToastOptions,
+      useClass: CustomOptions,
+    },
     // AUTHS
     AuthGuard,
     AuthService,
