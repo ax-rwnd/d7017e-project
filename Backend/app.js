@@ -62,9 +62,11 @@ var courses = express.Router();
 require('./routes/api/courses')(courses);
 app.use('/api/courses', courses);
 
+/*
 var features = express.Router();
 require('./routes/api/features')(features);
 app.use('/api/features', features);
+*/
 
 var tester = express.Router();
 require('./routes/api/tester')(tester);
