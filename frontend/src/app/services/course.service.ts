@@ -89,14 +89,18 @@ function getTeachCourses(response, backendService, courseService, assignmentServ
   const promiseArray = [];
   console.log('Teachresponse:', response);
   for (let i = 0; i < courses.length; i++) {
-    console.log('Course:', courses[i]._id)
     promiseArray.push(backendService.getCourse(courses[i]._id)
       .then(course => {
           const code = course.hasOwnProperty('course_code') ? course['course_code'] : '';
-          courseService.teaching.push(newTeachCourse(course['_id'], course['name'], code, course['description'], course['hidden'], course['enabled_features'], course['students'], course['teachers'], course['autojoin'], course['assignments']));
-          assignmentService.AddCourseAssignments(courses[i]._id, course['assignments']);
-        })
+          courseService.teaching.push(newTeachCourse(course['_id'], course['name'], code,
+            course['description'], course['hidden'], course['enabled_features'],
+            course['students'], course['teachers'], course['autojoin']));
+      })
       .catch());
+    promiseArray.push(backendService.getCourseAssignments(courses[i]._id)
+      .then(assignmentsResponse => {
+        assignmentService.AddCourseAssignments(courses[i]._id, assignmentsResponse.assignments);
+      }));
   }
   return Promise.all(promiseArray);
 }
@@ -189,7 +193,7 @@ function handleFeatureResponse(response: any) {
   return newRewards(progress, score, badges, leaderboard);
 }
 
-function newTeachCourse(id, name, code, course_desc, hidden, en_feat, students, teachers, autojoin, assigs) {
+function newTeachCourse(id, name, code, course_desc, hidden, en_feat, students, teachers, autojoin) {
   return {
     id: id,
     name: name,
@@ -200,7 +204,6 @@ function newTeachCourse(id, name, code, course_desc, hidden, en_feat, students, 
     students: students,
     teachers: teachers,
     autojoin: autojoin,
-    assignments: assigs,
   };
 }
 
