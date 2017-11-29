@@ -1,16 +1,15 @@
+<div class="gamification-block panel panel-default" *ngIf="isEnabled !== false">
+  <div class="panel-heading gamification-header">Adventure Map</div>
+  <div>
 
- <div class="gamification-block panel panel-default">
-      <div class="panel-heading gamification-header">Map</div>
-      <div class="stepwizard">
-        <div class="stepwizard-row">
-        	<div *ngFor="let m of assignmentz">
-	        	<div class="stepwizard-step">	
-	        		<button type="button" class="btn btn-primary btn-circle" (click)="getCourseElement(m)"></button>
-	        	</div>
-        	</div>
-        </div>
+    <div class="panel-body text-center">
+      <canvas #mapCanvas width="{{width}}" height="{{height}}"></canvas>
+
+      <div>
+      <p *ngIf="selectedAssignment === undefined">Pick an assignment</p>
+      <button *ngIf="selectedAssignment !== undefined" type="button" class="btn" id="goToAssignment" [routerLink]="['/courses', courseCode, 'assignment', assignmentId]">{{assignmentText}}</button>
       </div>
-        <div>
-          <!--Show name of element-->
-        </div>
     </div>
+
+  </div>
+</div>

@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { trigger, state, style, animate, transition } from '@angular/animations';
 import { HeadService } from './services/head.service';
 import { CourseService } from './services/course.service';
+import { ToastsManager} from 'ng2-toastr/ng2-toastr';
+import { ViewContainerRef} from '@angular/core';
 
 class Course {
   id: string;
@@ -35,14 +37,19 @@ export class AppComponent implements OnInit {
   courses: any;
   teachCourses: any;
 
-  constructor(private headService: HeadService, private courseService: CourseService) {
+  constructor(private headService: HeadService, private courseService: CourseService,
+              private toastr: ToastsManager, private vcr: ViewContainerRef) {
     this.headService.stateChange.subscribe(sidebarState => { this.sidebarState = sidebarState; });
+    this.toastr.setRootViewContainerRef(vcr);
   }
 
-  ngOnInit() {
+  displayCourseName(name: string): string {
+    return (name.length > 20) ? name.substr(0, 19) + '...' : name;
+  }
+
+   ngOnInit() {
     this.sidebarState = 'inactive';
     this.courses = this.courseService.courses;
     this.teachCourses = this.courseService.teaching;
   }
-
 }

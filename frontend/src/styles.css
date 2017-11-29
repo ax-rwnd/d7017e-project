@@ -7,7 +7,6 @@
 
 body {
   color: black;
-  font-family: Tahoma, Geneva, sans-serif;
   padding-top: 30px;
 }
 
@@ -29,7 +28,7 @@ body {
 }
 
 /* overall buttons */
-.btn {
+.btn-primary {
   background-color: #133756;
   border-style: none;
   color: white;
@@ -38,12 +37,12 @@ body {
   padding: 0.7em;
 }
 
-.btn:hover {
+.btn-primary:hover {
   color: grey;
   background-color: #0f2837;
 }
 
-.btn:focus {
+.btn-primary:focus {
   color: white;
   border-style: none;
 }
@@ -52,37 +51,37 @@ body {
 .nav-pills > li > a {
   color: white;
   transition: background-color 0.5s ease-out,
-              margin 0.2s ease-out,
-              border 0.5s ease-out;
-  border-style: solid;
-  border-color: #133756;
-  border-top-right-radius: 0;
-  border-bottom-right-radius: 0;
-  border-right: 0;
+              color 0.5s ease-out,
+              margin 0.2s ease-out;
+  border: none;
+  background-color: #133756;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
 }
 
 .nav-pills > li > a:hover {
   color: white;
   background-color: #0f2837;
-  margin-left: 0.4em;
-  border-style: solid;
-  border-color: #0f2837;
+  margin-right: 1em;
+  border: none;
 }
 
 .nav-pills > li.active > a,
 .nav-pills > li.active > a:hover,
-.nav-pills > li.active > a:focus {
+.nav-pills > li.active > a:focus{
+  margin-right: 1em;
+  color: darkgray;
   background-color: #133756;
-  border-style: solid;
-  border-color: white;
+  border: none;
 }
 
 /* navbar Default modifications down below*/
 .navbar-default {
   background-color: #133756;
   border-radius: 0px;
-  border-style: none;
+  border: none;
   margin-bottom: 0;
+  box-shadow: 0px 0px 5px #777;
 }
 /* navbar Title */
 .navbar-default .navbar-brand {
@@ -94,14 +93,9 @@ body {
   cursor: pointer;
 }
 
-/* navbar Link */
+/* navbar Link header */
 .navbar-default .navbar-nav > li > a {
   color: white;
-  border-style: solid;
-  border-color: #133756;
-  border-top-left-radius: 0.5em;
-  border-top-right-radius: 0.5em;
-  border-bottom: 0;
   transition: background-color 0.5s ease-out,
               border 0.5s ease-out,
               margin 0.2s ease-out;
@@ -121,6 +115,6 @@ body {
 .navbar-default .navbar-nav > .open > a,
 .navbar-default .navbar-nav > .open > a:hover,
 .navbar-default .navbar-nav > .open > a:focus {
-  color: #555;
+  color: white;
   background-color: #D5D5D5;
 }

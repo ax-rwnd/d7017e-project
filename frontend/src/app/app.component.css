@@ -8,19 +8,24 @@
 }
 
 .courseTitle {
-  padding-top: 10%;
+  color: #20202c;
+  padding-left: 5%;
   text-transform: uppercase;
+  font-weight: 100;
 }
 
 /* Sidebar */
 .sidebar {
-  color: white;
+  /* test*/
+  color: black;
   width: var(--wSidebar);
   height: 100%;
-  background: #133756;
+  background: white;
+  /*background: rgba(29, 117, 175, 0.27);*/
   position: fixed;
   padding-top: 5%;
   left: 0;
-  padding-left: 1%;
+  padding-right: 1%;
   font-size: 1.1em;
+  z-index: 1;
 }

@@ -11,10 +11,12 @@ export class ModBadgesSingleComponent extends ModBadgesComponent implements OnIn
 
   update() {
     super.getElements(this.courseCode);
-    this.backendService.getFeaturesCourseMe(this.courseCode).then( (data: any) => {
-      // this.badges = data.badges.slice(0, 1);
-      this.badges = [1, 2].slice(0, 1);
-    });
+    this.backendService.getFeaturesCourseMe(this.courseCode)
+      .then( (data: any) => {
+        // this.badges = data.badges.slice(0, 1);
+        this.badges = [1, 2].slice(0, 1);
+      })
+      .catch(err => console.error('Update single badge component failed'));
   }
 
   isEnabled() {

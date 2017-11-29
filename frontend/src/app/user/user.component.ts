@@ -78,7 +78,7 @@ export class UserComponent implements OnInit {
           this.pending = response;
         });
       })
-      .catch(err => console.log('error', err));
+      .catch(err => console.error('Cancel request failed', err));
   }
 
   openModal(modal) {
@@ -100,7 +100,8 @@ export class UserComponent implements OnInit {
           }
           this.possibleCourses[i] = {name: name, id: courses[i]['_id']};
         }
-      });
+      })
+      .catch(err => console.error('Get courses for search modal failed'));
   }
 
   createCourse() {
@@ -128,7 +129,8 @@ export class UserComponent implements OnInit {
             this.possibleCourses.push({name: course.name, id: course._id});
           }
         }
-      });
+      })
+      .catch(err => console.error('getSearch failed', err));
   }
 
   join(course_id) {
@@ -137,35 +139,40 @@ export class UserComponent implements OnInit {
       .then(response => {
         console.log(response);
         this.getPending();
-      });
+      })
+      .catch(err => console.error('Join course request failed', err));
   }
   acceptInvite(course_id) {
     this.backendService.acceptInvite(course_id, new ObjectID(this.userService.userInfo.id))
       .then(response => {
         console.log(response);
         this.getInvites();
-      });
+      })
+      .catch(err => console.error('Accept course invite failed', err));
   }
   declineInvite(course_id) {
     this.backendService.declineInvite(course_id)
       .then(response => {
         console.log(response);
         this.getInvites();
-      });
+      })
+      .catch(err => console.error('Decline course invite failed', err));
   }
   getPending() {
     this.backendService.getMyPendingRequests()
       .then(pending => {
         this.pending = pending;
         console.log('pending', this.pending);
-      });
+      })
+      .catch(err => console.error('Get pending course requests failed', err));
   }
   getInvites() {
     this.backendService.getMyInvites()
       .then(response => {
         this.invites = response;
         console.log('invites', this.invites);
-      });
+      })
+      .catch(err => console.error('getInvites failed', err));
   }
 
   getMe() {
@@ -174,7 +181,7 @@ export class UserComponent implements OnInit {
     return this.backendService.getMe().then(resp => {
       console.log(resp);
     }).catch(err => {
-      console.log(err);
+      console.error('getMe failed', err);
     });
   }
 }

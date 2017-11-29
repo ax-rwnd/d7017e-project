@@ -1,42 +1,91 @@
 <app-head></app-head>
 <div id="cont" class="content" [@content]="sidebarState">
   <div class="container">
-    <div class="col-lg-6">
-      <h1>
-        {{currentCourse.code}} - {{currentCourse.name}}
-      </h1>
-      <button type="button" class="btn" id="createNewAssignment" [routerLink]="['/courses', currentCourse.id, 'createNewAssignment']">Create New Assignment</button>
-      <button type="button" class="btn" (click)="openModal(inviteStudentModal)">Invite student to course</button>
+    <!-- START of the student view -->
+    <span *ngIf="teachCourses.indexOf(currentCourse) === -1; else teacherView"> <!-- Could switch this do for ex a bool or something -->
+      <!-- This view below is for students, the view for the teacher is in teacherView down below -->
+      <div class="col-lg-6">
+        <!-- Title of the student page-->
+        <h1>
+          <span *ngIf="currentCourse.code">{{currentCourse.code}} - </span> {{currentCourse.name}}
+        </h1>
+          <!-- Display the course description, markdown style -->
+          <markdown [data]="currentCourse.course_info"></markdown>
 
-      <span *ngIf="teachCourses.indexOf(currentCourse) === -1; else teacherView">
-        <markdown [data]="currentCourse.course_info"></markdown>
+          <!-- Feature progress bar -->
+          <app-mod-progressbar [courseCode]="currentCourse.id"></app-mod-progressbar>
 
-        <app-mod-progressbar [courseCode]="currentCourse.id"></app-mod-progressbar>
-
-        <div class="gamification-block panel panel-default" *ngIf="currentCourse.rewards.score !== false">
-          <div class="panel-heading gamification-header">
-            Score
+          <!-- Score board -->
+          <div class="gamification-block panel panel-default" *ngIf="currentCourse.rewards.score !== false">
+            <div class="panel-heading gamification-header">
+              Score
+            </div>
+            <div class="panel-body">
+              {{currentCourse.rewards.score}}
+            </div>
           </div>
-          <div class="panel-body">
-            {{currentCourse.rewards.score}}
+          <!-- Features, display if defined for course -->
+          <app-mod-badges [courseCode]="currentCourse.id"></app-mod-badges>
+          <app-mod-leaderboard [courseCode]="currentCourse.id"></app-mod-leaderboard>
+          <app-mod-adventuremap-large [courseCode]="currentCourse.id"></app-mod-adventuremap-large>
+      </div>
+      <!-- Next column, for assignments group -->
+      <div class="col-lg-6">
+        <div *ngFor="let g of assignmentGroups">
+          <app-assignment-group [assignmentGroup]="g" [courseCode]="currentCourse.id"></app-assignment-group>
+        </div>
+      </div>
+      <!-- End of assignments group -->
+    </span>
+    <!-- END of the student view, START of the teacher view -->
+    <ng-template #teacherView>
+      <h1>
+        <span *ngIf="currentCourse.code">{{currentCourse.code}} - </span> {{currentCourse.name}}
+      </h1>
+      <button type="button" class="btn btn-primary" id="createNewAssignment" [routerLink]="['/courses', currentCourse.id, 'createNewAssignment']">Create New Assignment</button>
+      <button type="button" class="btn btn-primary" (click)="openModal(inviteStudentModal)">Invite student to course</button>
+      <button type="button" class="btn btn-primary" (click)="openModal(createBadge)">Create badge</button>
+      <div class="row">
+      <!-- Display the course description, markdown style -->
+        <div class="col-lg-8">
+          <h3>Course description<button type="button" class="glyph-button" [routerLink]="['/user/updateCourse', currentCourse.id]"><span class="glyphicon glyphicon-edit"></span></button></h3>
+          <markdown [data]="currentCourse.desc"></markdown>
+          <span *ngIf="currentCourse.autojoin">This is autojoin course so no pending requests available</span>
+          <h3>Assignments</h3>
+          <div *ngFor="let g of assignmentGroups">
+            <app-assignment-group [assignmentGroup]="g" [courseCode]="currentCourse.id"></app-assignment-group>
           </div>
         </div>
-
-        <app-mod-badges [courseCode]="currentCourse.id"></app-mod-badges>
-
-        <app-mod-leaderboard [courseCode]="currentCourse.id"></app-mod-leaderboard>
-      </span>
-      <ng-template #teacherView></ng-template>
-    </div>
-    <div class="col-lg-6">
-      <div *ngFor="let g of assignmentGroups">
-        <app-assignment-group [assignmentGroup]="g" [courseCode]="currentCourse.id"></app-assignment-group>
+        <div class="col-lg-4">
+          <h4>Enrolled students
+            <!-- Haven't decided what to use here yet
+            <button class="glyph-button pull-right" style="font-size:1.4em;">
+              <span class="glyphicon glyphicon-plus-sign"></span>
+            </button>-->
+          </h4>
+          <table class="table table-hover">
+            <thead>
+            <tr>
+             <!-- <th>Username</th> -->
+            </tr>
+            </thead>
+            <tbody>
+              <tr *ngIf="currentCourse.students.length === 0">
+                <td>No students are enrolled to this course...</td>
+              </tr>
+              <tr *ngFor="let student of currentCourse.students">
+                <td>{{student.username}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
-    </div>
+    </ng-template>
+    <!-- Teacher view END -->
   </div>
-
 </div>
 
+<!-- Modal for invitation of student to course -->
 <ng-template #inviteStudentModal>
   <div class="modal-header">
     <h4 class="modal-title pull-left">Invite students</h4>
@@ -65,4 +114,41 @@
     </div>
     <div class="modal-footer">
     </div>
+</ng-template>
+
+<ng-template #createBadge>
+  <div class="modal-header">
+    <h4 class="modal-title pull-left">Create badge</h4>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <h3>Select badge</h3>
+    <div class="form-group">
+      <select class="form-control" [(ngModel)]="selectedBadge">
+        <option *ngFor="let badge of badges" [ngValue]="badge['key']">{{badge['name']}}</option>
+      </select>
+    </div>
+    <div>
+      <img src="../../assets/images/{{selectedBadge}}.png"/>
+    </div>
+  </div>
+  <div class="modal-body">
+    <h3>
+      Add goals
+    </h3>
+    <div class="form-group">
+      <div class="select-block" *ngFor="let selected of selectedAssignments; let i = index">
+        <button class="glyphicon glyphicon-minus btn btn-danger select-remove" (click)="removeGoal(i)"></button>
+        <select class="form-control select-list"  [(ngModel)]="selectedAssignments[i]['assignment']">
+          <option *ngFor="let assignment of selected['possible']" [ngValue]="assignment">{{assignment.name}}</option>
+        </select>
+        {{selectedAssignments[i].name}}
+      </div>
+      <button class="glyphicon glyphicon-plus btn btn-success" (click)="addGoal()"></button>
+    </div>
+  </div>
+  <div class="modal-footer">
+  </div>
 </ng-template>

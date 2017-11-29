@@ -44,3 +44,10 @@
   margin-bottom: 10px;
   background-color: rgba(29,117,175,0.27);
 }
+
+.custom-well {
+}
+
+.right-buttons {
+  float: right;
+}

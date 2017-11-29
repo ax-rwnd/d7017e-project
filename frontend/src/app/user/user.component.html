@@ -1,106 +1,67 @@
 <app-head></app-head>
 
 <div id="cont" class="content" [@content]="sidebarState">
-  <button class="btn" routerLink="./createCourse">Create course</button>
-  <!--<p><a class="userlinks" (click)="toggleStatistics()">Statistics</a></p>-->
-  <button type="button" class="btn" (click)="openModal(searchCourseModal)">Find course to join</button>
-
   <div class="container">
+    <button class="btn" routerLink="./createCourse">Create course</button>
+    <!--<p><a class="userlinks" (click)="toggleStatistics()">Statistics</a></p>-->
+    <button type="button" class="btn" (click)="openModal(searchCourseModal)">Find course to join</button>
     <div class="row">
       <div class="container col-lg-9">
         <!-- Title -->
         <h2>Courses</h2>
-        <!-- The head panel -->
-        <div class="gamification-block shadow panel panel-default" *ngFor="let course of courses">
-
-          <div class="panel-heading gamification-header">
-            <!-- Course panel title -->
-            <div [routerLink]="['/courses', course.id]" class="pointer"><h4>{{course.code}} - {{course.name}}</h4></div>
-          </div>
-
-          <!-- 'Main' body panel -->
-          <div class="panel-body">
+        <!-- iterate of the list of courses -->
+        <span *ngFor="let course of courses">
+          <!-- The panel content, input to panel is course  -->
+          <app-user-panels [course]="course">
             <div class="col-md-5">
               <app-mod-badges-single [courseCode]="course.id"></app-mod-badges-single>
               <app-mod-progressbar [courseCode]="course.id"></app-mod-progressbar>
-
+              <app-mod-adventuremap [courseCode]="course.id"></app-mod-adventuremap>
               <!-- Assignment panel start -->
+              <!--
               <div class="gamification-block panel panel-default">
                 <div class="panel-heading gamification-header">
                   Current Assignment
                 </div>
-
                 <div class="panel-body">
                   <div class="assignment">Assignment 1</div>
                 </div>
               </div>
+              -->
               <!-- Assignment panel end -->
-
             </div>
             <!-- column for progress and assignment end -->
-
             <div class="col-md-4">
               <app-mod-leaderboard [courseCode]="course.id"></app-mod-leaderboard>
             </div>
-
-          </div>
-        </div>
+          </app-user-panels>
+        </span>
         <br> <!-- add some space -->
         <!-- Title -->
         <h2>My Courses</h2>
-        <!-- The head panel -->
-        <div class="gamification-block shadow panel panel-default" *ngFor="let course of courses">
-
-          <div class="panel-heading gamification-header">
-            <!-- Course panel title -->
-            <div [routerLink]="['/courses', course.id]" class="pointer"><h4>{{course.code}} - {{course.name}}</h4></div>
-          </div>
-
-          <!-- 'Main' body panel -->
-          <div class="panel-body">
-            <div class="col-md-5">
-              <app-mod-badges-single [courseCode]="course.id"></app-mod-badges-single>
-              <app-mod-progressbar [courseCode]="course.id"></app-mod-progressbar>
-
-              <!-- Assignment panel start -->
-              <div class="gamification-block panel panel-default">
-                <div class="panel-heading gamification-header">
-                  Current Assignment
-                </div>
-
-                <div class="panel-body">
-                  <div class="assignment">Assignment 1</div>
-                </div>
-              </div>
-              <!-- Assignment panel end -->
-
-            </div>
-            <!-- column for progress and assignment end -->
-
-            <div class="col-md-4">
-              <app-mod-leaderboard [courseCode]="course.id"></app-mod-leaderboard>
-            </div>
-
-          </div>
-        </div>
-
+        <span *ngFor="let course of teachCourses">
+          <app-user-panels [course]="course"></app-user-panels>
+        </span>
 
       </div>
       <div class="col-lg-3">
-        <h2>Join requests</h2>
-        <div *ngFor="let p of pending">
-          <div class="row">
-            <div class="col-md-9" *ngIf="p.course['course_code'] !== undefined">
-              <h4>{{p.course['course_code']}}</h4>
-            </div>
-            <div class="col-md-9" *ngIf="p.course['course_code'] === undefined">
-              <h4>{{p.course['name']}}</h4>
-            </div>
-            <div class="col-md-3">
-              <button (click)="cancelRequest(p.course['_id'])" class="btn btn-danger">Cancel</button>
+        <div class="well custom-well">
+          <h2>Join requests</h2>
+          <div *ngFor="let p of pending">
+            <div class="row">
+              <div class="col-md-9" *ngIf="p.course['course_code'] !== undefined">
+                <h4>{{p.course['course_code']}}</h4>
+              </div>
+              <div class="col-md-9" *ngIf="p.course['course_code'] === undefined">
+                <h4>{{p.course['name']}}</h4>
+              </div>
+              <div class="col-md-3">
+                <button (click)="cancelRequest(p.course['_id'])" class="btn btn-danger pull-right">Cancel</button>
+              </div>
             </div>
           </div>
         </div>
+
         <h2>Invites</h2>
         <div *ngFor="let i of invites">
           <div class="row">
@@ -121,10 +82,8 @@
     </div>
   </div>
 
-  <app-statistics *ngIf="statistics"></app-statistics>
-
+  </div>
 </div>
-
 
 <ng-template #searchCourseModal>
   <div class="modal-header">
@@ -151,8 +110,6 @@
           </div>
         </div>
     </div>
-    <div class="modal-footer">
-
-    </div>
+    <div class="modal-footer"></div>
   <!--</form>-->
 </ng-template>

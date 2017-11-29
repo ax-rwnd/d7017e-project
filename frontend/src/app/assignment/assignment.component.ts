@@ -7,6 +7,7 @@ import { trigger, state, style, animate, transition } from '@angular/animations'
 import { HeadService } from '../services/head.service';
 import { CourseService } from '../services/course.service';
 import { UserService } from '../services/user.service';
+import { ToastService } from '../services/toast.service';
 import { Observable } from 'rxjs/Rx';
 import { Subscription } from 'rxjs/Subscription';
 
@@ -32,7 +33,7 @@ export class AssignmentComponent implements OnInit, OnDestroy {
   theme: string;
   languages: string[];
   language: string;
-  status: string;
+  status: boolean;
   sidebarState; // state of sidebar
   userid: string;
   feedback: string[];
@@ -46,17 +47,20 @@ export class AssignmentComponent implements OnInit, OnDestroy {
               private headService: HeadService,
               private route: ActivatedRoute,
               private userService: UserService,
-              private courseService: CourseService) {
+              private courseService: CourseService,
+              private toastService: ToastService) {
     this.headService.stateChange.subscribe(sidebarState => {
         this.sidebarState = sidebarState;
     });
     this.route.params.subscribe( params => {
       this.assignment = this.assignmentService.GetAssignment(params['course'], params['assignment']);
       this.currentCourse = this.courseService.GetCourse(params['course']);
-      this.backendService.getDraft(new ObjectID(params['course']), new ObjectID(params['assignment'])).then(data => {
-        this.resolveLanguage(data['lang']);
-        this.content = data['code'];
-      });
+      this.backendService.getDraft(new ObjectID(params['course']), new ObjectID(params['assignment']))
+        .then(data => {
+          this.resolveLanguage(data['lang']);
+          this.content = data['code'];
+        })
+        .catch(err => console.error('Get draft failed', err));
     });
   }
 
@@ -74,9 +78,9 @@ export class AssignmentComponent implements OnInit, OnDestroy {
       this.content = '';
     }
 
-    this.status = 'Not Completed';
+    this.status = false;
     if (this.hasPassed()) {
-      this.status = 'Completed';
+      this.status = true;
     }
     this.tests = [];
     this.testStrings = [];
@@ -116,9 +120,11 @@ export class AssignmentComponent implements OnInit, OnDestroy {
     const user_id = new ObjectID(this.userid);
     const assignment_id = new ObjectID(this.assignment['id']);
     const course_id = new ObjectID(this.assignment['course_id']);
-    this.backendService.submitAssignment(user_id, course_id, assignment_id, this.language, this.content).then(data => {
-      this.HandleResponse(data);
-    });
+    this.backendService.submitAssignment(user_id, course_id, assignment_id, this.language, this.content)
+      .then(data => {
+        this.HandleResponse(data);
+      })
+      .catch(err => console.error('Submit code failed', err));
     this.postDraft();
   }
 
@@ -127,16 +133,19 @@ export class AssignmentComponent implements OnInit, OnDestroy {
 
     const assignment_id = new ObjectID(this.assignment['id']);
     const course_id = new ObjectID(this.assignment['course_id']);
-    this.backendService.postDraft(course_id, assignment_id, this.content, this.language);
+    this.backendService.postDraft(course_id, assignment_id, this.content, this.language)
+      .catch(err => console.error('Post draft failed', err));
   }
 
   getTests() {
     const assignment_id = new ObjectID(this.assignment['course_id']);
     const course_id = new ObjectID(this.assignment['course_id']);
-    this.backendService.getCourseAssignmentTests(course_id, assignment_id).then(data => {
-      this.tests = data;
-      this.testStrings = this.formatTests(this.tests);
-    });
+    this.backendService.getCourseAssignmentTests(course_id, assignment_id)
+      .then(data => {
+        this.tests = data;
+        this.testStrings = this.formatTests(this.tests);
+      })
+      .catch(err => console.error('Get tests failed', err));
   }
 
   formatTests(tests) {
@@ -215,16 +224,18 @@ export class AssignmentComponent implements OnInit, OnDestroy {
     this.setFeedback(feedback);
 
     if (value['passed']) {
-      this.status = 'Completed';
+      this.toastService.success('Assignment passed!');
+      this.status = true;
 
       // Refresh the course
       this.courseService.UpdateCourse(this.currentCourse.id)
         .then(response => {
           // Once the course has been updated, get it
           this.currentCourse = this.courseService.GetCourse(this.currentCourse.id);
-        });
+        })
+        .catch(err => console.error('Update course failed', err));
     } else {
-      this.status = 'Not Completed';
+      this.status = false;
     }
   }
 

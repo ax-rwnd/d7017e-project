@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
+import { ToastService } from './toast.service';
 
 export class ObjectID {
   // Defines a controlled type for mongoose object ids
@@ -34,15 +35,24 @@ export class BackendService {
   //  });
   // `
 
-  constructor(private http: HttpClient) { }
-
+  constructor(private http: HttpClient, private toastService: ToastService) { }
+/*
+Http requests:
+1. GET
+2. POST
+3. PUT
+4. DELETE
+*/
   private apiGet(endpoint: string) {
     // Send a get request to the endpoint
 
     return this.http.get(environment.backend_ip + endpoint)
       .toPromise()
       .then(response => response)
-      .catch(err => console.error('API Get failed in ' + endpoint + ' error', err));
+      .catch(err => {
+        this.toastService.error(err.error);
+        throw err;
+      });
   }
 
   private apiPost(endpoint, body) {
@@ -51,7 +61,10 @@ export class BackendService {
     return this.http.post(environment.backend_ip + endpoint, body, {responseType: 'json'})
       .toPromise()
       .then(response => response)
-      .catch(err => console.error('API Post failed in ' + endpoint + ' error ', err));
+      .catch(err => {
+        this.toastService.error(err.error);
+        throw err;
+      });
   }
 
   private apiPut(endpoint, body) {
@@ -60,7 +73,10 @@ export class BackendService {
     return this.http.put(environment.backend_ip + endpoint, body, {responseType: 'json'})
       .toPromise()
       .then(response => response)
-      .catch(err => console.error('API Put failed in ' + endpoint + ' error ', err));
+      .catch(err => {
+        this.toastService.error(err.error);
+        throw err;
+      });
   }
 
   private apiDelete(endpoint) {
@@ -69,35 +85,42 @@ export class BackendService {
     return this.http.delete(environment.backend_ip + endpoint)
       .toPromise()
       .then(response => response)
-      .catch(err => console.error('API Delete failed in ' + endpoint + ' error ', err));
+      .catch(err => {
+        this.toastService.error(err.error);
+        throw err;
+      });
   }
 
-  addUserToCourse(course_id: ObjectID, student_id: ObjectID) {
-  // Add a student to a course.
+/*
+------ API ENDPOINTS START --------
+The structure below is the following:
 
-    const body = {student_id: student_id.get()};
-    return this.apiPut('/api/courses/' + course_id.get() + '/students', body);
-  }
+1. Token (me) calls
+2. User(s) calls
+3. Course(s) calls
+  - Create and update
+  - Students and courses
+4. Feature(s) calls
+5. Assignment(s) calls
+  - Create, update and submit
+  - Assignment draft
+  - Assignment test(s)
+6. Invite/pending calls
+  - Invite(s)
+  - Pending
+7. Other calls
+  - Search
+  - Login
+
+*/
+
+// ----- 1. TOKEN (me) calls ------- //
 
   getMe() {
     // Get information for the currently logged in user
 
     return this.apiGet('/api/users/me');
   }
-
-  getUser(id: ObjectID) {
-    // Get info for the user with some ID
-
-    return this.apiGet('/api/users/' + id.get());
-  }
-
-  getCourses() {
-    // Get all courses for display on frontend
-    // TODO: this route is completely untested
-
-    return this.apiGet('/api/courses');
-  }
-
   getMyCourses() {
     // Get courses that the logged in user is participating in as a 'student'
 
@@ -110,10 +133,39 @@ export class BackendService {
     return this.apiGet('/api/users/me/teaching');
   }
 
-  getUserCourses(id: string) {
+  getFeaturesCourseMe (course_id: string) {
+    // Get feature state for a user in a course
+
+    return this.apiGet('/api/courses/' + course_id + '/features/me');
+  }
+
+// ---------- 2. USER(S) calls --------- //
+
+  getUser(id: ObjectID) {
+    // Get info for the user with some ID
+
+    return this.apiGet('/api/users/' + id.get());
+  }
+
+  getUserCourses(user_id: string) {
     // Get courses for some user
 
-    return this.apiGet('/api/users/' + id + '/courses');
+    return this.apiGet('/api/users/' + user_id + '/courses');
+  }
+
+  getUserCourseStatus(course_id: string) {
+    // Retrieves if you're an admin, a teacher or a student in a course
+
+    return this.apiGet('/api/users/courses/' + course_id + '/status');
+  }
+
+// ----------- 3. COURSE(S) calls ----------- //
+
+  getCourses() {
+    // Get all courses for display on frontend
+    // TODO: this route is completely untested
+
+    return this.apiGet('/api/courses');
   }
 
   getCourse(id: string) {
@@ -122,10 +174,80 @@ export class BackendService {
     return this.apiGet('/api/courses/' + id);
   }
 
+// -- Create and update -- //
+
+  postNewCourse(name: string, desc: string, hidden: boolean, course_code: string,
+                en_feat: Object, autojoin: boolean) {
+    // Post a new course to database
+
+    const body = {'name': name, 'description': desc, 'hidden': hidden,
+      'course_code': course_code, 'enabled_features': en_feat, 'autojoin': autojoin};
+    return this.apiPost('/api/courses', body);
+  }
+
+  updateCourse(id: string, name: string, desc: string, hidden: boolean, course_code: string,
+               en_feat: Object, autojoin: boolean) {
+    // Put, update course in database
+
+    const body = {'name': name, 'description': desc, 'hidden': hidden,
+      'course_code': course_code, 'enabled_features': en_feat, 'autojoin': autojoin};
+    return this.apiPut('/api/courses/' + id, body);
+  }
+
+// -- Students and courses -- //
+
   getCourseUsers(id: string) {
     // Get users studying a course
 
     return this.apiGet('/api/courses/' + id + '/students');
+  }
+
+  addUserToCourse(course_id: ObjectID, student_id: ObjectID) {
+  // Add a student to a course.
+
+    const body = {student_id: student_id.get()};
+    return this.apiPut('/api/courses/' + course_id.get() + '/students', body);
+  }
+
+// ----------- 4. FEATURES(S) calls ----------- //
+
+  getFeaturesCourse (course_id: string) {
+    // Get features for all users in a course
+
+    return this.apiGet('/api/courses/' + course_id + '/features');
+  }
+
+  postNewBadge(icon: string, title: string, description: string) {
+    const body = {'icon': icon, 'title': title, 'description': description};
+    return this.apiPost('/api/features/badge', body);
+  }
+
+  getEnabledFeaturesCourse (course_id: string) {
+    // Get enabled features for a course
+
+    return this.apiGet('/api/courses/' + course_id + '/enabled_features');
+  }
+
+
+// ----------- 5. ASSIGNMENT(S) calls ----------- //
+
+  getCourseAssignments(course_id: string) {
+    return this.apiGet('/api/courses/' + course_id + '/assignments');
+  }
+
+  getAssignment(course_id: string, assignment_id: string) {
+    return this.apiGet('/api/courses/' + course_id + '/assignments/' + assignment_id);
+  }
+
+// -- Create, update and submit -- //
+
+  createAssignment(course_id: any, assignmentName: string, description: string, languages: string[]) {
+    // Creates an assignment
+    // Get an assignment with name desc., langs.
+    // course_id
+    // lang
+    const body = {'name': assignmentName, 'description': description, 'languages': ['python3'], 'hidden': 'false'};
+    return this.apiPost('/api/courses/' + course_id + '/assignments/', body);
   }
 
   submitAssignment(user_id: ObjectID, course_id: ObjectID, assignment_id: ObjectID, lang: string, code: string) {
@@ -134,6 +256,8 @@ export class BackendService {
     const body = {'lang': lang, 'code': code};
     return this.apiPost('/api/courses/' + course_id.get() + '/assignments/' + assignment_id.get() + '/submit', body);
   }
+
+// -- Assignment draft -- //
 
   postDraft(course_id: ObjectID, assignment_id: ObjectID, code: string, lang: string) {
     // Saves a draft of the editors content on backend
@@ -148,14 +272,14 @@ export class BackendService {
     return this.apiGet('/api/courses/' + course_id.get() + '/assignments/' + assignment_id.get() + '/draft');
   }
 
-  createAssignment(course_id: any, assignmentName: string, description: string, languages: string[]) {
-    // Creates an assignment
-    // Get an assignment with name desc., langs.
-    // course_id
-    // lang
-    const body = {'name': assignmentName, 'description': description, 'languages': ['python3'], 'hidden': 'false'};
-    return this.apiPost('/api/courses/' + course_id + '/assignments/', body);
+// -- Assignment test(s) -- //
+
+  getCourseAssignmentTests(course_id: ObjectID, assignment_id: ObjectID) {
+    // Get all tests of a specific assignment
+
+    return this.apiGet('/api/courses/' + course_id.get() + '/assignments/' + assignment_id.get() + '/tests');
   }
+
   // add tests to assignment
   createTest(course_id: any, test: string[], assignment_id: any) {
     // check if io test, create io test
@@ -172,55 +296,14 @@ export class BackendService {
     }
   }
 
-  getAssignment(course_id: string, assignment_id: string) {
-    return this.apiGet('/api/courses/' + course_id + '/assignments/' + assignment_id);
-  }
-  getCourseAssignments(course_id: string) {
-    return this.apiGet('/api/courses/' + course_id + '/assignments');
-  }
+// ----------- 6. INVITE/PENDING calls ----------- //
 
-  getCourseAssignmentTests(course_id: ObjectID, assignment_id: ObjectID) {
-    // Get all tests of a specific assignment
+// -- Invite(s) -- //
 
-    return this.apiGet('/api/courses/' + course_id.get() + '/assignments/' + assignment_id.get() + '/tests');
-  }
+  getMyInvites() {
+    // Find invites for me
 
-  postNewBadge(icon: string, title: string, description: string) {
-    const body = {'icon': icon, 'title': title, 'description': description};
-    return this.apiPost('/api/features/badge', body);
-  }
-
-  getEnabledFeaturesCourse (course_id: string) {
-    // Get enabled features for a course
-
-    return this.apiGet('/api/courses/' + course_id + '/enabled_features');
-  }
-
-  getFeaturesCourseMe (course_id: string) {
-    // Get feature state for a user in a course
-
-    return this.apiGet('/api/features/feature/' + course_id + '/me');
-  }
-
-  getFeaturesCourse (course_id: string) {
-    // Get features for all users in a course
-
-    return this.apiGet('/api/features/features/' + course_id);
-  }
-
-  getSearch (query: string) {
-    // Search the database.
-
-    return this.apiGet('/api/search?query=' + query);
-  }
-
-  postNewCourse(name: string, desc: string, hidden: boolean, course_code: string,
-    en_feat: Object, autojoin: boolean) {
-    // Post a new course to database
-
-    const body = {'name': name, 'description': desc, 'hidden': hidden,
-      'course_code': course_code, 'enabled_features': en_feat, 'autojoin': autojoin};
-    return this.apiPost('/api/courses', body);
+    return this.apiGet('/api/users/courses/invite');
   }
 
   postInvitationToCourse(course_id: ObjectID, student_id: ObjectID) {
@@ -230,17 +313,18 @@ export class BackendService {
     return this.apiPost('/api/courses/' + course_id + '/students/invite', body);
   }
 
-  postJoinRequest(course_id: ObjectID, student_id: ObjectID) {
-    // Send a request to join a course
-
-    const body = {'student_id': student_id};
-    return this.apiPost('/api/courses/' + course_id + '/students/pending', body);
+  acceptInvite(course_id: ObjectID, student_id: ObjectID) {
+    return this.apiPut('/api/courses/' + course_id + '/students/invite', {'student_id': student_id});
   }
 
-  getMyInvites() {
-    // Find invites for me
+  declineInvite(course_id: ObjectID) {
+    return this.apiDelete('/api/courses/' + course_id + '/students/invite');
+  }
 
-    return this.apiGet('/api/users/courses/invite');
+// -- Pending -- //
+
+  getMyPendingRequests() {
+    return this.apiGet('/api/users/courses/pending');
   }
 
   getPendingUsers(course_id) {
@@ -249,31 +333,28 @@ export class BackendService {
     return this.apiGet('/api/courses/' + course_id + '/students/pending');
   }
 
-  getMyPendingRequests() {
-    return this.apiGet('/api/users/courses/pending');
+  postJoinRequest(course_id: ObjectID, student_id: ObjectID) {
+    // Send a request to join a course
+
+    const body = {'student_id': student_id};
+    return this.apiPost('/api/courses/' + course_id + '/students/pending', body);
   }
 
   cancelPendingJoin(course_id: ObjectID) {
     return this.apiDelete('/api/courses/' + course_id + '/students/pending');
   }
-  acceptInvite(course_id: ObjectID, student_id: ObjectID) {
-    return this.apiPut('/api/courses/' + course_id + '/students/invite', {'student_id': student_id});
-  }
-  declineInvite(course_id: ObjectID) {
-    return this.apiDelete('/api/courses/' + course_id + '/students/invite');
-  }
 
-  getCoursesById(user_id: string) {
-    // Get the courses that a student i taking
+// ----------- 7. OTHER calls ----------- //
 
-    return this.apiGet('/api/users/' + user_id + '/courses');
+// -- Search -- //
+
+  getSearch (query: string) {
+    // Search the database.
+
+    return this.apiGet('/api/search?query=' + query);
   }
 
-  getUserCourseStatus(course_id: string) {
-    // Retrieves if you're an admin, a teacher or a student in a course
-
-    return this.apiGet('/api/users/courses/' + course_id + '/status');
-  }
+// -- Login -- //
 
   login(ticket: string, service: string) {
     // TODO: is this still relevant?

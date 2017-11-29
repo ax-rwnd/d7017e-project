@@ -36,6 +36,7 @@ export class AuthGuardService implements CanActivate {
 function activateHelper(courseService, userService) {
   const promiseArray = [];
   promiseArray.push(courseService.GetAllCoursesForUser());
+  promiseArray.push(courseService.GetAllTeachingCourses());
   promiseArray.push(userService.getMe());
   return Promise.all(promiseArray);
 }
