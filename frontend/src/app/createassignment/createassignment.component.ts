@@ -29,6 +29,7 @@ export class CreateassignmentComponent implements OnInit {
   languages: string[];
   content: string;
   unitTests: any[];
+  lintTest: boolean;
   courseId: string;
 
   markdownExampleCode: string;
@@ -70,14 +71,7 @@ export class CreateassignmentComponent implements OnInit {
   }
 
   createTest() {
-    // TODO: read the documentation and update the input here
-
-    if (this.testType === 'io') {
-      this.unitTests.push([this.testType, this.form.value.ioInput, this.form.value.ioOutput]);
-    } else {
-      this.unitTests.push([this.testType]);
-    }
-    this.testType = '';
+    this.unitTests.push(['io', this.form.value.ioInput, this.form.value.ioOutput]);
   }
 
   editExistingTest(e) {

@@ -35,6 +35,16 @@
   overflow: scroll;
 }
 
+#desc {
+  margin: 1%;
+  padding: 12px 16px;
+  height: 500px;
+  text-align: left;
+  float: left;
+  width: 100%;
+  overflow: scroll;
+}
+
 #addTests {
   margin: 1%;
   padding: 0;
@@ -105,8 +115,6 @@
 #header, #footer {
   text-align: center;
   padding: 1em;
-  color: white;
-  background-color: #133756;
   clear: left;
   text-align: center;
 }
