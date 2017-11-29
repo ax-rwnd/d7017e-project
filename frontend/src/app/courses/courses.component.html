@@ -27,11 +27,10 @@
           <!-- Features, display if defined for course -->
           <app-mod-badges [courseCode]="currentCourse.id"></app-mod-badges>
           <app-mod-leaderboard [courseCode]="currentCourse.id"></app-mod-leaderboard>
-          <app-mod-adventuremap [courseCode]="currentCourse.id"></app-mod-adventuremap>
+          <app-mod-adventuremap-large [courseCode]="currentCourse.id"></app-mod-adventuremap-large>
       </div>
       <!-- Next column, for assignments group -->
       <div class="col-lg-6">
-        This too
         <div *ngFor="let g of assignmentGroups">
           <app-assignment-group [assignmentGroup]="g" [courseCode]="currentCourse.id"></app-assignment-group>
         </div>
@@ -43,11 +42,43 @@
       <h1>
         <span *ngIf="currentCourse.code">{{currentCourse.code}} - </span> {{currentCourse.name}}
       </h1>
-      <button type="button" class="btn" id="createNewAssignment" [routerLink]="['/courses', currentCourse.id, 'createNewAssignment']">Create New Assignment</button>
-      <button type="button" class="btn" (click)="openModal(inviteStudentModal, 'inviteStudent')">Invite student to course</button>
-      <button type="button" class="btn" (click)="openModal(createBadge, 'createBadge')">Create badge</button>
-      <div *ngFor="let g of assignmentGroups">
-        <app-assignment-group [assignmentGroup]="g" [courseCode]="currentCourse.id"></app-assignment-group>
+      <button type="button" class="btn btn-primary" id="createNewAssignment" [routerLink]="['/courses', currentCourse.id, 'createNewAssignment']">Create New Assignment</button>
+      <button type="button" class="btn btn-primary" (click)="openModal(inviteStudentModal, 'inviteStudent')">Invite student to course</button>
+      <button type="button" class="btn btn-primary" (click)="openModal(createBadge, 'createBadge')">Create badge</button>
+      <div class="row">
+      <!-- Display the course description, markdown style -->
+        <div class="col-lg-8">
+          <h3>Course description<button type="button" class="glyph-button" [routerLink]="['/user/updateCourse', currentCourse.id]"><span class="glyphicon glyphicon-edit"></span></button></h3>
+          <markdown [data]="currentCourse.desc"></markdown>
+          <span *ngIf="currentCourse.autojoin">This is autojoin course so no pending requests available</span>
+          <h3>Assignments</h3>
+          <div *ngFor="let g of assignmentGroups">
+            <app-assignment-group [assignmentGroup]="g" [courseCode]="currentCourse.id"></app-assignment-group>
+          </div>
+        </div>
+        <div class="col-lg-4">
+          <h4>Enrolled students
+            <!-- Haven't decided what to use here yet
+            <button class="glyph-button pull-right" style="font-size:1.4em;">
+              <span class="glyphicon glyphicon-plus-sign"></span>
+            </button>-->
+          </h4>
+          <table class="table table-hover">
+            <thead>
+            <tr>
+             <!-- <th>Username</th> -->
+            </tr>
+            </thead>
+            <tbody>
+              <tr *ngIf="currentCourse.students.length === 0">
+                <td>No students are enrolled to this course...</td>
+              </tr>
+              <tr *ngFor="let student of currentCourse.students">
+                <td>{{student.username}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </ng-template>
     <!-- Teacher view END -->
@@ -92,7 +123,6 @@
       <span aria-hidden="true">&times;</span>
     </button>
   </div>
-
   <div class="modal-body">
     <h3>Select badge</h3>
     <div class="form-group">

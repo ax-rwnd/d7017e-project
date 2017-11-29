@@ -2,6 +2,9 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
+import { ToastModule, ToastOptions } from 'ng2-toastr/ng2-toastr';
+import { CustomOptions } from './toastr-options';
+
 // NG-BOOTSTRAP
 import { AlertModule } from 'ngx-bootstrap';
 import { ButtonsModule } from 'ngx-bootstrap';
@@ -18,24 +21,25 @@ import { MarkdownModule } from 'angular2-markdown';
 
 import { AppComponent } from './app.component';
 import { StatisticsComponent } from './statistics/statistics.component';
-import {RouterModule, Routes} from '@angular/router';
+import { RouterModule, Routes} from '@angular/router';
 import { LoginComponent } from './login/login.component';
 import { LoginHelperComponent} from './login-helper/login-helper.component';
-import {HeadComponent} from './head/head.component';
-import {UserComponent} from './user/user.component';
+import { HeadComponent } from './head/head.component';
+import { UserComponent } from './user/user.component';
 import { AssignmentComponent } from './assignment/assignment.component';
 import { MainComponent } from './main/main.component';
 import { CoursesComponent } from './courses/courses.component';
 import { CreateassignmentComponent } from './createassignment/createassignment.component';
 
-import {BackendService} from './services/backend.service';
+import { BackendService } from './services/backend.service';
 
 // Animation
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HeadService } from './services/head.service';
-import {UserService} from './services/user.service';
-import {CourseService} from './services/course.service';
+import { UserService } from './services/user.service';
+import { CourseService} from './services/course.service';
 import { AssignmentService } from './services/assignment.service';
+import { ToastService } from './services/toast.service';
 
 // AUTH
 import {AuthGuardService as AuthGuard} from './services/Auth/Auth-Guard.service';
@@ -54,6 +58,7 @@ import { GameelementComponent } from './gameelement/gameelement.component';
 import { ModLeaderboardComponent } from './mod-leaderboard/mod-leaderboard.component';
 import { ModProgressbarComponent } from './mod-progressbar/mod-progressbar.component';
 import { ModAdventuremapComponent } from './mod-adventuremap/mod-adventuremap.component';
+import { ModAdventuremapLargeComponent } from './mod-adventuremap/mod-adventuremap-large.component';
 import { ModBadgesComponent } from './mod-badges/mod-badges.component';
 import { ModBadgesSingleComponent } from './mod-badges/mod-badges-single.component';
 
@@ -94,6 +99,7 @@ const appRoutes: Routes = [
     ModBadgesComponent,
     ModBadgesSingleComponent,
     ModAdventuremapComponent,
+    ModAdventuremapLargeComponent,
   ],
   imports: [
     BrowserModule,
@@ -115,7 +121,8 @@ const appRoutes: Routes = [
     ModalModule.forRoot(),
     RouterModule.forRoot(
       appRoutes
-    )
+    ),
+    ToastModule.forRoot()
   ],
   providers: [
     {
@@ -128,6 +135,11 @@ const appRoutes: Routes = [
     UserService,
     CourseService,
     AssignmentService,
+    ToastService,
+    {
+      provide: ToastOptions,
+      useClass: CustomOptions,
+    },
     // AUTHS
     AuthGuard,
     AuthService,

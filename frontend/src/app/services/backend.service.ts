@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
+import { ToastService } from './toast.service';
 
 export class ObjectID {
   // Defines a controlled type for mongoose object ids
@@ -34,7 +35,7 @@ export class BackendService {
   //  });
   // `
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private toastService: ToastService) { }
 /*
 Http requests:
 1. GET
@@ -48,7 +49,10 @@ Http requests:
     return this.http.get(environment.backend_ip + endpoint)
       .toPromise()
       .then(response => response)
-      .catch(err => console.error('API Get failed in ' + endpoint + ' error', err));
+      .catch(err => {
+        this.toastService.error(err.error);
+        throw err;
+      });
   }
 
   private apiPost(endpoint, body) {
@@ -57,7 +61,10 @@ Http requests:
     return this.http.post(environment.backend_ip + endpoint, body, {responseType: 'json'})
       .toPromise()
       .then(response => response)
-      .catch(err => console.error('API Post failed in ' + endpoint + ' error ', err));
+      .catch(err => {
+        this.toastService.error(err.error);
+        throw err;
+      });
   }
 
   private apiPut(endpoint, body) {
@@ -66,7 +73,10 @@ Http requests:
     return this.http.put(environment.backend_ip + endpoint, body, {responseType: 'json'})
       .toPromise()
       .then(response => response)
-      .catch(err => console.error('API Put failed in ' + endpoint + ' error ', err));
+      .catch(err => {
+        this.toastService.error(err.error);
+        throw err;
+      });
   }
 
   private apiDelete(endpoint) {
@@ -75,7 +85,10 @@ Http requests:
     return this.http.delete(environment.backend_ip + endpoint)
       .toPromise()
       .then(response => response)
-      .catch(err => console.error('API Delete failed in ' + endpoint + ' error ', err));
+      .catch(err => {
+        this.toastService.error(err.error);
+        throw err;
+      });
   }
 
 /*
@@ -270,19 +283,12 @@ The structure below is the following:
   }
 
   // add tests to assignment
-  createTest(course_id: any, test: string[], assignment_id: any) {
-    // check if io test, create io test
-    if (test[0] === 'io') {
-      const stdin = test[1];
-      const stdout = test[2];
-      const body = {'stdout': stdout, 'stdin': stdin, 'args': []};
-      return this.apiPost('/api/courses/' + course_id + '/assignments/' + assignment_id + '/tests', body);
-    }
-    // other tests
-    if (test[0] === 'lint') {
-      const body = {'stdout': '', 'stdin': '', 'args': [], 'lint': true};
-      return this.apiPost('/api/courses/' + course_id + '/assignments/' + assignment_id + '/tests', body);
-    }
+  createTest(course_id: any, test: string[], assignment_id: any, lint: boolean) {
+    // create io test
+    const stdin = test[1];
+    const stdout = test[2];
+    const body = {'stdout': stdout, 'stdin': stdin, 'args': [], 'lint': lint};
+    return this.apiPost('/api/courses/' + course_id + '/assignments/' + assignment_id + '/tests', body);
   }
 
 // ----------- 6. INVITE/PENDING calls ----------- //

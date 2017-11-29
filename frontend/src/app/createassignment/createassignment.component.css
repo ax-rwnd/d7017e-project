@@ -7,31 +7,12 @@
   box-shadow: 1px 1px 3px rgba(180, 180, 180, 1);
 }
 
-#assignmentDescription {
-  margin: 1%;
-  padding: 0;
-  height: 500px;
-  max-height: 500px;
-  background-color: lightgray;
-  float: left;
-  width: 48%;
-  border-radius: 15px;
-  background-color: rgba(255, 255, 255, 0.8);
-  box-shadow: 1px 1px 3px rgba(180, 180, 180, 1);
-  overflow: scroll;
-}
-
-#preview {
-  margin: 1%;
+#desc {
   padding: 12px 16px;
-  height: 500px;
+  height: 610px;
   text-align: left;
-  background-color: lightgray;
   float: left;
-  width: 48%;
-  border-radius: 15px;
-  background-color: rgba(255, 255, 255, 0.8);
-  box-shadow: 1px 1px 3px rgba(180, 180, 180, 1);
+  width: 100%;
   overflow: scroll;
 }
 
@@ -41,7 +22,7 @@
   height: 100%;
   text-align: left;
   float: left;
-  width: 78%;
+  width: 100%;
 }
 
 #test {
@@ -105,8 +86,6 @@
 #header, #footer {
   text-align: center;
   padding: 1em;
-  color: white;
-  background-color: #133756;
   clear: left;
   text-align: center;
 }
@@ -116,4 +95,10 @@
   height: 500px;
   max-height: 500px;
   overflow: scroll;
+}
+
+.question{
+  background: none;
+  border: none;
+  color: #133756;
 }

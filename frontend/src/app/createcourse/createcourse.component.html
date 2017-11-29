@@ -1,11 +1,16 @@
 <app-head></app-head>
 <div id="cont" class="content" [@content]="sidebarState">
+  <button *ngIf="sidebarState === 'inactive'" style="float:left;" class="glyph-button" (click)="goBack()"><span class="glyphicon glyphicon-circle-arrow-left"></span></button>
   <!-- start of the form -->
-    <form class="container" (ngSubmit)="submitCourse()" [formGroup]="form" novalidate>
-      <!-- Title -->
-      <h2 *ngIf="!course">Create course <span class="required">{{errorMessage}}</span></h2>
-      <h2 *ngIf="course">Update course <span class="required">{{errorMessage}}</span></h2>
-
+  <!-- Title -->
+  <div class="container">
+    <h2 *ngIf="!course">Create course <span class="required">{{errorMessage}}</span></h2>
+    <h2 *ngIf="course">Update course <span class="required">{{errorMessage}}</span></h2>
+    <span *ngIf="!course">
+    <div class="color-gray">(All fields can later be changed)</div>
+    <br>
+    </span>
+    <form (ngSubmit)="submitCourse()" [formGroup]="form" novalidate>
       <div class="row">
         <div class="col-md-6">
           <!-- First input, for course code -->
@@ -87,6 +92,7 @@
           </button>
       </div>
     </form>
+</div>
 </div>
 
 <!-- Start of different Modals here -->
