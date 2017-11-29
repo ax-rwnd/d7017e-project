@@ -281,19 +281,12 @@ The structure below is the following:
   }
 
   // add tests to assignment
-  createTest(course_id: any, test: string[], assignment_id: any) {
-    // check if io test, create io test
-    if (test[0] === 'io') {
-      const stdin = test[1];
-      const stdout = test[2];
-      const body = {'stdout': stdout, 'stdin': stdin, 'args': []};
-      return this.apiPost('/api/courses/' + course_id + '/assignments/' + assignment_id + '/tests', body);
-    }
-    // other tests
-    if (test[0] === 'lint') {
-      const body = {'stdout': '', 'stdin': '', 'args': [], 'lint': true};
-      return this.apiPost('/api/courses/' + course_id + '/assignments/' + assignment_id + '/tests', body);
-    }
+  createTest(course_id: any, test: string[], assignment_id: any, lint: boolean) {
+    // create io test
+    const stdin = test[1];
+    const stdout = test[2];
+    const body = {'stdout': stdout, 'stdin': stdin, 'args': [], 'lint': lint};
+    return this.apiPost('/api/courses/' + course_id + '/assignments/' + assignment_id + '/tests', body);
   }
 
 // ----------- 6. INVITE/PENDING calls ----------- //

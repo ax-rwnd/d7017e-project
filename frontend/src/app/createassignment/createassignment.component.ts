@@ -105,6 +105,14 @@ export class CreateassignmentComponent implements OnInit {
     }
   }
 
+  testLint() {
+    if (this.lintTest === true) {
+      this.lintTest = false;
+    } else {
+      this.lintTest = true;
+    }
+  }
+
   submitNewAssignment() {
     // Submits the assignment to the backend
     // TODO: this function should work, but requires more testing, the backend
@@ -115,7 +123,7 @@ export class CreateassignmentComponent implements OnInit {
         const assignmentId = response._id;
         console.warn('assignmentId was', assignmentId);
         for (const test of this.unitTests) {
-          this.backendService.createTest(this.courseId, test, assignmentId);
+          this.backendService.createTest(this.courseId, test, assignmentId, this.lintTest);
         }
         this.toastService.success('Assignment Created!');
       })

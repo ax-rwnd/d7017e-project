@@ -2,16 +2,15 @@
 
 <div id="cont" class="content" [@content]="sidebarState">
 
-  <div id="difficulty">
-    Assignment name:
-    <div>
-      <input (text)="assignmentName" style="color:black; font-weight: normal" [(ngModel)]="assignmentName">
-    </div>
+
+  <h2>Create Assignment</h2>
+  <div class="form-group">
+    <h4>Assignment name:</h4>
+    <input (text)="assignmentName" class="form-control" placeholder="Hello Assignment" [(ngModel)]="assignmentName">
+    <input type="checkbox" name="linttest" (click)="testLint()" class="question" tooltip="asd">Test code syntax using lint
+    <button type="button" class="question" tooltip="Test code syntax using lint"><span class="glyphicon glyphicon-question-sign"></span></button>
   </div>
-  <label class="label-norm form-check-label">
-    <span style="display:inline-block; width: 0.5em;"></span> <input class="form-check-input" formControlName="map" type="checkbox"> Adventure map
-    <button type="button" class="lint" tooltip="lint enabled for testing"><span class="glyphicon glyphicon-question-sign"></span></button>
-  </label>
+
   <!--
   <div id="assignmentDescription" appScroller>
     <div ace-editor [(text)]="content" [mode]="'markdown'" [theme]="'eclipse'" [options]="{maxLines: 1000, printMargin: false}" [readOnly]="false" [autoUpdateContent]="true" [durationBeforeCallback]="1000"(textChanged)="onChange(content)"  style="min-height: 100%; width:100%; overflow: auto;">
@@ -22,6 +21,7 @@
   </div>
   -->
   <div id="desc">
+    <h4>Description</h4>
     <tabset>
       <tab heading="Write" id="tab1">
         <div class="assignmentDescription" appScroller>
@@ -44,7 +44,8 @@
   </div>
 
   <div id="addTests">
-    <button class="btn" (click)="openModal(testModal)">Add Test</button>
+    <h4>Code tests</h4>
+    <button class="btn btn-primary" (click)="openModal(testModal)">Add Test</button>
   </div>
 
   <div *ngFor='let fb of unitTests' id="test">
@@ -55,7 +56,7 @@
     </div>
     <div id="testEdit">
       <div style="align:right">
-        <button class="btn" (click)="openModalEdit(editTest); testType=fb[0]; editT=unitTests.indexOf(fb)">Edit test</button>
+        <button class="btn btn-primary" (click)="openModalEdit(editTest); testType=fb[0]; editT=unitTests.indexOf(fb)">Edit test</button>
       </div>
     </div>
   </div>
@@ -74,7 +75,7 @@
 
 </div>
 <div id="footer">
-  <button class="btn" (click)="submitNewAssignment()">Submit Assignment</button>
+  <button class="btn btn-primary" (click)="submitNewAssignment()">Submit Assignment</button>
 </div>
 
 
