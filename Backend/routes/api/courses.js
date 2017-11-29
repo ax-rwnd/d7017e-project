@@ -324,7 +324,7 @@ module.exports = function(router) {
             return queries.createRequestToCourse(student_id, course_id, "invite");
         })
         .then(function (inviteObject) {
-            return res.sendStatus(202);
+            return res.sendStatus(202).json({});
         })
         .catch(function (error) {
             return next(error);
@@ -354,7 +354,7 @@ module.exports = function(router) {
             return queries.addCourseStudent(course_id, req.user.id);
         })
         .then(function () {
-            return res.sendStatus(201);
+            return res.sendStatus(201),json({});
         })
         .catch(function (error) {
             return next(error);
@@ -425,7 +425,7 @@ module.exports = function(router) {
             }
         })
         .then(function () {
-            return res.sendStatus(200);
+            return res.sendStatus(200).json({});
         })
         .catch(function (error) {
             return next(error);
@@ -486,12 +486,12 @@ module.exports = function(router) {
                     return queries.createRequestToCourse(req.user.id, course_id, "pending");
                 })
                 .then(function () {
-                    return res.sendStatus(202);
+                    return res.sendStatus(202).json({});
                 });
             } else {
                 queries.addCourseStudent(course_id, req.user.id)
                 .then(function () {
-                    res.sendStatus(201);
+                    return res.sendStatus(201).json({});
                 });
             }
         })
@@ -526,7 +526,7 @@ module.exports = function(router) {
             return queries.addCourseStudent(course_id, student_id);
         })
         .then(function () {
-            return res.sendStatus(200);
+            return res.sendStatus(200).json({});
         })
         .catch(function (error) {
             return next(error);
@@ -562,7 +562,7 @@ module.exports = function(router) {
             if (student_id === req.user.id) {
                 return queries.findAndRemoveRequest(student_id, course_id, "pending")
                 .then(function () {
-                    return res.sendStatus(200);
+                    return res.sendStatus(200).json({});
                 });
             } else {
                 return queries.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
@@ -570,7 +570,7 @@ module.exports = function(router) {
                     return queries.findAndRemoveRequest(student_id, course_id, "pending");
                 })
                 .then(function () {
-                    return res.sendStatus(201);
+                    return res.sendStatus(201).json({});
                 });
             }
         })
@@ -609,7 +609,7 @@ module.exports = function(router) {
             if (student_id === req.user.id) {
                 return queries.removeStudentFromCourse(student_id, course_id)
                 .then(function () {
-                    return res.sendStatus(200);
+                    return res.sendStatus(200).json({});
                 });
             } else {
                 return queries.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
@@ -617,7 +617,7 @@ module.exports = function(router) {
                     return queries.removeStudentFromCourse(student_id, course_id);
                 })
                 .then(function () {
-                    return res.sendStatus(200);
+                    return res.sendStatus(200).json({});
                 });
             }
         })
@@ -660,7 +660,7 @@ module.exports = function(router) {
             return queries.addTeacherToCourse(teacher_id, course_id);
         })
         .then(function () {
-            return res.sendStatus(201);
+            return res.sendStatus(201).json({});
         })
         .catch(function (error) {
             return next(error);
@@ -688,7 +688,7 @@ module.exports = function(router) {
             return queries.removeTeacherFromCourse(teacher_id, course_id);
         })
         .then (function () {
-            return res.sendStatus(200);
+            return res.sendStatus(200).json({});
         })
         .catch(function (error) {
             return next(error);
