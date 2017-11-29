@@ -204,9 +204,11 @@ The structure below is the following:
     return this.apiGet('/api/courses/' + course_id + '/features');
   }
 
-  postNewBadge(icon: string, title: string, description: string) {
-    const body = {'icon': icon, 'title': title, 'description': description};
-    return this.apiPost('/api/features/badge', body);
+  postNewBadge(icon: string, title: string, description: string, course_id: ObjectID, badges: any[], assignments: any[]) {
+    const goals = {'badges': badges, 'assignments': assignments};
+    const body = {'icon': icon, 'title': title, 'description': description, 'course_id': course_id, 'goals': goals};
+    console.log('post body', body);
+    return this.apiPost('/api/courses/' + course_id + '/badges', body);
   }
 
   getEnabledFeaturesCourse (course_id: string) {

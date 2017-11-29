@@ -44,8 +44,8 @@
         <span *ngIf="currentCourse.code">{{currentCourse.code}} - </span> {{currentCourse.name}}
       </h1>
       <button type="button" class="btn" id="createNewAssignment" [routerLink]="['/courses', currentCourse.id, 'createNewAssignment']">Create New Assignment</button>
-      <button type="button" class="btn" (click)="openModal(inviteStudentModal)">Invite student to course</button>
-      <button type="button" class="btn" (click)="openModal(createBadge)">Create badge</button>
+      <button type="button" class="btn" (click)="openModal(inviteStudentModal, 'inviteStudent')">Invite student to course</button>
+      <button type="button" class="btn" (click)="openModal(createBadge, 'createBadge')">Create badge</button>
       <div *ngFor="let g of assignmentGroups">
         <app-assignment-group [assignmentGroup]="g" [courseCode]="currentCourse.id"></app-assignment-group>
       </div>
@@ -92,6 +92,7 @@
       <span aria-hidden="true">&times;</span>
     </button>
   </div>
+
   <div class="modal-body">
     <h3>Select badge</h3>
     <div class="form-group">
@@ -102,8 +103,10 @@
     <div>
       <img src="../../assets/images/{{selectedBadge}}.png"/>
     </div>
-  </div>
-  <div class="modal-body">
+    <label for="name">Name:</label>
+    <input id="name" type="text" class="form-control" [(ngModel)]="badgeName">
+    <label for="description">Description:</label>
+    <input id="description" type="text" class="form-control" [(ngModel)]="badgeDescription">
     <h3>
       Add goals
     </h3>
@@ -113,11 +116,20 @@
         <select class="form-control select-list"  [(ngModel)]="selectedAssignments[i]['assignment']">
           <option *ngFor="let assignment of selected['possible']" [ngValue]="assignment">{{assignment.name}}</option>
         </select>
-        {{selectedAssignments[i].name}}
+        <div class="tests row">
+          <div *ngFor="let test of tests[selected.assignment['id']]; let j = index" class="pull-left test-box">
+            <label class="label-norm form-check-label">
+              <input class="form-check-input" [(ngModel)]="test['checked']" type="checkbox"> Test {{j+1}}
+              <label type="button" class="question" tooltip="Stdin: {{test['stdin']}}, Stdout: {{test['stdout']}}"><span class="glyphicon glyphicon-question-sign"></span></label>
+            </label>
+          </div>
+        </div>
+        <div class="row"></div>
       </div>
       <button class="glyphicon glyphicon-plus btn btn-success" (click)="addGoal()"></button>
     </div>
   </div>
   <div class="modal-footer">
+    <button class="btn btn-primary pull-right" (click)="submitBadge()">Submit</button>
   </div>
 </ng-template>

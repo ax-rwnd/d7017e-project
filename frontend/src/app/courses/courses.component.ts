@@ -8,7 +8,7 @@ import { CourseService } from '../services/course.service';
 import { trigger, state, style, animate, transition } from '@angular/animations';
 import { HeadService } from '../services/head.service';
 import { AssignmentService } from '../services/assignment.service';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import { BackendService } from '../services/backend.service';
 
 
@@ -37,6 +37,7 @@ export class CoursesComponent implements OnInit {
   defaultForm = {
     search: ''
   };
+
   selectedBadge: string;
   badges: Array<Object> = [
     {key: 'bronze_medal_badge', name: 'Bronze medal'},
@@ -44,6 +45,9 @@ export class CoursesComponent implements OnInit {
     {key: 'gold_medal_badge', name: 'Gold medal'}
   ];
   selectedAssignments: any[];
+  tests: any;
+  badgeName: string;
+  badgeDescription: string;
 
   constructor(private courseService: CourseService, private route: ActivatedRoute, private headService: HeadService,
               private fb: FormBuilder, private assignmentService: AssignmentService, private modalService: BsModalService,
@@ -70,16 +74,16 @@ export class CoursesComponent implements OnInit {
       this.backendService.getPendingUsers(this.currentCourse.id)
         .then(response => console.log('pending', response));
     });
-    console.log('flat ', this.flattenAssignments());
   }
 
   ngOnInit() {
     this.teachCourses = this.courseService.teaching;
     this.sidebarState = this.headService.getCurrentState();
     this.possibleStudents = [];
-    this.form = this.fb.group(this.defaultForm);
     this.selectedBadge = 'bronze_medal_badge';
+    this.form = this.fb.group(this.defaultForm);
     this.selectedAssignments = [{'assignment': this.flattenAssignments()[0], 'possible': this.flattenAssignments()}];
+    this.tests = {};
   }
 
   getProgress() {
@@ -89,10 +93,25 @@ export class CoursesComponent implements OnInit {
     return (this.courseService.GetProgress(this.currentCourse.id));
   }
 
-  openModal(modal) {
+  openModal(modal, type) {
     // Open a modal dialog box
-
+    if (type === 'createBadge') {
+      for (const a of this.flattenAssignments()) {
+        this.backendService.getAssignment(a.course_id, a.id)
+          .then(response => {
+            const tests = response['tests']['io'].concat(response['optional_tests']['io']);
+            for (let i = 0; i < tests.length; i++) {
+              tests[i]['checked'] = false;
+            }
+            this.tests[a.id] = tests;
+          });
+      }
+    }
     this.modalRef = this.modalService.show(modal);
+  }
+  getTests(assignment) {
+    console.log('get tests ', assignment);
+    return this.tests[assignment.assignment['id']];
   }
 
   invite(student_id) {
@@ -132,6 +151,25 @@ export class CoursesComponent implements OnInit {
 
   addGoal() {
     this.selectedAssignments.push({'assignment': this.flattenAssignments()[0], 'possible': this.flattenAssignments()});
+  }
+
+  submitBadge() {
+    const assignments = [];
+
+    for (const a of this.selectedAssignments) {
+      const assignmentTests = [];
+      for (const t in this.tests[a['assignment'].id]) {
+        const test = this.tests[a['assignment'].id][t];
+        if (test['checked'] === true) {
+          assignmentTests.push(test._id);
+        }
+      }
+      assignments.push({'assignment': a['assignment'].id, 'tests': assignmentTests, 'code_size': 100});
+    }
+    console.log('submit', assignments);
+    this.backendService.postNewBadge(this.selectedBadge, this.badgeName, this.badgeDescription, this.currentCourse.id,
+      [], assignments)
+      .then(response => console.log('badge created: ', response));
   }
 }
 
