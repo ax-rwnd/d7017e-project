@@ -1019,3 +1019,4 @@ exports.getAssignmentTests = getAssignmentTests;
 exports.getUserPopulated = getUserPopulated;
 exports.updateCourse = updateCourse;
 exports.deleteCourse = deleteCourse;
+exports.deleteAssignment = deleteAssignment;
