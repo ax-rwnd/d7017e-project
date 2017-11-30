@@ -25,6 +25,14 @@
   font-size: 0.7em;
 }
 
+.assignment {
+  background-color: #133756;
+  border-radius: 0.5em;
+  padding: 2%;
+  margin: 1%;
+  color: white;
+}
+
 .gamification-header {
   background-color: #133756;
   color: white;

@@ -131,16 +131,22 @@ export class CoursesComponent implements OnInit {
     return this.tests[assignment.assignment['id']];
   }
 
-  acceptAllReqs() {
-
+  acceptAllReqs() { // iterate through pending list
+    for (const req of this.pendingReqs) {
+      this.acceptReq(req.user['_id']);
+    }
   }
 
-  acceptReq() {
-
+  acceptReq(student_id) {
+    this.backendService.acceptPending(student_id, this.currentCourse.id)
+      .then( response => {
+        // console.log('Accepted req:', response); // Object error stuff, need to check, but works
+      })
+      .catch();
   }
 
-  declineReq() {
-
+  declineReq(user_id) { // need to rewrite delete in backend.service
+    console.log(user_id);
   }
 
   invite(student_id) {

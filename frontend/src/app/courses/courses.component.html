@@ -50,17 +50,18 @@
     <div class="row">
       <!-- Display the course description, markdown style -->
       <div class="col-lg-8">
-        <h3>Course description
+        <h3>Course
           <button type="button" class="glyph-button" [routerLink]="['/user/updateCourse', currentCourse.id]">
             <span class="glyphicon glyphicon-edit"></span>
           </button>
         </h3>
         <markdown [data]="currentCourse.desc"></markdown>
         <br>
-        <h3>Features</h3>
-        <div *ngFor="let g of assignmentGroups">
-          <app-assignment-group [assignmentGroup]="g" [courseCode]="currentCourse.id"></app-assignment-group>
+        <h3>Assignments</h3>
+        <div *ngFor="let assignment of assignmentGroups[0].assignments" class="assignment">
+          {{assignment.name}}
         </div>
+        <br>
       </div>
       <div class="col-lg-4">
         <h4>Pending requests
@@ -74,9 +75,9 @@
             <td>No pending requests...</td>
           </tr>
           <tr *ngFor="let req of pendingReqs">
-            <td>{{req.user.username}}</td>
-            <td><button type="button" class="glyph-accept" (click)="acceptReq()"><span class="glyphicon glyphicon-ok"></span></button></td>
-            <td><button type="button" class="glyph-decline" (click)="declineReq()"><span class="glyphicon glyphicon-remove"></span></button></td>
+            <td>{{req.user['username']}}</td>
+            <td><button type="button" class="glyph-accept" (click)="acceptReq(req.user['_id'])"><span class="glyphicon glyphicon-ok"></span></button></td>
+            <td><button type="button" class="glyph-decline" (click)="declineReq(req.user['_id'])"><span class="glyphicon glyphicon-remove"></span></button></td>
           </tr>
           </tbody>
         </table>
