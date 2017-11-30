@@ -32,6 +32,7 @@ export class CoursesComponent implements OnInit {
   sidebarState; // state of sidebar
   progress: any;
   currentCourse: any;
+  currentCourseSaved: any;
   possibleStudents: any[];
   form: FormGroup;
   modalRef: BsModalRef;
@@ -39,6 +40,7 @@ export class CoursesComponent implements OnInit {
   defaultForm = {
     search: ''
   };
+  teacherViewBool = false;
 
   selectedBadge: string;
   badges: Array<Object> = [
@@ -70,6 +72,7 @@ export class CoursesComponent implements OnInit {
     this.route.params.subscribe( (params: any) => {
       // Grab the current course
       this.currentCourse = this.courseService.GetCourse(params.course);
+      this.currentCourseSaved = this.currentCourse;
       console.log('course', this.currentCourse);
       // Assign groups for assignments
       if (this.assignmentService.courseAssignments[this.currentCourse.id] !== undefined) {
@@ -198,6 +201,19 @@ export class CoursesComponent implements OnInit {
     this.backendService.postNewBadge(this.selectedBadge, this.badgeName, this.badgeDescription, this.currentCourse.id,
       [], assignments)
       .then(response => console.log('badge created: ', response));
+  }
+
+  toggleView() {
+    this.teacherViewBool = !this.teacherViewBool;
+    console.log(this.teacherViewBool);
+    if (this.teacherViewBool) {
+      this.courseService.GetTeacherStudentViewHelper(this.currentCourse).then(res => {
+        console.log(res);
+        this.currentCourse = res;
+      });
+    } else {
+      this.currentCourse = this.currentCourseSaved;
+    }
   }
 }
 
