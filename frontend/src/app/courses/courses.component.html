@@ -77,6 +77,9 @@
                 <span class="option-text">CREATE ASSIGNMENT</span>
               </button>
             </h4>
+            <span *ngIf="assignmentGroups[0].assignments.length === 0">
+              No assignments created yet...
+            </span>
             <div *ngFor="let assignment of assignmentGroups[0].assignments" class="assignment">
               {{assignment.name}}
               <button type="button" class="glyph-button white-text pull-right">
