@@ -94,7 +94,7 @@ module.exports = function(router) {
         .catch(next);
     });
 */
-/*
+
 
     // Create new course
     // Admin/teachers can create unlimited courses
@@ -118,9 +118,9 @@ module.exports = function(router) {
             next(err);
         });
     });
-*/
 
 
+/*
     // TODO:
     // Tests
     // Documentation
@@ -152,7 +152,7 @@ module.exports = function(router) {
         })
         .catch(next);      
     });
-
+*/
 
     // SHOULD BE REMOVED
     router.get('/me', function (req, res, next) {
