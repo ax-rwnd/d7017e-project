@@ -5,6 +5,9 @@
     <fa class="navbar-right right-margin" *ngIf="assignmentGroup.availability === 'unlocked'" name="unlock"></fa>
   </div>
   <div class="panel-body" [collapse]="assignmentGroup.collapse">
+    <span *ngIf="assignmentGroup.assignments.length === 0" style="color: dimgrey;">
+        No assignments available for the moment...
+      </span>
     <div [routerLink]="['/courses', courseCode, 'assignment', a.id]" *ngFor="let a of assignmentGroup.assignments" class="assignment well">
       {{a.name}}
     </div>

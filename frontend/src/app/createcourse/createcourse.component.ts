@@ -148,11 +148,11 @@ export class CreatecourseComponent implements OnInit {
     this.form.setValue({
       name: this.course ? this.course.name : '',
       code: this.course ? this.course.code : '',
-      progress: false,
-      badges: false,
-      map: false,
-      leaderboard: false,
-      nothidden: false,
+      progress: this.course ? this.course.enabled_features.progressbar : false,
+      badges: this.course ? this.course.enabled_features.badges : false,
+      map: this.course ? this.course.enabled_features.adventuremap : false,
+      leaderboard: this.course ? this.course.enabled_features.leaderboard : false,
+      public: this.course ? !this.course.hidden : false, // if it's not hidden it is public
       autojoin: this.course ? this.course.autojoin : false,
     });
   }
@@ -179,7 +179,7 @@ function createCourseForm() {
     badges: new FormControl(false),
     map: new FormControl(false),
     leaderboard: new FormControl(false),
-    nothidden: new FormControl(false),
+    public: new FormControl(false),
     autojoin: new FormControl(false),
   });
 }
