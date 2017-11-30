@@ -15,7 +15,6 @@ import { ModalModule } from 'ngx-bootstrap';
 import { TooltipModule } from 'ngx-bootstrap/tooltip';
 import { AngularFontAwesomeModule } from 'angular-font-awesome/angular-font-awesome';
 
-import { CodemirrorModule } from 'ng2-codemirror';
 import { AceEditorModule } from 'ng2-ace-editor';
 import { MarkdownModule } from 'angular2-markdown';
 
@@ -106,7 +105,6 @@ const appRoutes: Routes = [
     FormsModule,
     ReactiveFormsModule,
     BrowserAnimationsModule,
-    CodemirrorModule,
     AceEditorModule,
     MarkdownModule.forRoot(),
     AlertModule.forRoot(),

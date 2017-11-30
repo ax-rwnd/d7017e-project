@@ -43,7 +43,15 @@ export class CoursesComponent implements OnInit {
   badges: Array<Object> = [
     {key: 'bronze_medal_badge', name: 'Bronze medal'},
     {key: 'silver_medal_badge', name: 'Silver medal'},
-    {key: 'gold_medal_badge', name: 'Gold medal'}
+    {key: 'gold_medal_badge', name: 'Gold medal'},
+    {key: 'cake_badge', name: 'Cake'},
+    {key: 'computer_badge', name: 'Computer'},
+    {key: 'bronze_trophy_badge', name: 'Bronze trophy'},
+    {key: 'silver_trophy_badge', name: 'Silver trophy'},
+    {key: 'gold_trophy_badge', name: 'Gold trophy'},
+    {key: 'badge1', name: 'Smiley'},
+    {key: 'badge2', name: 'Silver trophy 2'},
+    {key: 'badge3', name: 'Lightning'},
   ];
   selectedAssignments: any[];
   tests: any;
