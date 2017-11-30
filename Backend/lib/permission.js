@@ -17,12 +17,21 @@ var constants = require('./constants.js');
 
 
 function checkIfTeacherOrAdmin(user_id, course_id, access) {
-	return CourseMember.count({role: "teacher", user: user_id, course: course_id}).then(function (count) {
-		if (count === 0 && access !== "admin") {
-			throw errors.INSUFFICIENT_PERMISSION;
-		}
-	});
+    return CourseMember.count({role: "teacher", user: user_id, course: course_id}).then(function (count) {
+        if (count === 0 && access !== "admin") {
+            throw errors.INSUFFICIENT_PERMISSION;
+        }
+    });
+}
+
+function checkIfTeacher(user_id, course_id) {
+    return CourseMember.count({role: "teacher", user: user_id, course: course_id}).then(function (count) {
+        if (count === 0) {
+            throw errors.INSUFFICIENT_PERMISSION;
+        }
+    });
 }
 
 
 exports.checkIfTeacherOrAdmin = checkIfTeacherOrAdmin;
+exports.checkIfTeacher = checkIfTeacher;

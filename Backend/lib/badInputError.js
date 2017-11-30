@@ -1,6 +1,5 @@
 'use strict';
 var util = require('util');
-// This file defines enums for easy error handling
 var config = require('config');
 
 function BadInputError(inputErrors) {
