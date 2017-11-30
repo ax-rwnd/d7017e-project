@@ -328,6 +328,13 @@ The structure below is the following:
     return this.apiGet('/api/courses/' + course_id + '/students/pending');
   }
 
+  acceptPending(student_id, course_id) {
+    // Admin or teacher can accept an request to join the course.
+
+    const body = {'student_id': student_id};
+    return this.apiPut('/api/courses/' + course_id + '/students/pending', body);
+  }
+
   postJoinRequest(course_id: ObjectID, student_id: ObjectID) {
     // Send a request to join a course
 
