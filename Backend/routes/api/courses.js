@@ -129,8 +129,9 @@ module.exports = function(router) {
     // Admin/teachers can create unlimited courses
     // Students limited to 3 courses?
     router.post('/', function (req, res, next) {
+        var input;
         try {
-            var input = inputValidation.postCourseValidation(req);
+            input = inputValidation.postCourseValidation(req);
         }
         catch(error) {
             return next(error);
@@ -354,7 +355,7 @@ module.exports = function(router) {
             return queries.addCourseStudent(course_id, req.user.id);
         })
         .then(function () {
-            return res.sendStatus(201),json({});
+            return res.sendStatus(201).json({});
         })
         .catch(function (error) {
             return next(error);
