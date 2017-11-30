@@ -35,6 +35,7 @@ export class CoursesComponent implements OnInit {
   possibleStudents: any[];
   form: FormGroup;
   modalRef: BsModalRef;
+  pendingReqs: any;
   defaultForm = {
     search: ''
   };
@@ -81,7 +82,10 @@ export class CoursesComponent implements OnInit {
 
       // Get a list of the users waiting to join the course
       this.backendService.getPendingUsers(this.currentCourse.id)
-        .then(response => console.log('pending', response))
+        .then(response => {
+          console.log('pending', response);
+          this.pendingReqs = response;
+        })
         .catch(err => console.error('Get pending users failed', err));
     });
   }
@@ -122,6 +126,18 @@ export class CoursesComponent implements OnInit {
   getTests(assignment) {
     console.log('get tests ', assignment);
     return this.tests[assignment.assignment['id']];
+  }
+
+  acceptAllReqs() {
+
+  }
+
+  acceptReq() {
+
+  }
+
+  declineReq() {
+
   }
 
   invite(student_id) {
