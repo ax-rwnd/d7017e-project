@@ -7,7 +7,8 @@ var CourseMember = require('../../models/schemas').CourseMembers;
 var Test = require('../../models/schemas').Test;
 var User = require('../../models/schemas').User;
 var Draft = require('../../models/schemas').Draft;
-var JoinRequests = require('../../models/schemas').JoinRequests;
+var JoinRequest = require('../../models/schemas').JoinRequests;
+var Badge = require('../../models/schemas').Badge;
 var errors = require('../errors.js');
 var mongoose = require('mongoose');
 var logger = require('../logger.js');
@@ -320,7 +321,7 @@ function checkIfUserAlreadyInCourse(user_id, course_id, optionalCourseFieldsToRe
 }
 
 function checkIfRequestAlreadySent(user_id, course_id, type) {
-    return JoinRequests.count({inviteType: type, user: user_id, course: course_id})
+    return JoinRequest.count({inviteType: type, user: user_id, course: course_id})
     .then(function (count) {
         if (count !== 0) {
             throw errors.INVITE_ALREADY_SENT;
@@ -329,12 +330,12 @@ function checkIfRequestAlreadySent(user_id, course_id, type) {
 }
 
 function createRequestToCourse(user_id, course_id, type) {
-    var invite = new JoinRequests({inviteType: type, user: user_id, course: course_id});
+    var invite = new JoinRequest({inviteType: type, user: user_id, course: course_id});
     return invite.save();
 }
 
 function findAndRemoveRequest(user_id, course_id, type) {
-    return JoinRequests.findOneAndRemove({inviteType: type, user: user_id, course: course_id})
+    return JoinRequest.findOneAndRemove({inviteType: type, user: user_id, course: course_id})
     .then(function(deletedInvite) {
         if (!deletedInvite) {
             throw errors.NO_INVITE_FOUND;
@@ -406,15 +407,15 @@ function removeStudentFromCourse(user_id, course_id) {
 
 
 function getCourseInvites(course_id, type) {
-    return JoinRequests.find({inviteType: type, course: course_id}, "user -_id").populate("user", "username email");
+    return JoinRequest.find({inviteType: type, course: course_id}, "user -_id").populate("user", "username email");
 }
 
 function getUserInvites(user_id, type) {
-    return JoinRequests.find({inviteType: type, user: user_id}, "course -_id").populate("course", "name course_code");
+    return JoinRequest.find({inviteType: type, user: user_id}, "course -_id").populate("course", "name course_code");
 }
 
 function getInvitesCourseUser(user_id, course_id) {
-    return JoinRequests.find({user: user_id, course: course_id});
+    return JoinRequest.find({user: user_id, course: course_id});
 }
 
 function returnPromiseForChainStart() {
@@ -465,16 +466,44 @@ function updateCourse(id, set_props) {
 }
 
 function deleteCourse(id) {
-    return Course.findById(id)
+    return Course.findOneAndRemove({_id: id})
     .then(course => {
-        // features
+        if (!course) {
+            throw errors.COURSE_DOES_NOT_EXIST;
+        }
         // assignments
         for (let ass_id of course.assignments) {
-            //deleteAssignment(ass_id);
+            deleteAssignment(ass_id)
+            .catch(() => {});
         }
-        // students
-        // teachers
-        // TODO: members
+        let promises = course.assignments
+            .map(aid => {
+                return deleteAssignment(aid)
+                // ignore error when assignment doesn't exist
+                .catch(()=>{});
+            });
+        // members
+        promises.push(CourseMember.remove({course: course._id}));
+        // join requests
+        promises.push(JoinRequest.remove({course: course._id}));
+        // badges
+        promises.push(Badge.remove({course_id: course._id}));
+        return Promise.all(promises);
+    });
+}
+
+function deleteAssignment(id) {
+    return Assignment.findOneAndRemove({_id: id})
+    .then(ass => {
+        if (!ass) {
+            throw errors.ASSIGNMENT_DOES_NOT_EXIST;
+        }
+        // tests
+        let allTests = ass.tests.io.concat(ass.optional_tests.io);
+        let del_tests = Test.remove({_id: {$in: allTests}});
+        // drafts
+        let del_drafts = Draft.remove({assignment: ass._id});
+        return Promise.all([del_tests, del_drafts]);
     });
 }
 
@@ -912,7 +941,7 @@ function countOwnedCourses(user_id) {
 }
 
 function acceptInviteToCourse(user_id, course_id) {
-    return JoinRequests.findOneAndRemove({inviteType: "invite", user: user_id, course: course_id})
+    return JoinRequest.findOneAndRemove({inviteType: "invite", user: user_id, course: course_id})
     .then(function(deletedInvite) {
         if (!deletedInvite) {
             throw errors.NO_INVITE_FOUND;
@@ -924,7 +953,7 @@ function acceptInviteToCourse(user_id, course_id) {
 }
 
 function addMemberToCourse(user_id, course_id) {
-    return JoinRequests.findOneAndRemove({inviteType: "pending", user: user_id, course: course_id})
+    return JoinRequest.findOneAndRemove({inviteType: "pending", user: user_id, course: course_id})
     .then(function(deletedInvite) {
         if (!deletedInvite) {
             throw errors.NO_INVITE_FOUND;
