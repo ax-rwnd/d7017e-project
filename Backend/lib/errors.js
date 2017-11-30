@@ -46,5 +46,7 @@ module.exports = {
     USER_IS_NOT_TEACHER: new APIError("User is not teacher of course", 400, 7028),
     USER_IS_NOT_STUDENT: new APIError("User is not student in this course", 400, 7029),
     COURSE_NOT_CREATED: new APIError("Course not created", 500, 7030),
-    MAXIMUM_AMOUNT_OF_COURSES: new APIError("You can't create more courses. Delete one or contact system admin", 403, 7031)
+    MAXIMUM_AMOUNT_OF_COURSES: new APIError("You can't create more courses. Delete one or contact system admin", 403, 7031),
+    INVALID_LINK: new APIError("Invalid invite link", 401, 7032),
+    EXPIRED_LINK: new APIError("Invite link has expired", 401, 7033)
 };

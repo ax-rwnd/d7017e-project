@@ -761,6 +761,30 @@ module.exports = function(router) {
         }).catch(next);
     });
 
+    router.get('/:course_id/invitelink', function (req, res, next) {
+        var course_id = req.params.course_id;
+
+        queries.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access).then(function () {
+            return queries.generateInviteLink(course_id).then(function (obj) {
+                res.status(201).json({course: obj.course, code: obj.code});
+            });
+        })
+        .catch(function (err) {
+            next(err);
+        });
+    });
+
+    router.get('/join/:code', function (req, res, next) {
+        var code = req.params.code;
+
+        queries.validateInviteLink(code, req.user.id).then(function (result) {
+            res.json({success: true});
+        })
+        .catch(function (err) {
+            next(err);
+        });
+    });
+
 /*
     //TODO: It is currently not checked if the requested assignment actually belongs to the specified course
     router.get('/:course_id/assignments/:assignment_id', function (req, res, next) {

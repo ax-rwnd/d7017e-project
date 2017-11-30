@@ -9,12 +9,14 @@ var User = require('../../models/schemas').User;
 var Draft = require('../../models/schemas').Draft;
 var JoinRequest = require('../../models/schemas').JoinRequests;
 var Badge = require('../../models/schemas').Badge;
+var InviteLinks = require('../../models/schemas').InviteLinks;
 var errors = require('../errors.js');
 var mongoose = require('mongoose');
 var logger = require('../logger.js');
 var jwt = require('jsonwebtoken');
 var config = require('config');
 var constants = require('../constants.js');
+var randomstring = require('randomstring');
 
 /* MOVED TO LIB/CONSTANTS.JS
 const FIELDS = {
@@ -964,6 +966,33 @@ function addMemberToCourse(user_id, course_id) {
     });
 }
 
+function generateInviteLink(course_id) {
+    var code = randomstring.generate();
+    if (!mongoose.Types.ObjectId.isValid(course_id)) {
+            throw errors.INVALID_ID;
+    }
+    var newLink = new InviteLinks({code: code, course: course_id});
+    return newLink.save().then(function (obj) {
+        return obj;
+    });
+}
+
+function validateInviteLink(code, user_id) {
+    return InviteLinks.findOne({code: code}).then(function (obj) {
+        if (!obj) {
+            throw errors.INVALID_LINK;
+        }
+        if (obj.expiresAt < Date.now()) {
+            return InviteLinks.deleteOne({code: code}).then(function () {
+                throw errors.EXPIRED_LINK;
+            });
+        }
+        // Add student to course
+        var memberObject = new CourseMember({role: "student", course: obj.course, user: user_id, features: "5a157a581154d36ecfcc7ab1"});
+        return memberObject.save();
+    });
+}
+
 exports.getUserCourses1 = getUserCourses1;
 exports.getCourses1 = getCourses1;
 exports.tempSaveMember = tempSaveMember;
@@ -1020,3 +1049,5 @@ exports.getUserPopulated = getUserPopulated;
 exports.updateCourse = updateCourse;
 exports.deleteCourse = deleteCourse;
 exports.deleteAssignment = deleteAssignment;
+exports.generateInviteLink = generateInviteLink;
+exports.validateInviteLink = validateInviteLink;

@@ -51,6 +51,7 @@ describe('/api', () => {
     let course_id;
     let assignment_id;
     let test_id;
+    let invitelink;
 
     before(() => {
         access_tokens = {};
@@ -369,6 +370,39 @@ describe('/api', () => {
                     });
             });
         });
+
+        describe('GET /api/courses/:course_id/invitelink', () => {
+            it('Generate invite link', () => {
+                return request(runner.server)
+                    .get('/api/courses/' + course_id + '/invitelink')
+                    .set('Authorization', 'Bearer ' + access_tokens.admin)
+                    .expect(201)
+                    .then(res => {
+                        assert(res.body.code, 'does not return a code');
+                        assert.equal(res.body.course, course_id);
+
+                        invitelink = res.body.code;
+                    });
+            });
+            it('Try generating invite link without permission', () => {
+                return request(runner.server)
+                    .get('/api/courses/' + course_id + '/invitelink')
+                    .set('Authorization', 'Bearer ' + access_tokens.user)
+                    .expect(403);
+            });
+        });
+
+        describe('GET /api/courses/join/:code', () => {
+            it('Join a course using an invite link', () => {
+                return request(runner.server)
+                    .get('/api/courses/join/' + invitelink)
+                    .set('Authorization', 'Bearer ' + access_tokens.user)
+                    .expect(200)
+                    .then(res => {
+                        assert.equal(res.body.success, true);
+                    });
+            });
+        });
     });
 
     describe('/users', () => {
@@ -520,7 +554,7 @@ describe('/api', () => {
         describe('GET /api/courses/:course_id/badges/:badge_id', () => {
             it('Fetch a badge', () => {
                 return request(runner.server)
-                    .put('/api/courses/:course_id/badges/' + badge_id)
+                    .get('/api/courses/:course_id/badges/' + badge_id)
                     .set('Authorization', 'Bearer ' + access_tokens.admin)
                     .expect(200)
                     .then(res => {
