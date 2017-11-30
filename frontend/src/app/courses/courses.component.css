@@ -21,8 +21,20 @@
   border: none;
 }
 
+.table-button-text {
+  font-size: 0.7em;
+}
+
 .option-text {
   font-size: 0.7em;
+}
+
+.blue-text {
+  color: #133756;
+}
+
+.white-text {
+  color: white;
 }
 
 .assignment {
@@ -31,6 +43,7 @@
   padding: 2%;
   margin: 1%;
   color: white;
+  font-weight: normal;
 }
 
 .gamification-header {

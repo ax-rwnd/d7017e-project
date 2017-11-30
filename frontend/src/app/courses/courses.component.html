@@ -45,7 +45,6 @@
     <h1>
       <span *ngIf="currentCourse.code">{{currentCourse.code}} - </span> {{currentCourse.name}}
     </h1>
-    <button type="button" class="btn btn-primary" id="createNewAssignment" [routerLink]="['/courses', currentCourse.id, 'createNewAssignment']">Create New Assignment</button>
     <button type="button" class="btn btn-primary" (click)="openModal(createBadge, 'createBadge')">Create badge</button>
     <div class="row">
       <!-- Display the course description, markdown style -->
@@ -58,15 +57,39 @@
         <markdown [data]="currentCourse.desc"></markdown>
         <br>
         <h3>Assignments</h3>
-        <div *ngFor="let assignment of assignmentGroups[0].assignments" class="assignment">
-          {{assignment.name}}
+        <div class="row">
+          <div class="col-lg-6">
+            <h4>Groups
+              <button class="glyph-button pull-right">
+                <span class="option-text">CREATE GROUP</span>
+              </button>
+            </h4>
+            <span *ngIf="assignmentGroups[0].groups.length === 0">
+              No groups created yet...
+            </span>
+            <div *ngFor="let group of assignmentGroups[0].groups" class="assignment">
+              {{group}}
+            </div>
+          </div>
+          <div class="col-lg-6">
+            <h4>Assignments
+              <button class="glyph-button pull-right" [routerLink]="['/courses', currentCourse.id, 'createNewAssignment']">
+                <span class="option-text">CREATE ASSIGNMENT</span>
+              </button>
+            </h4>
+            <div *ngFor="let assignment of assignmentGroups[0].assignments" class="assignment">
+              {{assignment.name}}
+              <button type="button" class="glyph-button white-text pull-right">
+                <span class="glyphicon glyphicon-edit" style="font-size: 1.2em;"></span>
+              </button>
+            </div>
+          </div>
         </div>
-        <br>
       </div>
       <div class="col-lg-4">
         <h4>Pending requests
           <button class="glyph-button pull-right" (click)="acceptAllReqs()">
-            <span class="option-text">ACCEPT ALL</span>
+            <span class="table-button-text">ACCEPT ALL</span>
           </button>
         </h4>
         <table class="table table-hover">
@@ -84,7 +107,7 @@
         <br>
         <h4>Enrolled students
           <button class="glyph-button pull-right" (click)="openModal(inviteStudentModal)">
-            <span class="option-text">ADD STUDENT</span>
+            <span class="table-button-text">ADD STUDENT</span>
           </button>
         </h4>
         <table class="table table-hover">
