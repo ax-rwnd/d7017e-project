@@ -11,6 +11,8 @@ var JoinRequest = require('../../models/schemas').JoinRequests;
 var Badge = require('../../models/schemas').Badge;
 var Feature = require('../../models/schemas').Features;
 var InviteLink = require('../../models/schemas').InviteLinks;
+var Features = require('./features.js');
+
 var errors = require('../errors.js');
 var mongoose = require('mongoose');
 var logger = require('../logger.js');
@@ -936,13 +938,17 @@ function tempSaveMember (user_id, course_id) {
     return member.save();
 }
 
-function saveCourseObject(courseObject) {
+function saveCourseObject(user_id, courseObject) {
     var course = new Course(courseObject);
-    return course.save().then(function (savedCourse) {
-        // TODO: FIX FEATURE FIELD. WHAT SHOULD IT ADD?
-        var memberObject = new CourseMember({role: "teacher", course: savedCourse._id, user: savedCourse.owner, features: "5a157a581154d36ecfcc7ab1"});
-        return memberObject.save().then(function () {
-            return savedCourse;
+    return course.save().then(function (savedCourse) {  
+        console.log(savedCourse);
+        return Features.createFeature(user_id, savedCourse._id).then(function (featureObject) {
+            // TODO: FIX FEATURE FIELD. WHAT SHOULD IT ADD?
+            console.log(featureObject);
+            var memberObject = new CourseMember({role: "teacher", course: savedCourse._id, user: savedCourse.owner, features: featureObject._id});
+            return memberObject.save().then(function () {
+                return savedCourse;
+            });
         });
     });
 }
@@ -961,9 +967,11 @@ function acceptInviteToCourse(user_id, course_id) {
         if (!deletedInvite) {
             throw errors.NO_INVITE_FOUND;
         }
-        // TODO: CHANGE FEATURE FIELD
-        var memberObject = new CourseMember({role: "student", course: course_id, user: user_id, features: "5a157a581154d36ecfcc7ab1"});
-        return memberObject.save();
+        return Features.createFeature(user_id, course_id).then(function (featureObject) {
+            // TODO: CHANGE FEATURE FIELD
+            var memberObject = new CourseMember({role: "student", course: course_id, user: user_id, features: featureObject._id});
+            return memberObject.save();        
+        });
     });
 }
 
@@ -973,9 +981,11 @@ function addMemberToCourse(user_id, course_id) {
         if (!deletedInvite) {
             throw errors.NO_INVITE_FOUND;
         }
-        // TODO: CHANGE FEATURE FIELD
-        var memberObject = new CourseMember({role: "student", course: course_id, user: user_id, features: "5a157a581154d36ecfcc7ab1"});
-        return memberObject.save();
+        return Features.createFeature(user_id, course_id).then(function (featureObject) {
+            // TODO: CHANGE FEATURE FIELD
+            var memberObject = new CourseMember({role: "student", course: course_id, user: user_id, features: featureObject._id});
+            return memberObject.save();
+        });
     });
 }
 
@@ -1026,9 +1036,12 @@ function validateInviteLink(code, user_id) {
                 throw errors.EXPIRED_LINK;
             });
         }
-        // Add student to course
-        var memberObject = new CourseMember({role: "student", course: obj.course, user: user_id, features: "5a157a581154d36ecfcc7ab1"});
-        return memberObject.save();
+
+        return Features.createFeature(user_id, obj.course).then(function (featureObject) {
+            // Add student to course
+            var memberObject = new CourseMember({role: "student", course: obj.course, user: user_id, features: featureObject._id});
+            return memberObject.save();
+        });
     });
 }
 

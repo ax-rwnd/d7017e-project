@@ -141,10 +141,10 @@ module.exports = function(router) {
         if (req.user.access === "basic") {
             p = queries.countOwnedCourses(req.user.id)
                 .then(function () {
-                    return queries.saveCourseObject(input);
+                    return queries.saveCourseObject(req.user.id, input);
                 });
         } else {
-            p = queries.saveCourseObject(input);
+            p = queries.saveCourseObject(req.user.id, input);
         }
         p.then(function (savedCourse) {
             return res.status(201).json(savedCourse);
