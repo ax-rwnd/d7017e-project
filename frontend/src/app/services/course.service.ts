@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import {BackendService} from './backend.service';
 import {AssignmentService} from './assignment.service';
+import {assign} from 'rxjs/util/assign';
 
 
 @Injectable()
@@ -82,6 +83,12 @@ export class CourseService {
     const course = this.GetCourse(courseId);
     return  (course.progress.completed / course.progress.total) * 100;
   }
+
+  GetTeacherStudentViewHelper(Course) {
+    return getTeacherStudentView(Course, this.backendService, this, this.assignmentService).then(res => {
+      return res;
+    });
+  }
 }
 
 function getTeachCourses(response, backendService, courseService, assignmentService) {
@@ -104,6 +111,7 @@ function getTeachCourses(response, backendService, courseService, assignmentServ
   }
   return Promise.all(promiseArray);
 }
+
 
 function updateCourses(response, backendService, courseService, assignmentService) {
   // Updates the courses with input from backend, some course service a´nd an assignment service
@@ -132,6 +140,28 @@ function updateCourses(response, backendService, courseService, assignmentServic
       }));
   }
   return Promise.all(promiseArray);
+}
+
+function getTeacherStudentView(course, backendService, courseService, assignmentService) {
+  const promise = new Promise((resolve, reject) => {
+    backendService.getFeaturesCourseMe(course.id).then(resp => {
+      const rewards = handleFeatureResponse(resp);
+      const progress = newProgress(resp.total_assignments, resp.completed_assignments);
+      const course2 = newCourse(course.id, course.name, course.code, course.desc, rewards, progress);
+      resolve(course2);
+    });
+  });
+  return promise;
+      // courseService.AddCourse(course2);
+    /*
+    }).then(function() {
+      backendService.getCourseAssignments(course.id).then(AssignmentResp => {
+        assignmentService.AddCourseAssignments(course.id, AssignmentResp.assignments);
+      });
+    }).catch(err => {
+      console.log('err in catch', err);
+    });
+    */
 }
 
 function updateCourseFeatures(courseId, backendService, courseService) {

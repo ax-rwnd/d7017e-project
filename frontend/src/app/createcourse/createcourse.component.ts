@@ -6,7 +6,7 @@ import {FormGroup, FormControl, Validators } from '@angular/forms';
 import {BackendService} from '../services/backend.service';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { BsModalRef } from 'ngx-bootstrap/modal/modal-options.class';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import {CourseService} from '../services/course.service';
 import { ToastService } from '../services/toast.service';
 
@@ -45,7 +45,7 @@ export class CreatecourseComponent implements OnInit {
 
   constructor(private headService: HeadService, private backendService: BackendService, private modalService: BsModalService,
               private route: ActivatedRoute, private courseService: CourseService, private toastService: ToastService,
-              private _location: Location) {
+              private _location: Location, private router: Router) {
     this.headService.stateChange.subscribe(sidebarState => { // subscribe to the state value head provides
       this.sidebarState = sidebarState;
     });
@@ -122,7 +122,11 @@ export class CreatecourseComponent implements OnInit {
         const courseId = response._id;
         console.log('Got back id:', courseId);
         // this.form = createSearchForm(); // for invites, not yet implemented
-        this.openModal(this.courseModal);
+        this.router.navigate(['/user'])
+          .then( nav => {
+            location.reload();
+          });
+        // this.openModal(this.courseModal);
       })
       .catch(err => console.error('Create course failed', err));
   }
@@ -131,6 +135,7 @@ export class CreatecourseComponent implements OnInit {
     this.backendService.updateCourse(this.course.id, this.form.value.name, this.content,
       !this.form.value.nothidden, this.form.value.code, enabled_features, this.form.value.autojoin)
       .then((response: any) => { // when put, should get back empty object
+        location.reload();
         this.toastService.success('Course updated!');
         console.log(response);
       })

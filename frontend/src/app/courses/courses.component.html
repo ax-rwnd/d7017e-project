@@ -1,8 +1,9 @@
 <app-head></app-head>
 <div id="cont" class="content" [@content]="sidebarState">
   <div class="container">
+    <button type="button" (click)="toggleView()">Toggle</button>
     <!-- START of the student view -->
-    <span *ngIf="teachCourses.indexOf(currentCourse) === -1; else teacherView"> <!-- Could switch this do for ex a bool or something -->
+    <span *ngIf="teachCourses.indexOf(currentCourse) === -1; else testTemplate"> <!-- Could switch this do for ex a bool or something -->
       <!-- This view below is for students, the view for the teacher is in teacherView down below -->
       <div class="col-lg-6">
         <!-- Title of the student page-->
@@ -37,52 +38,106 @@
       </div>
       <!-- End of assignments group -->
     </span>
-    <!-- END of the student view, START of the teacher view -->
-    <ng-template #teacherView>
+  </div>
+
+  <!-- END of the student view, START of the teacher view -->
+  <ng-template #teacherView>
+    <h1>
+      <span *ngIf="currentCourse.code">{{currentCourse.code}} - </span> {{currentCourse.name}}
+    </h1>
+    <button type="button" class="btn btn-primary" (click)="openModal(createBadge, 'createBadge')">Create badge</button>
+    <div class="row">
+      <!-- Display the course description, markdown style -->
+      <div class="col-lg-8">
+        <h3>Course
+          <button type="button" class="glyph-button" [routerLink]="['/user/updateCourse', currentCourse.id]">
+            <span class="glyphicon glyphicon-edit"></span>
+          </button>
+        </h3>
+        <markdown [data]="currentCourse.desc"></markdown>
+        <br>
+        <h3>Assignments</h3>
+        <div class="row">
+          <div class="col-lg-6">
+            <h4>Groups
+              <button class="glyph-button pull-right">
+                <span class="option-text">CREATE GROUP</span>
+              </button>
+            </h4>
+            <span *ngIf="assignmentGroups[0].groups.length === 0">
+              No groups created yet...
+            </span>
+            <div *ngFor="let group of assignmentGroups[0].groups" class="assignment">
+              {{group}}
+            </div>
+          </div>
+          <div class="col-lg-6">
+            <h4>Assignments
+              <button class="glyph-button pull-right" [routerLink]="['/courses', currentCourse.id, 'createNewAssignment']">
+                <span class="option-text">CREATE ASSIGNMENT</span>
+              </button>
+            </h4>
+            <span *ngIf="assignmentGroups[0].assignments.length === 0">
+              No assignments created yet...
+            </span>
+            <div *ngFor="let assignment of assignmentGroups[0].assignments" class="assignment">
+              {{assignment.name}}
+              <button type="button" class="glyph-button white-text pull-right">
+                <span class="glyphicon glyphicon-edit" style="font-size: 1.2em;"></span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <h4>Pending requests
+          <button class="glyph-button pull-right" (click)="acceptAllReqs()">
+            <span class="table-button-text">ACCEPT ALL</span>
+          </button>
+        </h4>
+        <table class="table table-hover">
+          <tbody>
+          <tr *ngIf="pendingReqs && pendingReqs.length === 0">
+            <td>No pending requests...</td>
+          </tr>
+          <tr *ngFor="let req of pendingReqs">
+            <td>{{req.user['username']}}</td>
+            <td><button type="button" class="glyph-accept" (click)="acceptReq(req.user['_id'])"><span class="glyphicon glyphicon-ok"></span></button></td>
+            <td><button type="button" class="glyph-decline" (click)="declineReq(req.user['_id'])"><span class="glyphicon glyphicon-remove"></span></button></td>
+          </tr>
+          </tbody>
+        </table>
+        <br>
+        <h4>Enrolled students
+          <button class="glyph-button pull-right" (click)="openModal(inviteStudentModal)">
+            <span class="table-button-text">ADD STUDENT</span>
+          </button>
+        </h4>
+        <table class="table table-hover">
+          <tbody>
+          <tr *ngIf="currentCourse.students.length === 0">
+            <td>No students are enrolled to this course...</td>
+          </tr>
+          <tr *ngFor="let student of currentCourse.students">
+            <td>{{student.username}}</td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div> <!-- for end row -->
+  </ng-template>
+  <!-- Teacher view END -->
+
+  <ng-template #testTemplate>
+    <div *ngIf="teacherViewBool; else teacherView" class="col-lg-6">
       <h1>
         <span *ngIf="currentCourse.code">{{currentCourse.code}} - </span> {{currentCourse.name}}
       </h1>
-      <button type="button" class="btn btn-primary" id="createNewAssignment" [routerLink]="['/courses', currentCourse.id, 'createNewAssignment']">Create New Assignment</button>
-      <button type="button" class="btn btn-primary" (click)="openModal(inviteStudentModal, 'inviteStudent')">Invite student to course</button>
-      <button type="button" class="btn btn-primary" (click)="openModal(createBadge, 'createBadge')">Create badge</button>
-      <div class="row">
-      <!-- Display the course description, markdown style -->
-        <div class="col-lg-8">
-          <h3>Course description<button type="button" class="glyph-button" [routerLink]="['/user/updateCourse', currentCourse.id]"><span class="glyphicon glyphicon-edit"></span></button></h3>
-          <markdown [data]="currentCourse.desc"></markdown>
-          <span *ngIf="currentCourse.autojoin">This is autojoin course so no pending requests available</span>
-          <h3>Assignments</h3>
-          <div *ngFor="let g of assignmentGroups">
-            <app-assignment-group [assignmentGroup]="g" [courseCode]="currentCourse.id"></app-assignment-group>
-          </div>
-        </div>
-        <div class="col-lg-4">
-          <h4>Enrolled students
-            <!-- Haven't decided what to use here yet
-            <button class="glyph-button pull-right" style="font-size:1.4em;">
-              <span class="glyphicon glyphicon-plus-sign"></span>
-            </button>-->
-          </h4>
-          <table class="table table-hover">
-            <thead>
-            <tr>
-             <!-- <th>Username</th> -->
-            </tr>
-            </thead>
-            <tbody>
-              <tr *ngIf="currentCourse.students.length === 0">
-                <td>No students are enrolled to this course...</td>
-              </tr>
-              <tr *ngFor="let student of currentCourse.students">
-                <td>{{student.username}}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </ng-template>
-    <!-- Teacher view END -->
-  </div>
+      <!-- Display the course description, markdown style
+      <markdown [data]="currentCourse.course_info"></markdown> -->
+    </div>
+  </ng-template>
+
 </div>
 
 <!-- Modal for invitation of student to course -->

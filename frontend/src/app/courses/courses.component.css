@@ -9,6 +9,43 @@
   border: none;
 }
 
+.glyph-accept {
+  color: darkgreen;
+  background: none;
+  border: none;
+}
+
+.glyph-decline {
+  color: darkred;
+  background: none;
+  border: none;
+}
+
+.table-button-text {
+  font-size: 0.7em;
+}
+
+.option-text {
+  font-size: 0.7em;
+}
+
+.blue-text {
+  color: #133756;
+}
+
+.white-text {
+  color: white;
+}
+
+.assignment {
+  background-color: #133756;
+  border-radius: 0.5em;
+  padding: 2%;
+  margin: 1%;
+  color: white;
+  font-weight: normal;
+}
+
 .gamification-header {
   background-color: #133756;
   color: white;

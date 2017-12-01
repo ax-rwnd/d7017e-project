@@ -11,6 +11,7 @@ import { AssignmentService } from '../services/assignment.service';
 import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import { BackendService } from '../services/backend.service';
 import { ToastService } from '../services/toast.service';
+import {UserService} from '../services/user.service';
 
 
 @Component({
@@ -32,12 +33,15 @@ export class CoursesComponent implements OnInit {
   sidebarState; // state of sidebar
   progress: any;
   currentCourse: any;
+  currentCourseSaved: any;
   possibleStudents: any[];
   form: FormGroup;
   modalRef: BsModalRef;
+  pendingReqs: any;
   defaultForm = {
     search: ''
   };
+  teacherViewBool = false;
 
   selectedBadge: string;
   badges: Array<Object> = [
@@ -60,7 +64,7 @@ export class CoursesComponent implements OnInit {
 
   constructor(private courseService: CourseService, private route: ActivatedRoute, private headService: HeadService,
               private fb: FormBuilder, private assignmentService: AssignmentService, private modalService: BsModalService,
-              private backendService: BackendService, private toastService: ToastService) {
+              private backendService: BackendService, private toastService: ToastService, private userService: UserService) {
 
     // Subscribe to the sidebar state
     this.headService.stateChange.subscribe(sidebarState => {
@@ -69,6 +73,7 @@ export class CoursesComponent implements OnInit {
     this.route.params.subscribe( (params: any) => {
       // Grab the current course
       this.currentCourse = this.courseService.GetCourse(params.course);
+      this.currentCourseSaved = this.currentCourse;
       console.log('course', this.currentCourse);
       // Assign groups for assignments
       if (this.assignmentService.courseAssignments[this.currentCourse.id] !== undefined) {
@@ -80,14 +85,19 @@ export class CoursesComponent implements OnInit {
       }
 
       // Get a list of the users waiting to join the course
-      this.backendService.getPendingUsers(this.currentCourse.id)
-        .then(response => console.log('pending', response))
-        .catch(err => console.error('Get pending users failed', err));
+      this.teachCourses = this.courseService.teaching;
+      if (this.teachCourses.indexOf(this.currentCourse) !== -1) {
+        this.backendService.getPendingUsers(this.currentCourse.id)
+          .then(response => {
+            console.log('pending', response);
+            this.pendingReqs = response;
+          })
+          .catch(err => console.error('Get pending users failed', err));
+      }
     });
   }
 
   ngOnInit() {
-    this.teachCourses = this.courseService.teaching;
     this.sidebarState = this.headService.getCurrentState();
     this.possibleStudents = [];
     this.selectedBadge = 'bronze_medal_badge';
@@ -122,6 +132,24 @@ export class CoursesComponent implements OnInit {
   getTests(assignment) {
     console.log('get tests ', assignment);
     return this.tests[assignment.assignment['id']];
+  }
+
+  acceptAllReqs() { // iterate through pending list
+    for (const req of this.pendingReqs) {
+      this.acceptReq(req.user['_id']);
+    }
+  }
+
+  acceptReq(student_id) {
+    this.backendService.acceptPending(student_id, this.currentCourse.id)
+      .then( response => {
+        // console.log('Accepted req:', response); // Object error stuff, need to check, but works
+      })
+      .catch();
+  }
+
+  declineReq(user_id) { // need to rewrite delete in backend.service
+    console.log(user_id);
   }
 
   invite(student_id) {
@@ -182,6 +210,19 @@ export class CoursesComponent implements OnInit {
     this.backendService.postNewBadge(this.selectedBadge, this.badgeName, this.badgeDescription, this.currentCourse.id,
       [], assignments)
       .then(response => console.log('badge created: ', response));
+  }
+
+  toggleView() {
+    this.teacherViewBool = !this.teacherViewBool;
+    console.log(this.teacherViewBool);
+    if (this.teacherViewBool) {
+      this.courseService.GetTeacherStudentViewHelper(this.currentCourse).then(res => {
+        console.log(res);
+        this.currentCourse = res;
+      });
+    } else {
+      this.currentCourse = this.currentCourseSaved;
+    }
   }
 }
 
