@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { ToastService } from './toast.service';
 
@@ -79,10 +79,15 @@ Http requests:
       });
   }
 
-  private apiDelete(endpoint) {
+  private apiDelete(endpoint, body) {
     // Send a put request to the endpoint
 
-    return this.http.delete(environment.backend_ip + endpoint)
+    const options = { // Need to send a body
+      headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
+      body: body,
+    };
+
+    return this.http.delete(environment.backend_ip + endpoint, options)
       .toPromise()
       .then(response => response)
       .catch(err => {
@@ -313,7 +318,8 @@ The structure below is the following:
   }
 
   declineInvite(course_id: ObjectID) {
-    return this.apiDelete('/api/courses/' + course_id + '/students/invite');
+    const body = {};
+    return this.apiDelete('/api/courses/' + course_id + '/students/invite', body);
   }
 
 // -- Pending -- //
@@ -343,7 +349,8 @@ The structure below is the following:
   }
 
   cancelPendingJoin(course_id: ObjectID) {
-    return this.apiDelete('/api/courses/' + course_id + '/students/pending');
+    const body = {};
+    return this.apiDelete('/api/courses/' + course_id + '/students/pending', body);
   }
 
 // ----------- 7. OTHER calls ----------- //
