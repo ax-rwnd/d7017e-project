@@ -51,6 +51,7 @@ describe('/api', () => {
     let course_id;
     let assignment_id;
     let test_id;
+    let invitelink;
 
     before(() => {
         access_tokens = {};
@@ -83,6 +84,30 @@ describe('/api', () => {
     }
 
     describe('/courses', () => {
+ 
+        describe('POST /api/courses', () => {
+            let route = '/api/courses';
+            it_rejects_unauthorized_post(route);
+            let course = {
+                name: 'Introduction to Automated Testing in JavaScript',
+                description: 'In this course you will use Mocha and supertest to create automated tests for NodeJS applications.',
+                hidden: false,
+                course_code: 'D00testingE',
+                enabled_features: {badges: true}
+            };
+            it('returns the new id', () => {
+                return request(runner.server)
+                    .post(route)
+                    .send(course)
+                    .set('Authorization', 'Bearer ' + access_tokens.admin)
+                    .expect(201)
+                    .then(res => {
+                        assert(ObjectId.isValid(res.body._id), 'response is not a valid ObjectId');
+                        course_id = res.body._id;
+                    });
+            });
+        });
+        
         describe('GET /api/courses', () => {
             let route = '/api/courses';
             it_rejects_unauthorized_get(route);
@@ -94,47 +119,8 @@ describe('/api', () => {
                     .expect(200)
                     .then(res => {
                         let courses = res.body.courses;
-                        assert(Array.isArray(courses), 'not an array');
-                        assert(courses.length > 0, 'array is empty');
-                    });
-            });
-        });
-
-        describe('POST /api/courses', () => {
-            let route = '/api/courses';
-            it_rejects_unauthorized_post(route);
-            let assignment = {
-                name: 'Introduction to Automated Testing in JavaScript',
-                description: 'In this course you will use Mocha and supertest to create automated tests for NodeJS applications.',
-                hidden: false,
-                course_code: 'D00testingE',
-                enabled_features: {badges: true}
-            };
-            it('returns the new id', () => {
-                return request(runner.server)
-                    .post(route)
-                    .send(assignment)
-                    .set('Authorization', 'Bearer ' + access_tokens.admin)
-                    .expect(201)
-                    .then(res => {
-                        assert(ObjectId.isValid(res.body._id), 'response is not a valid ObjectId');
-                        course_id = res.body._id;
-                    });
-            });
-        });
-
-        describe('GET /api/courses/me', () => {
-            let route = '/api/courses/me';
-            it_rejects_unauthorized_get(route);
-
-            it('gets a list of courses for the fake user', () => {
-                return request(runner.server)
-                    .get(route)
-                    .set('Authorization', 'Bearer ' + access_tokens.user)
-                    .expect(200)
-                    .then(res => {
-                        assert(Array.isArray(res.body.courses), 'not an array');
-                        assert(res.body.courses.length > 0, 'array is empty');
+                        assert(Array.isArray(courses), 'should be an array');
+                        assert(courses.length > 0, 'array should not be empty');
                     });
             });
         });
@@ -169,7 +155,7 @@ describe('/api', () => {
                     .set('Authorization', 'Bearer ' + access_tokens.user)
                     .expect(200)
                     .then(res => {
-                        assert(Array.isArray(res.body.students), 'not an array');
+                        assert(Array.isArray(res.body.students), 'should be an array');
                     });
             });
         });
@@ -185,6 +171,22 @@ describe('/api', () => {
             });
         });
 
+        describe('GET /api/courses/me', () => {
+            let route = '/api/courses/me';
+            it_rejects_unauthorized_get(route);
+
+            it('gets a list of courses for the fake user', () => {
+                return request(runner.server)
+                    .get(route)
+                    .set('Authorization', 'Bearer ' + access_tokens.user)
+                    .expect(200)
+                    .then(res => {
+                        assert(Array.isArray(res.body.courses), 'should be an array');
+                        assert(res.body.courses.length > 0, 'array should not be empty');
+                    });
+            });
+        });
+
         describe('GET /api/courses/:course_id/teachers', () => {
             it('returns a non-empty list of teachers', () => {
                 return request(runner.server)
@@ -192,8 +194,8 @@ describe('/api', () => {
                     .set('Authorization', 'Bearer ' + access_tokens.user)
                     .expect(200)
                     .then(res => {
-                        assert(Array.isArray(res.body.teachers), 'not an array');
-                        assert(res.body.teachers.length > 0, 'array is empty');
+                        assert(Array.isArray(res.body.teachers), 'should be an array');
+                        assert(res.body.teachers.length > 0, 'array should not be empty');
                     });
             });
         });
@@ -203,8 +205,8 @@ describe('/api', () => {
                 return request(runner.server)
                     .post('/api/courses/' + course_id + '/assignments')
                     .send({
-                        name: 'Introduktion till tester',
-                        description: 'Skriv tester med mocha',
+                        name: 'Introduction to Mocha tests',
+                        description: 'Write tests with Mocha',
                         hidden: false,
                         languages: 'javascript'
                     })
@@ -224,8 +226,8 @@ describe('/api', () => {
                     .set('Authorization', 'Bearer ' + access_tokens.user)
                     .expect(200)
                     .then(res => {
-                        assert(Array.isArray(res.body.assignments), 'not an array');
-                        assert(res.body.assignments.length > 0, 'array is empty');
+                        assert(Array.isArray(res.body.assignments), 'should be an array');
+                        assert(res.body.assignments.length > 0, 'array should not be empty');
                     });
             });
         });
@@ -256,8 +258,8 @@ describe('/api', () => {
                     .set('Authorization', 'Bearer ' + access_tokens.admin)
                     .expect(200)
                     .then(res => {
-                        assert(Array.isArray(res.body.tests.io), 'not an array');
-                        assert(res.body.tests.io.length > 0, 'array is empty');
+                        assert(Array.isArray(res.body.tests.io), 'should be an array');
+                        assert(res.body.tests.io.length > 0, 'array should not be empty');
                     });
             });
         });
@@ -289,9 +291,8 @@ describe('/api', () => {
         describe('POST /api/courses/:course_id/assignments/:assignment_id/submit', () => {
 
             it('run assignments tests', () => {
-                let assignment_id_test = '59f8a2a81ac36c0762eb46ae';
                 return request(runner.server)
-                    .post('/api/courses/' + course_id + '/assignments/' + assignment_id_test + '/submit')
+                    .post('/api/courses/' + course_id + '/assignments/' + assignment_id + '/submit')
                     .set('Authorization', 'Bearer ' + access_tokens.user)
                     .send({
                         'lang': 'python3',
@@ -299,14 +300,13 @@ describe('/api', () => {
                     })
                     .expect(200)
                     .then(res => {
-                        assert(assignment_id_test == res.body.assignment_id, 'response is not contain the correct assignment_id');
+                        assert(assignment_id == res.body.assignment_id, 'response is not contain the correct assignment_id');
                     });
             });
         });
 
         describe('POST /:course_id/assignments/:assignment_id/save', () => {
             it('saves an empty draft to the database', () => {
-                let assignment_id = '59f8a2a81ac36c0762eb46ae';
                 return request(runner.server)
                     .post('/api/courses/' + course_id + '/assignments/' + assignment_id + '/save')
                     .set('Authorization', 'Bearer ' + access_tokens.user)
@@ -319,7 +319,6 @@ describe('/api', () => {
                     });
             });
             it('saves a draft to the database', () => {
-                let assignment_id = '59f8a2a81ac36c0762eb46ae';
                 let draft = {
                     lang: 'python3',
                     code: 'print(\"hello world\")\n'
@@ -339,8 +338,6 @@ describe('/api', () => {
 
         describe('GET /:course_id/assignments/:assignment_id/draft', () => {
             it('retrieves a draft from the database', () => {
-                let assignment_id = '59f8a2a81ac36c0762eb46ae';
-
                 let lang = 'python3';
                 let code = 'print(\"hello world\")\n';
                 return request(runner.server)
@@ -354,20 +351,6 @@ describe('/api', () => {
                         assert(res.body.code == code, 'response does not contain the correct code');
                     });
             });
-            it('retrieves a non-existing draft from the database', () => {
-                let assignment_id = '59f8a2a81ac36c0762eb32be';
-
-                return request(runner.server)
-                    .get('/api/courses/' + course_id + '/assignments/' + assignment_id + '/draft')
-                    .set('Authorization', 'Bearer ' + access_tokens.user)
-                    .send()
-                    .expect(200)
-                    .then(res => {
-                        assert(assignment_id == res.body.assignment, 'response does not contain the correct assignment_id');
-                        assert(res.body.lang == "", 'response param lang is not empty');
-                        assert(res.body.code == "", 'response param code is not empty');
-                    });
-            });
         });
 
         describe('GET /api/courses/:course_id/enabled_features', () => {
@@ -379,8 +362,41 @@ describe('/api', () => {
                     .then(res => {
 
                         console.log(res.body);
-                        //assert(Array.isArray(res.body.teachers), 'not an array');
-                        //assert(res.body.teachers.length > 0, 'array is empty');
+                        //assert(Array.isArray(res.body.teachers), 'should be an array');
+                        //assert(res.body.teachers.length > 0, 'array should not be empty');
+                    });
+            });
+        });
+
+        describe('GET /api/courses/:course_id/invitelink', () => {
+            it('Generate invite link', () => {
+                return request(runner.server)
+                    .get('/api/courses/' + course_id + '/invitelink')
+                    .set('Authorization', 'Bearer ' + access_tokens.admin)
+                    .expect(201)
+                    .then(res => {
+                        assert(res.body.code, 'does not return a code');
+                        assert.equal(res.body.course, course_id);
+
+                        invitelink = res.body.code;
+                    });
+            });
+            it('Try generating invite link without permission', () => {
+                return request(runner.server)
+                    .get('/api/courses/' + course_id + '/invitelink')
+                    .set('Authorization', 'Bearer ' + access_tokens.user)
+                    .expect(403);
+            });
+        });
+
+        describe('GET /api/courses/join/:code', () => {
+            it('Join a course using an invite link', () => {
+                return request(runner.server)
+                    .get('/api/courses/join/' + invitelink)
+                    .set('Authorization', 'Bearer ' + access_tokens.user)
+                    .expect(200)
+                    .then(res => {
+                        assert.equal(res.body.success, true);
                     });
             });
         });
@@ -413,8 +429,8 @@ describe('/api', () => {
                     .set('Authorization', 'Bearer ' + access_tokens.user)
                     .expect(200)
                     .then(res => {
-                        assert(Array.isArray(res.body.courses), 'not an array');
-                        assert(res.body.courses.length > 0, 'array is empty');
+                        assert(Array.isArray(res.body.courses), 'should be an array');
+                        assert(res.body.courses.length > 0, 'array should not be empty');
                     });
             });
         });
@@ -423,15 +439,15 @@ describe('/api', () => {
             let route = '/api/users/me/teaching';
             it_rejects_unauthorized_get(route);
 
-            it('gets a list of courses for the fake user', () => {
+            it('gets a list of courses for the teacher', () => {
                 return request(runner.server)
                     .get(route)
-                    .set('Authorization', 'Bearer ' + access_tokens.user)
+                    .set('Authorization', 'Bearer ' + access_tokens.admin)
                     .expect(200)
                     .then(res => {
                         let courses = res.body.teaching;
-                        assert(Array.isArray(courses), 'not an array');
-                        assert(courses.length > 0, 'array is empty');
+                        assert(Array.isArray(courses), 'should be an array');
+                        assert(courses.length > 0, 'array should not be empty');
                     });
             });
         });
@@ -448,35 +464,204 @@ describe('/api', () => {
             });
         });
 
-        describe.skip('GET /api/users/register', () => {
-            it('TODO', () => {
-            });
-        });
-
-        describe.skip('GET /api/users/:user_id/submissions', () => {
-            it('TODO', () => {
-            });
-        });
-
         describe('GET /api/users/:user_id/courses', () => {
             it('returns a non-empty array', () => {
                 return request(runner.server)
-                .get('/api/users/' + admin_id + '/courses')
+                .get('/api/users/' + user_id + '/courses')
                 .set('Authorization', 'Bearer ' + access_tokens.user)
                 .then(res => {
-                    assert(Array.isArray(res.body.courses), 'not an array');
-                    assert(res.body.courses.length > 0, 'array is empty');
+                    assert(Array.isArray(res.body.courses), 'should be an array');
+                    assert(res.body.courses.length > 0, 'array should not be empty');
                 });
             });
         });
+    });
 
-        describe.skip('GET /api/users/:user_id/courses/:course_id/submissions', () => {
-            it('TODO', () => {
+    describe('/features', () => {
+        describe('GET /api/:course_id/features/', () => {
+            it('Get features for all users in course', () => {
+                let route = '/api/courses/'+course_id+'/features/';
+                return request(runner.server)
+                    .get(route)
+                    .set('Authorization', 'Bearer ' + access_tokens.admin)
+                    .expect(200)
+                    .then(res => {
+                        assert(Array.isArray(res.body.features), 'not an array');
+                    });
+            });
+        });
+
+        describe('GET /api/courses/:course_id/features/me', () => {
+            it('Get feature for user in course', () => {
+                let route = '/api/courses/'+course_id+'/features/me';
+                return request(runner.server)
+                    .get(route)
+                    .set('Authorization', 'Bearer ' + access_tokens.admin)
+                    .expect(200)
+                    .then(res => {
+                        assert(Array.isArray(res.body.badges), 'not an array');
+                        assert(Array.isArray(res.body.progress), 'not an array');
+                    });
+            });
+        });
+
+        let badge = {
+            // missing course_id is set later
+            icon: 'pretty_icon',   //name of an icon image file
+            title: 'Pretty badge',
+            description: 'Very impossibru badgeererer',
+            goals: {
+                badges: [],
+                assignments: []
+            }
+        };
+        let new_title = 'Another title';
+        let badge_id;
+
+        describe('POST /api/courses/:course_id/badges', () => {
+            it('Create a badge', () => {
+                badge.course_id = course_id;
+                return request(runner.server)
+                    .post('/api/courses/'+ course_id + '/badges')
+                    .set('Authorization', 'Bearer ' + access_tokens.admin)
+                    .send(badge)
+                    .set('Content-Type', 'application/json')
+                    .expect(200)
+                    .then(res => {
+                        badge_id = res.body._id;
+                    });
+            });
+        });
+
+        describe('PUT /api/courses/:course_id/badges/:badge_id', () => {
+            it('Update a badge', () => {
+                badge.title = new_title;
+                return request(runner.server)
+                    .put('/api/courses/' + course_id + '/badges/' + badge_id)
+                    .set('Authorization', 'Bearer ' + access_tokens.admin)
+                    .send(badge)
+                    .set('Content-Type', 'application/json')
+                    .expect(200)
+                    .then(res => {
+                        assert(res.body._id == badge_id, 'Badge IDs did not match');
+                    });
+            });
+        });
+
+        describe('GET /api/courses/:course_id/badges/:badge_id', () => {
+            it('Fetch a badge', () => {
+                return request(runner.server)
+                    .get('/api/courses/:course_id/badges/' + badge_id)
+                    .set('Authorization', 'Bearer ' + access_tokens.admin)
+                    .expect(200)
+                    .then(res => {
+                        assert(res.body.title == new_title, 'Updated badge did not have title '+new_title+' but '+res.body.title);
+                    });
             });
         });
     });
 
-    describe.skip('/features', () => {
+    describe('/search', () => {
+        describe('Check config so that minimun query length is set', () => {
+            it('Minimum query length is set', () => {
+                assert(config.get('Search.min_query_length') !== undefined, 'Search.min_query_length in config is not set');
+            });
+        });
+
+        describe('GET /api/search', () => {
+            it('Fails on bad query parameter', () => {
+                let query = '?iambad=program';
+                let route = '/api/search';
+                return request(runner.server)
+                    .get(route+query)
+                    .set('Authorization', 'Bearer ' + access_tokens.user)
+                    .expect(400)
+                    .then(res => {
+                        assert(res.error.text == 'Bad input. Expected: "?query=XYZ"', 'query was misspelled');
+                    });
+            });
+        });
+
+        describe('GET /api/search', () => {
+            it('Too short query data', () => {
+                let query = '?query=hi';
+                let route = '/api/search';
+                return request(runner.server)
+                    .get(route+query)
+                    .set('Authorization', 'Bearer ' + access_tokens.user)
+                    .expect(400)
+                    .then(res => {
+                        assert(res.error.text == 'Bad input. Expected query with length atleast ' + config.get('Search.min_query_length'), 'Too short query data');
+                    });
+            });
+        });
+
+        describe('GET /api/search', () => {
+            it('Return search results', () => {
+                let query = '?query=Mocha';
+                let route = '/api/search';
+                return request(runner.server)
+                    .get(route+query)
+                    .set('Authorization', 'Bearer ' + access_tokens.user)
+                    .expect(200)
+                    .then(res => {
+                        assert(res.body.hasOwnProperty('courses'), 'Result did not have property courses');
+                        assert(Array.isArray(res.body.courses), 'Property courses was not an array');
+                        assert(res.body.hasOwnProperty('assignments'), 'Result did not have property assignments');
+                        assert(Array.isArray(res.body.assignments), 'Property assignments was not an array');
+                        assert(res.body.hasOwnProperty('users'), 'Result did not have property users');
+                        assert(Array.isArray(res.body.users), 'Property users was not an array');
+
+                        assert(res.body.assignments.length > 0, 'Property assignments was empty');
+                    });
+            });
+        });
+
+        describe('GET /api/search', () => {
+            it('Return search results with "categories" as filter', () => {
+                let query = '?query=program&categories=users,courses';
+                let route = '/api/search';
+                return request(runner.server)
+                    .get(route+query)
+                    .set('Authorization', 'Bearer ' + access_tokens.user)
+                    .expect(200)
+                    .then(res => {
+                        assert(res.body.hasOwnProperty('courses'), 'Result did not have property courses');
+                        assert(Array.isArray(res.body.courses), 'Property courses was not an array');
+                        assert(res.body.hasOwnProperty('assignments'), 'Result did not have property assignments');
+                        assert(Array.isArray(res.body.assignments), 'Property assignments was not an array');
+                        assert(res.body.hasOwnProperty('users'), 'Result did not have property users');
+                        assert(Array.isArray(res.body.users), 'Property users was not an array');
+
+                        assert(res.body.assignments.length == 0, 'Property assignments was not empty');
+                    });
+            });
+        });
+
+        describe('GET /api/search', () => {
+            it('Search with hyphen', () => {
+                let query = '?query=fake-admin-00';
+                let route = '/api/search';
+                return request(runner.server)
+                    .get(route+query)
+                    .set('Authorization', 'Bearer ' + access_tokens.user)
+                    .expect(200)
+                    .then(res => {
+                        assert(res.body.users.length == 1, 'Wrong number of users where found');
+                    });
+            });
+        });
     });
 
+    describe('deletion', () => {
+        describe('DELETE /api/courses/:course_id', () => {
+            it('completes without an error', () => {
+                return request(runner.server)
+                    .delete('/api/courses/' + course_id)
+                    .set('Authorization', 'Bearer ' + access_tokens.admin)
+                    .expect(200);
+                // TODO: add assertions to check if there is some data left
+            });
+        });
+    });
 });

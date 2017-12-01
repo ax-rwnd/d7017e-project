@@ -4,6 +4,8 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
+const INVITELINK_TTL = 24 * 60 * 60 * 1000;
+
 /*
 * Base schemas
 */
@@ -60,6 +62,13 @@ var courseMembers = new Schema({
     course: {type: Schema.Types.ObjectId, ref: 'Course', required: true},
     user: {type: Schema.Types.ObjectId, ref: 'User', required: true},
     features: {type: Schema.Types.ObjectId, ref: 'Features', required: false}
+});
+
+var inviteLinks = new Schema({
+    code: {type: String, required: true},
+    course: {type: Schema.Types.ObjectId, ref: 'Course', required: true},
+    createdAt: {type: Date, default: Date.now()},
+    expiresAt: {type: Date, default: (Date.now() + INVITELINK_TTL)}
 });
 
 var courseSchema = new Schema({
@@ -125,7 +134,8 @@ var CourseMembers = mongoose.model('CourseMembers', courseMembers);
 var Course = mongoose.model('Course', courseSchema);
 var Badge = mongoose.model('Badge', badgeSchema);
 var Features = mongoose.model('Features', featuresSchema);
+var InviteLinks = mongoose.model('InviteLinks', inviteLinks);
 var models = {Assignment: Assignment, Test: Test, User: User, Draft: Draft, 
-        JoinRequests: JoinRequests, CourseMembers: CourseMembers, Course: Course, Badge: Badge, Features: Features};
+        JoinRequests: JoinRequests, InviteLinks: InviteLinks, CourseMembers: CourseMembers, Course: Course, Badge: Badge, Features: Features};
 
 module.exports = models;
