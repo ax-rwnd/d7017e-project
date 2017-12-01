@@ -95,7 +95,7 @@ module.exports = function(router) {
     });
 */
 
-/*
+
     // Create new course
     // Admin/teachers can create unlimited courses
     // Students limited to 3 courses?
@@ -119,8 +119,8 @@ module.exports = function(router) {
         });
     });
 
-*/
 
+/*
     // TODO:
     // Tests
     // Documentation
@@ -151,7 +151,7 @@ module.exports = function(router) {
         })
         .catch(next);
     });
-
+*/
 
     // SHOULD BE REMOVED
     router.get('/me', function (req, res, next) {
@@ -896,7 +896,7 @@ module.exports = function(router) {
             return next(errors.BAD_INPUT);
         }
 
-        queries.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.admin)
+        permission.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
         .then(function () {
             return queries.getAssignmentTests(course_id, assignment_id);
         })
@@ -921,7 +921,7 @@ module.exports = function(router) {
             return next(errors.BAD_INPUT);
         }
 
-        queries.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.admin)
+        permission.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
         .then(function () {
             return queries.createTest(stdout, stdin, args, lint, assignment_id);
         })
@@ -933,7 +933,7 @@ module.exports = function(router) {
         });
     });
 
-    // Get specified assignment
+    // Get specified test
     router.get('/:course_id/assignments/:assignment_id/tests/:test_id', function (req, res, next) {
         var course_id = req.params.course_id;
         var assignment_id = req.params.assignment_id;
@@ -943,12 +943,58 @@ module.exports = function(router) {
             return next(errors.BAD_INPUT);
         }
 
-        queries.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.admin)
+        permission.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
         .then(function () {
             return queries.getTest(test_id, "stdout stdin args");
         })
         .then(function (test) {
             return res.json(test);
+        })
+        .catch(function (err) {
+            next(err);
+        });
+    });
+
+    // Update specified test
+    router.put('/:course_id/assignments/:assignment_id/tests/:test_id', function (req, res, next) {
+        var course_id = req.params.course_id;
+        var assignment_id = req.params.assignment_id;
+        var test_id = req.params.test_id;
+
+        if (!mongoose.Types.ObjectId.isValid(assignment_id) || !mongoose.Types.ObjectId.isValid(course_id) || !mongoose.Types.ObjectId.isValid(test_id)) {
+            return next(errors.BAD_INPUT);
+        }
+
+        let b = req.body;
+        let clean_b = {};
+        if (b.hasOwnProperty('stdout')) {
+            if (typecheck.isString(b.stdout)) {
+                clean_b.stdout = b.stdout;
+            } else {
+                return next(errors.BAD_INPUT);
+            }
+        }
+        if (b.hasOwnProperty('stdin')) {
+            if (typecheck.isString(b.stdin)) {
+                clean_b.stdin = b.stdin;
+            } else {
+                return next(errors.BAD_INPUT);
+            }
+        }
+        if (b.hasOwnProperty('args')) {
+            if (Array.isArray(b.args)) {
+                clean_b.args = b.args;
+            } else {
+                return next(errors.BAD_INPUT);
+            }
+        }
+
+        permission.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
+        .then(function () {
+            return queries.updateTest(test_id, clean_b);
+        })
+        .then(function () {
+            return res.json({});
         })
         .catch(function (err) {
             next(err);

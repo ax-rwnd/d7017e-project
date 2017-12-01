@@ -664,6 +664,29 @@ function getTest(id, fields) {
     });
 }
 
+function updateTest(id, set_props) {
+    return Test.findById(id, "stdout stdin args").then(function (test) {
+        if (!test) {
+            throw errors.TEST_DOES_NOT_EXIST;
+        }
+
+        return Test.update(
+            {_id: id},
+            {$set: set_props},
+            {runValidators: true}
+        ).then(raw => {
+            // check if the test update was ok
+            if (raw.ok !== 1) {
+                // TODO: make a real error message!
+                throw new Error('Mongo error: Failed to update test');
+            // check if the test existed
+            } else if (raw.n === 0) {
+                throw errors.TEST_DOES_NOT_EXIST;
+            }
+        });
+    });
+}
+
 function getAssignmentTests(course_id, assignment_id) {
     return Assignment.findById(assignment_id, "tests").populate("tests.io")
     .then(function (assignmentObject) {
@@ -1106,6 +1129,7 @@ exports.getInvitesCourseUser = getInvitesCourseUser;
 exports.getAssignmentTests = getAssignmentTests;
 exports.getUserPopulated = getUserPopulated;
 exports.updateCourse = updateCourse;
+exports.updateTest = updateTest;
 exports.deleteCourse = deleteCourse;
 exports.deleteAssignment = deleteAssignment;
 exports.generateInviteLink = generateInviteLink;
