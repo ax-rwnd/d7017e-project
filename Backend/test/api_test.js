@@ -340,20 +340,6 @@ describe('/api', () => {
                         assert(res.body.code == code, 'response does not contain the correct code');
                     });
             });
-            it('retrieves a non-existing draft from the database', () => {
-                // nonexistent but valid ObjectID
-                let assignment_id = 'badb0a710ad0fbaddeadbeef';
-                return request(runner.server)
-                    .get('/api/courses/' + course_id + '/assignments/' + assignment_id + '/draft')
-                    .set('Authorization', 'Bearer ' + access_tokens.user)
-                    .send()
-                    .expect(200)
-                    .then(res => {
-                        assert(assignment_id == res.body.assignment, 'response does not contain the correct assignment_id');
-                        assert(res.body.lang == "", 'response param lang is not empty');
-                        assert(res.body.code == "", 'response param code is not empty');
-                    });
-            });
         });
 
         describe('GET /api/courses/:course_id/enabled_features', () => {
