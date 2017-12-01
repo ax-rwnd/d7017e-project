@@ -129,8 +129,9 @@ module.exports = function(router) {
     // Admin/teachers can create unlimited courses
     // Students limited to 3 courses?
     router.post('/', function (req, res, next) {
+        var input;
         try {
-            var input = inputValidation.postCourseValidation(req);
+            input = inputValidation.postCourseValidation(req);
         }
         catch(error) {
             return next(error);
@@ -194,12 +195,20 @@ module.exports = function(router) {
         });
     });
 
-
-
     // Deletes course with id :course_id
     // Only admin and teacher of course can delete course
     router.delete('/:course_id', function (req, res, next) {
-
+        var course_id = req.params.course_id;
+        if (!mongoose.Types.ObjectId.isValid(course_id)) {
+            return next(errors.BAD_INPUT);
+        }
+        queries.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
+        .then(() => {
+            return queries.deleteCourse(course_id);
+        }).then(() => {
+            // respond with empty body
+            res.json({});
+        }).catch(next);
     });
 
     // Modify course with id :course_id
@@ -324,7 +333,7 @@ module.exports = function(router) {
             return queries.createRequestToCourse(student_id, course_id, "invite");
         })
         .then(function (inviteObject) {
-            return res.sendStatus(202);
+            return res.sendStatus(202).json({});
         })
         .catch(function (error) {
             return next(error);
@@ -382,7 +391,7 @@ module.exports = function(router) {
             return queries.addCourseStudent(course_id, req.user.id);
         })
         .then(function () {
-            return res.sendStatus(201);
+            return res.sendStatus(201).json({});
         })
         .catch(function (error) {
             return next(error);
@@ -453,7 +462,7 @@ module.exports = function(router) {
             }
         })
         .then(function () {
-            return res.sendStatus(200);
+            return res.sendStatus(200).json({});
         })
         .catch(function (error) {
             return next(error);
@@ -514,12 +523,12 @@ module.exports = function(router) {
                     return queries.createRequestToCourse(req.user.id, course_id, "pending");
                 })
                 .then(function () {
-                    return res.sendStatus(202);
+                    return res.sendStatus(202).json({});
                 });
             } else {
                 queries.addCourseStudent(course_id, req.user.id)
                 .then(function () {
-                    res.sendStatus(201);
+                    return res.sendStatus(201).json({});
                 });
             }
         })
@@ -554,7 +563,7 @@ module.exports = function(router) {
             return queries.addCourseStudent(course_id, student_id);
         })
         .then(function () {
-            return res.sendStatus(200);
+            return res.sendStatus(200).json({});
         })
         .catch(function (error) {
             return next(error);
@@ -590,7 +599,7 @@ module.exports = function(router) {
             if (student_id === req.user.id) {
                 return queries.findAndRemoveRequest(student_id, course_id, "pending")
                 .then(function () {
-                    return res.sendStatus(200);
+                    return res.sendStatus(200).json({});
                 });
             } else {
                 return queries.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
@@ -598,7 +607,7 @@ module.exports = function(router) {
                     return queries.findAndRemoveRequest(student_id, course_id, "pending");
                 })
                 .then(function () {
-                    return res.sendStatus(201);
+                    return res.sendStatus(201).json({});
                 });
             }
         })
@@ -637,7 +646,7 @@ module.exports = function(router) {
             if (student_id === req.user.id) {
                 return queries.removeStudentFromCourse(student_id, course_id)
                 .then(function () {
-                    return res.sendStatus(200);
+                    return res.sendStatus(200).json({});
                 });
             } else {
                 return queries.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
@@ -645,7 +654,7 @@ module.exports = function(router) {
                     return queries.removeStudentFromCourse(student_id, course_id);
                 })
                 .then(function () {
-                    return res.sendStatus(200);
+                    return res.sendStatus(200).json({});
                 });
             }
         })
@@ -688,7 +697,7 @@ module.exports = function(router) {
             return queries.addTeacherToCourse(teacher_id, course_id);
         })
         .then(function () {
-            return res.sendStatus(201);
+            return res.sendStatus(201).json({});
         })
         .catch(function (error) {
             return next(error);
@@ -716,7 +725,7 @@ module.exports = function(router) {
             return queries.removeTeacherFromCourse(teacher_id, course_id);
         })
         .then (function () {
-            return res.sendStatus(200);
+            return res.sendStatus(200).json({});
         })
         .catch(function (error) {
             return next(error);
@@ -778,6 +787,30 @@ module.exports = function(router) {
                 return res.json(assignmentObject);
             });
         }).catch(next);
+    });
+
+    router.get('/:course_id/invitelink', function (req, res, next) {
+        var course_id = req.params.course_id;
+
+        queries.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access).then(function () {
+            return queries.generateInviteLink(course_id).then(function (obj) {
+                res.status(201).json({course: obj.course, code: obj.code});
+            });
+        })
+        .catch(function (err) {
+            next(err);
+        });
+    });
+
+    router.get('/join/:code', function (req, res, next) {
+        var code = req.params.code;
+
+        queries.validateInviteLink(code, req.user.id).then(function (result) {
+            res.json({success: true});
+        })
+        .catch(function (err) {
+            next(err);
+        });
     });
 
 /*
