@@ -137,4 +137,4 @@ function putMembersInviteValidation (req) {
 
 exports.postCourseValidation = postCourseValidation;
 exports.putMembersInviteValidation = putMembersInviteValidation;
-exports.postMemberInviteValidation = postMemberInviteValidation
+exports.postMemberInviteValidation = postMemberInviteValidation;
