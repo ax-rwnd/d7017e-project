@@ -275,6 +275,17 @@ describe('/api', () => {
             });
         });
 
+        describe('PUT /api/courses/:course_id/assignments/:assignment_id/tests/:test_id', () => {
+            it('modifies stdout successfully', () => {
+                return request(runner.server)
+                    .put('/api/courses/' + course_id + '/assignments/' + assignment_id + '/tests/' + test_id)
+                    .send({
+                        stdout: 'sockerkaka'
+                    }).set('Authorization', 'Bearer ' + access_tokens.admin)
+                    .expect(200);
+            });
+        });
+
         describe('POST /api/courses/:course_id/assignments/:assignment_id/submit', () => {
 
             it('run assignments tests', () => {
