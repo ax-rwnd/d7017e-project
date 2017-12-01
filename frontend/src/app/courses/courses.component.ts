@@ -84,20 +84,18 @@ export class CoursesComponent implements OnInit {
         console.log('assignments', this.assignmentGroups);
       }
 
-      // Get a list of the users waiting to join the course
-      this.teachCourses = this.courseService.teaching;
-      if (this.teachCourses.indexOf(this.currentCourse) !== -1) {
-        this.backendService.getPendingUsers(this.currentCourse.id)
-          .then(response => {
-            console.log('pending', response);
-            this.pendingReqs = response;
-          })
-          .catch(err => console.error('Get pending users failed', err));
-      }
+      this.backendService.getPendingUsers(this.currentCourse.id)
+        .then(response => {
+          console.log('pending', response);
+          this.pendingReqs = response;
+        })
+        .catch(err => console.error('Get pending users failed', err));
+
     });
   }
 
   ngOnInit() {
+    this.teachCourses = this.courseService.teaching;
     this.sidebarState = this.headService.getCurrentState();
     this.possibleStudents = [];
     this.selectedBadge = 'bronze_medal_badge';
@@ -143,9 +141,10 @@ export class CoursesComponent implements OnInit {
   acceptReq(student_id) {
     this.backendService.acceptPending(student_id, this.currentCourse.id)
       .then( response => {
+        this.toastService.success('Request accepted!');
         // console.log('Accepted req:', response); // Object error stuff, need to check, but works
       })
-      .catch();
+      .catch(err => console.error('Accept failed', err));
   }
 
   declineReq(user_id) { // need to rewrite delete in backend.service
