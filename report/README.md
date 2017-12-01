@@ -1,2 +1,2 @@
 Rapport      
-Första delen av rapporten, ändra/lägg till i de rubriker som finns även om den är tom. Lägg till nya underrubriker om ni vill men vänta med att lägga till nya Huvudrubriker innan hela rapporten är släppt 1 december
+Hela rapporten, ändra/lägg till fram till Onsdag 20/12 08:00.
