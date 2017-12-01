@@ -339,6 +339,34 @@ module.exports = function(router) {
         });
     });
 
+/*
+    // TODO:
+    // Tests
+    // Documentation
+    //
+    //
+    router.post('/:course_id/members/invite', function (req, res, next) {
+        try {
+            var input = inputValidation.putMembersInviteValidation(req);
+        }
+        catch(error) {
+            return next(error);
+        }
+
+        var p;
+        if (input.user_id === req.user.id) {
+            p = permission.checkUserNotInCourse(input.user_id, input.course_id).then(function () {
+                    return permission.checkIfAlreadyInvited(input.user_id, input.course_id).then(function () {
+
+                    })
+                })
+                .then(function () {
+
+                })
+        }
+
+    });
+*/
 
     // TODO
     // Documentation
@@ -346,7 +374,7 @@ module.exports = function(router) {
     //
     // Caller will accept an invite to :course_id.
     // If invite exists user caller will be added as a student in the course.
-    router.put('/:course_id/students/invite', function (req, res, next) {
+    router.put('/:course_id/members/invite', function (req, res, next) {
         var course_id = req.params.course_id;
 
 
