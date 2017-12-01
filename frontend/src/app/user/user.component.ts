@@ -90,15 +90,15 @@ export class UserComponent implements OnInit {
     this.backendService.getCourses()
       .then(response => {
         const courses = response['courses'];
+        console.log('List of courses:', courses);
         for (let i = 0; i < courses.length; i++) {
-          console.log(courses[i]);
           let name = '';
-          if (courses[i]['course_code'] !== undefined) {
-            name = courses[i]['course_code'];
+          if (courses[i].course_code) {
+            name = courses[i].course_code;
           } else {
-            name = courses[i]['name'];
+            name = courses[i].name;
           }
-          this.possibleCourses[i] = {name: name, id: courses[i]['_id']};
+          this.possibleCourses[i] = {name: name, id: courses[i]._id};
         }
       })
       .catch(err => console.error('Get courses for search modal failed'));
