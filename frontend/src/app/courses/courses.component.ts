@@ -11,6 +11,7 @@ import { AssignmentService } from '../services/assignment.service';
 import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import { BackendService } from '../services/backend.service';
 import { ToastService } from '../services/toast.service';
+import {UserService} from '../services/user.service';
 
 
 @Component({
@@ -63,7 +64,7 @@ export class CoursesComponent implements OnInit {
 
   constructor(private courseService: CourseService, private route: ActivatedRoute, private headService: HeadService,
               private fb: FormBuilder, private assignmentService: AssignmentService, private modalService: BsModalService,
-              private backendService: BackendService, private toastService: ToastService) {
+              private backendService: BackendService, private toastService: ToastService, private userService: UserService) {
 
     // Subscribe to the sidebar state
     this.headService.stateChange.subscribe(sidebarState => {
@@ -84,17 +85,19 @@ export class CoursesComponent implements OnInit {
       }
 
       // Get a list of the users waiting to join the course
-      this.backendService.getPendingUsers(this.currentCourse.id)
-        .then(response => {
-          console.log('pending', response);
-          this.pendingReqs = response;
-        })
-        .catch(err => console.error('Get pending users failed', err));
+      this.teachCourses = this.courseService.teaching;
+      if (this.teachCourses.indexOf(this.currentCourse) !== -1) {
+        this.backendService.getPendingUsers(this.currentCourse.id)
+          .then(response => {
+            console.log('pending', response);
+            this.pendingReqs = response;
+          })
+          .catch(err => console.error('Get pending users failed', err));
+      }
     });
   }
 
   ngOnInit() {
-    this.teachCourses = this.courseService.teaching;
     this.sidebarState = this.headService.getCurrentState();
     this.possibleStudents = [];
     this.selectedBadge = 'bronze_medal_badge';
