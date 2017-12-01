@@ -24,6 +24,7 @@ export class ModBadgesComponent extends GameelementComponent implements OnInit, 
     super.getElements(this.courseCode);
     this.backendService.getFeaturesCourseMe(this.courseCode)
       .then( (data: any) => {
+        console.log('badges', data.badges);
         this.badges = data.badges;
       })
       .catch(err => console.error('Update badge component failed', err));
