@@ -95,7 +95,7 @@ module.exports = function(router) {
     });
 */
 
-
+/*
     // Create new course
     // Admin/teachers can create unlimited courses
     // Students limited to 3 courses?
@@ -119,8 +119,8 @@ module.exports = function(router) {
         });
     });
 
+*/
 
-/*
     // TODO:
     // Tests
     // Documentation
@@ -151,7 +151,7 @@ module.exports = function(router) {
         })
         .catch(next);
     });
-*/
+
 
     // SHOULD BE REMOVED
     router.get('/me', function (req, res, next) {
@@ -186,7 +186,12 @@ module.exports = function(router) {
             }
 
             queries.getCourse(course_id, roll, wantedFields).then(function (course) {
-                return res.json(course);
+                return queries.getCourseMembers1(course_id).then(function(courseMembers) {
+                    var courseObject = course.toObject();
+                    courseObject.members = courseMembers;
+                    console.log(courseObject);
+                    return res.json(courseObject); 
+                });
             });
         })
         .catch(function(err) {
@@ -237,6 +242,26 @@ module.exports = function(router) {
         }).catch(next);
     });
 
+/*
+    router.get('/:course_id/members', function (req, res, next) {
+        var course_id = req.params.course_id;
+        var query = req.query.role;
+
+        var p;
+        if (query === "teacher") {
+            p = queries.getCourseTeachers1(course_id);
+        } else if (query === "student") {
+            p = queries.getCourseStudents1(course_id);
+        } else {
+            p = queries.getCourseMembers1(course_id);
+        }
+
+        p.then(function (memberArray) {
+            return res.json({members: memberArray});
+        })
+        .catch(next);
+    });
+*/
 
     router.get('/:course_id/students', function (req, res, next) {
         var course_id = req.params.course_id;

@@ -413,7 +413,12 @@ function getCourseInvites(course_id, type) {
 }
 
 function getUserInvites(user_id, type) {
-    return JoinRequest.find({inviteType: type, user: user_id}, "course -_id").populate("course", "name course_code");
+    if (type) {
+        return JoinRequest.find({inviteType: type, user: user_id}, "inviteType course -_id").populate("course", "name course_code");
+    } else {
+        return JoinRequest.find({user: user_id}, "inviteType course -_id").populate("course", "name course_code");
+
+    }   
 }
 
 function getInvitesCourseUser(user_id, course_id) {
@@ -966,6 +971,32 @@ function addMemberToCourse(user_id, course_id) {
     });
 }
 
+function getCourseMembers1(course_id) {
+    return CourseMember.find({course: course_id}, "role user -_id").populate("user", "username email");
+}
+
+function getCourseTeachers1(course_id) {
+    return CourseMember.find({role: "teacher", course: course_id}, "role user -_id").populate("user", "username email");
+}
+
+function getCourseStudents1(course_id) {
+    return CourseMember.find({role: "student", course: course_id}, "role user -_id").populate("user", "username email");
+}
+
+function getUserTeacherCourses1(user_id) {
+    return CourseMember.find({user: user_id, role: "teacher"}, "role course -_id").populate("course", constants.FIELDS.COURSE.BASE_FIELDS);
+}
+function getUserStudentCourses1(user_id) {
+    return CourseMember.find({user: user_id, role: "student"}, "role course -_id").populate("course", constants.FIELDS.COURSE.BASE_FIELDS);
+}
+function getUserMemberCourses1(user_id) {
+    return CourseMember.find({user: user_id}, "role course -_id").populate("course", constants.FIELDS.COURSE.BASE_FIELDS);
+}
+
+function getUserMemberStatus(course_id, user_id) {
+    return CourseMember.findOne({user: user_id, course: course_id}, "role");
+}
+
 function generateInviteLink(course_id) {
     var code = randomstring.generate();
     if (!mongoose.Types.ObjectId.isValid(course_id)) {
@@ -1002,6 +1033,13 @@ exports.saveCourseObject = saveCourseObject;
 exports.countOwnedCourses = countOwnedCourses;
 exports.acceptInviteToCourse = acceptInviteToCourse;
 exports.addMemberToCourse = addMemberToCourse;
+exports.getCourseMembers1 = getCourseMembers1;
+exports.getCourseTeachers1 = getCourseTeachers1;
+exports.getCourseStudents1 = getCourseStudents1;
+exports.getUserTeacherCourses1 = getUserTeacherCourses1;
+exports.getUserStudentCourses1 = getUserStudentCourses1;
+exports.getUserMemberCourses1 = getUserMemberCourses1;
+exports.getUserMemberStatus = getUserMemberStatus;
 
 exports.getTestsFromAssignment = getTestsFromAssignment;
 exports.findOrCreateUser = findOrCreateUser;

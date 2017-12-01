@@ -41,6 +41,27 @@ module.exports = function (router) {
         }).catch(next);
     });
 
+    router.get('/me/member/', function (req, res, next) {
+        var user_id = req.user.id;
+        var specificRole = req.query.role;
+
+        var p;
+        if (specificRole === "teacher") {  
+            p = queries.getUserTeacherCourses1(user_id);
+
+        } else if (specificRole === "student") {
+            p = queries.getUserStudentCourses1(user_id);
+        } else {
+            p = queries.getUserMemberCourses1(user_id);
+        }
+
+        p.then(function (courseList) {
+            return res.json({courses: courseList});
+        })
+        .catch(next);
+    });
+
+
     router.get('/me/courses', function (req, res, next) {
         queries.getUserCourses(req.user.id, constants.FIELDS.COURSE.BASE_FIELDS).then(function (courses) {
             return res.json(courses);
@@ -55,6 +76,7 @@ module.exports = function (router) {
         .catch(next);
     });
 
+
     router.get('/:user_id', function (req, res, next) {
         var user_id = req.params.user_id;
         var filter = (req.user.access === constants.ACCESS.ADMIN)
@@ -62,7 +84,12 @@ module.exports = function (router) {
             : constants.FIELDS.USER.BASE_FIELDS;
 
         queries.getUser(user_id, filter).then(function (user) {
-            return res.json(user);
+            return queries.getUserMemberCourses1(user_id).then(function(userCourses) {
+                console.log(userCourses);
+                    var userObject = user.toObject();
+                    userObject.courses = userCourses;
+                    return res.json(userObject); 
+                });
         })
         .catch(function (err) {
             next(err);
@@ -96,6 +123,26 @@ module.exports = function (router) {
             next(err);
         });
     });
+
+
+    router.get('/me/invite', function (req, res, next) {
+        var query = req.query.type;
+
+        var p;
+        if (req.query.type) {
+            p = queries.getUserInvites(req.user.id, query);
+        } else {
+            p = queries.getUserInvites(req.user.id);
+        }
+
+        p.then(function(inviteArray) {
+            return res.json(inviteArray);
+        })
+        .catch(function (error) {
+            return next(error);
+        });
+    });
+
 
     // TODO
     // Documentation
@@ -140,12 +187,13 @@ module.exports = function (router) {
             return next(errors.BAD_INPUT);
         }
 
-        queries.getUser(req.user.id, "teaching courses")
-        .then(function (userObject) {
-            if (userObject.teaching.indexOf(course_id) !== -1) {
+        queries.getUserMemberStatus(course_id, req.user.id)
+        .then(function (statusObject) {
+            console.log(statusObject.role);
+            if (statusObject.role === "teacher") {
                 return "Teacher";
             }
-            if (userObject.courses.indexOf(course_id) !== -1) {
+            if (statusObject.role === "student") {
                 return "Student";
             }
             return queries.getInvitesCourseUser(req.user.id, course_id)
@@ -163,6 +211,7 @@ module.exports = function (router) {
             });
         })
         .then(function (status) {
+            console.log(status);
             return res.json({status: status});
         })
         .catch(function (error) {
