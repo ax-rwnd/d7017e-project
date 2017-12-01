@@ -11,6 +11,7 @@ import { AssignmentService } from '../services/assignment.service';
 import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import { BackendService } from '../services/backend.service';
 import { ToastService } from '../services/toast.service';
+import {UserService} from '../services/user.service';
 
 
 @Component({
@@ -63,7 +64,7 @@ export class CoursesComponent implements OnInit {
 
   constructor(private courseService: CourseService, private route: ActivatedRoute, private headService: HeadService,
               private fb: FormBuilder, private assignmentService: AssignmentService, private modalService: BsModalService,
-              private backendService: BackendService, private toastService: ToastService) {
+              private backendService: BackendService, private toastService: ToastService, private userService: UserService) {
 
     // Subscribe to the sidebar state
     this.headService.stateChange.subscribe(sidebarState => {
@@ -83,13 +84,13 @@ export class CoursesComponent implements OnInit {
         console.log('assignments', this.assignmentGroups);
       }
 
-      // Get a list of the users waiting to join the course
       this.backendService.getPendingUsers(this.currentCourse.id)
         .then(response => {
           console.log('pending', response);
           this.pendingReqs = response;
         })
         .catch(err => console.error('Get pending users failed', err));
+
     });
   }
 
@@ -140,9 +141,10 @@ export class CoursesComponent implements OnInit {
   acceptReq(student_id) {
     this.backendService.acceptPending(student_id, this.currentCourse.id)
       .then( response => {
+        this.toastService.success('Request accepted!');
         // console.log('Accepted req:', response); // Object error stuff, need to check, but works
       })
-      .catch();
+      .catch(err => console.error('Accept failed', err));
   }
 
   declineReq(user_id) { // need to rewrite delete in backend.service
