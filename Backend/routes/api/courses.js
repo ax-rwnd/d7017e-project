@@ -955,6 +955,28 @@ module.exports = function(router) {
         });
     });
 
+    // Delete specified test
+    router.delete('/:course_id/assignments/:assignment_id/tests/:test_id', function (req, res, next) {
+        var course_id = req.params.course_id;
+        var assignment_id = req.params.assignment_id;
+        var test_id = req.params.test_id;
+
+        if (!mongoose.Types.ObjectId.isValid(assignment_id) || !mongoose.Types.ObjectId.isValid(course_id) || !mongoose.Types.ObjectId.isValid(test_id)) {
+            return next(errors.BAD_INPUT);
+        }
+
+        permission.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
+        .then(function () {
+            return queries.deleteTest(test_id, assignment_id);
+        })
+        .then(function () {
+            return res.json({});
+        })
+        .catch(function (err) {
+            next(err);
+        });
+    });
+
     // Update specified test
     router.put('/:course_id/assignments/:assignment_id/tests/:test_id', function (req, res, next) {
         var course_id = req.params.course_id;

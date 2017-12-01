@@ -49,5 +49,6 @@ module.exports = {
     MAXIMUM_AMOUNT_OF_COURSES: new APIError("You can't create more courses. Delete one or contact system admin", 403, 7031),
     REQUEST_ALREADY_SENT: new APIError("A request to join this course have already been made.", 403, 7032),
     INVALID_LINK: new APIError("Invalid invite link", 401, 7032),
-    EXPIRED_LINK: new APIError("Invite link has expired", 401, 7033)
+    EXPIRED_LINK: new APIError("Invite link has expired", 401, 7033),
+    TEST_NOT_IN_ASSIGNMENT: new APIError("The test is not in this assignment", 400, 7034)
 };

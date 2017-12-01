@@ -654,6 +654,16 @@ describe('/api', () => {
     });
 
     describe('deletion', () => {
+        describe('DELETE /api/courses/:course_id/assignments/:assignment_id/tests/:test_id', () => {
+            it('completes without an error', () => {
+                return request(runner.server)
+                    .delete('/api/courses/' + course_id + '/assignments/' + assignment_id + '/tests/' + test_id)
+                    .set('Authorization', 'Bearer ' + access_tokens.admin)
+                    .expect(200);
+                // TODO: add assertions to check if there is some data left
+            });
+        });
+
         describe('DELETE /api/courses/:course_id', () => {
             it('completes without an error', () => {
                 return request(runner.server)

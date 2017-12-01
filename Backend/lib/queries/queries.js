@@ -408,6 +408,25 @@ function removeStudentFromCourse(user_id, course_id) {
     });
 }
 
+function deleteTest(test_id, assignment_id) {
+    return Assignment.update(
+        {_id: assignment_id},
+        {$pull: {'tests.io': test_id}},
+        {runValidators: true}
+    ).then(function (updated) {
+        if (updated.nModified === 0) {
+            throw errors.TEST_NOT_IN_ASSIGNMENT;
+        }
+        return Test.findOneAndRemove({_id: test_id})
+        .then(function(test) {
+            if (!test) {
+                throw errors.TEST_DOES_NOT_EXIST;
+            }
+            return test;
+        });
+    });
+}
+
 
 function getCourseInvites(course_id, type) {
     return JoinRequest.find({inviteType: type, course: course_id}, "user -_id").populate("user", "username email");
@@ -1117,6 +1136,7 @@ exports.getAssignmentTests = getAssignmentTests;
 exports.getUserPopulated = getUserPopulated;
 exports.updateCourse = updateCourse;
 exports.updateTest = updateTest;
+exports.deleteTest = deleteTest;
 exports.deleteCourse = deleteCourse;
 exports.deleteAssignment = deleteAssignment;
 exports.generateInviteLink = generateInviteLink;
