@@ -896,7 +896,7 @@ module.exports = function(router) {
             return next(errors.BAD_INPUT);
         }
 
-        queries.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.admin)
+        permission.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
         .then(function () {
             return queries.getAssignmentTests(course_id, assignment_id);
         })
@@ -921,7 +921,7 @@ module.exports = function(router) {
             return next(errors.BAD_INPUT);
         }
 
-        queries.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.admin)
+        permission.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
         .then(function () {
             return queries.createTest(stdout, stdin, args, lint, assignment_id);
         })
@@ -943,7 +943,7 @@ module.exports = function(router) {
             return next(errors.BAD_INPUT);
         }
 
-        queries.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.admin)
+        permission.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
         .then(function () {
             return queries.getTest(test_id, "stdout stdin args");
         })
@@ -989,7 +989,7 @@ module.exports = function(router) {
             }
         }
 
-        queries.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.admin)
+        permission.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
         .then(function () {
             return queries.updateTest(test_id, clean_b);
         })

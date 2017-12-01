@@ -1116,6 +1116,7 @@ exports.getInvitesCourseUser = getInvitesCourseUser;
 exports.getAssignmentTests = getAssignmentTests;
 exports.getUserPopulated = getUserPopulated;
 exports.updateCourse = updateCourse;
+exports.updateTest = updateTest;
 exports.deleteCourse = deleteCourse;
 exports.deleteAssignment = deleteAssignment;
 exports.generateInviteLink = generateInviteLink;
