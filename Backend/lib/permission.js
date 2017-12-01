@@ -32,6 +32,33 @@ function checkIfTeacher(user_id, course_id) {
     });
 }
 
+function checkUserNotInCourse(user_id, course_id) {
+    return CourseMember.count({user:user_id, course: course_id}).then(function (count) {
+        if (count !== 0) {
+            throw errors.USER_ALREADY_IN_COURSE;
+        }
+    });
+}
+
+function checkIfAlreadyInvited(user_id, course_id) {
+    return JoinRequests.count({inviteType: 'invite', user: user_id, course: course_id}).then(function (count) {
+        if (count !== 0) {
+            throw errors.INVITE_ALREADY_SENT;
+        }
+    });
+}
+
+function checkIfAlreadyRequested(user_id, course_id) {
+    return JoinRequests.count({inviteType: 'pending', user: user_id, course: course_id}).then(function (count) {
+        if (count !== 0) {
+            throw errors.REQUEST_ALREADY_SENT;
+        }
+    });
+}
+
 
 exports.checkIfTeacherOrAdmin = checkIfTeacherOrAdmin;
 exports.checkIfTeacher = checkIfTeacher;
+exports.checkUserNotInCourse = checkUserNotInCourse;
+exports.checkIfAlreadyInvited = checkIfAlreadyInvited;
+exports.checkIfAlreadyRequested = checkIfAlreadyRequested;

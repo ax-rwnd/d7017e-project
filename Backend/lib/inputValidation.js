@@ -77,6 +77,35 @@ function postCourseValidation(req) {
     return input;
 }
 
+// Input Validation for POST /api/courses/:course_id/members/invite
+function postMemberInviteValidation(req) {
+    // required
+    var course_id;
+
+    // optional
+    var user_id;
+
+    //req
+    req.checkParams("course_id", "Not a valid course id").isMongoId();
+    course_id = req.params.course_id;
+
+    //optional
+    if (!req.body.user_id) {
+        user_id = req.user.id;
+    } else {
+        req.checkBody("user_id", "Not a valid user id").isMongoId();
+        user_id = req.body.user_id;
+    }
+
+    var inputError = req.validationErrors();
+    if (inputError) {
+        throw badInput.BAD_INPUT(inputError);            
+    }
+
+    var input = {course_id: course_id, user_id: user_id};
+    return input;
+}
+
 // Input Validation for PUT /api/courses/:course_id/members/invite
 function putMembersInviteValidation (req) {
     // required
@@ -108,3 +137,4 @@ function putMembersInviteValidation (req) {
 
 exports.postCourseValidation = postCourseValidation;
 exports.putMembersInviteValidation = putMembersInviteValidation;
+exports.postMemberInviteValidation = postMemberInviteValidation;

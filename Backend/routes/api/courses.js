@@ -27,7 +27,7 @@ module.exports = function(router) {
     // If admin get all
     // If teacher or student get all not hidden courses.
     // Also get hidden courses if teacher/student of it?
-    
+
     router.get('/', function (req, res, next) {
         var ids = req.query.ids;
 
@@ -63,8 +63,8 @@ module.exports = function(router) {
             });
         }
         */
-        
-        
+
+
     });
 
     // TODO:
@@ -74,7 +74,7 @@ module.exports = function(router) {
     //
     // Returns BASE_FIELDS of every course in db.
     // If course is "hidden" only Admin and members of the course can see it.
-/*   
+/*
     router.get('/', function (req, res, next) {
 
         var p;
@@ -95,7 +95,7 @@ module.exports = function(router) {
     });
 */
 
-
+/*
     // Create new course
     // Admin/teachers can create unlimited courses
     // Students limited to 3 courses?
@@ -119,8 +119,8 @@ module.exports = function(router) {
         });
     });
 
+*/
 
-/*
     // TODO:
     // Tests
     // Documentation
@@ -136,7 +136,7 @@ module.exports = function(router) {
         catch(error) {
             return next(error);
         }
-        
+
         var p;
         if (req.user.access === "basic") {
             p = queries.countOwnedCourses(req.user.id)
@@ -146,13 +146,12 @@ module.exports = function(router) {
         } else {
             p = queries.saveCourseObject(input);
         }
-
         p.then(function (savedCourse) {
             return res.status(201).json(savedCourse);
         })
-        .catch(next);      
+        .catch(next);
     });
-*/
+
 
     // SHOULD BE REMOVED
     router.get('/me', function (req, res, next) {
@@ -187,7 +186,12 @@ module.exports = function(router) {
             }
 
             queries.getCourse(course_id, roll, wantedFields).then(function (course) {
-                return res.json(course);
+                return queries.getCourseMembers1(course_id).then(function(courseMembers) {
+                    var courseObject = course.toObject();
+                    courseObject.members = courseMembers;
+                    console.log(courseObject);
+                    return res.json(courseObject); 
+                });
             });
         })
         .catch(function(err) {
@@ -238,6 +242,26 @@ module.exports = function(router) {
         }).catch(next);
     });
 
+/*
+    router.get('/:course_id/members', function (req, res, next) {
+        var course_id = req.params.course_id;
+        var query = req.query.role;
+
+        var p;
+        if (query === "teacher") {
+            p = queries.getCourseTeachers1(course_id);
+        } else if (query === "student") {
+            p = queries.getCourseStudents1(course_id);
+        } else {
+            p = queries.getCourseMembers1(course_id);
+        }
+
+        p.then(function (memberArray) {
+            return res.json({members: memberArray});
+        })
+        .catch(next);
+    });
+*/
 
     router.get('/:course_id/students', function (req, res, next) {
         var course_id = req.params.course_id;
@@ -340,6 +364,34 @@ module.exports = function(router) {
         });
     });
 
+/*
+    // TODO:
+    // Tests
+    // Documentation
+    //
+    //
+    router.post('/:course_id/members/invite', function (req, res, next) {
+        try {
+            var input = inputValidation.putMembersInviteValidation(req);
+        }
+        catch(error) {
+            return next(error);
+        }
+
+        var p;
+        if (input.user_id === req.user.id) {
+            p = permission.checkUserNotInCourse(input.user_id, input.course_id).then(function () {
+                    return permission.checkIfAlreadyInvited(input.user_id, input.course_id).then(function () {
+
+                    })
+                })
+                .then(function () {
+
+                })
+        }
+
+    });
+*/
 
     // TODO
     // Documentation
@@ -347,7 +399,7 @@ module.exports = function(router) {
     //
     // Caller will accept an invite to :course_id.
     // If invite exists user caller will be added as a student in the course.
-    router.put('/:course_id/students/invite', function (req, res, next) {
+    router.put('/:course_id/members/invite', function (req, res, next) {
         var course_id = req.params.course_id;
 
 
@@ -384,7 +436,6 @@ module.exports = function(router) {
         catch(error) {
             return next(error);
         }
-
         var p;
         if (input.user_id === req.user.id) {
             p = queries.acceptInviteToCourse(input.user_id, input.course_id);
@@ -393,7 +444,6 @@ module.exports = function(router) {
                         return queries.addMemberToCourse(input.user_id, input.course_id);
                 });
         }
-
         p.then(function () {
             return res.status(201).json({});
         })
@@ -907,49 +957,184 @@ module.exports = function(router) {
 
     // Return enabled_features of a course
     router.get('/:course_id/enabled_features', function(req, res, next) {
-        queries.getCoursesEnabledFeatures(req.params.course_id).then(function (enabled_features) {
-            res.json(enabled_features);
-        }).catch(next);
+
+        var course_id = req.params.course_id;
+
+        if (!mongoose.Types.ObjectId.isValid(course_id)) {
+            return next(errors.BAD_INPUT);
+        }
+
+        return queries.getCoursesEnabledFeatures(course_id)
+        .then(enabled_features => res.json(enabled_features))
+        .catch(next);
     });
 
     // Return all features of a course
     router.get('/:course_id/features', function(req, res, next) {
-        features.getFeaturesOfCourse(req.params.course_id).then(function(progress) {
-            return res.json(progress);
-        }).catch(next);
+
+        var course_id = req.params.course_id;
+
+        if (!mongoose.Types.ObjectId.isValid(course_id)) {
+            return next(errors.BAD_INPUT);
+        }
+
+        features.getFeaturesOfCourse(course_id)
+        .then(res.json)
+        .catch(next);
     });
 
     // Return feature of user in a course
     router.get('/:course_id/features/me', function(req, res, next) {
-        features.getFeatureOfUserID(req.params.course_id, req.user.id).then(function(progress) {
-            return res.json(progress);
-        }).catch(next);
+
+        var course_id = req.params.course_id;
+        var user_id = req.user.id;
+
+        if (!mongoose.Types.ObjectId.isValid(course_id) || !mongoose.Types.ObjectId.isValid(user_id)) {
+            return next(errors.BAD_INPUT);
+        }
+
+        features.getFeatureOfUserID(course_id, user_id)
+        .then(res.json)
+        .catch(next);
+    });
+
+    // Get all badges in a course
+    router.get('/:course_id/badges', function(req, res, next) {
+
+        var course_id = req.params.course_id;
+
+        if (!mongoose.Types.ObjectId.isValid(course_id)) {
+            return next(errors.BAD_INPUT);
+        }
+
+        return features.getBadgeByCourseID(course_id)
+        .then(res.json)
+        .catch(next);
     });
 
     // Create badge
     router.post('/:course_id/badges', function (req, res, next) {
-        features.createBadge(req.body).then(function(badge) {
+
+        var course_id = req.params.course_id;
+
+        if (!mongoose.Types.ObjectId.isValid(course_id)) {
+            return next(errors.BAD_INPUT);
+        }
+
+        req.body.course_id = course_id;
+
+        return features.createBadge(req.body)
+        .then(function(badge) {
             return res.json(badge);
-        }).catch(next);
+        })
+        .catch(next);
     });
 
     // Get a badge by id
     router.get('/:course_id/badges/:badge_id', function (req, res, next) {
-        features.getBadge(req.params.badge_id).then(function(badge) {
+
+        var course_id = req.params.course_id;
+        var badge_id = req.params.badge_id;
+
+        if (!mongoose.Types.ObjectId.isValid(course_id) || !mongoose.Types.ObjectId.isValid(badge_id)) {
+            return next(errors.BAD_INPUT);
+        }
+
+        features.getBadge(badge_id)
+        .then(function(badge) {
             return res.json(badge);
-        }).catch(next);
+        })
+        .catch(next);
     });
 
     // Update a badge by id
     router.put('/:course_id/badges/:badge_id', function(req, res, next) {
-        features.updateBadge(req.params.badge_id, req.body).then(function(badge) {
+
+        var course_id = req.params.course_id;
+        var badge_id = req.params.badge_id;
+
+        if (!mongoose.Types.ObjectId.isValid(course_id) || !mongoose.Types.ObjectId.isValid(badge_id)) {
+            return next(errors.BAD_INPUT);
+        }
+
+        req.body.course_id = course_id;
+
+        return features.updateBadge(badge_id, req.body)
+        .then(function(badge) {
             return res.json(badge);
-        }).catch(next);
+        })
+        .catch(next);
     });
 
     // Delete a badge by id
     router.delete('/:course_id/badges/:badge_id', function(req, res, next) {
+
+        var course_id = req.params.course_id;
+        var badge_id = req.params.badge_id;
+
+        if (!mongoose.Types.ObjectId.isValid(course_id) || !mongoose.Types.ObjectId.isValid(badge_id)) {
+            return next(errors.BAD_INPUT);
+        }
+
         // TODO
         return res.sendStatus(501);
+    });
+
+    // Get all assignmentgroups of a course
+    router.get('/:course_id/assignmentgroups', function(req, res, next) {
+
+        var course_id = req.params.course_id;
+
+        if (!mongoose.Types.ObjectId.isValid(course_id)) {
+            return next(errors.BAD_INPUT);
+        }
+
+    });
+
+    // Create an assignment group
+    router.post('/:course_id/assignmentgroups', function(req, res, next) {
+
+        var course_id = req.params.course_id;
+
+        if (!mongoose.Types.ObjectId.isValid(course_id)) {
+            return next(errors.BAD_INPUT);
+        }
+
+    });
+
+    // Return an assignment group
+    router.get('/:course_id/assignmentgroups/:assignmentgroup_id', function(req, res, next) {
+
+        var course_id = req.params.course_id;
+        var assignmentgroup_id = req.params.assignmentgroup_id;
+
+        if (!mongoose.Types.ObjectId.isValid(course_id) || !mongoose.Types.ObjectId.isValid(course_id)) {
+            return next(errors.BAD_INPUT);
+        }
+
+    });
+
+    // Update an assignment group
+    router.put('/:course_id/assignmentgroups/:assignmentgroup_id', function(req, res, next) {
+
+        var course_id = req.params.course_id;
+        var assignmentgroup_id = req.params.assignmentgroup_id;
+
+        if (!mongoose.Types.ObjectId.isValid(course_id) || !mongoose.Types.ObjectId.isValid(course_id)) {
+            return next(errors.BAD_INPUT);
+        }
+
+    });
+
+    // Delete an assignment group
+    router.delete('/:course_id/assignmentgroups/:assignmentgroup_id', function(req, res, next) {
+
+        var course_id = req.params.course_id;
+        var assignmentgroup_id = req.params.assignmentgroup_id;
+
+        if (!mongoose.Types.ObjectId.isValid(course_id) || !mongoose.Types.ObjectId.isValid(course_id)) {
+            return next(errors.BAD_INPUT);
+        }
+
     });
 };
