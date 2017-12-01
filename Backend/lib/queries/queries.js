@@ -9,7 +9,8 @@ var User = require('../../models/schemas').User;
 var Draft = require('../../models/schemas').Draft;
 var JoinRequest = require('../../models/schemas').JoinRequests;
 var Badge = require('../../models/schemas').Badge;
-var InviteLinks = require('../../models/schemas').InviteLinks;
+var Feature = require('../../models/schemas').Features;
+var InviteLink = require('../../models/schemas').InviteLinks;
 var errors = require('../errors.js');
 var mongoose = require('mongoose');
 var logger = require('../logger.js');
@@ -474,10 +475,6 @@ function deleteCourse(id) {
             throw errors.COURSE_DOES_NOT_EXIST;
         }
         // assignments
-        for (let ass_id of course.assignments) {
-            deleteAssignment(ass_id)
-            .catch(() => {});
-        }
         let promises = course.assignments
             .map(aid => {
                 return deleteAssignment(aid)
@@ -485,12 +482,23 @@ function deleteCourse(id) {
                 .catch(()=>{});
             });
         // members
-        promises.push(CourseMember.remove({course: course._id}));
+        promises.push(deleteCourseMembers(course._id));
         // join requests
         promises.push(JoinRequest.remove({course: course._id}));
+        // invite links
+        promises.push(InviteLink.remove({course: course._id}));
         // badges
         promises.push(Badge.remove({course_id: course._id}));
         return Promise.all(promises);
+    });
+}
+
+function deleteCourseMembers(course_id) {
+    return CourseMember.find({course: course_id})
+    .then(members => {
+        let p = members.map(m => Feature.remove({_id: m.features}));
+        p.concat(members.map(m => m.remove()));
+        return Promise.all(p);
     });
 }
 
@@ -971,19 +979,19 @@ function generateInviteLink(course_id) {
     if (!mongoose.Types.ObjectId.isValid(course_id)) {
             throw errors.INVALID_ID;
     }
-    var newLink = new InviteLinks({code: code, course: course_id});
+    var newLink = new InviteLink({code: code, course: course_id});
     return newLink.save().then(function (obj) {
         return obj;
     });
 }
 
 function validateInviteLink(code, user_id) {
-    return InviteLinks.findOne({code: code}).then(function (obj) {
+    return InviteLink.findOne({code: code}).then(function (obj) {
         if (!obj) {
             throw errors.INVALID_LINK;
         }
         if (obj.expiresAt < Date.now()) {
-            return InviteLinks.deleteOne({code: code}).then(function () {
+            return InviteLink.deleteOne({code: code}).then(function () {
                 throw errors.EXPIRED_LINK;
             });
         }
