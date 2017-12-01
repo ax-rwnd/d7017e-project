@@ -141,10 +141,10 @@ module.exports = function(router) {
         if (req.user.access === "basic") {
             p = queries.countOwnedCourses(req.user.id)
                 .then(function () {
-                    return queries.saveCourseObject(input);
+                    return queries.saveCourseObject(req.user.id, input);
                 });
         } else {
-            p = queries.saveCourseObject(input);
+            p = queries.saveCourseObject(req.user.id, input);
         }
         p.then(function (savedCourse) {
             return res.status(201).json(savedCourse);
@@ -808,6 +808,25 @@ module.exports = function(router) {
             .then(function (assignmentObject) {
                 return res.json(assignmentObject);
             });
+        }).catch(next);
+    });
+
+    router.delete('/:course_id/assignments/:assignment_id', function (req, res, next) {
+        var course_id = req.params.course_id;
+        var assignment_id = req.params.assignment_id;
+        if (!mongoose.Types.ObjectId.isValid(course_id)) {
+            return next(errors.BAD_INPUT);
+        }
+        if (!mongoose.Types.ObjectId.isValid(assignment_id)) {
+            return next(errors.BAD_INPUT);
+        }
+        queries.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
+        // ensure the course actually owns the assignment
+        // TODO: use lib/perssion
+        .then(() => queries.deleteAssignment(assignment_id))
+        .then(() => {
+            // respond with empty body
+            res.json({});
         }).catch(next);
     });
 
