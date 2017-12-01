@@ -44,6 +44,7 @@ import { ToastService } from './services/toast.service';
 import {AuthGuardService as AuthGuard} from './services/Auth/Auth-Guard.service';
 import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
 import {NoopInterceptor} from './Interceptors/Auth.interceptor';
+import {EmptyResponseBodyErrorInterceptor} from './Interceptors/Backend.interceptor';
 
 import {AuthService} from './services/Auth/Auth.service';
 import {Http, HttpModule} from '@angular/http';
@@ -126,6 +127,11 @@ const appRoutes: Routes = [
     {
       provide: HTTP_INTERCEPTORS,
       useClass: NoopInterceptor,
+      multi: true,
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: EmptyResponseBodyErrorInterceptor,
       multi: true,
     },
     HeadService, // the state variable that head provides
