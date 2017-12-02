@@ -19,13 +19,12 @@
   /* test*/
   color: black;
   width: var(--wSidebar);
-  height: 100%;
   background: white;
   /*background: rgba(29, 117, 175, 0.27);*/
-  position: fixed;
-  padding-top: 5%;
+  position: absolute;
   left: 0;
+  padding-top: 5%;
   padding-right: 1%;
   font-size: 1.1em;
-  z-index: 1;
+
 }
