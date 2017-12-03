@@ -49,6 +49,7 @@
       <div *ngFor="let g of assignmentGroups">
         <app-assignment-group [assignmentGroup]="g" [courseCode]="currentCourse.id"></app-assignment-group>
       </div>
+      <app-mod-adventuremap-editor [courseCode]="currentCourse.id"></app-mod-adventuremap-editor>
     </ng-template>
     <!-- Teacher view END -->
   </div>

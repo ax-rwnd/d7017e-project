@@ -1,5 +1,5 @@
 import { GameelementComponent } from '../gameelement/gameelement.component';
-import { Component, OnInit, OnChanges, ViewChild, AfterViewInit, Input } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit, Input } from '@angular/core';
 
 
 @Component({
@@ -7,7 +7,7 @@ import { Component, OnInit, OnChanges, ViewChild, AfterViewInit, Input } from '@
   templateUrl: './mod-adventuremap.component.html',
   styleUrls: ['../gameelement/gameelement.component.css']
 })
-export class ModAdventuremapComponent extends GameelementComponent implements OnInit, OnChanges, AfterViewInit {
+export class ModAdventuremapComponent extends GameelementComponent implements OnInit, AfterViewInit {
   @ViewChild('mapCanvas') mapCanvas;
   @Input() courseCode: string;
 
@@ -22,7 +22,7 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
 
   // Backend state
   private userProgress: any;
-  private assignments: any[];
+  protected assignments: any[];
 
   // Frontend state
   private lastAssignment: any;
@@ -31,8 +31,8 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
   private assignmentId: string;
 
   // Shadow-DOM elements
-  private canvas: any;
-  private context: CanvasRenderingContext2D;
+  protected canvas: any;
+  protected context: CanvasRenderingContext2D;
 
   ngOnInit() {
     // Setup the viewport to reload once the image has loaded
@@ -43,17 +43,20 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
     this.img.src = '/assets/images/ck4.gif';
   }
 
-  ngOnChanges() {
-    this.update();
-  }
-
   ngAfterViewInit() {
     this.canvas = this.mapCanvas.nativeElement;
     this.context = this.canvas.getContext('2d');
     this.update();
 
     // Allow users to select assignments
-    this.canvas.addEventListener('click', (ev: any) => {
+    this.canvas.addEventListener('click',
+      this.handleClick(), false);
+  }
+
+  handleClick() {
+    return (ev: any) => {
+      // Handle click for this kind of event
+
       const rect: any = (this as any).canvas.getBoundingClientRect();
       const x = ev.clientX - rect.left;
       const y = ev.clientY - rect.top;
@@ -67,8 +70,7 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
 
       this.setTextValues();
       this.drawMap();
-    },
-    false);
+    };
   }
 
   setTextValues() {
@@ -81,6 +83,8 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
   }
 
   update() {
+    // Update the model with all the latest and greatest state
+
     this.loadAssignments()
       .then( () => {
         this.selectedAssignment = this.assignments[this.userProgress.completed_assignments];
@@ -127,7 +131,7 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
     });
   }
 
-drawMap() {
+  drawMap() {
     // Render one frame of the game map
 
     if (this.context === undefined) {

@@ -1,0 +1,17 @@
+<div class="gamification-block panel panel-default" *ngIf="isEnabled !== false">
+  <div class="panel-heading gamification-header">Adventure Map</div>
+  <div>
+
+    <div class="panel-body text-center">
+      <canvas #mapCanvas width="{{width}}" height="{{height}}"></canvas>
+
+      <div>
+        <select [(ngModel)]="toEdit">
+          <option *ngFor="let a of assignments" [ngValue]="a">{{a.name || 'Nothing'}}</option>
+        </select>
+        <p>{{toEdit}}</p>
+      </div>
+    </div>
+
+  </div>
+</div>

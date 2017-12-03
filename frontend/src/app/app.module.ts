@@ -55,6 +55,7 @@ import { ModLeaderboardComponent } from './mod-leaderboard/mod-leaderboard.compo
 import { ModProgressbarComponent } from './mod-progressbar/mod-progressbar.component';
 import { ModAdventuremapComponent } from './mod-adventuremap/mod-adventuremap.component';
 import { ModAdventuremapLargeComponent } from './mod-adventuremap/mod-adventuremap-large.component';
+import { ModAdventuremapEditorComponent } from './mod-adventuremap/mod-adventuremap-editor.component';
 import { ModBadgesComponent } from './mod-badges/mod-badges.component';
 import { ModBadgesSingleComponent } from './mod-badges/mod-badges-single.component';
 
@@ -95,6 +96,7 @@ const appRoutes: Routes = [
     ModBadgesComponent,
     ModBadgesSingleComponent,
     ModAdventuremapComponent,
+    ModAdventuremapEditorComponent,
     ModAdventuremapLargeComponent,
   ],
   imports: [
