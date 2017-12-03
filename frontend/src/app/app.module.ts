@@ -2,6 +2,9 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
+import { ToastModule, ToastOptions } from 'ng2-toastr/ng2-toastr';
+import { CustomOptions } from './toastr-options';
+
 // NG-BOOTSTRAP
 import { AlertModule } from 'ngx-bootstrap';
 import { ButtonsModule } from 'ngx-bootstrap';
@@ -12,7 +15,6 @@ import { ModalModule } from 'ngx-bootstrap';
 import { TooltipModule } from 'ngx-bootstrap/tooltip';
 import { AngularFontAwesomeModule } from 'angular-font-awesome/angular-font-awesome';
 
-import { CodemirrorModule } from 'ng2-codemirror';
 import { AceEditorModule } from 'ng2-ace-editor';
 import { MarkdownModule } from 'angular2-markdown';
 
@@ -36,11 +38,13 @@ import { HeadService } from './services/head.service';
 import { UserService } from './services/user.service';
 import { CourseService} from './services/course.service';
 import { AssignmentService } from './services/assignment.service';
+import { ToastService } from './services/toast.service';
 
 // AUTH
 import {AuthGuardService as AuthGuard} from './services/Auth/Auth-Guard.service';
 import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
 import {NoopInterceptor} from './Interceptors/Auth.interceptor';
+import {EmptyResponseBodyErrorInterceptor} from './Interceptors/Backend.interceptor';
 
 import {AuthService} from './services/Auth/Auth.service';
 import {Http, HttpModule} from '@angular/http';
@@ -104,7 +108,6 @@ const appRoutes: Routes = [
     FormsModule,
     ReactiveFormsModule,
     BrowserAnimationsModule,
-    CodemirrorModule,
     AceEditorModule,
     MarkdownModule.forRoot(),
     AlertModule.forRoot(),
@@ -119,7 +122,8 @@ const appRoutes: Routes = [
     ModalModule.forRoot(),
     RouterModule.forRoot(
       appRoutes
-    )
+    ),
+    ToastModule.forRoot()
   ],
   providers: [
     {
@@ -127,11 +131,21 @@ const appRoutes: Routes = [
       useClass: NoopInterceptor,
       multi: true,
     },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: EmptyResponseBodyErrorInterceptor,
+      multi: true,
+    },
     HeadService, // the state variable that head provides
     BackendService,
     UserService,
     CourseService,
     AssignmentService,
+    ToastService,
+    {
+      provide: ToastOptions,
+      useClass: CustomOptions,
+    },
     // AUTHS
     AuthGuard,
     AuthService,

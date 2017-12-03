@@ -34,8 +34,19 @@
   overflow: scroll;
 }
 
+.color-gray {
+  color: gray;
+}
+
 .glyphicon {
   font-size: 1.1em;
+}
+
+.glyph-button {
+  color: #133756;
+  background: none;
+  border: none;
+  font-size: 1.8em;
 }
 
 .question {

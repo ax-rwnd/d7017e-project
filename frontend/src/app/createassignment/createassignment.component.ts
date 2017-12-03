@@ -8,6 +8,7 @@ import {FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { BsModalRef } from 'ngx-bootstrap/modal/modal-options.class';
 import {ActivatedRoute} from '@angular/router';
+import { ToastService } from '../services/toast.service';
 
 @Component({
   selector: 'app-createassignment',
@@ -29,6 +30,7 @@ export class CreateassignmentComponent implements OnInit {
   languages: string[];
   content: string;
   unitTests: any[];
+  lintTest: boolean;
   courseId: string;
 
   markdownExampleCode: string;
@@ -47,7 +49,8 @@ export class CreateassignmentComponent implements OnInit {
   };
 
   constructor(private backendService: BackendService, private headService: HeadService,
-              private modalService: BsModalService, private fb: FormBuilder, private route: ActivatedRoute) {
+              private modalService: BsModalService, private fb: FormBuilder, private route: ActivatedRoute,
+              private toastService: ToastService) {
     this.route.params.subscribe(params => this.courseId = params['course']);
     this.headService.stateChange.subscribe(sidebarState => { this.sidebarState = sidebarState; });
   }
@@ -70,14 +73,7 @@ export class CreateassignmentComponent implements OnInit {
   }
 
   createTest() {
-    // TODO: read the documentation and update the input here
-
-    if (this.testType === 'io') {
-      this.unitTests.push([this.testType, this.form.value.ioInput, this.form.value.ioOutput]);
-    } else {
-      this.unitTests.push([this.testType]);
-    }
-    this.testType = '';
+    this.unitTests.push(['io', this.form.value.ioInput, this.form.value.ioOutput]);
   }
 
   editExistingTest(e) {
@@ -109,6 +105,14 @@ export class CreateassignmentComponent implements OnInit {
     }
   }
 
+  testLint() {
+    if (this.lintTest === true) {
+      this.lintTest = false;
+    } else {
+      this.lintTest = true;
+    }
+  }
+
   submitNewAssignment() {
     // Submits the assignment to the backend
     // TODO: this function should work, but requires more testing, the backend
@@ -119,9 +123,11 @@ export class CreateassignmentComponent implements OnInit {
         const assignmentId = response._id;
         console.warn('assignmentId was', assignmentId);
         for (const test of this.unitTests) {
-          this.backendService.createTest(this.courseId, test, assignmentId);
+          this.backendService.createTest(this.courseId, test, assignmentId, this.lintTest);
         }
-      });
+        this.toastService.success('Assignment Created!');
+      })
+      .catch(err => console.error('Create assignment failed', err));
   }
 }
 

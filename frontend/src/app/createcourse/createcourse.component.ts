@@ -1,12 +1,14 @@
 import {Component, OnInit, ViewChild, TemplateRef} from '@angular/core';
+import { Location } from '@angular/common';
 import { trigger, state, style, animate, transition } from '@angular/animations';
 import { HeadService } from '../services/head.service';
 import {FormGroup, FormControl, Validators } from '@angular/forms';
 import {BackendService} from '../services/backend.service';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { BsModalRef } from 'ngx-bootstrap/modal/modal-options.class';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import {CourseService} from '../services/course.service';
+import { ToastService } from '../services/toast.service';
 
 @Component({
   selector: 'app-createcourse',
@@ -36,13 +38,14 @@ export class CreatecourseComponent implements OnInit {
   progDesc = 'The student will be able to see progress depending on amount of completed assignments.';
   advmapDesc = 'The student will have an adventure map there different paths can be unlocked by completing assignments or tasks.'; //
   leadbDesc = 'The course will have a leaderboard that shows scores for each students in the course.';
-  publicDesc = 'Make the course public on create. Can later be changed.';
-  autojoinDesc = 'Students will be able to join the course freely.';
+  publicDesc = 'Make the course public so students can see, request access or join the course.';
+  autojoinDesc = 'Students will be able to join the course freely so no request is required.';
 
   @ViewChild('courseCreated') courseModal: TemplateRef<any>; // Temporary solution, modal will pop up after course is created
 
   constructor(private headService: HeadService, private backendService: BackendService, private modalService: BsModalService,
-              private route: ActivatedRoute, private courseService: CourseService) {
+              private route: ActivatedRoute, private courseService: CourseService, private toastService: ToastService,
+              private _location: Location, private router: Router) {
     this.headService.stateChange.subscribe(sidebarState => { // subscribe to the state value head provides
       this.sidebarState = sidebarState;
     });
@@ -52,6 +55,11 @@ export class CreatecourseComponent implements OnInit {
       this.course = this.courseService.GetCourse(params.course);
     });
   }
+
+  goBack() {
+    this._location.back();
+  }
+
   // for the hypertext
   onChange(c) {
     this.content = c;
@@ -108,23 +116,30 @@ export class CreatecourseComponent implements OnInit {
     this.backendService.postNewCourse(this.form.value.name, this.content,
       !this.form.value.nothidden, this.form.value.code, enabled_features, this.form.value.autojoin)
       .then( (response: any) => {
+        this.toastService.success('Course created!');
         // Handle response from backend
         // newTeachCourse(id, name, code, course_desc, hidden, en_feat, students, teachers, autojoin, assigs) { }
         const courseId = response._id;
         console.log('Got back id:', courseId);
         // this.form = createSearchForm(); // for invites, not yet implemented
-        this.openModal(this.courseModal);
+        this.router.navigate(['/user'])
+          .then( nav => {
+            location.reload();
+          });
+        // this.openModal(this.courseModal);
       })
-      .catch(err => console.error('Something went wrong when creating the course:', err));
+      .catch(err => console.error('Create course failed', err));
   }
 
   updateCourse(enabled_features: Object) {
     this.backendService.updateCourse(this.course.id, this.form.value.name, this.content,
       !this.form.value.nothidden, this.form.value.code, enabled_features, this.form.value.autojoin)
       .then((response: any) => { // when put, should get back empty object
+        location.reload();
+        this.toastService.success('Course updated!');
         console.log(response);
       })
-      .catch(err => console.error('Something went wrong when creating the course:', err));
+      .catch(err => console.error('Update course failed:', err));
   }
 
   openModal(modal) {
@@ -138,18 +153,18 @@ export class CreatecourseComponent implements OnInit {
     this.form.setValue({
       name: this.course ? this.course.name : '',
       code: this.course ? this.course.code : '',
-      progress: false,
-      badges: false,
-      map: false,
-      leaderboard: false,
-      nothidden: false,
+      progress: this.course ? this.course.enabled_features.progressbar : false,
+      badges: this.course ? this.course.enabled_features.badges : false,
+      map: this.course ? this.course.enabled_features.adventuremap : false,
+      leaderboard: this.course ? this.course.enabled_features.leaderboard : false,
+      public: this.course ? !this.course.hidden : false, // if it's not hidden it is public
       autojoin: this.course ? this.course.autojoin : false,
     });
   }
   ngOnInit() {
     this.sidebarState = this.headService.getCurrentState();
     this.setForm();
-    this.content = this.course ? this.course.desc : '';
+    this.content = this.course ? this.course.desc : '## Header';
     this.errorMessage = '';
     this.students = []; // should be empty list
   }
@@ -169,7 +184,7 @@ function createCourseForm() {
     badges: new FormControl(false),
     map: new FormControl(false),
     leaderboard: new FormControl(false),
-    nothidden: new FormControl(false),
+    public: new FormControl(false),
     autojoin: new FormControl(false),
   });
 }

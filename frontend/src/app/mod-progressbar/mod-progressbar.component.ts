@@ -26,18 +26,20 @@ export class ModProgressbarComponent extends GameelementComponent implements OnI
   update() {
     // Grab updates from backend
 
-    this.backendService.getFeaturesCourseMe(this.courseCode).then((data: any) => {
-      this.currentAssignments = data.completed_assignments;
-      this.maxAssignments = data.total_assignments;
+    this.backendService.getFeaturesCourseMe(this.courseCode)
+      .then((data: any) => {
+        this.currentAssignments = data.completed_assignments;
+        this.maxAssignments = data.total_assignments;
 
-      // Set progress
-      if (this.maxAssignments === 0) {
-        this.progress = 1;
-      } else {
-        this.progress = this.currentAssignments / this.maxAssignments;
-      }
-      this.progress *= 100;
-    });
+        // Set progress
+        if (this.maxAssignments === 0) {
+          this.progress = 1;
+        } else {
+          this.progress = this.currentAssignments / this.maxAssignments;
+        }
+        this.progress *= 100;
+      })
+      .catch(err => console.error('Update leaderboard failed', err));
   }
 
   isEnabled() {
