@@ -40,6 +40,7 @@ export class TeacherCoursesComponent implements OnInit {
   defaultForm = {
     search: ''
   };
+  groupName: string;
   teacherViewBool = false;
   selectedBadge: string;
   badges: Array<Object> = [
@@ -86,6 +87,7 @@ export class TeacherCoursesComponent implements OnInit {
         this.assignmentGroups = this.assignmentService.courseAssignments['default'];
         console.log('assignments', this.assignmentGroups);
       }
+      this.selectedAssignments = [{'assignment': this.flattenAssignments()[0], 'possible': this.flattenAssignments()}];
 
       this.backendService.getPendingUsers(this.currentCourse.id)
         .then(response => {
@@ -119,8 +121,14 @@ export class TeacherCoursesComponent implements OnInit {
             this.tests[a.id] = tests;
           });
       }
+    } else if (type === 'createGroup') {
+      this.groupName = '';
     }
     this.modalRef = this.modalService.show(modal);
+  }
+
+  createAssignmentGroup() {
+    this.backendService.postAssignmentGroup(this.currentCourse.id, this.groupName);
   }
 
   acceptAllReqs() { // iterate through pending list
