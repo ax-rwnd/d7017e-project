@@ -3,13 +3,11 @@
   <div>
 
     <div class="panel-body text-center">
-      <canvas #mapCanvas width="{{width}}" height="{{height}}"></canvas>
+      <canvas #mapCanvas width="{{width}}" height="{{height}}" onblur="lostFocus()" onfocusout="alert(1)"></canvas>
 
       <div>
-        <select [(ngModel)]="toEdit">
-          <option *ngFor="let a of assignments" [ngValue]="a">{{a.name || 'Nothing'}}</option>
-        </select>
-        <p>{{toEdit}}</p>
+        <p *ngIf="selectedAssignment !== undefined">{{selectedAssignment.name}}</p>
+        <p *ngIf="selectedAssignment === undefined">Select- and move your assignments by clicking on them on the map.</p>
       </div>
     </div>
 

@@ -16,8 +16,8 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
   protected height = 200;
   private readonly borderThickness = 2;
   private readonly lineThickness = 1;
-  private readonly radius = 4;
-  private readonly sensitivity = this.radius;
+  protected radius = 4;
+  protected sensitivity = this.radius;
   protected img = new Image(this.width, this.height);
 
   // Backend state
@@ -25,8 +25,8 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
   protected assignments: any[];
 
   // Frontend state
-  private lastAssignment: any;
-  private selectedAssignment: any;
+  protected lastAssignment: any;
+  protected selectedAssignment: any;
   private assignmentText: string;
   private assignmentId: string;
 
@@ -151,50 +151,63 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
 
       for (let i = 0; i < this.assignments.length; i++) {
         const current = this.assignments[i];
-
-        // Connect dots
-        if (i < this.assignments.length - 1) {
-          const next = this.assignments[i + 1];
-
-          ctx.beginPath();
-          ctx.lineWidth = 1;
-          ctx.strokeStyle = 'black';
-          ctx.moveTo(current.x, current.y);
-          ctx.lineTo(next.x, next.y);
-          ctx.stroke();
-        }
-
-        // Draw dot
-        ctx.beginPath();
-        ctx.arc(current.x, current.y, this.radius, 0, 2 * Math.PI, false);
-
-        // TODO: this is dependent on the linearity of the responses
-        // perhaps it could be done better with cooperation from backend
-        ctx.strokeStyle = 'black';
-
-        // Set fill stule
-        if (this.lastAssignment !== undefined &&
-            this.lastAssignment._id === current._id) {
-          ctx.fillStyle = 'blue';
-        } else if (this.userProgress.completed_assignments >= i) {
-          ctx.fillStyle = 'red';
-        } else {
-          ctx.fillStyle = 'gray';
-        }
-        ctx.fill();
-
-        // Set stroke style
-        if (this.selectedAssignment !== undefined &&
-          this.selectedAssignment._id === current._id) {
-          ctx.lineWidth = 2;
-          ctx.strokeStyle = 'green';
-        } else {
-          ctx.lineWidth = 1;
-          ctx.strokeStyle = 'black';
-        }
-
-        ctx.stroke();
+        this.drawAssignment(ctx, current, i);
       }
     }
+  }
+
+  strokePath(ctx: CanvasRenderingContext2D, current: any, index: number) {
+    // Stroke path between assignments
+
+    if (index < this.assignments.length - 1) {
+      const next = this.assignments[index + 1];
+
+      ctx.beginPath();
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = 'black';
+      ctx.moveTo(current.x, current.y);
+      ctx.lineTo(next.x, next.y);
+      ctx.stroke();
+    }
+  }
+
+  drawPoint(ctx: CanvasRenderingContext2D, current: any, index: number) {
+    // Draw dot
+    ctx.beginPath();
+    ctx.arc(current.x, current.y, this.radius, 0, 2 * Math.PI, false);
+
+    // TODO: this is dependent on the linearity of the responses
+    // perhaps it could be done better with cooperation from backend
+    ctx.strokeStyle = 'black';
+
+    // Set fill stule
+    if (this.lastAssignment !== undefined &&
+        this.lastAssignment._id === current._id) {
+      ctx.fillStyle = 'blue';
+    } else if (this.userProgress.completed_assignments >= index) {
+      ctx.fillStyle = 'red';
+    } else {
+      ctx.fillStyle = 'gray';
+    }
+    ctx.fill();
+
+    // Set stroke style
+    if (this.selectedAssignment !== undefined &&
+      this.selectedAssignment._id === current._id) {
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = '#5f5';
+    } else {
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = 'black';
+    }
+
+    ctx.stroke();
+  }
+
+  drawAssignment(ctx: CanvasRenderingContext2D, current: any, index: number) {
+    // Draw information for one assignment
+
+    this.strokePath(ctx, current, index);
+    this.drawPoint(ctx, current, index);
   }
 }

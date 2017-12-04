@@ -8,11 +8,12 @@ import { Component, OnInit, OnChanges, SimpleChanges, AfterViewInit } from '@ang
 })
 
 export class ModAdventuremapEditorComponent extends ModAdventuremapComponent implements OnInit, AfterViewInit {
-  private toEdit: any;
+  // private toEdit: any;
 
   ngOnInit() {
     this.width = 512;
     this.height = 512;
+    this.sensitivity = this.radius *= ((this.width + this.height) / 2) / 128;
 
     // Make sure to get those assignments loaded right away
     this.loadAssignments();
@@ -37,15 +38,28 @@ export class ModAdventuremapEditorComponent extends ModAdventuremapComponent imp
 
   handleClick() {
     return (ev: any) => {
-      if (this.toEdit !== undefined) {
-        // TODO: initially selected element isn't defined
+      // Hittest the nodes
+      const rect: any = (this as any).canvas.getBoundingClientRect();
+      const x = ev.clientX - rect.left;
+      const y = ev.clientY - rect.top;
 
-        const rect: any = (this as any).canvas.getBoundingClientRect();
-        this.toEdit.x = ev.clientX - rect.left;
-        this.toEdit.y = ev.clientY - rect.top;
+      const toSelect = this.assignments.find( (el) => {
+        const dx = x - el.x;
+        const dy = y - el.y;
+        return (Math.sqrt(dx * dx + dy * dy) < this.sensitivity);
+      });
 
-        this.drawMap();
+      // Determine what to do
+      if (toSelect !== undefined) {
+        this.selectedAssignment = toSelect;
+      } else if (this.selectedAssignment !== undefined) {
+        this.selectedAssignment.x = x;
+        this.selectedAssignment.y = y;
+      } else {
+        console.warn('Warning: undefined elements.');
       }
+
+      this.drawMap();
     };
   }
 }
