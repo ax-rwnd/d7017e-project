@@ -2,8 +2,9 @@
 // Any modular game component should inherit this and make use of its methods
 //   instead of implementing its own.
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { BackendService } from '../services/backend.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-gameelement',
@@ -11,10 +12,18 @@ import { BackendService } from '../services/backend.service';
 })
 
 export class GameelementComponent implements OnInit {
-  constructor(public backendService: BackendService) {}
+  constructor(protected backendService: BackendService, protected route: ActivatedRoute) {
+    this.route.params.subscribe( (data: any) => {
+      this.sidebarUpdate(data);
+    });
+  }
   public elements: any;
 
   ngOnInit() {
+  }
+
+  sidebarUpdate(data: any) {
+    // Implement this to trigger when sidebar is used for changing
   }
 
   queryEnabled(componentName: string) {
