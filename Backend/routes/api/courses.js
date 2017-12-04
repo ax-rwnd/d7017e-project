@@ -206,7 +206,7 @@ module.exports = function(router) {
         if (!mongoose.Types.ObjectId.isValid(course_id)) {
             return next(errors.BAD_INPUT);
         }
-        queries.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
+        permission.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
         .then(() => {
             return queries.deleteCourse(course_id);
         }).then(() => {
