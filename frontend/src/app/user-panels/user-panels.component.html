@@ -3,7 +3,12 @@
     <h4 class="pull-left">
       <span *ngIf="course.code">{{course.code}} - </span> {{course.name}}
     </h4>
-    <!-- <button class="btn btn-primary pull-right" [routerLink]="['/teaching', course.id]">Go to course</button> -->
+    <span *ngIf="teaching; else studentCourse">
+      <button class="btn btn-primary pull-right" [routerLink]="['/teaching', course.id]">Go to course</button>
+    </span>
+    <ng-template #studentCourse>
+      <button class="btn btn-primary pull-right" [routerLink]="['/courses', course.id]">Go to course</button>
+    </ng-template>
   </div>
   <div class="panel-body" [collapse]="collapsed"> <!-- [ngClass]="{hide: collapsed}" -->
     <ng-content></ng-content>

@@ -7,6 +7,7 @@ import {Component, OnInit, Input, ViewChild, ElementRef, TemplateRef} from '@ang
 })
 export class UserPanelsComponent implements OnInit {
   @Input() course: any;
+  @Input() teaching: boolean;
   collapsed: boolean;
 
   @ViewChild('body') body: ElementRef;
