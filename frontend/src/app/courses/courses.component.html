@@ -62,7 +62,7 @@
         <div class="row">
           <div class="col-lg-6 bottom-margin">
             <h4>Groups
-              <button class="glyph-button pull-right">
+              <button (click)="openModal(createGroup, 'createGroup')" class="glyph-button pull-right">
                 <span class="option-text">CREATE GROUP</span>
               </button>
             </h4>
@@ -204,12 +204,14 @@
           <option *ngFor="let assignment of selected['possible']" [ngValue]="assignment">{{assignment.name}}</option>
         </select>
         <div class="tests row">
-          <div *ngFor="let test of tests[selected.assignment['id']]; let j = index" class="pull-left test-box">
-            <label class="label-norm form-check-label">
-              <input class="form-check-input" [(ngModel)]="test['checked']" type="checkbox"> Test {{j+1}}
-              <label type="button" class="question" tooltip="Stdin: {{test['stdin']}}, Stdout: {{test['stdout']}}, Args: {{test['args']}}">
-                <span class="glyphicon glyphicon-question-sign"></span></label>
-            </label>
+          <div *ngIf="selected.assignment">
+            <div *ngFor="let test of tests[selected.assignment['id']]; let j = index" class="pull-left test-box">
+              <label class="label-norm form-check-label">
+                <input class="form-check-input" [(ngModel)]="test['checked']" type="checkbox"> Test {{j+1}}
+                <label type="button" class="question" tooltip="Stdin: {{test['stdin']}}, Stdout: {{test['stdout']}}, Args: {{test['args']}}">
+                  <span class="glyphicon glyphicon-question-sign"></span></label>
+              </label>
+            </div>
           </div>
         </div>
         <div class="row"></div>
@@ -219,5 +221,24 @@
   </div>
   <div class="modal-footer">
     <button class="btn btn-primary pull-right" (click)="submitBadge()">Submit</button>
+  </div>
+</ng-template>
+
+<!-- Modal for creation of assignment group -->
+<ng-template #createGroup>
+  <div class="modal-header">
+    <h4 class="modal-title pull-left">Create assignment group</h4>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+      <div class="form-group">
+        <label for="groupName">Group name</label>
+        <input type="text" class="form-control" id="groupName" [(ngModel)]="groupName">
+      </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-primary" (click)="createAssignmentGroup()" type="submit">Submit</button>
   </div>
 </ng-template>

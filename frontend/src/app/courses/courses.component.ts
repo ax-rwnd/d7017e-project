@@ -41,6 +41,7 @@ export class CoursesComponent implements OnInit {
   defaultForm = {
     search: ''
   };
+  groupName: string;
   teacherViewBool = false;
   selectedBadge: string;
   badges: Array<Object> = [
@@ -130,12 +131,14 @@ export class CoursesComponent implements OnInit {
             this.tests[a.id] = tests;
           });
       }
+    } else if (type === 'createGroup') {
+      this.groupName = '';
     }
     this.modalRef = this.modalService.show(modal);
   }
-  getTests(assignment) {
-    console.log('get tests ', assignment);
-    return this.tests[assignment.assignment['id']];
+  createAssignmentGroup() {
+    this.backendService.postAssignmentGroup(this.currentCourse.id, this.groupName)
+      .then(response => console.log('group ', response));
   }
 
   acceptAllReqs() { // iterate through pending list

@@ -206,6 +206,11 @@ The structure below is the following:
     return this.apiPut('/api/courses/' + id, body);
   }
 
+  postAssignmentGroup(course_id: ObjectID, name: string) {
+    const body = {'name': name};
+    return this.apiPost('/api/courses/' + course_id + '/assignmentgroups', body);
+  }
+
 // -- Students and courses -- //
 
   getCourseUsers(id: string) {
