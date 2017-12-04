@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { BsModalRef } from 'ngx-bootstrap/modal/modal-options.class';
@@ -63,11 +63,16 @@ export class CoursesComponent implements OnInit {
 
   constructor(private courseService: CourseService, private route: ActivatedRoute, private headService: HeadService,
               private fb: FormBuilder, private assignmentService: AssignmentService, private modalService: BsModalService,
-              private backendService: BackendService, private toastService: ToastService, private userService: UserService) {
+              private backendService: BackendService, private toastService: ToastService, private userService: UserService,
+              private router: Router) {
 
     // Subscribe to the sidebar state
     this.headService.stateChange.subscribe(sidebarState => {
       this.sidebarState = sidebarState; });
+
+    this.courseService.teachCourses.subscribe( teachCourses => {
+      this.teachCourses = teachCourses;
+    });
 
     this.route.params.subscribe( (params: any) => {
       // Grab the current course
@@ -83,13 +88,15 @@ export class CoursesComponent implements OnInit {
         console.log('assignments', this.assignmentGroups);
       }
 
-      this.backendService.getPendingUsers(this.currentCourse.id)
-        .then(response => {
-          console.log('pending', response);
-          this.pendingReqs = response;
-        })
-        .catch(err => console.error('Get pending users failed', err));
-
+      this.teachCourses = this.courseService.teaching;
+      if (this.teachCourses.indexOf(this.currentCourse) !== -1) {
+        this.backendService.getPendingUsers(this.currentCourse.id)
+          .then(response => {
+            console.log('pending', response);
+            this.pendingReqs = response;
+          })
+          .catch(err => console.error('Get pending users failed', err));
+      }
     });
   }
 

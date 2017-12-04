@@ -179,6 +179,13 @@ The structure below is the following:
     return this.apiGet('/api/courses/' + id);
   }
 
+  deleteCourse(course_id: string) {
+    // Delete course with certain id
+
+    const body = {};
+    return this.apiDelete('/api/courses/' + course_id, body);
+  }
+
 // -- Create and update -- //
 
   postNewCourse(name: string, desc: string, hidden: boolean, course_code: string,

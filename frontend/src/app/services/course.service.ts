@@ -2,12 +2,13 @@ import { Injectable } from '@angular/core';
 import {BackendService} from './backend.service';
 import {AssignmentService} from './assignment.service';
 import {assign} from 'rxjs/util/assign';
-
+import { Subject } from 'rxjs/Subject';
 
 @Injectable()
 export class CourseService {
   courses: Course[];
   teaching: Course[];
+  teachCourses = new Subject<Course[]>();
   updated = false;
   constructor(private backendService: BackendService, private assignmentService: AssignmentService) {
     this.courses = [];
@@ -58,6 +59,16 @@ export class CourseService {
     return promise;
   }
 
+  addTeacherCourse(course) {
+    this.teaching.push(newTeachCourse(course));
+    setAssignmentsForCourse(course._id, this.backendService, this.assignmentService)
+      .then( done => {
+        return this.teachCourses.next(this.teaching);
+      })
+      .catch(err => { console.log('err in catch', err);
+      });
+  }
+
   UpdateCourseProgress(courseId, progress) {
     // Updates the progress field of the course, not to be confused with reward.progress
     let i;
@@ -80,7 +91,8 @@ export class CourseService {
   }
   GetProgress(courseId) {
     // Returns progress for a course
-    const course = this.GetCourse(courseId);
+    let course: Course;
+    course = this.GetCourse(courseId);
     return  (course.progress.completed / course.progress.total) * 100;
   }
 
@@ -98,20 +110,24 @@ function getTeachCourses(response, backendService, courseService, assignmentServ
   for (let i = 0; i < courses.length; i++) {
     promiseArray.push(backendService.getCourse(courses[i]._id)
       .then(course => {
-          const code = course.hasOwnProperty('course_code') ? course['course_code'] : '';
-          courseService.teaching.push(newTeachCourse(course['_id'], course['name'], code,
-            course['description'], course['hidden'], course['enabled_features'],
-            course['students'], course['teachers'], course['autojoin']));
+          courseService.teaching.push(newTeachCourse(course));
       })
       .catch());
-    promiseArray.push(backendService.getCourseAssignments(courses[i]._id)
-      .then(assignmentsResponse => {
-        assignmentService.AddCourseAssignments(courses[i]._id, assignmentsResponse.assignments);
-      }));
+    promiseArray.push(setAssignmentsForCourse(courses[i]._id, backendService, assignmentService));
   }
   return Promise.all(promiseArray);
 }
 
+function setAssignmentsForCourse(course_id, backendService, assignmentService): Promise<any> {
+  return new Promise((resolve, reject) => {
+    backendService.getCourseAssignments(course_id)
+      .then(assignmentsResponse => {
+        assignmentService.AddCourseAssignments(course_id, assignmentsResponse.assignments);
+        resolve();
+      })
+      .catch(reject);
+  });
+}
 
 function updateCourses(response, backendService, courseService, assignmentService) {
   // Updates the courses with input from backend, some course service a´nd an assignment service
@@ -223,17 +239,20 @@ function handleFeatureResponse(response: any) {
   return newRewards(progress, score, badges, leaderboard);
 }
 
-function newTeachCourse(id, name, code, course_desc, hidden, en_feat, students, teachers, autojoin) {
+function newTeachCourse(course: Object) {
+  const code = course.hasOwnProperty('course_code') ? course['course_code'] : '';
   return {
-    id: id,
-    name: name,
+    id: course['_id'],
+    name: course['name'],
     code: code,
-    desc: course_desc,
-    hidden: hidden,
-    enabled_features: en_feat,
-    students: students,
-    teachers: teachers,
-    autojoin: autojoin,
+    course_info: course['description'],
+    hidden: course['hidden'],
+    enabled_features: course['enabled_features'],
+    students: course['students'],
+    teachers: course['teachers'],
+    autojoin: course['autojoin'],
+    rewards: newRewards('', '', '', ''),
+    progress: '',
   };
 }
 
@@ -276,6 +295,12 @@ interface Course {
   course_info: string;
   rewards: Rewards;
   progress: any;
+  // Additional teacher course info
+  hidden: boolean;
+  enabled_features: Object;
+  students: any[];
+  teachers: any[];
+  autojoin: boolean;
 }
 
 interface Rewards {

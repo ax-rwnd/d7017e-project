@@ -122,10 +122,10 @@ export class CreatecourseComponent implements OnInit {
         const courseId = response._id;
         console.log('Got back id:', courseId);
         // this.form = createSearchForm(); // for invites, not yet implemented
-        this.router.navigate(['/user'])
-          .then( nav => {
-            location.reload();
-          });
+        if (courseId) { // else undefined
+          this.courseService.addTeacherCourse(response);
+          this.router.navigate(['/user']);
+        }
         // this.openModal(this.courseModal);
       })
       .catch(err => console.error('Create course failed', err));
@@ -164,7 +164,7 @@ export class CreatecourseComponent implements OnInit {
   ngOnInit() {
     this.sidebarState = this.headService.getCurrentState();
     this.setForm();
-    this.content = this.course ? this.course.desc : '## Header';
+    this.content = this.course ? this.course.course_info : '## Header';
     this.errorMessage = '';
     this.students = []; // should be empty list
   }
