@@ -28,7 +28,6 @@ export class AssignmentComponent implements OnInit, OnDestroy {
   assignment: any;
   course: string;
   content: string;
-  progress: any;
   themes: string[];
   theme: string;
   languages: string[];
@@ -68,7 +67,6 @@ export class AssignmentComponent implements OnInit, OnDestroy {
     this.languages = this.assignment['languages'];
     this.themes = ['eclipse', 'monokai'];
     this.theme = 'eclipse'; // default theme for now, could be saved on backend
-    this.progress = { current: 0}; // this.assignmentService.progress; what even is this
     if (typeof this.language === 'undefined') {
       this.language = this.languages[0];
     }
