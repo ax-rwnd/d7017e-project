@@ -16,7 +16,7 @@
     <h4 class="courseTitle">My courses</h4>
     <ul class="nav nav-pills nav-stacked"> <!-- iterates over a list of courses -->
       <li [routerLinkActive]="['active']" *ngFor="let course of teachCourses">
-        <a routerLink="/courses/{{course.id}}">
+        <a routerLink="/teaching/{{course.id}}">
           <span *ngIf="course.code; else courseName">{{course.code}} <!-- control if course.id exist --></span>
           <ng-template #courseName>
             {{displayCourseName(course.name)}} <!-- if true dots, else nothing -->

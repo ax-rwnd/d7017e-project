@@ -12,7 +12,7 @@
         <!-- iterate of the list of courses -->
         <span *ngFor="let course of courses">
           <!-- The panel content, input to panel is course  -->
-          <app-user-panels [course]="course">
+          <app-user-panels [course]="course" [teaching]="false">
             <div class="col-md-5">
               <app-mod-badges-single [courseCode]="course.id"></app-mod-badges-single>
               <app-mod-progressbar [courseCode]="course.id"></app-mod-progressbar>
@@ -40,7 +40,7 @@
         <!-- Title -->
         <h2>My Courses</h2>
         <span *ngFor="let course of teachCourses">
-          <app-user-panels [course]="course"></app-user-panels>
+          <app-user-panels [course]="course" [teaching]="true"></app-user-panels>
         </span>
 
       </div>
