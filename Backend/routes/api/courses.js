@@ -190,7 +190,7 @@ module.exports = function(router) {
                     var courseObject = course.toObject();
                     courseObject.members = courseMembers;
                     console.log(courseObject);
-                    return res.json(courseObject); 
+                    return res.json(courseObject);
                 });
             });
         })
@@ -754,7 +754,7 @@ module.exports = function(router) {
         });
     });
 
-    // Return all assignemnts from a course
+    // Return all assignmnts from a course
     router.get('/:course_id/assignments', function (req, res, next) {
         var course_id = req.params.course_id;
 
@@ -811,6 +811,15 @@ module.exports = function(router) {
         }).catch(next);
     });
 
+    // Update an assignment
+    router.put('/:course_id/assignments/:assignment_id', function (req, res, next) {
+
+        // TODO
+
+        return res.json({});
+    });
+
+    // Delete an assignment
     router.delete('/:course_id/assignments/:assignment_id', function (req, res, next) {
         var course_id = req.params.course_id;
         var assignment_id = req.params.assignment_id;
@@ -1066,7 +1075,7 @@ module.exports = function(router) {
         }
 
         features.getFeaturesOfCourse(course_id)
-        .then(res.json)
+        .then(features => res.json({features: features}))
         .catch(next);
     });
 
@@ -1095,7 +1104,7 @@ module.exports = function(router) {
         }
 
         return features.getBadgeByCourseID(course_id)
-        .then(res.json)
+        .then(badges => res.json({badges: badges}))
         .catch(next);
     });
 
@@ -1108,9 +1117,17 @@ module.exports = function(router) {
             return next(errors.BAD_INPUT);
         }
 
-        req.body.course_id = course_id;
+        var input;
+        try {
+            input = inputValidation.badgeValidation(req);
+        } catch(error) {
+            return next(error);
+        }
 
-        return features.createBadge(req.body)
+        return permission.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
+        .then(function() {
+            return features.createBadge(input);
+        })
         .then(function(badge) {
             return res.json(badge);
         })
@@ -1163,8 +1180,14 @@ module.exports = function(router) {
             return next(errors.BAD_INPUT);
         }
 
-        // TODO
-        return res.sendStatus(501);
+        return permission.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
+        .then(function() {
+            return features.deleteBadge(badge_id);
+        })
+        .then(function(result) {
+            return res.json({});
+        })
+        .catch(next);
     });
 
     // Get all assignmentgroups of a course
@@ -1176,6 +1199,9 @@ module.exports = function(router) {
             return next(errors.BAD_INPUT);
         }
 
+        queries.getAssignmentgroupsByCourseID(course_id)
+        .then(assignmentgroups => res.json(assignmentgroups))
+        .catch(next);
     });
 
     // Create an assignment group
@@ -1187,6 +1213,21 @@ module.exports = function(router) {
             return next(errors.BAD_INPUT);
         }
 
+        var input;
+        try {
+            input = inputValidation.assignmentgroupValidation(req);
+        } catch(error) {
+            return next(error);
+        }
+
+        return permission.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
+        .then(function() {
+            return queries.createAssignmentgroup(input, course_id);
+        })
+        .then(function(assignmentgroup) {
+            return res.json(assignmentgroup);
+        })
+        .catch(next);
     });
 
     // Return an assignment group
@@ -1195,10 +1236,15 @@ module.exports = function(router) {
         var course_id = req.params.course_id;
         var assignmentgroup_id = req.params.assignmentgroup_id;
 
-        if (!mongoose.Types.ObjectId.isValid(course_id) || !mongoose.Types.ObjectId.isValid(course_id)) {
+        if (!mongoose.Types.ObjectId.isValid(course_id) || !mongoose.Types.ObjectId.isValid(assignmentgroup_id)) {
             return next(errors.BAD_INPUT);
         }
 
+        queries.getAssignmentgroupByID(assignmentgroup_id)
+        .then(function(assignmentgroup) {
+            return res.json(assignmentgroup);
+        })
+        .catch(next);
     });
 
     // Update an assignment group
@@ -1207,10 +1253,25 @@ module.exports = function(router) {
         var course_id = req.params.course_id;
         var assignmentgroup_id = req.params.assignmentgroup_id;
 
-        if (!mongoose.Types.ObjectId.isValid(course_id) || !mongoose.Types.ObjectId.isValid(course_id)) {
+        if (!mongoose.Types.ObjectId.isValid(course_id) || !mongoose.Types.ObjectId.isValid(assignmentgroup_id)) {
             return next(errors.BAD_INPUT);
         }
 
+        var input;
+        try {
+            input = inputValidation.assignmentgroupValidation(req);
+        } catch(error) {
+            return next(error);
+        }
+
+        permission.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
+        .then(function() {
+            queries.updateAssignmentgroup(input, assignmentgroup_id)
+            .then(function(assignmentgroup) {
+                return res.json(assignmentgroup);
+            });
+        })
+        .catch(next);
     });
 
     // Delete an assignment group
@@ -1219,9 +1280,17 @@ module.exports = function(router) {
         var course_id = req.params.course_id;
         var assignmentgroup_id = req.params.assignmentgroup_id;
 
-        if (!mongoose.Types.ObjectId.isValid(course_id) || !mongoose.Types.ObjectId.isValid(course_id)) {
+        if (!mongoose.Types.ObjectId.isValid(course_id) || !mongoose.Types.ObjectId.isValid(assignmentgroup_id)) {
             return next(errors.BAD_INPUT);
         }
 
+        return permission.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
+        .then(function() {
+            return queries.deleteAssignmentgroup(assignmentgroup_id, course_id);
+        })
+        .then(function(result) {
+            return res.json({});
+        })
+        .catch(next);
     });
 };

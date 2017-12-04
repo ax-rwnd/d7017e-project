@@ -49,9 +49,13 @@ describe('/api', () => {
     let user_id;
     let admin_id;
     let course_id;
+    let assignmentgroup_id1;
+    let assignmentgroup_id2;
     let assignment_id;
     let test_id;
     let invitelink;
+    let badge_id;
+    let badge_id2;
 
     before(() => {
         access_tokens = {};
@@ -84,7 +88,7 @@ describe('/api', () => {
     }
 
     describe('/courses', () => {
- 
+
         describe('POST /api/courses', () => {
             let route = '/api/courses';
             it_rejects_unauthorized_post(route);
@@ -107,7 +111,7 @@ describe('/api', () => {
                     });
             });
         });
-        
+
         describe('GET /api/courses', () => {
             let route = '/api/courses';
             it_rejects_unauthorized_get(route);
@@ -196,6 +200,108 @@ describe('/api', () => {
                     .then(res => {
                         assert(Array.isArray(res.body.teachers), 'should be an array');
                         assert(res.body.teachers.length > 0, 'array should not be empty');
+                    });
+            });
+        });
+
+        describe('POST /api/courses/:course_id/assignmentgroups', () => {
+
+            let assignmentgroup = {
+                name: "assignmentgroup"
+            };
+
+            it('create an assignmentgroup', () => {
+
+                assignmentgroup.name = "assignmentgroup1";
+
+                request(runner.server)
+                    .post('/api/courses/' + course_id + '/assignmentgroups')
+                    .send(assignmentgroup)
+                    .set('Authorization', 'Bearer ' + access_tokens.admin)
+                    .expect(200)
+                    .then(res => {
+                        assert(ObjectId.isValid(res.body._id), 'response is not a valid ObjectId');
+                        assignmentgroup_id1 = res.body._id;
+                    });
+            });
+            it('create another assignmentgroup that will be removed later', () => {
+
+                assignmentgroup.name = "assignmentgroup2";
+
+                request(runner.server)
+                    .post('/api/courses/' + course_id + '/assignmentgroups')
+                    .send(assignmentgroup)
+                    .set('Authorization', 'Bearer ' + access_tokens.admin)
+                    .expect(200)
+                    .then(res => {
+                        assert(ObjectId.isValid(res.body._id), 'response is not a valid ObjectId');
+                        assignmentgroup_id2 = res.body._id;
+                    });
+            });
+        });
+
+        describe('GET /api/courses/:course_id/assignmentgroups', () => {
+            it('get all assignmentgroup in a course', () => {
+                return request(runner.server)
+                    .get('/api/courses/' + course_id + '/assignmentgroups')
+                    .set('Authorization', 'Bearer ' + access_tokens.user)
+                    .expect(200)
+                    .then(res => {
+                        assert(Array.isArray(res.body.assignmentgroups), 'should be an array');
+                        assert(res.body.assignmentgroups.length === 2, 'not length 2');
+                    });
+            });
+        });
+
+        describe('GET /api/courses/:course_id/assignmentgroups/:assignmentgroup_id', () => {
+            it('get an assignmentgroup', () => {
+                return request(runner.server)
+                    .get('/api/courses/' + course_id + '/assignmentgroups/' + assignmentgroup_id1)
+                    .set('Authorization', 'Bearer ' + access_tokens.user)
+                    .expect(200)
+                    .then(res => {
+                        assert(ObjectId.isValid(res.body._id), 'response is not a valid ObjectId');
+                        assert(assignmentgroup_id1 == res.body._id, 'response is not the requested test');
+                    });
+            });
+        });
+
+        describe('PUT /api/courses/:course_id/assignmentgroups/:assignmentgroup_id', () => {
+            it('update an assignmentgroup', () => {
+
+                let new_data = {
+                    name: 'new name1'
+                };
+
+                return request(runner.server)
+                    .put('/api/courses/' + course_id + '/assignmentgroups/' + assignmentgroup_id1)
+                    .set('Authorization', 'Bearer ' + access_tokens.admin)
+                    .send(new_data)
+                    .set('Content-Type', 'application/json')
+                    .expect(200)
+                    .then(res => {
+                        assert(ObjectId.isValid(res.body._id), 'response is not a valid ObjectId');
+                        assert(assignmentgroup_id1 == res.body._id, 'response is not the requested test');
+                        assert(res.body.name === new_data.name, 'name was wrong');
+                    });
+            });
+        });
+
+        describe('DELETE /api/courses/:course_id/assignmentgroups/:assignmentgroup_id', () => {
+            it('delete assignmentgroup2', () => {
+                return request(runner.server)
+                    .delete('/api/courses/' + course_id + '/assignmentgroups/' + assignmentgroup_id2)
+                    .set('Authorization', 'Bearer ' + access_tokens.admin)
+                    .expect(200)
+                    .then(res => {
+                        return request(runner.server)
+                            .get('/api/courses/' + course_id + '/assignmentgroups')
+                            .set('Authorization', 'Bearer ' + access_tokens.user)
+                            .expect(200)
+                            .then(res => {
+                                assert(Array.isArray(res.body.assignmentgroups), 'should be an array');
+                                assert(res.body.assignmentgroups.length === 1, 'not length 1');
+                            });
                     });
             });
         });
@@ -358,13 +464,7 @@ describe('/api', () => {
                 return request(runner.server)
                     .get('/api/courses/' + course_id + '/enabled_features')
                     .set('Authorization', 'Bearer ' + access_tokens.user)
-                    .expect(200)
-                    .then(res => {
-
-                        console.log(res.body);
-                        //assert(Array.isArray(res.body.teachers), 'should be an array');
-                        //assert(res.body.teachers.length > 0, 'array should not be empty');
-                    });
+                    .expect(200);
             });
         });
 
@@ -478,7 +578,7 @@ describe('/api', () => {
     });
 
     describe('/features', () => {
-        describe('GET /api/:course_id/features/', () => {
+        describe.skip('GET /api/:course_id/features/', () => {
             it('Get features for all users in course', () => {
                 let route = '/api/courses/'+course_id+'/features/';
                 return request(runner.server)
@@ -491,7 +591,7 @@ describe('/api', () => {
             });
         });
 
-        describe('GET /api/courses/:course_id/features/me', () => {
+        describe.skip('GET /api/courses/:course_id/features/me', () => {
             it('Get feature for user in course', () => {
                 let route = '/api/courses/'+course_id+'/features/me';
                 return request(runner.server)
@@ -505,22 +605,31 @@ describe('/api', () => {
             });
         });
 
-        let badge = {
-            // missing course_id is set later
-            icon: 'pretty_icon',   //name of an icon image file
-            title: 'Pretty badge',
-            description: 'Very impossibru badgeererer',
-            goals: {
-                badges: [],
-                assignments: []
-            }
-        };
-        let new_title = 'Another title';
-        let badge_id;
+
+
+
+
 
         describe('POST /api/courses/:course_id/badges', () => {
+
+
+
             it('Create a badge', () => {
-                badge.course_id = course_id;
+
+                let badge = {
+                    // missing course_id is set later
+                    icon: 'pretty_icon',   //name of an icon image file
+                    title: 'Pretty badge',
+                    description: 'Very impossibru badgeererer',
+                    goals: {
+                        badges: [],
+                        assignments: [{
+                            assignment: assignment_id,
+                            tests: [test_id]
+                        }]
+                    }
+                };
+
                 return request(runner.server)
                     .post('/api/courses/'+ course_id + '/badges')
                     .set('Authorization', 'Bearer ' + access_tokens.admin)
@@ -528,14 +637,44 @@ describe('/api', () => {
                     .set('Content-Type', 'application/json')
                     .expect(200)
                     .then(res => {
+                        assert(ObjectId.isValid(res.body._id), 'response is not a valid ObjectId');
                         badge_id = res.body._id;
+                    });
+            });
+
+            it('Create a badge that will be removed', () => {
+
+                let badge = {
+                    // missing course_id is set later
+                    icon: 'pretty_icon',   //name of an icon image file
+                    title: 'Another badge',
+                    description: 'Very impossibru badgeererer',
+                    goals: {
+                        badges: [],
+                        assignments: []
+                    }
+                };
+
+                return request(runner.server)
+                    .post('/api/courses/'+ course_id + '/badges')
+                    .set('Authorization', 'Bearer ' + access_tokens.admin)
+                    .send(badge)
+                    .set('Content-Type', 'application/json')
+                    .expect(200)
+                    .then(res => {
+                        assert(ObjectId.isValid(res.body._id), 'response is not a valid ObjectId');
+                        badge_id2 = res.body._id;
                     });
             });
         });
 
         describe('PUT /api/courses/:course_id/badges/:badge_id', () => {
             it('Update a badge', () => {
-                badge.title = new_title;
+                let new_title = 'Another title1';
+
+                let badge = {
+                    title: new_title
+                };
                 return request(runner.server)
                     .put('/api/courses/' + course_id + '/badges/' + badge_id)
                     .set('Authorization', 'Bearer ' + access_tokens.admin)
@@ -543,7 +682,7 @@ describe('/api', () => {
                     .set('Content-Type', 'application/json')
                     .expect(200)
                     .then(res => {
-                        assert(res.body._id == badge_id, 'Badge IDs did not match');
+                        assert(res.body.title == new_title, 'Updated badge did not have title '+new_title+' but '+res.body.title);
                     });
             });
         });
@@ -551,11 +690,33 @@ describe('/api', () => {
         describe('GET /api/courses/:course_id/badges/:badge_id', () => {
             it('Fetch a badge', () => {
                 return request(runner.server)
-                    .get('/api/courses/:course_id/badges/' + badge_id)
+                    .get('/api/courses/' + course_id + '/badges/' + badge_id)
                     .set('Authorization', 'Bearer ' + access_tokens.admin)
                     .expect(200)
                     .then(res => {
-                        assert(res.body.title == new_title, 'Updated badge did not have title '+new_title+' but '+res.body.title);
+                        assert(res.body._id == badge_id, 'Badge IDs did not match');
+                    });
+            });
+        });
+
+        describe('DELETE /api/courses/:course_id/badges/:badge_id', () => {
+            it('Return all badge of a course', () => {
+                return request(runner.server)
+                    .delete('/api/courses/' + course_id + '/badges/' + badge_id2)
+                    .set('Authorization', 'Bearer ' + access_tokens.admin)
+                    .expect(200);
+            });
+        });
+
+        describe('GET /api/courses/:course_id/badges', () => {
+            it('Return all badge of a course', () => {
+                return request(runner.server)
+                    .get('/api/courses/' + course_id + '/badges')
+                    .set('Authorization', 'Bearer ' + access_tokens.admin)
+                    .expect(200)
+                    .then(res => {
+                        assert(Array.isArray(res.body.badges), 'not an array');
+                        assert(res.body.badges.length === 1, 'not length 1');
                     });
             });
         });
@@ -666,8 +827,6 @@ describe('/api', () => {
 
         describe('DELETE /api/courses/:course_id/assignments/:assignment_id', () => {
             it('completes without an error', () => {
-                console.log(course_id);
-                console.log(assignment_id);
                 return request(runner.server)
                     .delete('/api/courses/' + course_id + '/assignments/' + assignment_id)
                     .set('Authorization', 'Bearer ' + access_tokens.admin)

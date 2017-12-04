@@ -12,6 +12,7 @@ var Badge = require('../../models/schemas').Badge;
 var Feature = require('../../models/schemas').Features;
 var InviteLink = require('../../models/schemas').InviteLinks;
 var Features = require('./features.js');
+var Assignmentgroup = require('../../models/schemas').Assignmentgroup;
 
 var errors = require('../errors.js');
 var mongoose = require('mongoose');
@@ -20,6 +21,7 @@ var jwt = require('jsonwebtoken');
 var config = require('config');
 var constants = require('../constants.js');
 var randomstring = require('randomstring');
+var features = require('./features.js');
 
 /* MOVED TO LIB/CONSTANTS.JS
 const FIELDS = {
@@ -440,7 +442,7 @@ function getUserInvites(user_id, type) {
     } else {
         return JoinRequest.find({user: user_id}, "inviteType course -_id").populate("course", "name course_code");
 
-    }   
+    }
 }
 
 function getInvitesCourseUser(user_id, course_id) {
@@ -500,10 +502,11 @@ function deleteCourse(id) {
         if (!course) {
             throw errors.COURSE_DOES_NOT_EXIST;
         }
+        console.log(course);
         // assignments
-        let promises = course.assignments
+        let promises = course.assignmentgroups
             .map(aid => {
-                return deleteAssignment(aid)
+                return deleteAssignmentgroup(aid, course._id)
                 // ignore error when assignment doesn't exist
                 .catch(()=>{});
             });
@@ -982,7 +985,7 @@ function tempSaveMember (user_id, course_id) {
 
 function saveCourseObject(user_id, courseObject) {
     var course = new Course(courseObject);
-    return course.save().then(function (savedCourse) {  
+    return course.save().then(function (savedCourse) {
         console.log(savedCourse);
         return Features.createFeature(user_id, savedCourse._id).then(function (featureObject) {
             // TODO: FIX FEATURE FIELD. WHAT SHOULD IT ADD?
@@ -1012,7 +1015,7 @@ function acceptInviteToCourse(user_id, course_id) {
         return Features.createFeature(user_id, course_id).then(function (featureObject) {
             // TODO: CHANGE FEATURE FIELD
             var memberObject = new CourseMember({role: "student", course: course_id, user: user_id, features: featureObject._id});
-            return memberObject.save();        
+            return memberObject.save();
         });
     });
 }
@@ -1087,6 +1090,62 @@ function validateInviteLink(code, user_id) {
     });
 }
 
+function getAssignmentgroupsByCourseID(course_id) {
+    return Course.findById(course_id, 'assignmentgroups');
+}
+
+function createAssignmentgroup(assignmentgroupObject, course_id) {
+    let assignmentgroup = new Assignmentgroup(assignmentgroupObject);
+    return assignmentgroup.save().then(assignmentgroup => {
+        return Course.update({'_id': course_id }, {$push: { assignmentgroups: assignmentgroup._id}})
+        .then(function(course) {
+            return assignmentgroup;
+        });
+    });
+}
+
+function getAssignmentgroupByID(assignmentgroup_id) {
+    return Assignmentgroup.findById(assignmentgroup_id)
+    .then(function(assignmentgroup) {
+        if(assignmentgroup === null)
+            throw errors.ASSIGNMENTGROUP_DO_NOT_EXIST;
+        return assignmentgroup;
+    });
+}
+
+function updateAssignmentgroup(assignmentgroupObject, assignmentgroup_id) {
+    return Assignmentgroup.findOneAndUpdate({"_id": assignmentgroup_id}, assignmentgroupObject, { runValidators: true, new: true})
+    .then(function(assignmentgroup) {
+        if(assignmentgroup === null)
+            throw errors.ASSIGNMENTGROUP_DO_NOT_EXIST;
+        return assignmentgroup;
+    });
+}
+
+function deleteAssignmentgroup(assignmentgroup_id, course_id) {
+
+    return Assignmentgroup.findOneAndRemove({_id: assignmentgroup_id})
+    .then(assignmentgroup => {
+        if (!assignmentgroup) {
+            throw errors.ASSIGNMENTGROUP_DO_NOT_EXIST;
+        }
+
+        let promises = assignmentgroup.assignments
+            .map(assignment => {
+                return deleteAssignment(assignment.assignment)
+                // ignore error when assignment doesn't exist
+                .catch(()=>{});
+            });
+
+        promises.push(Course.update({_id: course_id}, {$pull: { assignmentgroups: assignmentgroup_id}}));
+
+        return Promise.all(promises);
+    })
+    .then(function(result) {
+        return result;
+    });
+}
+
 exports.getUserCourses1 = getUserCourses1;
 exports.getCourses1 = getCourses1;
 exports.tempSaveMember = tempSaveMember;
@@ -1154,3 +1213,8 @@ exports.deleteCourse = deleteCourse;
 exports.deleteAssignment = deleteAssignment;
 exports.generateInviteLink = generateInviteLink;
 exports.validateInviteLink = validateInviteLink;
+exports.getAssignmentgroupsByCourseID = getAssignmentgroupsByCourseID;
+exports.createAssignmentgroup = createAssignmentgroup;
+exports.getAssignmentgroupByID = getAssignmentgroupByID;
+exports.updateAssignmentgroup = updateAssignmentgroup;
+exports.deleteAssignmentgroup = deleteAssignmentgroup;
