@@ -1,44 +1,22 @@
 import { Component, OnInit } from '@angular/core';
-import { UserService } from '../services/user.service';
-
-import { HttpClient } from '@angular/common/http';
-import {Observable} from 'rxjs/Observable';
 import { environment } from '../../environments/environment';
-import {ActivatedRoute, Router} from '@angular/router';
-
-class User {
-  id: string;
-  username: string;
-  email: string;
-  admin: boolean;
-  courses: [string];
-  constructor() {}
-}
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
-export class LoginComponent implements OnInit {
-  user: any;
-  data;
 
-  constructor(private userService: UserService, public http: HttpClient) {
-  }
-  results: string;
-  frontend_ip: string;
-  userMe: User[];
-  observableUser: Observable<User[]>;
-  errorMessage: String;
+export class LoginComponent {
+  descriptions = [
+    'A platform for learning new programming languages.',
+    'Your next tool when evaluating gamified learning techniques.',
+    'The nicest place yet to get started with your computer science degree.'];
 
-  ngOnInit() {
-    this.user = this.userService.userInfo;
-    this.frontend_ip = environment.frontend_ip;
-  }
   casLogin() {
+    // Create a redirect URL for logging in
 
-    const redirect = 'https://weblogon.ltu.se/cas/login?service=' + environment.frontend_ip + '/auth?urlPath=/user';
+    const redirect = `https://weblogon.ltu.se/cas/login?service=${environment.frontend_ip}/auth?urlPath=/user`;
     window.location.href = redirect;
   }
 }
