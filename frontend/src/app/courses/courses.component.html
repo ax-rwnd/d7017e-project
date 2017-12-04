@@ -56,7 +56,7 @@
             <span class="glyphicon glyphicon-edit"></span>
           </button>
         </h3>
-        <markdown [data]="currentCourse.desc"></markdown>
+        <markdown [data]="currentCourse.course_info"></markdown>
         <br>
         <h3>Assignments</h3>
         <div class="row">
@@ -204,14 +204,12 @@
           <option *ngFor="let assignment of selected['possible']" [ngValue]="assignment">{{assignment.name}}</option>
         </select>
         <div class="tests row">
-          <div *ngIf="selected.assignment">
-            <div *ngFor="let test of tests[selected.assignment['id']]; let j = index" class="pull-left test-box">
-              <label class="label-norm form-check-label">
-                <input class="form-check-input" [(ngModel)]="test['checked']" type="checkbox"> Test {{j+1}}
-                <label type="button" class="question" tooltip="Stdin: {{test['stdin']}}, Stdout: {{test['stdout']}}, Args: {{test['args']}}">
-                  <span class="glyphicon glyphicon-question-sign"></span></label>
-              </label>
-            </div>
+          <div *ngFor="let test of tests[selected.assignment['id']]; let j = index" class="pull-left test-box">
+            <label class="label-norm form-check-label">
+              <input class="form-check-input" [(ngModel)]="test['checked']" type="checkbox"> Test {{j+1}}
+              <label type="button" class="question" tooltip="Stdin: {{test['stdin']}}, Stdout: {{test['stdout']}}, Args: {{test['args']}}">
+                <span class="glyphicon glyphicon-question-sign"></span></label>
+            </label>
           </div>
         </div>
         <div class="row"></div>
