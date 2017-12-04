@@ -1,7 +1,3 @@
-.img-circle {
-  border-radius: 50%;
-}
-
 .pointer {
   cursor: pointer;
 }
@@ -19,6 +15,18 @@
   /*text-decoration: none;
   color: #343434;*/
   cursor: pointer;
+}
+
+.glyph-accept {
+  color: darkgreen;
+  background: none;
+  border: none;
+}
+
+.glyph-decline {
+  color: darkred;
+  background: none;
+  border: none;
 }
 
 .gamification-block {
