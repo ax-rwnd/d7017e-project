@@ -180,12 +180,16 @@ export class AssignmentComponent implements OnInit, OnDestroy {
 
   hasPassed() {
     // returns true if we have passed the assignment already
-    for (let prog of this.currentCourse.rewards.progress) {
-      if (prog.assignment._id === this.assignment.id) {
-        return true;
+    this.courseService.GetTeacherStudentViewHelper(this.currentCourse).then(res => {
+      this.currentCourse = res;
+      for (let prog of this.currentCourse.rewards.progress) {
+        if (prog.assignment._id === this.assignment.id) {
+          return true;
+        }
       }
-    }
-    return false;
+      return false;
+    });
+    console.log('this is current course', this.currentCourse);
   }
 
   // Handle the response from a code submission. Update the feedback div and update the course progress

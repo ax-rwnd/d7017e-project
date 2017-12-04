@@ -1,7 +1,9 @@
 <app-head></app-head>
 <div id="cont" class="content" [@content]="sidebarState">
   <div class="container">
-    <button type="button" (click)="toggleView()">Toggle</button>
+    <!-- toggle only visible to owner -->
+    <button *ngIf="toggleHelper()" type="button" class="btn btn-primary" (click)="toggleView()">Toggle</button>
+
     <!-- START of the student view -->
     <span *ngIf="teachCourses.indexOf(currentCourse) === -1; else testTemplate"> <!-- Could switch this do for ex a bool or something -->
       <!-- This view below is for students, the view for the teacher is in teacherView down below -->

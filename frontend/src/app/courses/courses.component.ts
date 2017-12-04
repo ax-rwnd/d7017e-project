@@ -42,7 +42,6 @@ export class CoursesComponent implements OnInit {
     search: ''
   };
   teacherViewBool = false;
-
   selectedBadge: string;
   badges: Array<Object> = [
     {key: 'bronze_medal_badge', name: 'Bronze medal'},
@@ -213,7 +212,6 @@ export class CoursesComponent implements OnInit {
 
   toggleView() {
     this.teacherViewBool = !this.teacherViewBool;
-    console.log(this.teacherViewBool);
     if (this.teacherViewBool) {
       this.courseService.GetTeacherStudentViewHelper(this.currentCourse).then(res => {
         console.log(res);
@@ -222,6 +220,15 @@ export class CoursesComponent implements OnInit {
     } else {
       this.currentCourse = this.currentCourseSaved;
     }
+  }
+
+  /* Decides if toggle button should be shown. */
+  toggleHelper(): boolean {
+    const myCourse = this.userService.userInfo.teaching.find((curr) => curr._id === this.currentCourseSaved.id);
+    if (myCourse !== undefined) {
+      return true;
+    }
+    return false;
   }
 }
 

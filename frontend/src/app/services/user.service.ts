@@ -8,6 +8,7 @@ export class UserService {
     userName: '',
     admin: false,
     access: '', // basic is student, advanced is teacher or assistant
+    teaching: [],
   };
   updated = false;
   constructor(private backendService: BackendService) { }
@@ -19,6 +20,7 @@ export class UserService {
       this.userInfo.userName = data['username'];
       this.userInfo.admin = data['admin'];
       this.userInfo.access = data['access'];
+      this.userInfo.teaching = data['teaching'];
     });
   }
 
