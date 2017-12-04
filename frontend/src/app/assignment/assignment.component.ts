@@ -37,8 +37,6 @@ export class AssignmentComponent implements OnInit, OnDestroy {
   sidebarState; // state of sidebar
   userid: string;
   feedback: string[];
-  tests: any;
-  testStrings: any;
   draftSubscription: Subscription;
   currentCourse: any;
 
@@ -82,25 +80,6 @@ export class AssignmentComponent implements OnInit, OnDestroy {
     if (this.hasPassed()) {
       this.status = true;
     }
-    this.tests = [];
-    this.testStrings = [];
-    // this.getTests();
-    // Use getTests as soon as backend routes are working
-    // this.tests = [
-    //     {
-    //     '_id': '59e4cb34d679e102ff66b865',
-    //     'stdin': '',
-    //     'stdout': 'hello world\n',
-    //     'args': [],
-    //     '__v': 0},
-    //     {
-    //       '_id': '59e4cb34d679e102ff66b865',
-    //       'stdin': 'test',
-    //       'stdout': 'hello world again\n',
-    //       'args': [],
-    //       '__v': 1},
-    // ];
-    // this.testStrings = this.formatTests(this.tests);
 
     // Periodically save a draft of the code
     this.draftSubscription = Observable.interval(30 * 1000).subscribe(x => {
@@ -135,31 +114,6 @@ export class AssignmentComponent implements OnInit, OnDestroy {
     const course_id = new ObjectID(this.assignment['course_id']);
     this.backendService.postDraft(course_id, assignment_id, this.content, this.language)
       .catch(err => console.error('Post draft failed', err));
-  }
-
-  getTests() {
-    const assignment_id = new ObjectID(this.assignment['course_id']);
-    const course_id = new ObjectID(this.assignment['course_id']);
-    this.backendService.getCourseAssignmentTests(course_id, assignment_id)
-      .then(data => {
-        this.tests = data;
-        this.testStrings = this.formatTests(this.tests);
-      })
-      .catch(err => console.error('Get tests failed', err));
-  }
-
-  formatTests(tests) {
-    let formattedTests = [];
-    for (let test of tests) {
-      formattedTests.push(this.formatTest(test));
-    }
-    return formattedTests;
-  }
-
-  // Takes a test and returns a markdown string for displaying the test
-  formatTest(test) {
-    const testMarkdown = '```text\nstdin: ' + test['stdin'] + '\nargs: ' + test['args'] + '\nstdout: ' + test['stdout'] + '```';
-    return testMarkdown;
   }
 
   setTheme(th) {
