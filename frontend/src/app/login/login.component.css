@@ -1,6 +1,16 @@
+.login_container {
+  margin-left: 20%;
+  margin-right: 20%;
+}
+
 .login {
-  margin-top: 20%;
-  margin-bottom: 20%; /* Remove the default bottom margin of .jumbotron */
+  margin-top: 10%;
+  margin-bottom: 10%; /* Remove the default bottom margin of .jumbotron */
+}
+
+h1 {
+  font-size: 72pt;
+  text-align: center;
 }
 
 .jumbotron {
@@ -20,4 +30,10 @@
 	100% {
     background-position: 96px 192px;
 	}
+}
+
+.description_box {
+  padding-top: 6px;
+  padding-bottom: 6px;
+  font-size: 16pt;
 }
