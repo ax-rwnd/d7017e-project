@@ -26,7 +26,7 @@ export class ModAdventuremapEditorComponent extends ModAdventuremapComponent imp
 
   }
 
-  ngAfterViewInit() {
+    /*  ngAfterViewInit() {
     this.canvas = this.mapCanvas.nativeElement;
     this.context = this.canvas.getContext('2d');
     this.update();
@@ -34,7 +34,7 @@ export class ModAdventuremapEditorComponent extends ModAdventuremapComponent imp
     // Allow users to select assignments
     this.canvas.addEventListener('click',
       this.handleClick(), false);
-  }
+  }*/
 
   drawPoint(ctx: CanvasRenderingContext2D, current: any, index: number) {
     // Draw the points in a manner relevant to the subclass

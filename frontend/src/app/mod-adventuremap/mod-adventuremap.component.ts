@@ -29,6 +29,7 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
   protected selectedAssignment: any;
   private assignmentText: string;
   private assignmentId: string;
+  protected initialized = false;
 
   // Shadow-DOM elements
   protected canvas: any;
@@ -51,6 +52,17 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
     // Allow users to select assignments
     this.canvas.addEventListener('click',
       this.handleClick(), false);
+
+    // Don't do stuff that relies on state until the component is initialized
+    this.initialized = true;
+  }
+
+  sidebarUpdate(data: any) {
+    // If the sidebar is clicked, update the map
+
+    if (this.initialized) {
+      this.update();
+    }
   }
 
   handleClick() {
