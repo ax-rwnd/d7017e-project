@@ -37,6 +37,10 @@
   color: white;
 }
 
+.bottom-margin {
+  margin-bottom: 5%;
+}
+
 .assignment {
   background-color: #133756;
   border-radius: 0.5em;
