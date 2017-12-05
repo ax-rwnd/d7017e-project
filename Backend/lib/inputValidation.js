@@ -273,6 +273,17 @@ function putCourseBodyValidation(req) {
     return input;
 }
 
+// checks that course_id and assignment_id are valid IDs
+function assignmentValidation(req) {
+    req.checkParams('course_id', 'Not a valid course id').isMongoId();
+    req.checkParams('assignment_id', 'Not a valid assignment id').isMongoId();
+    var inputError = req.validationErrors();
+    if (inputError) {
+        throw badInput.BAD_INPUT(inputError);
+    }
+    return {course_id: req.params.course_id, assignment_id: req.params.assignment_id};
+}
+
 exports.postCourseValidation = postCourseValidation;
 exports.putCourseBodyValidation = putCourseBodyValidation;
 exports.putMembersInviteValidation = putMembersInviteValidation;
@@ -280,3 +291,4 @@ exports.postMemberInviteValidation = postMemberInviteValidation;
 exports.assignmentgroupValidation = assignmentgroupValidation;
 exports.badgeValidation = badgeValidation;
 exports.courseIdValidation = courseIdValidation;
+exports.assignmentValidation = assignmentValidation;
