@@ -633,7 +633,10 @@ module.exports = function(router) {
             return next(errors.BAD_INPUT);
         }
 
-        permission.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
+        permission.checkIfAssignmentInCourse(course_id, assignment_id)
+        .then(function () {
+            return permission.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access);
+        })
         .then(function () {
             return queries.createTest(stdout, stdin, args, assignment_id);
         })
@@ -683,7 +686,13 @@ module.exports = function(router) {
             return next(errors.BAD_INPUT);
         }
 
-        permission.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
+        permission.checkIfTestInAssignment(assignment_id, test_id)
+        .then(function () {
+            return permission.checkIfAssignmentInCourse(course_id, assignment_id);
+        })
+        .then(function () {
+            return permission.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access);
+        })
         .then(function () {
             return queries.deleteTest(test_id, assignment_id);
         })
@@ -729,7 +738,13 @@ module.exports = function(router) {
             }
         }
 
-        permission.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
+        permission.checkIfTestInAssignment(assignment_id, test_id)
+        .then(function () {
+            return permission.checkIfAssignmentInCourse(course_id, assignment_id);
+        })
+        .then(function () {
+            return permission.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access);
+        })
         .then(function () {
             return queries.updateTest(test_id, clean_b);
         })
