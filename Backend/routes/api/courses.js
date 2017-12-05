@@ -230,11 +230,11 @@ module.exports = function(router) {
             p = permission.checkUserNotInCourse(input.user_id, input.course_id).then(function () {
                     return permission.checkIfAlreadyInvited(input.user_id, input.course_id).then(function () {
 
-                    })
+                    });
                 })
                 .then(function () {
 
-                })
+                });
         }
 
     });
@@ -388,7 +388,7 @@ module.exports = function(router) {
     });
 */
     router.delete('/:course_id/members', function (req, res, next) {
-        return res.json({fail: "Bosse"})
+        return res.json({fail: "Bosse"});
     });
 
 
@@ -482,7 +482,6 @@ module.exports = function(router) {
 
     // Update an assignment
     router.put('/:course_id/assignments/:assignment_id', function (req, res, next) {
-        // imhere
         let {course_id, assignment_id} = inputValidation.assignmentValidation(req);
         let body = inputValidation.putAssignmentBodyValidation(req);
 
@@ -516,9 +515,19 @@ module.exports = function(router) {
     router.get('/:course_id/invitelink', function (req, res, next) {
         var course_id = req.params.course_id;
 
+        if (req.query.expires) {
+            var expires = (+req.query.expires);
+            // throw Bad input if number is NaN or too small
+            if (expires !== expires || expires <= 0) {
+                return next(errors.BAD_INPUT);
+            }
+            // Increase number from milliseconds to hours
+            expires = expires * 60 * 60 * 1000;
+        }
+
         permission.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access).then(function () {
-            return queries.generateInviteLink(course_id).then(function (obj) {
-                res.status(201).json({course: obj.course, code: obj.code});
+            return queries.generateInviteLink(course_id, expires).then(function (obj) {
+                res.status(201).json({course: obj.course, code: obj.code, expiresAt: obj.expiresAt});
             });
         })
         .catch(function (err) {
@@ -530,7 +539,7 @@ module.exports = function(router) {
         var code = req.params.code;
 
         queries.validateInviteLink(code, req.user.id).then(function (result) {
-            res.json({success: true});
+            res.json({user: result.user, course: result.course, role: result.role, features: result.features});
         })
         .catch(function (err) {
             next(err);
