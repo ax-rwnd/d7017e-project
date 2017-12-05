@@ -564,6 +564,74 @@
         }
       }
     },
+    "/api/courses/{course_id}/invitelink" : {
+      "get" : {
+        "tags" : [ "courses" ],
+        "summary" : "generate an invite code to be used in the /api/courses/join/{code} endpoint",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "course_id",
+          "in" : "path",
+          "description" : "ID of course (not course code)",
+          "required" : true,
+          "type" : "string"
+        }, {
+          "name" : "expires",
+          "in" : "query",
+          "description" : "Number of hours the invite code should be valid. Default is 24.",
+          "required" : false,
+          "type" : "integer"
+        } ],
+        "responses" : {
+          "201" : {
+            "description" : "created",
+            "schema" : {
+              "$ref" : "#/definitions/Invitelink"
+            }
+          },
+          "400" : {
+            "description": "Wrong input. Read documentation."
+          },
+          "401" : {
+            "description" : "token expired"
+          },
+          "500" : {
+            "description" : "internal server error"
+          }
+        }
+      }
+    },
+    "/api/courses/join/{code}" : {
+      "get" : {
+        "tags" : [ "courses" ],
+        "summary" : "join the course that generated the {code} from the /api/courses/{course_id}/invitelink endpoint",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "code",
+          "in" : "path",
+          "description" : "The code generated from the /api/courses/{course_id}/invitelink endpoint",
+          "required" : true,
+          "type" : "string"
+        }],
+        "responses" : {
+          "200" : {
+            "description" : "ok",
+            "schema" : {
+              "$ref" : "#/definitions/JoinCode"
+            }
+          },
+          "400" : {
+            "description": "User is already a member of this course"
+          },
+          "401" : {
+            "description" : "token expired"
+          },
+          "500" : {
+            "description" : "internal server error"
+          }
+        }
+      }
+    },
     "/api/courses/{course_id}/enabled_features" : {
       "get" : {
         "tags" : [ "courses" ],
@@ -865,6 +933,42 @@
         "_id" : {
           "type" : "string",
           "example" : "5a12afe0bc88c426981e68fa"
+        }
+      }
+    },
+    "Invitelink" : {
+      "properties" : {
+        "course" : {
+          "type" : "string",
+          "example" : "5a157a3c1154d36eafcc7cb0"
+        },
+        "code" : {
+          "type" : "string",
+          "example" : "1QMVFAIZFZEs9Fiq0BeT1oGnXyULIauu"
+        },
+        "expiresAt" : {
+          "type" : "string",
+          "example" : "2017-12-05T23:53:08.683Z"
+        }
+      }
+    },
+    "JoinCode" : {
+      "properties" : {
+        "user" : {
+          "type" : "string",
+          "example" : "5a1822524187d62ddcb5d9fb"
+        },
+        "course" : {
+          "type" : "string",
+          "example" : "5a157a3c1154d36eafcc7cb0"
+        },
+        "role" : {
+          "type" : "string",
+          "example" : "student"
+        },
+        "features" : {
+          "type" : "string",
+          "example" : "5a26b783df4ce53a306e31f5"
         }
       }
     },

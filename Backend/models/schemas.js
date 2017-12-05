@@ -3,8 +3,7 @@
 
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
-
-const INVITELINK_TTL = 24 * 60 * 60 * 1000;
+var config = require('config');
 
 /*
 * Base schemas
@@ -53,8 +52,6 @@ var userSchema = new Schema({
     admin: {type: Boolean, required: true},
     access: {type: String, enum: ['admin', 'advanced', 'basic'], required: false}, //change to required: true later
     tokens: [{type: String, required: false}],
-    courses: [{type: Schema.Types.ObjectId, ref: 'Course', required: false}],
-    teaching: [{type: Schema.Types.ObjectId, ref: 'Course', required: false}],
     providers: [{type: String, required: true}] //LTU, KTH etc.
 });
 userSchema.index({username: 'text', email: 'text'});
@@ -84,7 +81,7 @@ var inviteLinks = new Schema({
     code: {type: String, required: true},
     course: {type: Schema.Types.ObjectId, ref: 'Course', required: true},
     createdAt: {type: Date, default: Date.now()},
-    expiresAt: {type: Date, default: (Date.now() + INVITELINK_TTL)}
+    expiresAt: {type: Date, default: (Date.now() + config.get("Courses.invite_link_ttl"))}
 });
 
 var courseSchema = new Schema({
@@ -94,11 +91,8 @@ var courseSchema = new Schema({
     hidden: {type: Boolean, default: false},  //public or private course
     autojoin: {type: Boolean, default: false},
     owner: {type: Schema.Types.ObjectId, ref: 'User', required: false},
-    teachers: [{ type: Schema.Types.ObjectId, ref: 'User', required: false }],
-    students: [{ type: Schema.Types.ObjectId, ref: 'User', required: false }],
     assignments: [{ type: Schema.Types.ObjectId, ref: 'Assignment', required: false }], // Remove me soon
     assignmentgroups: [{ type: Schema.Types.ObjectId, ref: 'Assignmentgroup', required: false }],
-    features: [{ type: Schema.Types.ObjectId, ref: 'Features', required: true }], //progress, badges etc.
     enabled_features: {
         badges: Boolean,
         progressbar: Boolean,

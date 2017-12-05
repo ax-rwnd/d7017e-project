@@ -77,19 +77,13 @@ function getNumberOfAssignments(course_id) {
 }
 
 function createFeature(user_id, course_id) {
-    return new Promise((resolve, reject) => {
-        let feature = new Features({user: user_id, progress: [], badges: []});
-        feature.save().then(function(data) {
-            let course = getCourseByID(course_id).then(function(course) {
-                course.features.push(feature);
-                course.save().then(function(course) {
-                    resolve(feature);
-                });
-            }).catch(function(err) {
-                reject(err);
-            });
-        });
+    let feature = new Features({user: user_id, progress: [], badges: []});
+    return feature.save().then(function(data) {
+        return data;
+    }).catch(function(err) {
+        throw err;
     });
+
 }
 
 function getFeatureByID(features_id) {
