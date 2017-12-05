@@ -17,7 +17,7 @@ function validateCode(user_id, lang, code, assignment_id) {
     return queries.getTestsFromAssignment(assignment_id)
     .then(function (tests) {
         console.log("TJA");
-        console.log(tests);
+        console.log(tests.tests);
         /*if(!tests.hasOwnProperty('tests') || tests.tests === undefined) {
             logger.log("error",'Assignment', assignment_id, 'did not have tests object.');
             return res.sendStatus(500);

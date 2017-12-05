@@ -402,12 +402,12 @@ describe('/api', () => {
                     .set('Authorization', 'Bearer ' + access_tokens.user)
                     .send({
                         'lang': 'python3',
-                        'code': 'print(\"hello world\")\n'
+                        'code': 'print(\"sockerkaka\")'
                     })
                     .expect(200)
                     .then(res => {
                         console.log(res.body);
-                        //assert(res.body.passed == true);
+                        assert(res.body.passed == true);
                         assert(assignment_id == res.body.assignment_id, 'response does not contain the correct assignment_id');
                     });
             });
