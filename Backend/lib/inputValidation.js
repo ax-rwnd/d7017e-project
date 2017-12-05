@@ -2,6 +2,7 @@
 var badInput = require('./badInputError.js');
 var errors = require('./errors.js');
 var constants = require('./constants.js');
+var typecheck = require('./typecheck.js');
 
 
 // GREAT LINKS:
@@ -11,7 +12,7 @@ var constants = require('./constants.js');
 // WHY IS IT DONE?!
 // Sending next as parameter does not work. Code will continue to execute in route.
 // Therefore calls to input validator will have to be wrapped in try catch block in route.
-// Promise creates difficult situations with reaching input in chains sometimes. 
+// Promise creates difficult situations with reaching input in chains sometimes.
 // This is not an asynchronus call so therefore promise is not a must.
 // If anyone have any idea of solving these problems. Feel free to change.
 
@@ -71,11 +72,11 @@ function postCourseValidation(req) {
     var inputError = req.validationErrors();
     if (inputError) {
         // next here seems to not work. Code will continue execute in routes anyways. Even with return.
-        throw badInput.BAD_INPUT(inputError);            
+        throw badInput.BAD_INPUT(inputError);
     }
 
     // TODO: REMOVE TEACHER IN OBJECT. WHEN TEST FIXED
-    var input = {name: name, owner: req.user.id, teachers: [req.user.id], enabled_features: enabled_features, description: description, 
+    var input = {name: name, owner: req.user.id, teachers: [req.user.id], enabled_features: enabled_features, description: description,
                         course_code: course_code, hidden: hidden, autojoin: autojoin};
     return input;
 }
@@ -102,7 +103,7 @@ function postMemberInviteValidation(req) {
 
     var inputError = req.validationErrors();
     if (inputError) {
-        throw badInput.BAD_INPUT(inputError);            
+        throw badInput.BAD_INPUT(inputError);
     }
 
     var input = {course_id: course_id, user_id: user_id};
@@ -131,13 +132,101 @@ function putMembersInviteValidation (req) {
 
     var inputError = req.validationErrors();
     if (inputError) {
-        throw badInput.BAD_INPUT(inputError);            
+        throw badInput.BAD_INPUT(inputError);
     }
 
     var input = {course_id: course_id, user_id: user_id};
     return input;
 }
 
+function assignmentgroupValidation(req) {
+
+    let input = {};
+
+    // required
+    var name;
+
+    // optional
+    var assignments = [];
+    var adventuremap = {};
+
+    //req
+    req.checkBody("name", "Must contain only ascii characters").isAscii();
+    name = req.body.name;
+
+    //optional
+    if(req.body.assignments) {
+        req.checkBody('assignments')
+             .custom((item)=>Array.isArray(item))
+             .withMessage( "Must be array");
+        assignments = req.body.assignments;
+    }
+    if(req.body.adventuremap) {
+        // TODO Check object
+        //req.checkBody("adventuremap", "Not a valid assignments field").isJSON();
+        adventuremap = req.body.adventuremap;
+    }
+
+    var inputError = req.validationErrors();
+    if (inputError) {
+        throw badInput.BAD_INPUT(inputError);
+    }
+
+    input.name = name;
+    input.assignments = assignments;
+    input.adventuremap = adventuremap;
+
+    return input;
+}
+
+function badgeValidation(req) {
+
+    let input = {};
+
+    // required
+    var course_id;
+    var icon;
+    var title;
+    var description;
+
+    // optional
+    var goals = {};
+    
+    //req
+    req.checkParams("course_id", "Not a valid course id").isMongoId();
+    course_id = req.params.course_id;
+    req.checkBody("icon", "Must contain only ascii characters").isAscii();
+    icon = req.body.icon;
+    req.checkBody("title", "Must contain only ascii characters").isAscii();
+    title = req.body.title;
+    req.checkBody("description", "Must contain only ascii characters").isAscii();
+    description = req.body.description;
+
+    //optional
+    if(req.body.goals) {
+        // TODO Check object
+        /*req.checkBody('assignments')
+             .custom((item)=>Array.isArray(item))
+             .withMessage( "Must be array");*/
+        goals = req.body.goals;
+    }
+
+    var inputError = req.validationErrors();
+    if (inputError) {
+        throw badInput.BAD_INPUT(inputError);
+    }
+
+    input.course_id = course_id;
+    input.icon = icon;
+    input.title = title;
+    input.description = description;
+    input.goals = goals;
+
+    return input;
+}
+
 exports.postCourseValidation = postCourseValidation;
 exports.putMembersInviteValidation = putMembersInviteValidation;
 exports.postMemberInviteValidation = postMemberInviteValidation;
+exports.assignmentgroupValidation = assignmentgroupValidation;
+exports.badgeValidation = badgeValidation;

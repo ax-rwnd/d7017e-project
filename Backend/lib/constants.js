@@ -4,7 +4,7 @@ const ACCESS = {
     ADMIN: 'admin',
     ADVANCED: 'advanced',
     BASIC: 'basic'
-}
+};
 
 const FIELDS = {
     USER : {
@@ -18,13 +18,16 @@ const FIELDS = {
     COURSE: {
         MODEL: require('../models/schemas').Course,
         BASE_FIELDS: "name description course_code",
-        ADMIN: "course_code name description autojoin hidden enabled_features teachers students invited pending assignments",
-        TEACHER: "course_code name description autojoin hidden enabled_features teachers students invited pending assignments",
-        STUDENT: "course_code name description assignments",
-        POPULATE_FIELDS: "teachers students assignments"
+        ADMIN: "course_code name description autojoin hidden enabled_features teachers students invited pending assignments assignmentgroups",
+        TEACHER: "course_code name description autojoin hidden enabled_features teachers students invited pending assignments assignmentgroups",
+        STUDENT: "course_code name description assignments assignmentgroups",
+        POPULATE_FIELDS: "teachers students assignments assignmentgroups"
     },
     TEACHERS: {
         BASE_FIELDS: "username email"
+    },
+    ASSIGNMENTGROUPS: {
+        BASE_FIELDS: "name assignments adventuremap"
     },
     ASSIGNMENTS: {
         MODEL: require('../models/schemas').Assignment,
@@ -52,8 +55,14 @@ const FIELDS = {
     },
     COURSES: {
         BASE_FIELDS: "course_code name description"
+    },
+    FEATURES: {
+        BASE_FIELDS: "user progress badges"
+    },
+    BADGES: {
+        BASE_FIELDS: "course_id icon title description goals"
     }
-}
+};
 
 exports.ACCESS = ACCESS;
 exports.FIELDS = FIELDS;

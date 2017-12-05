@@ -9,7 +9,11 @@ var User = require('../../models/schemas').User;
 var Draft = require('../../models/schemas').Draft;
 var JoinRequest = require('../../models/schemas').JoinRequests;
 var Badge = require('../../models/schemas').Badge;
-var InviteLinks = require('../../models/schemas').InviteLinks;
+var Feature = require('../../models/schemas').Features;
+var InviteLink = require('../../models/schemas').InviteLinks;
+var Features = require('./features.js');
+var Assignmentgroup = require('../../models/schemas').Assignmentgroup;
+
 var errors = require('../errors.js');
 var mongoose = require('mongoose');
 var logger = require('../logger.js');
@@ -17,6 +21,7 @@ var jwt = require('jsonwebtoken');
 var config = require('config');
 var constants = require('../constants.js');
 var randomstring = require('randomstring');
+var features = require('./features.js');
 
 /* MOVED TO LIB/CONSTANTS.JS
 const FIELDS = {
@@ -407,6 +412,25 @@ function removeStudentFromCourse(user_id, course_id) {
     });
 }
 
+function deleteTest(test_id, assignment_id) {
+    return Assignment.update(
+        {_id: assignment_id},
+        {$pull: {'tests.io': test_id}},
+        {runValidators: true}
+    ).then(function (updated) {
+        if (updated.nModified === 0) {
+            throw errors.TEST_NOT_IN_ASSIGNMENT;
+        }
+        return Test.findOneAndRemove({_id: test_id})
+        .then(function(test) {
+            if (!test) {
+                throw errors.TEST_DOES_NOT_EXIST;
+            }
+            return test;
+        });
+    });
+}
+
 
 function getCourseInvites(course_id, type) {
     return JoinRequest.find({inviteType: type, course: course_id}, "user -_id").populate("user", "username email");
@@ -418,7 +442,7 @@ function getUserInvites(user_id, type) {
     } else {
         return JoinRequest.find({user: user_id}, "inviteType course -_id").populate("course", "name course_code");
 
-    }   
+    }
 }
 
 function getInvitesCourseUser(user_id, course_id) {
@@ -478,24 +502,32 @@ function deleteCourse(id) {
         if (!course) {
             throw errors.COURSE_DOES_NOT_EXIST;
         }
+        console.log(course);
         // assignments
-        for (let ass_id of course.assignments) {
-            deleteAssignment(ass_id)
-            .catch(() => {});
-        }
-        let promises = course.assignments
+        let promises = course.assignmentgroups
             .map(aid => {
-                return deleteAssignment(aid)
+                return deleteAssignmentgroup(aid, course._id)
                 // ignore error when assignment doesn't exist
                 .catch(()=>{});
             });
         // members
-        promises.push(CourseMember.remove({course: course._id}));
+        promises.push(deleteCourseMembers(course._id));
         // join requests
         promises.push(JoinRequest.remove({course: course._id}));
+        // invite links
+        promises.push(InviteLink.remove({course: course._id}));
         // badges
         promises.push(Badge.remove({course_id: course._id}));
         return Promise.all(promises);
+    });
+}
+
+function deleteCourseMembers(course_id) {
+    return CourseMember.find({course: course_id})
+    .then(members => {
+        let p = members.map(m => Feature.remove({_id: m.features}));
+        p.concat(members.map(m => m.remove()));
+        return Promise.all(p);
     });
 }
 
@@ -654,6 +686,29 @@ function getTest(id, fields) {
     });
 }
 
+function updateTest(id, set_props) {
+    return Test.findById(id, "stdout stdin args").then(function (test) {
+        if (!test) {
+            throw errors.TEST_DOES_NOT_EXIST;
+        }
+
+        return Test.update(
+            {_id: id},
+            {$set: set_props},
+            {runValidators: true}
+        ).then(raw => {
+            // check if the test update was ok
+            if (raw.ok !== 1) {
+                // TODO: make a real error message!
+                throw new Error('Mongo error: Failed to update test');
+            // check if the test existed
+            } else if (raw.n === 0) {
+                throw errors.TEST_DOES_NOT_EXIST;
+            }
+        });
+    });
+}
+
 function getAssignmentTests(course_id, assignment_id) {
     return Assignment.findById(assignment_id, "tests").populate("tests.io")
     .then(function (assignmentObject) {
@@ -664,8 +719,8 @@ function getAssignmentTests(course_id, assignment_id) {
     });
 }
 
-function createAssignment(name, description, hidden, languages, course_id) {
-    var newAssignment = new Assignment({name: name, description: description, hidden: hidden, tests: {io: [], lint: false}, optionaal_tests: {io: [], lint: false}, languages: languages});
+function createAssignment(name, description, hidden, lint, languages, course_id) {
+    var newAssignment = new Assignment({name: name, description: description, hidden: hidden, tests: {io: [], lint: lint}, optionaal_tests: {io: [], lint: lint}, languages: languages});
     return newAssignment.save().then(function (createdAssignment) {
         if (!createdAssignment) {
             console.log("Error: Assignment not created");
@@ -686,7 +741,7 @@ function createAssignment(name, description, hidden, languages, course_id) {
     });
 }
 
-function createTest(stdout, stdin, args, lint, assignment_id) {
+function createTest(stdout, stdin, args, assignment_id) {
     var newTest = new Test({stdout: stdout, stdin: stdin, args: args});
 
     return newTest.save().then(function (createdTest) {
@@ -701,7 +756,7 @@ function createTest(stdout, stdin, args, lint, assignment_id) {
             }
             return Assignment.update(
                 { _id: assignment_id },
-                { $push: { 'tests.io': createdTest._id }, $set: { 'tests.lint': lint } }
+                { $push: { 'tests.io': createdTest._id }}
             ).then( function (v) {
                 return createdTest;
             });
@@ -928,13 +983,17 @@ function tempSaveMember (user_id, course_id) {
     return member.save();
 }
 
-function saveCourseObject(courseObject) {
+function saveCourseObject(user_id, courseObject) {
     var course = new Course(courseObject);
     return course.save().then(function (savedCourse) {
-        // TODO: FIX FEATURE FIELD. WHAT SHOULD IT ADD?
-        var memberObject = new CourseMember({role: "teacher", course: savedCourse._id, user: savedCourse.owner, features: "5a157a581154d36ecfcc7ab1"});
-        return memberObject.save().then(function () {
-            return savedCourse;
+        console.log(savedCourse);
+        return Features.createFeature(user_id, savedCourse._id).then(function (featureObject) {
+            // TODO: FIX FEATURE FIELD. WHAT SHOULD IT ADD?
+            console.log(featureObject);
+            var memberObject = new CourseMember({role: "teacher", course: savedCourse._id, user: savedCourse.owner, features: featureObject._id});
+            return memberObject.save().then(function () {
+                return savedCourse;
+            });
         });
     });
 }
@@ -953,9 +1012,11 @@ function acceptInviteToCourse(user_id, course_id) {
         if (!deletedInvite) {
             throw errors.NO_INVITE_FOUND;
         }
-        // TODO: CHANGE FEATURE FIELD
-        var memberObject = new CourseMember({role: "student", course: course_id, user: user_id, features: "5a157a581154d36ecfcc7ab1"});
-        return memberObject.save();
+        return Features.createFeature(user_id, course_id).then(function (featureObject) {
+            // TODO: CHANGE FEATURE FIELD
+            var memberObject = new CourseMember({role: "student", course: course_id, user: user_id, features: featureObject._id});
+            return memberObject.save();
+        });
     });
 }
 
@@ -965,9 +1026,11 @@ function addMemberToCourse(user_id, course_id) {
         if (!deletedInvite) {
             throw errors.NO_INVITE_FOUND;
         }
-        // TODO: CHANGE FEATURE FIELD
-        var memberObject = new CourseMember({role: "student", course: course_id, user: user_id, features: "5a157a581154d36ecfcc7ab1"});
-        return memberObject.save();
+        return Features.createFeature(user_id, course_id).then(function (featureObject) {
+            // TODO: CHANGE FEATURE FIELD
+            var memberObject = new CourseMember({role: "student", course: course_id, user: user_id, features: featureObject._id});
+            return memberObject.save();
+        });
     });
 }
 
@@ -1002,25 +1065,84 @@ function generateInviteLink(course_id) {
     if (!mongoose.Types.ObjectId.isValid(course_id)) {
             throw errors.INVALID_ID;
     }
-    var newLink = new InviteLinks({code: code, course: course_id});
+    var newLink = new InviteLink({code: code, course: course_id});
     return newLink.save().then(function (obj) {
         return obj;
     });
 }
 
 function validateInviteLink(code, user_id) {
-    return InviteLinks.findOne({code: code}).then(function (obj) {
+    return InviteLink.findOne({code: code}).then(function (obj) {
         if (!obj) {
             throw errors.INVALID_LINK;
         }
         if (obj.expiresAt < Date.now()) {
-            return InviteLinks.deleteOne({code: code}).then(function () {
+            return InviteLink.deleteOne({code: code}).then(function () {
                 throw errors.EXPIRED_LINK;
             });
         }
-        // Add student to course
-        var memberObject = new CourseMember({role: "student", course: obj.course, user: user_id, features: "5a157a581154d36ecfcc7ab1"});
-        return memberObject.save();
+
+        return Features.createFeature(user_id, obj.course).then(function (featureObject) {
+            // Add student to course
+            var memberObject = new CourseMember({role: "student", course: obj.course, user: user_id, features: featureObject._id});
+            return memberObject.save();
+        });
+    });
+}
+
+function getAssignmentgroupsByCourseID(course_id) {
+    return Course.findById(course_id, 'assignmentgroups');
+}
+
+function createAssignmentgroup(assignmentgroupObject, course_id) {
+    let assignmentgroup = new Assignmentgroup(assignmentgroupObject);
+    return assignmentgroup.save().then(assignmentgroup => {
+        return Course.update({'_id': course_id }, {$push: { assignmentgroups: assignmentgroup._id}})
+        .then(function(course) {
+            return assignmentgroup;
+        });
+    });
+}
+
+function getAssignmentgroupByID(assignmentgroup_id) {
+    return Assignmentgroup.findById(assignmentgroup_id)
+    .then(function(assignmentgroup) {
+        if(assignmentgroup === null)
+            throw errors.ASSIGNMENTGROUP_DO_NOT_EXIST;
+        return assignmentgroup;
+    });
+}
+
+function updateAssignmentgroup(assignmentgroupObject, assignmentgroup_id) {
+    return Assignmentgroup.findOneAndUpdate({"_id": assignmentgroup_id}, assignmentgroupObject, { runValidators: true, new: true})
+    .then(function(assignmentgroup) {
+        if(assignmentgroup === null)
+            throw errors.ASSIGNMENTGROUP_DO_NOT_EXIST;
+        return assignmentgroup;
+    });
+}
+
+function deleteAssignmentgroup(assignmentgroup_id, course_id) {
+
+    return Assignmentgroup.findOneAndRemove({_id: assignmentgroup_id})
+    .then(assignmentgroup => {
+        if (!assignmentgroup) {
+            throw errors.ASSIGNMENTGROUP_DO_NOT_EXIST;
+        }
+
+        let promises = assignmentgroup.assignments
+            .map(assignment => {
+                return deleteAssignment(assignment.assignment)
+                // ignore error when assignment doesn't exist
+                .catch(()=>{});
+            });
+
+        promises.push(Course.update({_id: course_id}, {$pull: { assignmentgroups: assignmentgroup_id}}));
+
+        return Promise.all(promises);
+    })
+    .then(function(result) {
+        return result;
     });
 }
 
@@ -1085,7 +1207,14 @@ exports.getInvitesCourseUser = getInvitesCourseUser;
 exports.getAssignmentTests = getAssignmentTests;
 exports.getUserPopulated = getUserPopulated;
 exports.updateCourse = updateCourse;
+exports.updateTest = updateTest;
+exports.deleteTest = deleteTest;
 exports.deleteCourse = deleteCourse;
 exports.deleteAssignment = deleteAssignment;
 exports.generateInviteLink = generateInviteLink;
 exports.validateInviteLink = validateInviteLink;
+exports.getAssignmentgroupsByCourseID = getAssignmentgroupsByCourseID;
+exports.createAssignmentgroup = createAssignmentgroup;
+exports.getAssignmentgroupByID = getAssignmentgroupByID;
+exports.updateAssignmentgroup = updateAssignmentgroup;
+exports.deleteAssignmentgroup = deleteAssignmentgroup;
