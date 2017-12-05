@@ -222,8 +222,19 @@ function badgeValidation(req) {
     return input;
 }
 
+// checks for a course_id param
+function courseIdValidation(req) {
+    req.checkParams('course_id', 'Not a valid course id').isMongoId();
+    var inputError = req.validationErrors();
+    if (inputError) {
+        throw badInput.BAD_INPUT(inputError);
+    }
+    return {course_id: req.params.course_id};
+}
+
 exports.postCourseValidation = postCourseValidation;
 exports.putMembersInviteValidation = putMembersInviteValidation;
 exports.postMemberInviteValidation = postMemberInviteValidation;
 exports.assignmentgroupValidation = assignmentgroupValidation;
 exports.badgeValidation = badgeValidation;
+exports.courseIdValidation = courseIdValidation;
