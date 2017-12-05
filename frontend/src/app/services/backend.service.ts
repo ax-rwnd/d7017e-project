@@ -235,8 +235,11 @@ The structure below is the following:
   }
 
   postNewBadge(icon: string, title: string, description: string, course_id: ObjectID, badges: any[], assignments: any[]) {
+    // Upload a new badge
+    // TODO: updated v2
+
     const goals = {'badges': badges, 'assignments': assignments};
-    const body = {'icon': icon, 'title': title, 'description': description, 'course_id': course_id, 'goals': goals};
+    const body = {'icon': icon, 'title': title, 'description': description, 'goals': goals};
     console.log('post body', body);
     return this.apiPost('/api/courses/' + course_id + '/badges', body);
   }
@@ -280,9 +283,10 @@ The structure below is the following:
 
   postDraft(course_id: ObjectID, assignment_id: ObjectID, code: string, lang: string) {
     // Saves a draft of the editors content on backend
+    // TODO: v2 test
 
     const body = {'code': code, 'lang': lang};
-    return this.apiPost('/api/courses/' + course_id.get() + '/assignments/' + assignment_id.get() + '/save', body);
+    return this.apiPost('/api/courses/' + course_id.get() + '/assignments/' + assignment_id.get() + '/draft', body);
   }
 
   getDraft(course_id: ObjectID, assignment_id: ObjectID) {
