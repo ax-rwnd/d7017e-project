@@ -47,7 +47,9 @@
           </div>
         </div>
       </div>
-      <app-mod-adventuremap-editor [courseCode]="currentCourse.id"></app-mod-adventuremap-editor>
+      <span *ngIf="currentCourse.enabled_features.adventuremap">
+        <app-mod-adventuremap-editor [courseCode]="currentCourse.id"></app-mod-adventuremap-editor>
+      </span>
     </div>
     <div class="col-lg-4">
       <h4>Pending requests

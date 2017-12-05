@@ -76,26 +76,39 @@ export class TeacherCoursesComponent implements OnInit {
 
     this.route.params.subscribe( (params: any) => {
       // Grab the current course
-      this.currentCourse = this.courseService.GetCourse(params.course);
-      this.currentCourseSaved = this.currentCourse;
-      console.log('course', this.currentCourse);
+      this.setCurrentCourse(params.course);
       // Assign groups for assignments
-      if (this.assignmentService.courseAssignments[this.currentCourse.id] !== undefined) {
-        this.assignmentGroups = this.assignmentService.courseAssignments[this.currentCourse.id];
-        console.log('assignments', this.assignmentGroups);
-      } else {
-        this.assignmentGroups = this.assignmentService.courseAssignments['default'];
-        console.log('assignments', this.assignmentGroups);
-      }
-      this.selectedAssignments = [{'assignment': this.flattenAssignments()[0], 'possible': this.flattenAssignments()}];
+      this.setAssignments();
+      // Get pending requests
+      this.setPendingReqs();
 
-      this.backendService.getPendingUsers(this.currentCourse.id)
-        .then(response => {
-          console.log('pending', response);
-          this.pendingReqs = response;
-        })
-        .catch(err => console.error('Get pending users failed', err));
     });
+  }
+
+  setPendingReqs() {
+    this.backendService.getPendingUsers(this.currentCourse.id)
+      .then(response => {
+        console.log('pending', response);
+        this.pendingReqs = response;
+      })
+      .catch(err => console.error('Get pending users failed', err));
+  }
+
+  setCurrentCourse(course) {
+    this.currentCourse = this.courseService.GetCourse(course);
+    this.currentCourseSaved = this.currentCourse;
+    console.log('course', this.currentCourse);
+  }
+
+  setAssignments() {
+    if (this.assignmentService.courseAssignments[this.currentCourse.id] !== undefined) {
+      this.assignmentGroups = this.assignmentService.courseAssignments[this.currentCourse.id];
+      console.log('assignments', this.assignmentGroups);
+    } else {
+      this.assignmentGroups = this.assignmentService.courseAssignments['default'];
+      console.log('assignments', this.assignmentGroups);
+    }
+    this.selectedAssignments = [{'assignment': this.flattenAssignments()[0], 'possible': this.flattenAssignments()}];
   }
 
   ngOnInit() {
