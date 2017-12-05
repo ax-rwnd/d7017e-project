@@ -290,6 +290,18 @@ function putAssignmentBodyValidation(req) {
         req.checkBody("hidden", "Must contain true or false").isBoolean();
         input.hidden = req.body.hidden;
     }
+    if ('tests' in req.body) {
+        if ('lint' in req.body.tests) {
+            req.checkBody("tests.lint", "Must contain true or false").isBoolean();
+            input.tests.lint = req.body.tests.lint;
+        }
+    }
+    if ('optional_tests' in req.body) {
+        if ('lint' in req.body.optional_tests) {
+            req.checkBody("optional_tests.lint", "Must contain true or false").isBoolean();
+            input.optional_tests.lint = req.body.optional_tests.lint;
+        }
+    }
     if ('languages' in req.body) {
         req.checkBody("languages", "Must contain only ascii characters").isAscii();
         input.languages = req.body.languages;
