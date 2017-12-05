@@ -315,6 +315,7 @@ describe('/api', () => {
                         name: 'Introduction to Mocha tests',
                         description: 'Write tests with Mocha',
                         hidden: false,
+                        lint: true,
                         languages: 'javascript'
                     })
                     .set('Authorization', 'Bearer ' + access_tokens.user)
@@ -363,8 +364,7 @@ describe('/api', () => {
                     .send({
                         stdout: 'hej\n',
                         stdin: '',
-                        args: [],
-                        lint: true
+                        args: []
                     })
                     .set('Authorization', 'Bearer ' + access_tokens.admin)
                     .expect(201)

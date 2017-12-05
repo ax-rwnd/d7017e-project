@@ -125,7 +125,7 @@ module.exports = function (router) {
     });
 
 
-    router.get('/me/invite', function (req, res, next) {
+    router.get('/me/invites', function (req, res, next) {
         var query = req.query.type;
 
         var p;
