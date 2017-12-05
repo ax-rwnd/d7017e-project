@@ -120,15 +120,8 @@ module.exports = function(router) {
             next(err);
         });
     });
-<<<<<<< HEAD
-*/
-
-
-=======
-
 
 /*
->>>>>>> origin/backend
     // TODO:
     // Tests
     // Documentation
