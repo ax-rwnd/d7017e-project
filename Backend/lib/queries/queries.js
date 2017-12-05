@@ -502,14 +502,21 @@ function deleteCourse(id) {
         if (!course) {
             throw errors.COURSE_DOES_NOT_EXIST;
         }
-        console.log(course);
+
         // assignments
-        let promises = course.assignmentgroups
+        let promises = course.assignments
+            .map(aid => {
+                return deleteAssignment(aid)
+                // ignore error when assignment doesn't exist
+                .catch(()=>{});
+            });
+        // assignmentgroups
+        promises.push(course.assignmentgroups
             .map(aid => {
                 return deleteAssignmentgroup(aid, course._id)
                 // ignore error when assignment doesn't exist
                 .catch(()=>{});
-            });
+            }));
         // members
         promises.push(deleteCourseMembers(course._id));
         // join requests
@@ -518,6 +525,7 @@ function deleteCourse(id) {
         promises.push(InviteLink.remove({course: course._id}));
         // badges
         promises.push(Badge.remove({course_id: course._id}));
+
         return Promise.all(promises);
     });
 }
@@ -1102,8 +1110,9 @@ function getAssignmentgroupsByCourseID(course_id) {
 
 function createAssignmentgroup(assignmentgroupObject, course_id) {
     let assignmentgroup = new Assignmentgroup(assignmentgroupObject);
-    return assignmentgroup.save().then(assignmentgroup => {
-        return Course.update({'_id': course_id }, {$push: { assignmentgroups: assignmentgroup._id}})
+    return assignmentgroup.save()
+    .then(assignmentgroup => {
+        return Course.update({'_id': course_id, $isolated: 1}, {$push: { assignmentgroups: assignmentgroup._id}})
         .then(function(course) {
             return assignmentgroup;
         });
@@ -1136,16 +1145,7 @@ function deleteAssignmentgroup(assignmentgroup_id, course_id) {
             throw errors.ASSIGNMENTGROUP_DO_NOT_EXIST;
         }
 
-        let promises = assignmentgroup.assignments
-            .map(assignment => {
-                return deleteAssignment(assignment.assignment)
-                // ignore error when assignment doesn't exist
-                .catch(()=>{});
-            });
-
-        promises.push(Course.update({_id: course_id}, {$pull: { assignmentgroups: assignmentgroup_id}}));
-
-        return Promise.all(promises);
+        return Course.update({_id: course_id}, {$pull: { assignmentgroups: assignmentgroup_id}});
     })
     .then(function(result) {
         return result;

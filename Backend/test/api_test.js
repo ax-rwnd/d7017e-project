@@ -51,7 +51,8 @@ describe('/api', () => {
     let course_id;
     let assignmentgroup_id1;
     let assignmentgroup_id2;
-    let assignment_id;
+    let assignment_id1;
+    let assignment_id2;
     let test_id;
     let invitelink;
     let badge_id;
@@ -270,7 +271,24 @@ describe('/api', () => {
                     .expect(201)
                     .then(res => {
                         assert(ObjectId.isValid(res.body._id), 'response is not a valid ObjectId');
-                        assignment_id = res.body._id;
+                        assignment_id1 = res.body._id;
+                    });
+            });
+
+            it('returns an assignment id for an assignment that will be removed later', () => {
+                return request(runner.server)
+                    .post('/api/courses/' + course_id + '/assignments')
+                    .send({
+                        name: 'Introduction to Mocha tests',
+                        description: 'Write tests with Mocha',
+                        hidden: false,
+                        languages: 'javascript'
+                    })
+                    .set('Authorization', 'Bearer ' + access_tokens.user)
+                    .expect(201)
+                    .then(res => {
+                        assert(ObjectId.isValid(res.body._id), 'response is not a valid ObjectId');
+                        assignment_id2 = res.body._id;
                     });
             });
         });
@@ -291,7 +309,7 @@ describe('/api', () => {
         describe('POST /api/courses/:course_id/assignments/:assignment_id/tests', () => {
             it('returns a test id', () => {
                 return request(runner.server)
-                    .post('/api/courses/' + course_id + '/assignments/' + assignment_id + '/tests')
+                    .post('/api/courses/' + course_id + '/assignments/' + assignment_id1 + '/tests')
                     .send({
                         stdout: 'hej\n',
                         stdin: '',
@@ -309,7 +327,7 @@ describe('/api', () => {
         describe('GET /api/courses/:course_id/assignments/:assignment_id/tests', () => {
             it('returns a non-empty list of tests and a lint bool', () => {
                 return request(runner.server)
-                    .get('/api/courses/' + course_id + '/assignments/' + assignment_id + '/tests')
+                    .get('/api/courses/' + course_id + '/assignments/' + assignment_id1 + '/tests')
                     .set('Authorization', 'Bearer ' + access_tokens.admin)
                     .expect(200)
                     .then(res => {
@@ -322,7 +340,7 @@ describe('/api', () => {
         describe('GET /api/courses/:course_id/assignments/:assignment_id/tests/:test_id', () => {
             it('returns a test object', () => {
                 return request(runner.server)
-                    .get('/api/courses/' + course_id + '/assignments/' + assignment_id + '/tests/' + test_id)
+                    .get('/api/courses/' + course_id + '/assignments/' + assignment_id1 + '/tests/' + test_id)
                     .set('Authorization', 'Bearer ' + access_tokens.admin)
                     .expect(200)
                     .then(res => {
@@ -335,40 +353,23 @@ describe('/api', () => {
         describe('PUT /api/courses/:course_id/assignments/:assignment_id/tests/:test_id', () => {
             it('modifies stdout successfully', () => {
                 return request(runner.server)
-                    .put('/api/courses/' + course_id + '/assignments/' + assignment_id + '/tests/' + test_id)
+                    .put('/api/courses/' + course_id + '/assignments/' + assignment_id1 + '/tests/' + test_id)
                     .send({
-                        stdout: 'sockerkaka'
+                        stdout: 'hello world2\n'
                     }).set('Authorization', 'Bearer ' + access_tokens.admin)
                     .expect(200);
-            });
-        });
-
-        describe('POST /api/courses/:course_id/assignments/:assignment_id/submit', () => {
-
-            it('run assignments tests', () => {
-                return request(runner.server)
-                    .post('/api/courses/' + course_id + '/assignments/' + assignment_id + '/submit')
-                    .set('Authorization', 'Bearer ' + access_tokens.user)
-                    .send({
-                        'lang': 'python3',
-                        'code': 'print(\"hello world\")\n'
-                    })
-                    .expect(200)
-                    .then(res => {
-                        assert(assignment_id == res.body.assignment_id, 'response is not contain the correct assignment_id');
-                    });
             });
         });
 
         describe('POST /:course_id/assignments/:assignment_id/save', () => {
             it('saves an empty draft to the database', () => {
                 return request(runner.server)
-                    .post('/api/courses/' + course_id + '/assignments/' + assignment_id + '/save')
+                    .post('/api/courses/' + course_id + '/assignments/' + assignment_id1 + '/save')
                     .set('Authorization', 'Bearer ' + access_tokens.user)
                     .send()
                     .expect(201)
                     .then(res => {
-                        assert(assignment_id == res.body.assignment, 'response does not contain the correct assignment_id');
+                        assert(assignment_id1 == res.body.assignment, 'response does not contain the correct assignment_id');
                         assert(res.body.lang == "", 'response param lang is not empty');
                         assert(res.body.code == "", 'response param code is not empty');
                     });
@@ -379,12 +380,12 @@ describe('/api', () => {
                     code: 'print(\"hello world\")\n'
                 };
                 return request(runner.server)
-                    .post('/api/courses/' + course_id + '/assignments/' + assignment_id + '/save')
+                    .post('/api/courses/' + course_id + '/assignments/' + assignment_id1 + '/save')
                     .set('Authorization', 'Bearer ' + access_tokens.user)
                     .send(draft)
                     .expect(201)
                     .then(res => {
-                        assert(assignment_id == res.body.assignment, 'response does not contain the correct assignment_id');
+                        assert(assignment_id1 == res.body.assignment, 'response does not contain the correct assignment_id');
                         assert(draft.lang == res.body.lang, 'response does not contain the correct lang');
                         assert(draft.code == res.body.code, 'response does not contain the correct code');
                     });
@@ -396,12 +397,12 @@ describe('/api', () => {
                 let lang = 'python3';
                 let code = 'print(\"hello world\")\n';
                 return request(runner.server)
-                    .get('/api/courses/' + course_id + '/assignments/' + assignment_id + '/draft')
+                    .get('/api/courses/' + course_id + '/assignments/' + assignment_id1 + '/draft')
                     .set('Authorization', 'Bearer ' + access_tokens.user)
                     .send()
                     .expect(200)
                     .then(res => {
-                        assert(assignment_id == res.body.assignment, 'response does not contain the correct assignment_id');
+                        assert(assignment_id1 == res.body.assignment, 'response does not contain the correct assignment_id');
                         assert(res.body.lang == lang, 'response does not contain the correct lang');
                         assert(res.body.code == code, 'response does not contain the correct code');
                     });
@@ -510,15 +511,7 @@ describe('/api', () => {
             });
         });
 
-
-
-
-
-
         describe('POST /api/courses/:course_id/badges', () => {
-
-
-
             it('Create a badge', () => {
 
                 let badge = {
@@ -529,7 +522,7 @@ describe('/api', () => {
                     goals: {
                         badges: [],
                         assignments: [{
-                            assignment: assignment_id,
+                            assignment: assignment_id1,
                             tests: [test_id]
                         }]
                     }
@@ -719,11 +712,41 @@ describe('/api', () => {
         });
     });
 
+    describe('tester', () => {
+        describe.skip('POST /api/courses/:course_id/assignments/:assignment_id/submit', () => {
+            it('run assignments tests', () => {
+                return request(runner.server)
+                    .post('/api/courses/' + course_id + '/assignments/' + assignment_id1 + '/submit')
+                    .set('Authorization', 'Bearer ' + access_tokens.user)
+                    .send({
+                        'lang': 'python3',
+                        'code': 'print(\"hello world2\")\n'
+                    })
+                    .expect(200)
+                    .then(res => {
+                        assert(assignment_id1 == res.body.assignment_id, 'response is not contain the correct assignment_id');
+                    });
+            });
+        });
+
+        describe('GET /api/tester/languages', () => {
+            it('Get supported languages from tester', () => {
+                return request(runner.server)
+                    .get('/api/tester/languages')
+                    .set('Authorization', 'Bearer ' + access_tokens.user)
+                    .expect(200)
+                    .then(res => {
+                        assert(Array.isArray(res.body.languages), 'Property languages was not an array');
+                    });
+            });
+        });
+    });
+
     describe('deletion', () => {
         describe('DELETE /api/courses/:course_id/assignments/:assignment_id/tests/:test_id', () => {
             it('completes without an error', () => {
                 return request(runner.server)
-                    .delete('/api/courses/' + course_id + '/assignments/' + assignment_id + '/tests/' + test_id)
+                    .delete('/api/courses/' + course_id + '/assignments/' + assignment_id1 + '/tests/' + test_id)
                     .set('Authorization', 'Bearer ' + access_tokens.admin)
                     .expect(200);
                 // TODO: add assertions to check if there is some data left
@@ -733,7 +756,7 @@ describe('/api', () => {
         describe('DELETE /api/courses/:course_id/assignments/:assignment_id', () => {
             it('completes without an error', () => {
                 return request(runner.server)
-                    .delete('/api/courses/' + course_id + '/assignments/' + assignment_id)
+                    .delete('/api/courses/' + course_id + '/assignments/' + assignment_id2)
                     .set('Authorization', 'Bearer ' + access_tokens.admin)
                     .expect(200);
                 // TODO: add assertions to check if there is some data left
