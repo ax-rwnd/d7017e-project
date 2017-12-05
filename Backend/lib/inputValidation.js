@@ -43,7 +43,7 @@ function postCourseValidation(req) {
         description = "";
     }
 
-    if (req.body.description) {
+    if (req.body.course_code) {
         req.checkBody("course_code", "Must contain only ascii characters").isAlphanumeric();
         course_code = req.body.course_code;
     } else {
@@ -232,7 +232,45 @@ function courseIdValidation(req) {
     return {course_id: req.params.course_id};
 }
 
+// Input validation for PUT /api/courses/:course_id
+function putCourseBodyValidation(req) {
+    var input = {};
+
+    // Optional fields
+    if ('name' in req.body) {
+        req.checkBody("name", "Must contain only letters and numbers").isAscii();
+        input.name = req.body.name;
+    }
+    if ('description' in req.body) {
+        req.checkBody("description", "Must contain only ascii characters").isAscii();
+        input.description = req.body.description;
+    }
+    if ('course_code' in req.body) {
+        req.checkBody("course_code", "Must contain only ascii characters").isAlphanumeric();
+        input.course_code = req.body.course_code;
+    }
+    if ('hidden' in req.body) {
+        req.checkBody("hidden", "Must contain true or false").isBoolean();
+        input.hidden = req.body.hidden;
+    }
+    if ('autojoin' in req.body) {
+        req.checkBody("autojoin", "Must contain true or false").isBoolean();
+        input.autojoin = req.body.autojoin;
+    }
+    if ('enabled_features' in req.body) {
+        // TODO: apply better validation from postCourseValidation when it is implemented
+        input.enabled_features = req.body.enabled_features;
+    }
+
+    var inputError = req.validationErrors();
+    if (inputError) {
+        throw badInput.BAD_INPUT(inputError);
+    }
+    return input;
+}
+
 exports.postCourseValidation = postCourseValidation;
+exports.putCourseBodyValidation = putCourseBodyValidation;
 exports.putMembersInviteValidation = putMembersInviteValidation;
 exports.postMemberInviteValidation = postMemberInviteValidation;
 exports.assignmentgroupValidation = assignmentgroupValidation;

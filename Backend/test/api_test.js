@@ -143,11 +143,17 @@ describe('/api', () => {
 
         describe('PUT /api/courses/:course_id', () => {
             it('modifies the course code successfully', () => {
+                let course_updated = {
+                    name: 'Introduction to Automated Testing in JavaScript (updated)',
+                    description: 'In this course you will use Mocha and supertest to create automated tests for NodeJS applications. (updated)',
+                    hidden: false,
+                    course_code: 'DtestingtestingE',
+                    enabled_features: {badges: false, progressbar: true}
+                };
                 return request(runner.server)
                     .put('/api/courses/' + course_id)
-                    .send({
-                        course_code: 'DtestingtestingE'
-                    }).set('Authorization', 'Bearer ' + access_tokens.admin)
+                    .send(course_updated)
+                    .set('Authorization', 'Bearer ' + access_tokens.admin)
                     .expect(200);
             });
         });

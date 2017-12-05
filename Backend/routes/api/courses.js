@@ -215,24 +215,11 @@ module.exports = function(router) {
     // Modify course with id :course_id
     // Must be teacher or higher
     router.put('/:course_id', function (req, res, next) {
-        let course_id = req.params.course_id;
-        if (!mongoose.Types.ObjectId.isValid(course_id)) {
-            return next(errors.BAD_INPUT);
-        }
-
-        let b = req.body;
-        let clean_b = {};
-        if (b.hasOwnProperty('course_code')) clean_b.course_code = b.course_code;
-        if (b.hasOwnProperty('name')) clean_b.name = b.name;
-        if (b.hasOwnProperty('description')) clean_b.description = b.description;
-        if (b.hasOwnProperty('hidden')) clean_b.hidden = b.hidden;
-        if (b.hasOwnProperty('autojoin')) clean_b.autojoin = b.autojoin;
-        // note that ALL fields in enabled_features are allowed
-        if (b.hasOwnProperty('enabled_features')) clean_b.enabled_features = b.enabled_features;
-
+        let {course_id} = inputValidation.courseIdValidation(req);
+        let body = inputValidation.putCourseBodyValidation(req);
         permission.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
         .then(() => {
-            return queries.updateCourse(course_id, clean_b);
+            return queries.updateCourse(course_id, body);
         }).then(() => {
             // send an empty response
             res.json({});
