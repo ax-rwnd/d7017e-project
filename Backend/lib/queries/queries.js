@@ -486,8 +486,7 @@ function updateCourse(id, set_props) {
         ).then(raw => {
             // check if the course update was ok
             if (raw.ok !== 1) {
-                // TODO: make a real error message!
-                throw new Error('Mongo error: failed to add to user.courses');
+                throw errors.FAILED_TO_UPDATE_COURSE;
             // check if the course existed
             } else if (raw.n === 0) {
                 throw errors.COURSE_DOES_NOT_EXIST;
@@ -683,6 +682,28 @@ function getAssignment(id, fields) {
 }
 */
 
+function updateAssignment(id, set_props) {
+    return Assignment.findById(id, "name description hidden languages").then(function (assignment) {
+        if (!assignment) {
+            throw errors.ASSIGNMENT_DOES_NOT_EXIST;
+        }
+
+        return Assignment.update(
+            {_id: id},
+            {$set: set_props},
+            {runValidators: true}
+        ).then(raw => {
+            // check if the assignemt update was ok
+            if (raw.ok !== 1) {
+                throw errors.FAILED_TO_UPDATE_ASSIGNMENT;
+            // check if the assignment existed
+            } else if (raw.n === 0) {
+                throw errors.ASSIGNMENTT_DOES_NOT_EXIST;
+            }
+        });
+    });
+}
+
 function getTest(id, fields) {
     var wantedFields = fields || "stdout stdin args";
 
@@ -707,8 +728,7 @@ function updateTest(id, set_props) {
         ).then(raw => {
             // check if the test update was ok
             if (raw.ok !== 1) {
-                // TODO: make a real error message!
-                throw new Error('Mongo error: Failed to update test');
+                throw errors.FAILED_TO_UPDATE_TEST;
             // check if the test existed
             } else if (raw.n === 0) {
                 throw errors.TEST_DOES_NOT_EXIST;
@@ -1224,3 +1244,4 @@ exports.createAssignmentgroup = createAssignmentgroup;
 exports.getAssignmentgroupByID = getAssignmentgroupByID;
 exports.updateAssignmentgroup = updateAssignmentgroup;
 exports.deleteAssignmentgroup = deleteAssignmentgroup;
+exports.updateAssignment = updateAssignment;

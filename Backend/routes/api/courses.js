@@ -482,10 +482,23 @@ module.exports = function(router) {
 
     // Update an assignment
     router.put('/:course_id/assignments/:assignment_id', function (req, res, next) {
+        // imhere
+        let {course_id, assignment_id} = inputValidation.assignmentValidation(req);
+        let body = inputValidation.putAssignmentBodyValidation(req);
 
-        // TODO
-
-        return res.json({});
+        permission.checkIfAssignmentInCourse(course_id, assignment_id)
+        .then(function () {
+            return permission.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access);
+        })
+        .then(function () {
+            return queries.updateAssignment(assignment_id, body);
+        })
+        .then(function () {
+            return res.json({});
+        })
+        .catch(function (err) {
+            next(err);
+        });
     });
 
     // Delete an assignment

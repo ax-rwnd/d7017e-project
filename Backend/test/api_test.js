@@ -312,6 +312,17 @@ describe('/api', () => {
             });
         });
 
+        describe('PUT /api/courses/:course_id/assignments/:assignment_id', () => {
+            it('modifies decription successfully', () => {
+                return request(runner.server)
+                    .put('/api/courses/' + course_id + '/assignments/' + assignment_id1)
+                    .send({
+                        description: 'Write tests with Mocha (modified)',
+                    }).set('Authorization', 'Bearer ' + access_tokens.admin)
+                    .expect(200);
+            });
+        });
+
         describe('POST /api/courses/:course_id/assignments/:assignment_id/tests', () => {
             it('returns a test id', () => {
                 return request(runner.server)

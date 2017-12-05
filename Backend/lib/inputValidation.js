@@ -273,6 +273,35 @@ function putCourseBodyValidation(req) {
     return input;
 }
 
+// Input validation for PUT /api/courses/:course_id/assignments/:assignment_id
+function putAssignmentBodyValidation(req) {
+    var input = {};
+
+    // Optional fields
+    if ('name' in req.body) {
+        req.checkBody("name", "Must contain only letters and numbers").isAscii();
+        input.name = req.body.name;
+    }
+    if ('description' in req.body) {
+        req.checkBody("description", "Must contain only ascii characters").isAscii();
+        input.description = req.body.description;
+    }
+    if ('hidden' in req.body) {
+        req.checkBody("hidden", "Must contain true or false").isBoolean();
+        input.hidden = req.body.hidden;
+    }
+    if ('languages' in req.body) {
+        req.checkBody("languages", "Must contain only ascii characters").isAscii();
+        input.languages = req.body.languages;
+    }
+
+    var inputError = req.validationErrors();
+    if (inputError) {
+        throw badInput.BAD_INPUT(inputError);
+    }
+    return input;
+}
+
 // checks that course_id and assignment_id are valid IDs
 function assignmentValidation(req) {
     req.checkParams('course_id', 'Not a valid course id').isMongoId();
@@ -292,3 +321,4 @@ exports.assignmentgroupValidation = assignmentgroupValidation;
 exports.badgeValidation = badgeValidation;
 exports.courseIdValidation = courseIdValidation;
 exports.assignmentValidation = assignmentValidation;
+exports.putAssignmentBodyValidation = putAssignmentBodyValidation;
