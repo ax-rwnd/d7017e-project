@@ -29,12 +29,15 @@ function postCourseValidation(req) {
     req.checkBody("name", "Must contain only letters and numbers").isAscii();
     name = req.body.name;
 
-    // TODO: This is an object. How to check this properly?
-    //req.checkBody("enabled_features", "Not a bool").isEmpty();
-    enabled_features = req.body.enabled_features;
-
-
     // Optional fields
+    if (req.body.enabled_features) {
+        // TODO: This is an object. How to check this properly?
+        //req.checkBody("enabled_features", "Not a bool").isEmpty();
+        enabled_features = req.body.enabled_features;
+    } else {
+        enabled_features = {};
+    }
+
     if (req.body.description) {
         req.checkBody("description", "Must contain only ascii characters").isAscii();
         description = req.body.description;
