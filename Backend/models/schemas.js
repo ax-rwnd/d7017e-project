@@ -3,8 +3,7 @@
 
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
-
-const INVITELINK_TTL = 24 * 60 * 60 * 1000;
+var config = require('config');
 
 /*
 * Base schemas
@@ -82,7 +81,7 @@ var inviteLinks = new Schema({
     code: {type: String, required: true},
     course: {type: Schema.Types.ObjectId, ref: 'Course', required: true},
     createdAt: {type: Date, default: Date.now()},
-    expiresAt: {type: Date, default: (Date.now() + INVITELINK_TTL)}
+    expiresAt: {type: Date, default: (Date.now() + config.get("Courses.invite_link_ttl"))}
 });
 
 var courseSchema = new Schema({

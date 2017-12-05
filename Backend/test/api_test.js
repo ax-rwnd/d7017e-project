@@ -452,7 +452,10 @@ describe('/api', () => {
                     .set('Authorization', 'Bearer ' + access_tokens.user)
                     .expect(200)
                     .then(res => {
-                        assert.equal(res.body.success, true);
+                        assert.equal(res.body.user, user_id);
+                        assert.equal(res.body.course, course_id);
+                        assert.equal(res.body.role, "student");
+                        assert(res.body.features, "did not return user");
                     });
             });
         });

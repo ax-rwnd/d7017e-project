@@ -19,6 +19,9 @@
         "access_ttl": 3600,
         "refresh_ttl": 86400
     },
+    "Courses": {
+        "invite_link_ttl": 86400000
+    },
     // Tester config module
     "Tester": {
         "tester_url": "https://130.240.5.118/codetest"

@@ -1074,12 +1074,14 @@ function getUserMemberStatus(course_id, user_id) {
     return CourseMember.findOne({user: user_id, course: course_id}, "role");
 }
 
-function generateInviteLink(course_id) {
+function generateInviteLink(course_id, expiresIn) {
     var code = randomstring.generate();
+    var exp = Date.now() + (expiresIn || config.get("Courses.invite_link_ttl"));
+
     if (!mongoose.Types.ObjectId.isValid(course_id)) {
             throw errors.INVALID_ID;
     }
-    var newLink = new InviteLink({code: code, course: course_id});
+    var newLink = new InviteLink({code: code, course: course_id, expiresAt: exp});
     return newLink.save().then(function (obj) {
         return obj;
     });
@@ -1096,11 +1098,19 @@ function validateInviteLink(code, user_id) {
             });
         }
 
-        return Features.createFeature(user_id, obj.course).then(function (featureObject) {
-            // Add student to course
-            var memberObject = new CourseMember({role: "student", course: obj.course, user: user_id, features: featureObject._id});
-            return memberObject.save();
+        return CourseMember.findOne({user: user_id, course: obj.course}).then(function (res) {
+            if (!res) {
+                return Features.createFeature(user_id, obj.course).then(function (featureObject) {
+                    // Add student to course
+                    var memberObject = new CourseMember({role: "student", course: obj.course, user: user_id, features: featureObject._id});
+                    return memberObject.save();
+                });
+            } else {
+                throw errors.USER_ALREADY_IN_COURSE;
+            }
         });
+
+        
     });
 }
 
