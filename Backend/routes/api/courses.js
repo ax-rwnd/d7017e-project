@@ -233,7 +233,7 @@ module.exports = function(router) {
         // note that ALL fields in enabled_features are allowed
         if (b.hasOwnProperty('enabled_features')) clean_b.enabled_features = b.enabled_features;
 
-        queries.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
+        permission.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
         .then(() => {
             return queries.updateCourse(course_id, clean_b);
         }).then(() => {
@@ -309,7 +309,7 @@ module.exports = function(router) {
             return next(errors.BAD_INPUT);
         }
 
-        queries.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
+        permission.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
         .then(function () {
             return queries.getCourseInvites(course_id, "invite");
         })
@@ -343,7 +343,7 @@ module.exports = function(router) {
         // Invite already sent check then
         // Create Invite and add to db
         // Thrown errors will halt execution.
-        queries.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access, "students teachers")
+        permission.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access, "students teachers")
         .then(function (courseObject) {
             return queries.checkIfUserAlreadyInCourseObject(student_id, courseObject);
         })
@@ -477,7 +477,7 @@ module.exports = function(router) {
             if (student_id === req.user.id) {
                 return queries.findAndRemoveRequest(student_id, course_id, "invite");
             } else {
-                return queries.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
+                return permission.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
                 .then(function () {
                   return queries.findAndRemoveRequest(student_id, course_id, "invite");
                 });
@@ -504,7 +504,7 @@ module.exports = function(router) {
             return next(errors.BAD_INPUT);
         }
 
-        queries.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
+        permission.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
         .then(function () {
             return queries.getCourseInvites(course_id, "pending");
         })
@@ -577,7 +577,7 @@ module.exports = function(router) {
         // Check if request exists if so remove it then
         // Add user to course
         // Thrown errors will halt execution
-        queries.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
+        permission.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
         .then(function () {
             return queries.findAndRemoveRequest(student_id, course_id, "pending");
         })
@@ -624,7 +624,7 @@ module.exports = function(router) {
                     return res.sendStatus(200).json({});
                 });
             } else {
-                return queries.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
+                return permission.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
                 .then(function () {
                     return queries.findAndRemoveRequest(student_id, course_id, "pending");
                 })
@@ -671,7 +671,7 @@ module.exports = function(router) {
                     return res.sendStatus(200).json({});
                 });
             } else {
-                return queries.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
+                return permission.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
                 .then(function () {
                     return queries.removeStudentFromCourse(student_id, course_id);
                 })
@@ -711,7 +711,7 @@ module.exports = function(router) {
             return next(errors.BAD_INPUT);
         }
 
-        queries.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access, "students teachers")
+        permission.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access, "students teachers")
         .then(function (courseObject) {
             return queries.checkIfUserInCourseAndNotTeacherObject(teacher_id, courseObject);
         })
@@ -739,7 +739,7 @@ module.exports = function(router) {
             return next(errors.BAD_INPUT);
         }
 
-        queries.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
+        permission.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
         .then(function (courseObject) {
             return queries.checkIfUserIsTeacherObject(teacher_id, courseObject);
         })
@@ -829,7 +829,7 @@ module.exports = function(router) {
         if (!mongoose.Types.ObjectId.isValid(assignment_id)) {
             return next(errors.BAD_INPUT);
         }
-        queries.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
+        permission.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
         // ensure the course actually owns the assignment
         // TODO: use lib/perssion
         .then(() => queries.deleteAssignment(assignment_id))
@@ -842,7 +842,7 @@ module.exports = function(router) {
     router.get('/:course_id/invitelink', function (req, res, next) {
         var course_id = req.params.course_id;
 
-        queries.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access).then(function () {
+        permission.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access).then(function () {
             return queries.generateInviteLink(course_id).then(function (obj) {
                 res.status(201).json({course: obj.course, code: obj.code});
             });
