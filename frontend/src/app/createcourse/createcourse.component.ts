@@ -134,8 +134,10 @@ export class CreatecourseComponent implements OnInit {
   updateCourse(enabled_features: Object) {
     this.backendService.updateCourse(this.course.id, this.form.value.name, this.content,
       !this.form.value.nothidden, this.form.value.code, enabled_features, this.form.value.autojoin)
-      .then((response: any) => { // when put, should get back empty object
-        location.reload();
+      .then((response: any) => {
+        // update course in courseService so don't have to refresh page
+        this.courseService.updateTeacherCourse(this.course.id, this.form.value.name, this.content,
+          !this.form.value.nothidden, this.form.value.code, enabled_features, this.form.value.autojoin);
         this.toastService.success('Course updated!');
         console.log(response);
       })

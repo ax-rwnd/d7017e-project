@@ -69,6 +69,17 @@ export class CourseService {
       });
   }
 
+  updateTeacherCourse(id: string, name: string, content: string, hidden: boolean, code: string, en_feat: Object, autojoin: boolean) {
+    const course = this.GetCourse(id);
+    course.name = name;
+    course.course_info = content;
+    course.hidden = hidden;
+    course.code = code;
+    course.enabled_features = en_feat;
+    course.autojoin = autojoin;
+    return this.teachCourses.next(this.teaching);
+  }
+
   UpdateCourseProgress(courseId, progress) {
     // Updates the progress field of the course, not to be confused with reward.progress
     let i;
