@@ -482,7 +482,6 @@ module.exports = function(router) {
 
     // Update an assignment
     router.put('/:course_id/assignments/:assignment_id', function (req, res, next) {
-        // imhere
         let {course_id, assignment_id} = inputValidation.assignmentValidation(req);
         let body = inputValidation.putAssignmentBodyValidation(req);
 
