@@ -13,9 +13,9 @@ var config = require('config');
 function validateCode(user_id, lang, code, assignment_id, res) {
 
     //Get tests from our database
-    queries.getTestsFromAssignment(assignment_id, function(tests) {
+    queries.getTestsFromAssignment(assignment_id).then(function (tests) {
 
-        if(!tests.hasOwnProperty('tests') || tests.tests === undefined) {
+        /*if(!tests.hasOwnProperty('tests') || tests.tests === undefined) {
             logger.log("error",'Assignment', assignment_id, 'did not have tests object.');
             return res.sendStatus(500);
         }
@@ -23,14 +23,13 @@ function validateCode(user_id, lang, code, assignment_id, res) {
         if(!tests.tests.hasOwnProperty('io') || tests.tests.io === undefined) {
             logger.log("error",'Assignment', assignment_id, 'did not have io list.');
             return res.sendStatus(500);
-        }
-
+        }*/
         tests.tests.io.forEach(function(test) {
             test.id = test._id;
             delete test._id;
         });
 
-        if(tests.hasOwnProperty('optional_tests')) {
+        /*if(tests.hasOwnProperty('optional_tests')) {
             if(tests.optional_tests !== undefined && tests.optional_tests.hasOwnProperty('io')) {
                 tests.optional_tests.io.forEach(function(test) {
                     test.id = test._id;
@@ -43,7 +42,7 @@ function validateCode(user_id, lang, code, assignment_id, res) {
 
         if(config.get('App.environment') === 'production') {
             throw new Error('Remove `rejectUnauthorized` for production in '+ module.filename);
-        }
+        }*/
 
         request({
             url: config.get('Tester.tester_url'),

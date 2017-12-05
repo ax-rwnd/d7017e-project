@@ -289,6 +289,7 @@ describe('/api', () => {
                     })
                     .expect(200)
                     .then(res => {
+                        assert(res.body.passed == true);
                         assert(assignment_id_test == res.body.assignment_id, 'response is not contain the correct assignment_id');
                     });
             });
