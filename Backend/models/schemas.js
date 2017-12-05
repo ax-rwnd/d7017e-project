@@ -4,6 +4,8 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
+const INVITELINK_TTL = 24 * 60 * 60 * 1000;
+
 /*
 * Base schemas
 */
@@ -22,6 +24,22 @@ var assignmentSchema = new Schema({
     languages: [String]
 });
 assignmentSchema.index({name: 'text', description: 'text'}, {weights: {name: 5, description: 1}});
+
+var assignmentgroupSchema = new Schema({
+    name: {type: String, required: true},
+    assignments: [{
+        coords: {
+            x: {type: Number, default: 0},
+            y: {type: Number, default: 0}
+        },
+        story: {type: String, default: ""},
+        assignment: { type: Schema.Types.ObjectId, ref: 'Assignment', required: true}
+    }],
+    adventuremap: {
+        background: {type: String, required: false},
+        transitionstory: {type: String, default: ""}
+    }
+});
 
 var testSchema = new Schema({
     stdout: {type: String, default: ''},
@@ -55,15 +73,31 @@ var joinRequests = new Schema({
     course: {type: Schema.Types.ObjectId, ref: 'Course', required: true}
 });
 
+var courseMembers = new Schema({
+    role: {type: String, required: true},
+    course: {type: Schema.Types.ObjectId, ref: 'Course', required: true},
+    user: {type: Schema.Types.ObjectId, ref: 'User', required: true},
+    features: {type: Schema.Types.ObjectId, ref: 'Features', required: true}
+});
+
+var inviteLinks = new Schema({
+    code: {type: String, required: true},
+    course: {type: Schema.Types.ObjectId, ref: 'Course', required: true},
+    createdAt: {type: Date, default: Date.now()},
+    expiresAt: {type: Date, default: (Date.now() + INVITELINK_TTL)}
+});
+
 var courseSchema = new Schema({
     course_code: {type: String, required: false},
     name: {type: String, required: true},
     description: {type: String, required: false},
-    hidden: {type: Boolean, required: true},  //public or private course
+    hidden: {type: Boolean, default: false},  //public or private course
     autojoin: {type: Boolean, default: false},
+    owner: {type: Schema.Types.ObjectId, ref: 'User', required: false},
     teachers: [{ type: Schema.Types.ObjectId, ref: 'User', required: false }],
     students: [{ type: Schema.Types.ObjectId, ref: 'User', required: false }],
-    assignments: [{ type: Schema.Types.ObjectId, ref: 'Assignment', required: false }],
+    assignments: [{ type: Schema.Types.ObjectId, ref: 'Assignment', required: false }], // Remove me soon
+    assignmentgroups: [{ type: Schema.Types.ObjectId, ref: 'Assignmentgroup', required: false }],
     features: [{ type: Schema.Types.ObjectId, ref: 'Features', required: true }], //progress, badges etc.
     enabled_features: {
         badges: Boolean,
@@ -91,7 +125,7 @@ var badgeSchema = new Schema({
         [{
             assignment: { type: Schema.Types.ObjectId, ref: 'Assignment', required: true},
             tests: [{ type: Schema.Types.ObjectId, ref: 'Test', required: false}],
-            code_size: Number
+            code_size: {type: Number, required: false}
         }]
     }
 });
@@ -109,14 +143,17 @@ var featuresSchema = new Schema({
 
 
 var Assignment = mongoose.model('Assignment', assignmentSchema);
+var Assignmentgroup = mongoose.model('Assignmentgroup', assignmentgroupSchema);
 var Test = mongoose.model('Test', testSchema);
 var User = mongoose.model('User', userSchema);
 var Draft = mongoose.model('Draft', draftSchema);
 var JoinRequests = mongoose.model('JoinRequests', joinRequests);
+var CourseMembers = mongoose.model('CourseMembers', courseMembers);
 var Course = mongoose.model('Course', courseSchema);
 var Badge = mongoose.model('Badge', badgeSchema);
 var Features = mongoose.model('Features', featuresSchema);
-var models = {Assignment: Assignment, Test: Test, User: User, Draft: Draft, JoinRequests: JoinRequests, Course: Course,
-    Badge: Badge, Features: Features};
+var InviteLinks = mongoose.model('InviteLinks', inviteLinks);
+var models = {Assignment: Assignment, Assignmentgroup: Assignmentgroup, Test: Test, User: User, Draft: Draft,
+        JoinRequests: JoinRequests, InviteLinks: InviteLinks, CourseMembers: CourseMembers, Course: Course, Badge: Badge, Features: Features};
 
 module.exports = models;

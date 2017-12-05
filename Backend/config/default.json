@@ -21,7 +21,7 @@
     },
     // Tester config module
     "Tester": {
-        "tester_url": "https://192.168.122.219:9100"
+        "tester_url": "https://130.240.5.118/codetest"
     },
     // Winston Logging configuration module
     "Logger": {
