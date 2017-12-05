@@ -76,24 +76,24 @@ const FIELDS = {
 // var Assignment, User, Test = require('../../models/schemas.js');
 
 //get all tests related to a specific assignment.
-function getTestsFromAssignment(assignmentID, callback) {
-    Assignment.findById(assignmentID)
+function getTestsFromAssignment(assignmentID) {
+    return Assignment.findById(assignmentID, "tests")
     .populate({
         path: 'tests.io',
         model: 'Test'
     }).populate({
         path: 'optional_tests.io',
         model: 'Test'
-    }).lean().exec(function (err, assignmentObject) {
-        /*if (!assignmentObject) {
-            console.log("assignment not found!")
+    })
+    .then(function (assignment) {
+        if (!assignment) {
             throw errors.ASSIGNMENT_DOES_NOT_EXIST;
-        } */    //THIS ERROR NEEDS TO BE THROWN AND HANDLED
-        let json = {};
-        json.tests = assignmentObject.tests;
-        json.optional_tests = assignmentObject.optional_tests;
-        callback(json);
-    });
+        }
+        var tests = {'tests':assignment.tests, 'optional_tests':assignment.optional_tests};
+        return tests;
+    }); 
+
+
 }
 
 function getUser(id, fields) {
@@ -319,24 +319,6 @@ function checkIfUserAlreadyInCourseObject(user_id, courseObject) {
 function checkIfUserAlreadyInCourse(user_id, course_id, optionalCourseFieldsToReturn) {
     return Course.findById(course_id, "teachers students" + ("" || " " + optionalCourseFieldsToReturn))
     .then(function (courseObject) {
-        if (courseObject.students.indexOf(user_id) !== -1
-        || courseObject.teachers.indexOf(user_id) !== -1) {
-            throw errors.USER_ALREADY_IN_COURSE;
-        }
-        return courseObject;
-    });
-}
-
-function checkIfAssignmentInCourse(assignment_id, course_id) {
-    return Course.findById(course_id)
-    .then(function (courseObject) {
-        var assignmentFound = false;
-
-        courseObject.assignments.forEach(function(element) {
-            if (element._id === assignment_id) {
-                assignmentFound = true;
-            }
-        })
         if (courseObject.students.indexOf(user_id) !== -1
         || courseObject.teachers.indexOf(user_id) !== -1) {
             throw errors.USER_ALREADY_IN_COURSE;
@@ -1008,6 +990,22 @@ function getAssignmentIDsByUser(user_id) {
             }
             return assignment_ids;
         });
+    });
+}
+
+// TODO: WILL BE AFFECTED BY NEW MEMBER SYSTEM
+// returns "teacher", "admin" or "student": the highest access level for a course
+function getHighestPermissionCourse(course_id, user_id) {
+    getUser(user_id, "teaching").then(function (userObject) {
+        var role = "";
+        if (userObject.teaching.indexOf(course_id) !== -1) {
+            role = "teacher";
+        } else if (userObject.access === constants.ACCESS.ADMIN) {
+            role = "admin";
+        } else {
+            role = "student";
+        }
+        return role;
     });
 }
 

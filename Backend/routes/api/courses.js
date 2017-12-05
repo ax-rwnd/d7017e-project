@@ -546,31 +546,34 @@ module.exports = function(router) {
         });
     });
 
-/*
-    //TODO: It is currently not checked if the requested assignment actually belongs to the specified course
-    router.get('/:course_id/assignments/:assignment_id', function (req, res, next) {
-        var course_id = req.params.course_id;
-        var assignment_id = req.params.assignment_id;
 
-        queries.getAssignment(assignment_id, "name description hidden languages").then(function (assignment) {
-            return res.json(assignment);
+    //submit user code to Tester service for code validation
+    router.post('/:course_id/assignments/:assignment_id/submit', function(req, res, next) {
+        var lang = req.body.lang;
+        var code = req.body.code;
+        var assignment_id = req.params.assignment_id;
+        var course_id = req.params.course_id;
+
+        var input;
+        try {
+            input = inputValidation.assignmentAndCourseValidation(req);
+        } catch(error) {
+            return next(error);
+        }
+
+        permission.checkIfAssignmentInCourse(course_id, assignment_id)
+        .then(function () {
+            return testerCom.validateCode(req.user.id, lang, code, assignment_id)
+            .then(function (testerResponse) {
+                return res.json(testerResponse);
+            });
         })
         .catch(function (err) {
             next(err);
         });
     });
-*/
 
-    //Submit code to tester
-    router.post('/:course_id/assignments/:assignment_id/submit', function(req, res) {
-
-        var lang = req.body.lang;
-        var code = req.body.code;
-        var assignment_id = req.params.assignment_id;
-
-        testerCom.validateCode(req.user.id, lang, code, assignment_id, res);
-    });
-
+    // TODO: SHOULD BE REMOVED ONCE NEW ROUTE PATH IS USED BY FRONTEND
     // Save draft to assignment
     // course_id not used, should route be changed? Implement some check?
     router.post('/:course_id/assignments/:assignment_id/save', function (req, res, next) {
@@ -586,12 +589,46 @@ module.exports = function(router) {
         });
     });
 
+    // save a user-draft (code) for an assignment
+    router.post('/:course_id/assignments/:assignment_id/draft', function (req, res, next) {
+        var assignment_id = req.params.assignment_id;
+        var course_id = req.params.course_id;
+        var code = req.body.code || "";
+        var lang = req.body.lang || "";
+
+        var input;
+        try {
+            input = inputValidation.assignmentAndCourseValidation(req);
+        } catch(error) {
+            return next(error);
+        }
+
+        permission.checkIfAssignmentInCourse(course_id, assignment_id).then(function () {
+            queries.saveCode(req.user.id, assignment_id, code, lang).then(function (draft) {
+                return res.status(201).json(draft);
+            });
+        })
+        .catch(function (err) {
+            next(err);
+        });
+    });
+
     // Retrieve the saved assignment draft, will create and return an empty draft if it doesn't already exist.
     router.get('/:course_id/assignments/:assignment_id/draft', function (req, res, next) {
         var assignment_id = req.params.assignment_id;
+        var course_id = req.params.course_id;
 
-        queries.getCode(req.user.id, assignment_id).then(function (draft) {
-            res.json(draft);
+        var input;
+        try {
+            input = inputValidation.assignmentAndCourseValidation(req);
+        } catch(error) {
+            return next(error);
+        }
+
+        permission.checkIfAssignmentInCourse(course_id, assignment_id).then(function () {
+            queries.getCode(req.user.id, assignment_id).then(function (draft) {
+                return res.json(draft);
+            });
         })
         .catch(function (err) {
             next(err);
