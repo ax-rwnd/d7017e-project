@@ -593,7 +593,10 @@ module.exports = function(router) {
             return next(errors.BAD_INPUT);
         }
 
-        permission.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
+        permission.checkIfAssignmentInCourse(course_id, assignment_id)
+        .then(function () {
+            return permission.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access);
+        })
         .then(function () {
             return queries.getAssignmentTests(course_id, assignment_id);
         })
