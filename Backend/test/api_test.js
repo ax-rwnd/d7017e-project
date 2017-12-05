@@ -367,7 +367,6 @@ describe('/api', () => {
             });
         });
 
-
         describe('POST /api/courses/:course_id/assignments/:assignment_id/submit', () => {
 
             it('run assignments tests', () => {
@@ -388,30 +387,9 @@ describe('/api', () => {
         });
 
         describe('POST /:course_id/assignments/:assignment_id/draft', () => {
-
-            it('retrieves a non-existing draft from the database', () => {    
-                return request(runner.server)
-                    .get('/api/courses/' + course_id + '/assignments/' + assignment_id1 + '/draft')
-                    .set('Authorization', 'Bearer ' + access_tokens.user)
-                    .send()
-                    .expect(200)
-                    .then(res => {
-                        assert(assignment_id1 == res.body.assignment, 'response does not contain the correct assignment_id');
-                        console.log(res.body);
-                        console.log(res.body.lang);
-                        assert(res.body.lang == "", 'response param lang is not empty');
-                        assert(res.body.code == "", 'response param code is not empty');
-                    });
-            });
             it('saves an empty draft to the database', () => {
                 return request(runner.server)
                     .post('/api/courses/' + course_id + '/assignments/' + assignment_id1 + '/draft')
-//=======
-/*        describe('POST /:course_id/assignments/:assignment_id/save', () => {
-            it('saves an empty draft to the database', () => {
-                return request(runner.server)
-                    .post('/api/courses/' + course_id + '/assignments/' + assignment_id1 + '/save')
-//>>>>>>> c973ca68d652bf90443cdb0cd126bd0623571d95
                     .set('Authorization', 'Bearer ' + access_tokens.user)
                     .send()
                     .expect(201)
@@ -428,7 +406,6 @@ describe('/api', () => {
                 };
                 return request(runner.server)
                     .post('/api/courses/' + course_id + '/assignments/' + assignment_id1 + '/draft')
-
                     .set('Authorization', 'Bearer ' + access_tokens.user)
                     .send(draft)
                     .expect(201)
@@ -436,9 +413,9 @@ describe('/api', () => {
                         assert(assignment_id1 == res.body.assignment, 'response does not contain the correct assignment_id');
                         assert(draft.lang == res.body.lang, 'response does not contain the correct lang');
                         assert(draft.code == res.body.code, 'response does not contain the correct code');
-                    });*/
+                    });
             });
-        }); 
+        });
 
         describe('GET /:course_id/assignments/:assignment_id/draft', () => {
             it('retrieves a draft from the database', () => {
@@ -451,8 +428,8 @@ describe('/api', () => {
                     .expect(200)
                     .then(res => {
                         assert(assignment_id1 == res.body.assignment, 'response does not contain the correct assignment_id');
-                        assert(res.body.lang == "", 'response does not contain the correct lang');
-                        assert(res.body.code == "", 'response does not contain the correct code');
+                        assert(res.body.lang == lang, 'response does not contain the correct lang');
+                        assert(res.body.code == code, 'response does not contain the correct code');
                     });
             });
         });
