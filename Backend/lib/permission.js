@@ -64,9 +64,18 @@ function checkIfAssignmentInCourse(course_id, assignment_id) {
     });
 }
 
+function checkIfTestInAssignment(assignment_id, test_id) {
+    return Assignment.find({ _id: assignment_id, 'tests.io': {$in: [test_id]} }).count().then(function (count) {
+        if (count === 0) {
+            throw errors.TEST_NOT_IN_ASSIGNMENT;
+        }
+    });
+}
+
 exports.checkIfTeacherOrAdmin = checkIfTeacherOrAdmin;
 exports.checkIfTeacher = checkIfTeacher;
 exports.checkUserNotInCourse = checkUserNotInCourse;
 exports.checkIfAlreadyInvited = checkIfAlreadyInvited;
 exports.checkIfAlreadyRequested = checkIfAlreadyRequested;
 exports.checkIfAssignmentInCourse = checkIfAssignmentInCourse;
+exports.checkIfTestInAssignment = checkIfTestInAssignment;

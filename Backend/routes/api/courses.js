@@ -971,7 +971,13 @@ module.exports = function(router) {
             return next(errors.BAD_INPUT);
         }
 
-        permission.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
+        permission.checkIfTestInAssignment(assignment_id, test_id)
+        .then(function () {
+            return permission.checkIfAssignmentInCourse(course_id, assignment_id);
+        })
+        .then(function () {
+            return permission.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access);
+        })
         .then(function () {
             return queries.getTest(test_id, "stdout stdin args");
         })
