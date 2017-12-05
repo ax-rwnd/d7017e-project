@@ -1,18 +1,18 @@
 \chapter{Design}
 \section{Decisions} 
-When the prestydy was completed it was time to make some decisions about the content of the platform, how it should look and how different parts should be implemented. To give a picture of how the design on the user interface should look like, a group sketched some simple mockups
+When the prestudy was completed it was time to make some decisions about the content of the platform, how it should look and how different parts should be implemented. To give a picture of how the design on the user interface should look like, a group sketched some simple mockups
 so that every member could have the same starting point and vision. 
 
 \begin{figure}[H]
   \centering
   \begin{minipage}[b]{0.7\textwidth}
     \includegraphics[width=\textwidth]{img/mockup1.png}
-    \caption{An initial mockup over the assignment page.}
+    \caption{An initial mockup for the assignment page.}
   \end{minipage}
   \hfill
   \begin{minipage}[b]{0.7\textwidth}
     \includegraphics[width=\textwidth]{img/mockup2.png}
-    \caption{An initial mockup over the leaderboard.}
+    \caption{An initial mockup for the leaderboard.}
   \end{minipage}
 \end{figure}
 
@@ -25,7 +25,7 @@ During the prestudy it become clear that the whole system flow was needed to be 
 \caption{A simple sketch over the system parts and how they are connected.}
 \end{figure}
 
-The time estimation for every separate part was difficult to estimate since the concept was fairly new for everyone. The decision of what programming language to use was based on the criteria, it should be fullstack meaning the same language should be used in every part so that if there is any interaction between the three groups it should be easy to understand the code. It should also be fairly modern programming language. The two alternatives was Python with frameworks or JavaScript with other frameworks. A democratic choice become JavaScript using Node.Js for backend and Tester, MongoDB as a NoSQL database and Angular4 for frontend. 
+The time estimation for every separate part was difficult to estimate since the concept was fairly new for everyone. The decision of what programming language to use was based on the criteria, it should be fullstack meaning the same language should be used in every part so that if there is any interaction between the three groups it should be easy to understand the code. It should also be fairly modern programming language. The two alternatives was Python with frameworks or JavaScript with other frameworks. A democratic choice become JavaScript using \nodejs{} for backend and Tester, MongoDB as a NoSQL database and Angular4 for frontend. 
 
 
 \section{Use-cases}
@@ -52,9 +52,9 @@ Students who want to solve an assignment go to the site, log in, go to the speci
 
 \section{Backend}
 A backend group was formed after all the prestudies were finished.
-Beginning to work on the backend, the first decision that had to be made was what it was going to be developed in. Since it had been decided previously that the project would be a full-stack JavaScript solution the natural decision was to use node.js as server framework with express.js as a web framework to handle routing, for database it was decided to use the document database MongoDB.
+Beginning to work on the backend, the first decision that had to be made was what it was going to be developed in. Since it had been decided previously that the project would be a full-stack JavaScript solution the natural decision was to use \nodejs{} as server framework with express.js as a web framework to handle routing, for database it was decided to use the document database MongoDB.
 
-The first few days were mostly spent on getting acquainted with node.js and its work flow.
+The first few days were mostly spent on getting acquainted with \nodejs{} and its work flow.
 After the group had gotten a general grasp of things, a coding standard was decided on and the group was divided into sub-parts in the backend.
 The parts that the group was divided into were routes, database and continuous integration.
 

@@ -1,5 +1,4 @@
-\chapter{Apendix}
-\subsection{Interview questions}\label{Interview:questions} 
+\chapter{Interview questions}\label{Interview:questions} 
 
 \begin{itemize}
  \item Do you find that student appreciate e-tools?
@@ -36,7 +35,7 @@
 \item What would you think about if you should create a similar tool?
 
 \end{itemize}
-\subsection{Workshop scenarios}\label{Worskshop:senarios}
+\chapter{Workshop scenarios}\label{Worskshop:senarios}
 \textbf{Introduction 10min}
 We are studying the fifth year at computer science program at LTU and for now doing our project. As a part of our prestudy are we hosting this workshop where we will investigate possibilities through a couple of scenarios. You will do a couple of assignments in groups and then present your result and discuss these with others.\\
 
@@ -67,9 +66,9 @@ Now when you have a working system and it scales along the new courses you teach
 \item Do you see any limitations?
 \end{itemize} 
 
-\subsection{Installation instructions}
+\chapter{Installation instructions}
 Learning as a service was built and tested on debian linux 9 (stretch) with node 8.6.0 and npm 5.3.0.
-\subsubsection{Tester}
+\section{Tester}
 Tester consists of two components; Manager and Runner. Managaer replies to requests from the backend and manages docker containers that run arbitrary code. Containers are used to ensure that some test A does not interfere with some later test B by modifying the executing environment.\\
 \begin{enumerate}
     \item Clone the repo: \textbf{git clone https://github.com/ax-rwnd/d7017e-project}
@@ -82,7 +81,7 @@ Tester consists of two components; Manager and Runner. Managaer replies to reque
     \item Start Manager: \textbf{node server.js \{PORT\}}
 \end{enumerate}
 
-\subsubsection{Backend}
+\section{Backend}
 Backend is the state-managing component. It uses MongoDB to store information that it receives while processesing frontend requests and tester results.
 \begin{enumerate}
 \item Install och configure MongoDB.
@@ -94,7 +93,7 @@ Backend is the state-managing component. It uses MongoDB to store information th
 \item (Optional) Start start backend in the foreground: \textbf{node ./bin/www}
 \end{enumerate}
 
-\subsubsection{Frontend}
+\section{Frontend}
 Frontend is the part that the users see. It builds on Angular for UI and contacts backend for functionality.
 
 \begin{enumerate}
@@ -107,7 +106,7 @@ Frontend is the part that the users see. It builds on Angular for UI and contact
     \item Start server: \textbf{--ssl 1 --ssl-cert ./encryption/server.crt --ssl-key ./encryption/private.key --live-reload false}
 \end{enumerate}
 
-\subsection{Cas-diagram}
+\chapter{Cas-diagram}
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.45]{img/login.png}

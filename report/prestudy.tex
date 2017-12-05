@@ -2,7 +2,7 @@
 Since the goal of the project is a platform that can increase learning using gamification it was need to conduct a study about which parts of gamification is relevant for the platform and how should they be represented. Peter Parnes, the project owner suggested that the information could be collected by reading literature, having a workshop with teachers at LTU and some teachers outside the university and by interviewing a few teachers teaching in courses that could have use for the platform as a part of their course. An investigation was done about what tools and existing platforms are already available and if they could be reused and built on. This investigation was done by the platform group.
 
 \section{Interviews}
-The interviews were done by interviewing a couple of teachers teaching in courses at LTU. A group of four members set up individual meetings with each respective teacher where they asked relevant questions regarding a gamified coding platform. The most comprehensive and general questions during the interviews can be found in appendix, see section~\ref{Interview:questions}. The interview answers from the teachers were summarized to identify the most important elements that could be used. The most important elements were those which were repeated during several interviews and those that the interview group found most interesting. The identified and summarized elements are:
+The interviews were done by interviewing a couple of teachers teaching in courses at LTU. A group of four members set up individual meetings with each respective teacher where they asked relevant questions regarding a gamified coding platform. The most comprehensive and general questions during the interviews can be found in appendix~\ref{Interview:questions}. The interview answers from the teachers were summarized to identify the most important elements that could be used. The most important elements were those which were repeated during several interviews and those that the interview group found most interesting. The identified and summarized elements are:
 
  \begin{itemize}
  \item Mandatory assignments would increase the participation frequency but would be less fun.
@@ -20,17 +20,17 @@ These summarized answers was a good starting point to see which parts should be 
 
 \section{Platform}   
 To meet the requirements and goals of the project it was clear that a platform that could compile and verify code was needed.
-When the project started, the project owner had suggested tech.io which is a collaborative platform to share coding assignments through open-source ``playgrounds''. At a first glance, the platform seemed to match the needs of the project, but it was unsure if the platform would have an open API which the project communicate and work with. The developers of tech.io, CodinGame was contacted to find out if they would be open to sharing their API.
+When the project started, the project owner had suggested \techio{} which is a collaborative platform to share coding assignments through open-source ``playgrounds''. At a first glance, the platform seemed to match the needs of the project, but it was unsure if the platform would have an open API which the project communicate and work with. The developers of \techio{}, CodinGame was contacted to find out if they would be open to sharing their API.
 
-%Fyll ut med några av problemen vi identifierade med tech.io som vi skulle ha behövt lösa om vi hade använt det. (finns i wikin)
+%Fyll ut med några av problemen vi identifierade med \techio{} som vi skulle ha behövt lösa om vi hade använt det. (finns i wikin)
 
-While waiting for an answer from tech.io, an investigation into alternative platforms to tech.io was launched and after some time of searching for a suitable alternative over the internet it was concluded that no platform found really matched the requirements that were set.
+While waiting for an answer from \techio{}, an investigation into alternative platforms to \techio{} was launched and after some time of searching for a suitable alternative over the internet it was concluded that no platform found really matched the requirements that were set.
 
-After waiting for several days, tech.io finally responded where they mentioned the possibility of using ``code snippets'' to embed coding assignments onto other sites than on tech.io, but they were evasive with the question if they would make their API open and never really answered this. After some time of consideration, a decision to not use tech.io was made because of the risk of becoming too dependent on their platform.
+After waiting for several days, \techio{} finally responded where they mentioned the possibility of using ``code snippets'' to embed coding assignments onto other sites than on \techio{}, but they were evasive with the question if they would make their API open and never really answered this. After some time of consideration, a decision to not use \techio{} was made because of the risk of becoming too dependent on their platform.
 
-Because of this, creating a code verification platform/API from scratch was considered. While discussing about making a code verification platform from scratch, a new alternative was brought into light. A computer science student at LTU was currently creating a platform named Sockr for code verification and once again, it was considered to use a third party platform.
+Because of this, creating a code verification platform/API from scratch was considered. While discussing about making a code verification platform from scratch, a new alternative was brought into light. A computer science student at LTU was currently creating a platform named \sockr{} for code verification and once again, it was considered to use a third party platform.
 
-After some discussions with the student, he explained that he would be open for the project to use Sockr. A thorough investigation of the Sockr source code was however needed to make sure that it was actually useful for the project. When diving deeper into the source code of Sockr it became clear that once again, the project would not be able to use this in a good and sustainable way. While Sockr did have the functionality that the project needed, the source code was mostly undocumented, didn't have a clear API and the backend and frontend were too tightly coupled to be used in a sustainable way.
+After some discussions with the student, he explained that he would be open for the project to use \sockr{}. A thorough investigation of the \sockr{} source code was however needed to make sure that it was actually useful for the project. When diving deeper into the source code of \sockr{} it became clear that once again, the project would not be able to use this in a good and sustainable way. While \sockr{} did have the functionality that the project needed, the source code was mostly undocumented, didn't have a clear API and the backend and frontend were too tightly coupled to be used in a sustainable way.
 
 As such, after much research it was concluded that the best and most sustainable thing for the project would be to develop a code verification/compilation platform from scratch, effectively making the project completely independent of other services.
 
@@ -113,7 +113,7 @@ The newly formed list contained the following key elements:
 
 
 \section{Workshop} 
-A workshop was presented as an idea from the project owner Parnes as a way to find out how different teachers think that the system would look like and what features they feel should be included. A group of five people started to work by writing different scenarios for the workshop, see section~\ref{Worskshop:senarios}. As a preparation for the real workshop, these scenarios were then tested on a few members of the project group where the members were acting as teachers and they had to implement the planned workshop scenarios. This gave the workshop group some thoughts about what could be improved before the ordinary workshop with the teachers. 
+A workshop was presented as an idea from the project owner Parnes as a way to find out how different teachers think that the system would look like and what features they feel should be included. A group of five people started to work by writing different scenarios for the workshop, see appendix~\ref{Worskshop:senarios}. As a preparation for the real workshop, these scenarios were then tested on a few members of the project group where the members were acting as teachers and they had to implement the planned workshop scenarios. This gave the workshop group some thoughts about what could be improved before the ordinary workshop with the teachers. 
 The workshop with the teachers was made by splitting the teachers into two different groups and then they had 10--15 minutes to discuss the scenarios in the group and then another 10 minutes for discussions with the other group. 
 The first scenario task was to discuss which type of system and elements could be available that would have motivated them as students. In the scenario 2 the groups had to imagine themselves being the examiners of a course and the groups got to discuss which limitations should be done in the system but also once again, how they could motivate their students. During the scenario 3 the task was to focus on embodying the ideas and thoughts from scenario 1 and 2 into an e-tool and how the general design should for said tool look like. A compiled list from both groups together from what was discussed and concluded during the workshop:
 \\
@@ -141,7 +141,7 @@ Result from scenario 2
 \begin{itemize}
 \item Old assignments could be divided.
 \item Shorter feedback loop.
-\item old assignments with new contex.
+\item old assignments with new context.
 \end{itemize}
 \item Updating the course introduction is cheap and makes the goals of the course more clear.
 \item When the knowledge should be testes.
