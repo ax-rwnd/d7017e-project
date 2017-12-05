@@ -57,6 +57,7 @@ function postCourseValidation(req) {
         hidden = false;
     }
 
+    // TODO: CANT CHECK BOOL LIKE THIS.
     if (req.body.autojoin) {
         req.checkBody("autojoin", "Must contain true or false").isBoolean();
         autojoin = req.body.autojoin;

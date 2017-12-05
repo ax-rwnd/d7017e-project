@@ -800,7 +800,12 @@ function populateObject(mongooseObject, schema, wantedFields) {
     }
 }
 
+// TODO fix this
+function getCourse(course_id) {
+    return Course.findById(course_id);
+}
 
+/*
 function getCourse(courseid, roll, fields) {
     var wantedFields = fields || constants.FIELDS.COURSE[roll.toUpperCase()];
     wantedFields = wantedFields.replace(/,/g, " ");
@@ -817,6 +822,7 @@ function getCourse(courseid, roll, fields) {
         });
     });
 }
+*/
 
 function saveCode(userID, assignmentID, code, lang) {
     // new: true - Creates a new document if it doesn't find one

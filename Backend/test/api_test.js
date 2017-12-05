@@ -152,57 +152,6 @@ describe('/api', () => {
             });
         });
 
-        describe('GET /api/courses/:course_id/students', () => {
-            it('returns a list of students', () => {
-                return request(runner.server)
-                    .get('/api/courses/' + course_id + '/students')
-                    .set('Authorization', 'Bearer ' + access_tokens.user)
-                    .expect(200)
-                    .then(res => {
-                        assert(Array.isArray(res.body.students), 'should be an array');
-                    });
-            });
-        });
-
-        describe('PUT /api/courses/:course_id/students', () => {
-            it('succeeds if you are a teacher with valid input', () => {
-                return request(runner.server)
-                    .put('/api/courses/' + course_id + '/students')
-                    .send({
-                        student_id: user_id
-                    }).set('Authorization', 'Bearer ' + access_tokens.admin)
-                    .expect(200);
-            });
-        });
-
-        describe('GET /api/courses/me', () => {
-            let route = '/api/courses/me';
-            it_rejects_unauthorized_get(route);
-
-            it('gets a list of courses for the fake user', () => {
-                return request(runner.server)
-                    .get(route)
-                    .set('Authorization', 'Bearer ' + access_tokens.user)
-                    .expect(200)
-                    .then(res => {
-                        assert(Array.isArray(res.body.courses), 'should be an array');
-                        assert(res.body.courses.length > 0, 'array should not be empty');
-                    });
-            });
-        });
-
-        describe('GET /api/courses/:course_id/teachers', () => {
-            it('returns a non-empty list of teachers', () => {
-                return request(runner.server)
-                    .get('/api/courses/' + course_id + '/teachers')
-                    .set('Authorization', 'Bearer ' + access_tokens.user)
-                    .expect(200)
-                    .then(res => {
-                        assert(Array.isArray(res.body.teachers), 'should be an array');
-                        assert(res.body.teachers.length > 0, 'array should not be empty');
-                    });
-            });
-        });
 
         describe('POST /api/courses/:course_id/assignmentgroups', () => {
 
@@ -519,38 +468,6 @@ describe('/api', () => {
             });
         });
 
-        describe('GET /api/users/me/courses', () => {
-            let route = '/api/users/me/courses';
-            it_rejects_unauthorized_get(route);
-
-            it('gets a list of courses for the fake user', () => {
-                return request(runner.server)
-                    .get(route)
-                    .set('Authorization', 'Bearer ' + access_tokens.user)
-                    .expect(200)
-                    .then(res => {
-                        assert(Array.isArray(res.body.courses), 'should be an array');
-                        assert(res.body.courses.length > 0, 'array should not be empty');
-                    });
-            });
-        });
-
-        describe('GET /api/users/me/teaching', () => {
-            let route = '/api/users/me/teaching';
-            it_rejects_unauthorized_get(route);
-
-            it('gets a list of courses for the teacher', () => {
-                return request(runner.server)
-                    .get(route)
-                    .set('Authorization', 'Bearer ' + access_tokens.admin)
-                    .expect(200)
-                    .then(res => {
-                        let courses = res.body.teaching;
-                        assert(Array.isArray(courses), 'should be an array');
-                        assert(courses.length > 0, 'array should not be empty');
-                    });
-            });
-        });
 
         describe('GET /api/users/:user_id', () => {
             it('gets some user information', () => {
@@ -560,18 +477,6 @@ describe('/api', () => {
                 .expect(200)
                 .then(res => {
                     assert.equal(res.body.username, 'fake-admin-00');
-                });
-            });
-        });
-
-        describe('GET /api/users/:user_id/courses', () => {
-            it('returns a non-empty array', () => {
-                return request(runner.server)
-                .get('/api/users/' + user_id + '/courses')
-                .set('Authorization', 'Bearer ' + access_tokens.user)
-                .then(res => {
-                    assert(Array.isArray(res.body.courses), 'should be an array');
-                    assert(res.body.courses.length > 0, 'array should not be empty');
                 });
             });
         });
@@ -722,7 +627,7 @@ describe('/api', () => {
         });
     });
 
-    describe('/search', () => {
+    describe.skip('/search', () => {
         describe('Check config so that minimun query length is set', () => {
             it('Minimum query length is set', () => {
                 assert(config.get('Search.min_query_length') !== undefined, 'Search.min_query_length in config is not set');

@@ -23,50 +23,6 @@ const ADMIN_FILTER = "name description course_code teachers students assignments
 
 module.exports = function(router) {
 
-    // Get all courses in db
-    // If admin get all
-    // If teacher or student get all not hidden courses.
-    // Also get hidden courses if teacher/student of it?
-
-    router.get('/', function (req, res, next) {
-        var ids = req.query.ids;
-
-        var filter = (req.user.access === constants.ACCESS.ADMIN)
-            ? ADMIN_FILTER
-            : BASIC_FILTER;
-
-        if (!ids) {
-            queries.getCourses(filter, req.user.access).then(function (courses) {
-                return res.json({courses: courses});
-            })
-            .catch(function (err) {
-                next(err);
-            });
-        } else {
-            var id_array = ids.split(',');
-            queries.getCourses(filter, req.user.access, id_array).then(function (courses) {
-                return res.json({courses: courses});
-            })
-            .catch(function (err) {
-                next(err);
-            });
-        }
-
-        //Need user object from token verify for admin check.
-        /*
-        if (user.admin) {
-            queries.getCourses("name description", user.admin).then(function (courses) {
-                return res.json(courses);
-            })
-            .catch(function (err) {
-                next(err);
-            });
-        }
-        */
-
-
-    });
-
     // TODO:
     // Tests
     // Documentation
@@ -74,7 +30,7 @@ module.exports = function(router) {
     //
     // Returns BASE_FIELDS of every course in db.
     // If course is "hidden" only Admin and members of the course can see it.
-/*
+
     router.get('/', function (req, res, next) {
 
         var p;
@@ -93,34 +49,8 @@ module.exports = function(router) {
         })
         .catch(next);
     });
-*/
 
 
-    // Create new course
-    // Admin/teachers can create unlimited courses
-    // Students limited to 3 courses?
-    router.post('/', function (req, res, next) {
-        var name = req.body.name;
-        var desc = req.body.description;
-        var hidden = req.body.hidden;
-        var course_code = req.body.course_code;
-        var enabled_features = req.body.enabled_features;
-        var autojoin = req.body.autojoin;
-        var teacher = req.user.id;
-
-        // TODO: validate input
-        // TODO: check permissions
-
-        queries.createCourse(name, desc, hidden, course_code, enabled_features, autojoin, teacher).then(function (course) {
-            return res.status(201).json(course);
-        })
-        .catch(function (err) {
-            next(err);
-        });
-    });
-
-
-/*
     // TODO:
     // Tests
     // Documentation
@@ -151,23 +81,13 @@ module.exports = function(router) {
         })
         .catch(next);
     });
-*/
 
-    // SHOULD BE REMOVED
-    router.get('/me', function (req, res, next) {
-        logger.log('warn', '/api/courses/me is deprecated. Use /api/users/me/courses instead.');
-        queries.getUserCourses(req.user.id, "name description course_code").then(function (courses) {
-            return res.json(courses);
-        })
-        .catch(function (err) {
-            next(err);
-        });
-    });
 
 
     // Get course with id :course_id
     // Different information depending on user roll.
     // What should be given for each roll?
+    /*
     router.get('/:course_id', function (req, res, next) {
         var roll;
         var course_id = req.params.course_id;
@@ -197,6 +117,22 @@ module.exports = function(router) {
         .catch(function(err) {
             next(err);
         });
+    });
+*/
+
+    router.get('/:course_id', function (req, res, next) {
+        var roll;
+        var course_id = req.params.course_id;
+        var wantedFields = req.query.fields || null;
+        queries.getCourse(course_id, roll, wantedFields).then(function (course) {
+            return queries.getCourseMembers1(course_id).then(function(courseMembers) {
+                var courseObject = course.toObject();
+                courseObject.members = courseMembers;
+                console.log(courseObject);
+                return res.json(courseObject);
+            });
+        })
+        .catch(next);
     });
 
     // Deletes course with id :course_id
@@ -242,7 +178,7 @@ module.exports = function(router) {
         }).catch(next);
     });
 
-/*
+
     router.get('/:course_id/members', function (req, res, next) {
         var course_id = req.params.course_id;
         var query = req.query.role;
@@ -261,40 +197,8 @@ module.exports = function(router) {
         })
         .catch(next);
     });
-*/
-
-    router.get('/:course_id/students', function (req, res, next) {
-        var course_id = req.params.course_id;
-
-        queries.getCourseStudents(course_id, "username email").then(function (students) {
-            return res.json(students);
-        })
-        .catch(function (err) {
-            next(err);
-        });
-    });
 
 
-    // SHOULD PROBABLY BE REMOVED
-    router.put('/:course_id/students', function (req, res, next) {
-        var course_id = req.params.course_id;
-        var student_id = req.body.student_id;
-        queries.getUser(req.user.id, "teaching")
-        .then(function (userObject) {
-            // admins and teachers can invite students
-            if (req.user.access === constants.ACCESS.ADMIN || userObject.teaching.indexOf(course_id) !== -1) {
-                return queries.addCourseStudent(course_id, student_id);
-            } else {
-                // TODO: use a better error
-                next(errors.INSUFFICIENT_PERMISSION);
-            }
-        }).then(function () {
-            res.sendStatus(200);
-        }).catch(err => {
-            console.log(err);
-            next(err);
-        });
-    });
 
 
     // TODO
@@ -322,54 +226,13 @@ module.exports = function(router) {
     });
 
 
-    // TODO
-    // Documentation
-    // Test
-    // Not accepting already pending students to course.
-    // Doesn't even flag if the user have already requested to join. Intended behaviour?
-    //
-    // Admin or teacher of course can invite users which is not already a member of the course.
-    router.post('/:course_id/students/invite', function (req, res, next) {
-        var course_id = req.params.course_id;
-        var student_id = req.body.student_id;
-
-        if (!mongoose.Types.ObjectId.isValid(student_id) || !mongoose.Types.ObjectId.isValid(course_id)) {
-            return next(errors.BAD_INPUT);
-        }
-
-        // First role check then
-        // Already member check then
-        // User exist check then
-        // Invite already sent check then
-        // Create Invite and add to db
-        // Thrown errors will halt execution.
-        permission.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access, "students teachers")
-        .then(function (courseObject) {
-            return queries.checkIfUserAlreadyInCourseObject(student_id, courseObject);
-        })
-        .then(function () {
-            return queries.checkIfUserExist(student_id);
-        })
-        .then(function () {
-            return queries.checkIfRequestAlreadySent(student_id, course_id, "invite");
-        })
-        .then(function () {
-            return queries.createRequestToCourse(student_id, course_id, "invite");
-        })
-        .then(function (inviteObject) {
-            return res.sendStatus(202).json({});
-        })
-        .catch(function (error) {
-            return next(error);
-        });
-    });
-
-/*
     // TODO:
     // Tests
     // Documentation
     //
     //
+
+    // NOT DONE
     router.post('/:course_id/members/invite', function (req, res, next) {
         try {
             var input = inputValidation.putMembersInviteValidation(req);
@@ -391,39 +254,8 @@ module.exports = function(router) {
         }
 
     });
-*/
-
-    // TODO
-    // Documentation
-    // Test
-    //
-    // Caller will accept an invite to :course_id.
-    // If invite exists user caller will be added as a student in the course.
-    router.put('/:course_id/members/invite', function (req, res, next) {
-        var course_id = req.params.course_id;
 
 
-        if (!mongoose.Types.ObjectId.isValid(course_id)) {
-            return next(errors.BAD_INPUT);
-        }
-
-        // First find and remove invite if it exists then
-        // Add student to course
-        // Thrown errors will halt execution.
-        queries.findAndRemoveRequest(req.user.id, course_id, "invite")
-        .then(function () {
-            return queries.addCourseStudent(course_id, req.user.id);
-        })
-        .then(function () {
-            return res.sendStatus(201).json({});
-        })
-        .catch(function (error) {
-            return next(error);
-        });
-    });
-
-
-/*
     // TODO:
     // Tests
     // Documentation
@@ -449,7 +281,7 @@ module.exports = function(router) {
         })
         .catch(next);
     });
-*/
+
     // TODO
     // Documentation
     // Test
@@ -485,153 +317,6 @@ module.exports = function(router) {
         })
         .then(function () {
             return res.sendStatus(200).json({});
-        })
-        .catch(function (error) {
-            return next(error);
-        });
-    });
-
-
-    // TODO
-    // Documentation
-    // TESTS
-    //
-    // Admin and teacher of course can get all current requests to join the course.
-    router.get('/:course_id/students/pending', function (req, res, next) {
-        var course_id = req.params.course_id;
-
-        if (!mongoose.Types.ObjectId.isValid(course_id)) {
-            return next(errors.BAD_INPUT);
-        }
-
-        permission.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
-        .then(function () {
-            return queries.getCourseInvites(course_id, "pending");
-        })
-        .then(function (courseInvites) {
-            return res.json(courseInvites);
-        })
-        .catch(function (error) {
-            return next(error);
-        });
-    });
-
-
-    // TODO
-    // Documentation
-    // TEST
-    //
-    // A student asks to join a course. If the course got autojoin he will be added as a student to the course.
-    // If course does not have autojoin a request to join will be created.
-    router.post('/:course_id/students/pending', function (req, res, next) {
-        var course_id = req.params.course_id;
-
-        if (!mongoose.Types.ObjectId.isValid(course_id)) {
-            return next(errors.BAD_INPUT);
-        }
-
-        // First check if user already in course then
-        // Check if course got autojoin
-        // If autojoin add student to course
-        // If not autojoin then
-        // Check if already asked to join then
-        // Create join request
-        // Thrown errors will halt execution
-        queries.checkIfUserAlreadyInCourse(req.user.id, course_id, "autojoin")
-        .then(function (courseObject) {
-            if (!courseObject.autojoin) {
-                return queries.checkIfRequestAlreadySent(req.user.id, course_id, "pending")
-                .then(function () {
-                    return queries.createRequestToCourse(req.user.id, course_id, "pending");
-                })
-                .then(function () {
-                    return res.sendStatus(202).json({});
-                });
-            } else {
-                queries.addCourseStudent(course_id, req.user.id)
-                .then(function () {
-                    return res.sendStatus(201).json({});
-                });
-            }
-        })
-        .catch(function (error) {
-            return next(error);
-        });
-    });
-
-
-    // TODO
-    // Documentation
-    // TEST
-    //
-    // Admin or teacher can accept an request to join the course.
-    router.put('/:course_id/students/pending', function (req, res, next) {
-        var course_id = req.params.course_id;
-        var student_id = req.body.student_id;
-
-        if (!mongoose.Types.ObjectId.isValid(student_id) || !mongoose.Types.ObjectId.isValid(course_id)) {
-            return next(errors.BAD_INPUT);
-        }
-
-        // First check if admin or teacher then
-        // Check if request exists if so remove it then
-        // Add user to course
-        // Thrown errors will halt execution
-        permission.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
-        .then(function () {
-            return queries.findAndRemoveRequest(student_id, course_id, "pending");
-        })
-        .then(function () {
-            return queries.addCourseStudent(course_id, student_id);
-        })
-        .then(function () {
-            return res.sendStatus(200).json({});
-        })
-        .catch(function (error) {
-            return next(error);
-        });
-    });
-
-
-    // TODO
-    // Documentation
-    // TESTS
-    //
-    // User can revoke his request to join the course.
-    // Admin and teachers of course can decline a request.
-    router.delete('/:course_id/students/pending', function (req, res, next) {
-        var course_id = req.params.course_id;
-        var student_id = req.body.student_id;
-
-        if (!student_id) {
-            student_id = req.user.id;
-        }
-        if (!mongoose.Types.ObjectId.isValid(student_id) || !mongoose.Types.ObjectId.isValid(course_id)) {
-            return next(errors.BAD_INPUT);
-        }
-
-        // If revoking own request then
-        // Remove request
-        //
-        // If decline request then
-        // Check if admin or teacher then
-        // Find and remove request.
-        queries.returnPromiseForChainStart()
-        .then(function () {
-            if (student_id === req.user.id) {
-                return queries.findAndRemoveRequest(student_id, course_id, "pending")
-                .then(function () {
-                    return res.sendStatus(200).json({});
-                });
-            } else {
-                return permission.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
-                .then(function () {
-                    return queries.findAndRemoveRequest(student_id, course_id, "pending");
-                })
-                .then(function () {
-                    return res.sendStatus(201).json({});
-                });
-            }
         })
         .catch(function (error) {
             return next(error);
@@ -686,18 +371,10 @@ module.exports = function(router) {
     });
 
 
-    router.get('/:course_id/teachers', function (req, res, next) {
-        var course_id = req.params.course_id;
-
-        queries.getCourseTeachers(course_id, constants.FIELDS.TEACHERS.BASE_FIELDS).then(function (teachers) {
-            return res.json(teachers);
-        })
-        .catch(function (err) {
-            next(err);
-        });
+    router.put('/:course_id/members', function (req, res, next) {
+        return res.json({fail: "bosse"});
     });
-
-
+/*
     // TODO
     // Documentation
     // TESTS
@@ -725,7 +402,13 @@ module.exports = function(router) {
             return next(error);
         });
     });
+*/
+    router.delete('/:course_id/members', function (req, res, next) {
+        return res.json({fail: "Bosse"})
+    });
 
+
+/*
     // TODO
     // Documentation
     // TESTS
@@ -753,6 +436,7 @@ module.exports = function(router) {
             return next(error);
         });
     });
+*/
 
     // Return all assignmnts from a course
     router.get('/:course_id/assignments', function (req, res, next) {
