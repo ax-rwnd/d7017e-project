@@ -285,7 +285,7 @@ describe('/api', () => {
                 return request(runner.server)
                     .post('/api/courses/' + course_id + '/assignments')
                     .send({
-                        name: 'Introduction to Mocha tests',
+                        name: 'Lesson 2 in Mocha tests',
                         description: 'Write tests with Mocha',
                         hidden: false,
                         languages: 'javascript'
