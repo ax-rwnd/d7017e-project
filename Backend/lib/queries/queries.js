@@ -77,46 +77,29 @@ const FIELDS = {
 
 //get all tests related to a specific assignment.
 function getTestsFromAssignment(assignmentID) {
-    /*Assignment.findById(assignmentID)
+    return Assignment.findById(assignmentID, "tests")
     .populate({
         path: 'tests.io',
         model: 'Test'
     }).populate({
         path: 'optional_tests.io',
         model: 'Test'
-    }).lean().exec(function (err, assignmentObject) {
-        //if (!assignmentObject) {
-        //    console.log("assignment not found!")
-        //    throw errors.ASSIGNMENT_DOES_NOT_EXIST;
-        //}     //THIS ERROR NEEDS TO BE THROWN AND HANDLED
-        let json = {};
-        json.tests = assignmentObject.tests;
-        json.optional_tests = assignmentObject.optional_tests;
-        callback(json);
-    }); */
-    Assignment.findById(assignmentID).then(function (assignment) {
+    })
+    //.populate("tests.io")
+    //.populate("optional_tests.io")
+    .then(function (assignment) {
+        console.log(assignment);
         if (!assignment) {
             throw errors.ASSIGNMENT_DOES_NOT_EXIST;
         }
-        Test.find(assignment.tests).then(function (tests) {
-            console.log("TJIOAJRI");
-            console.log(tests);
-        });
-        /*let tests = {};
-        tests.tests = assignment.tests;
-        tests.optional_tests = assignment.optional_tests;    
-        return tests;   */ 
-    });
-    /*
-    return User.findById(id).then(function (user) {
-        if (!user) {
-            throw errors.USER_NOT_FOUND;
-        }
-        User.deleteOne(user, function (err) {
-            return err;
-        });
-    });    
-    */
+        var tests = {'tests':assignment.tests, 'optional_tests':assignment.optional_tests};
+        console.log("VADDOE");
+        console.log(tests.tests);
+        return tests;
+
+    }); 
+
+
 }
 
 function getUser(id, fields) {

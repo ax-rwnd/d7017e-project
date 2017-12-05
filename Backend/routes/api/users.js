@@ -85,7 +85,6 @@ module.exports = function (router) {
 
         queries.getUser(user_id, filter).then(function (user) {
             return queries.getUserMemberCourses1(user_id).then(function(userCourses) {
-                console.log(userCourses);
                     var userObject = user.toObject();
                     userObject.courses = userCourses;
                     return res.json(userObject); 
@@ -189,7 +188,6 @@ module.exports = function (router) {
 
         queries.getUserMemberStatus(course_id, req.user.id)
         .then(function (statusObject) {
-            console.log(statusObject.role);
             if (statusObject.role === "teacher") {
                 return "Teacher";
             }
@@ -211,7 +209,6 @@ module.exports = function (router) {
             });
         })
         .then(function (status) {
-            console.log(status);
             return res.json({status: status});
         })
         .catch(function (error) {

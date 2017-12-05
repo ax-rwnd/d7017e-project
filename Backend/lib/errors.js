@@ -51,5 +51,6 @@ module.exports = {
     INVALID_LINK: new APIError("Invalid invite link", 401, 7033),
     EXPIRED_LINK: new APIError("Invite link has expired", 401, 7034),
     TEST_NOT_IN_ASSIGNMENT: new APIError("The test is not in this assignment", 400, 7035),
-    ASSIGNMENT_NOT_IN_COURSE: new APIError("The assignment is not in this course", 400, 7036)
+    ASSIGNMENT_NOT_IN_COURSE: new APIError("The assignment is not in this course", 400, 7036),
+    TESTER_ERROR: new APIError("Tester returned an error", 400, 7037)
 };

@@ -880,17 +880,31 @@ module.exports = function(router) {
 
     //submit user code to Tester service for code validation
     router.post('/:course_id/assignments/:assignment_id/submit', function(req, res, next) {
-
         var lang = req.body.lang;
         var code = req.body.code;
         var assignment_id = req.params.assignment_id;
         var course_id = req.params.course_id;
         
-        if (!mongoose.Types.ObjectId.isValid(assignment_id) || !mongoose.Types.ObjectId.isValid(course_id)) {
+        /*if (!mongoose.Types.ObjectId.isValid(assignment_id) || !mongoose.Types.ObjectId.isValid(course_id)) {
             return next(errors.BAD_INPUT);
+        }*/
+
+        var input;
+        try {
+            input = inputValidation.submitCodeValidation(req);
+        } catch(error) {
+            return next(error);
         }
 
-        testerCom.validateCode(req.user.id, lang, code, assignment_id, res)
+        return testerCom.validateCode(req.user.id, lang, code, assignment_id)
+        .then(function (testerResponse) {
+            console.log(testerResponse);
+            return res.json(testerResponse);
+        })
+        .catch(function (err) {
+            next(err);
+        });
+        //testerCom.validateCode(req.user.id, lang, code, assignment_id);
     });
 
     // TODO: SHOULD BE REMOVED ONCE NEW ROUTE PATH IS USED BY FRONTEND
@@ -950,7 +964,7 @@ module.exports = function(router) {
         queries.checkIfAssignmentInCourse(assignment_id, course_id).then(function () {
             queries.getCode(req.user.id, assignment_id).then(function (draft) {
                 return res.json(draft);
-            })
+            });
         })
         .catch(function (err) {
             next(err);
