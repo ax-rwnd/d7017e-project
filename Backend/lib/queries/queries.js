@@ -524,14 +524,21 @@ function deleteCourse(id) {
         if (!course) {
             throw errors.COURSE_DOES_NOT_EXIST;
         }
-        console.log(course);
+
         // assignments
-        let promises = course.assignmentgroups
+        let promises = course.assignments
+            .map(aid => {
+                return deleteAssignment(aid)
+                // ignore error when assignment doesn't exist
+                .catch(()=>{});
+            });
+        // assignmentgroups
+        promises.push(course.assignmentgroups
             .map(aid => {
                 return deleteAssignmentgroup(aid, course._id)
                 // ignore error when assignment doesn't exist
                 .catch(()=>{});
-            });
+            }));
         // members
         promises.push(deleteCourseMembers(course._id));
         // join requests
@@ -540,6 +547,7 @@ function deleteCourse(id) {
         promises.push(InviteLink.remove({course: course._id}));
         // badges
         promises.push(Badge.remove({course_id: course._id}));
+
         return Promise.all(promises);
     });
 }
@@ -741,8 +749,8 @@ function getAssignmentTests(course_id, assignment_id) {
     });
 }
 
-function createAssignment(name, description, hidden, languages, course_id) {
-    var newAssignment = new Assignment({name: name, description: description, hidden: hidden, tests: {io: [], lint: false}, optionaal_tests: {io: [], lint: false}, languages: languages});
+function createAssignment(name, description, hidden, lint, languages, course_id) {
+    var newAssignment = new Assignment({name: name, description: description, hidden: hidden, tests: {io: [], lint: lint}, optionaal_tests: {io: [], lint: lint}, languages: languages});
     return newAssignment.save().then(function (createdAssignment) {
         if (!createdAssignment) {
             console.log("Error: Assignment not created");
@@ -763,7 +771,7 @@ function createAssignment(name, description, hidden, languages, course_id) {
     });
 }
 
-function createTest(stdout, stdin, args, lint, assignment_id) {
+function createTest(stdout, stdin, args, assignment_id) {
     var newTest = new Test({stdout: stdout, stdin: stdin, args: args});
 
     return newTest.save().then(function (createdTest) {
@@ -778,7 +786,7 @@ function createTest(stdout, stdin, args, lint, assignment_id) {
             }
             return Assignment.update(
                 { _id: assignment_id },
-                { $push: { 'tests.io': createdTest._id }, $set: { 'tests.lint': lint } }
+                { $push: { 'tests.io': createdTest._id }}
             ).then( function (v) {
                 return createdTest;
             });
@@ -822,7 +830,12 @@ function populateObject(mongooseObject, schema, wantedFields) {
     }
 }
 
+// TODO fix this
+function getCourse(course_id) {
+    return Course.findById(course_id);
+}
 
+/*
 function getCourse(courseid, roll, fields) {
     var wantedFields = fields || constants.FIELDS.COURSE[roll.toUpperCase()];
     wantedFields = wantedFields.replace(/,/g, " ");
@@ -839,6 +852,7 @@ function getCourse(courseid, roll, fields) {
         });
     });
 }
+*/
 
 function saveCode(userID, assignmentID, code, lang) {
     // new: true - Creates a new document if it doesn't find one
@@ -1134,8 +1148,9 @@ function getAssignmentgroupsByCourseID(course_id) {
 
 function createAssignmentgroup(assignmentgroupObject, course_id) {
     let assignmentgroup = new Assignmentgroup(assignmentgroupObject);
-    return assignmentgroup.save().then(assignmentgroup => {
-        return Course.update({'_id': course_id }, {$push: { assignmentgroups: assignmentgroup._id}})
+    return assignmentgroup.save()
+    .then(assignmentgroup => {
+        return Course.update({'_id': course_id, $isolated: 1}, {$push: { assignmentgroups: assignmentgroup._id}})
         .then(function(course) {
             return assignmentgroup;
         });
@@ -1168,16 +1183,7 @@ function deleteAssignmentgroup(assignmentgroup_id, course_id) {
             throw errors.ASSIGNMENTGROUP_DO_NOT_EXIST;
         }
 
-        let promises = assignmentgroup.assignments
-            .map(assignment => {
-                return deleteAssignment(assignment.assignment)
-                // ignore error when assignment doesn't exist
-                .catch(()=>{});
-            });
-
-        promises.push(Course.update({_id: course_id}, {$pull: { assignmentgroups: assignmentgroup_id}}));
-
-        return Promise.all(promises);
+        return Course.update({_id: course_id}, {$pull: { assignmentgroups: assignmentgroup_id}});
     })
     .then(function(result) {
         return result;

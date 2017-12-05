@@ -60,22 +60,7 @@ module.exports = function (router) {
         })
         .catch(next);
     });
-
-
-    router.get('/me/courses', function (req, res, next) {
-        queries.getUserCourses(req.user.id, constants.FIELDS.COURSE.BASE_FIELDS).then(function (courses) {
-            return res.json(courses);
-        })
-        .catch(next);
-    });
-
-    router.get('/me/teaching', function (req, res, next) {
-        queries.getUserTeacherCourses(req.user.id, constants.FIELDS.COURSE.BASE_FIELDS).then(function (courses) {
-            return res.json(courses);
-        })
-        .catch(next);
-    });
-
+    
 
     router.get('/:user_id', function (req, res, next) {
         var user_id = req.params.user_id;
@@ -113,6 +98,8 @@ module.exports = function (router) {
         }
     });
 
+// SHOULD BE REMOVED
+/*
     router.get('/:user_id/courses', function (req, res, next) {
         var user_id = req.params.user_id;
         queries.getUserCourses(user_id, constants.FIELDS.COURSE.BASE_FIELDS).then(function (courses) {
@@ -122,9 +109,9 @@ module.exports = function (router) {
             next(err);
         });
     });
+*/
 
-
-    router.get('/me/invite', function (req, res, next) {
+    router.get('/me/invites', function (req, res, next) {
         var query = req.query.type;
 
         var p;
@@ -142,36 +129,6 @@ module.exports = function (router) {
         });
     });
 
-
-    // TODO
-    // Documentation
-    // TESTS
-    //
-    // User can get all invites he currently got to courses.
-    router.get('/courses/invite', function (req, res, next) {
-        queries.getUserInvites(req.user.id, "invite")
-        .then(function (userInvites) {
-            return res.json(userInvites);
-        })
-        .catch(function (error) {
-            return next(error);
-        });
-    });
-
-    // TODO
-    // Documentation
-    // TESTS
-    //
-    // User can get all courses he's asked to join.
-    router.get('/courses/pending', function (req, res, next) {
-        queries.getUserInvites(req.user.id, "pending")
-        .then(function (userInvites) {
-            return res.json(userInvites);
-        })
-        .catch(function (error) {
-            return next(error);
-        });
-    });
 
     // TODO
     // Documentation

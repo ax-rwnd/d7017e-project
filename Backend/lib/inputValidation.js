@@ -30,12 +30,15 @@ function postCourseValidation(req) {
     req.checkBody("name", "Must contain only letters and numbers").isAscii();
     name = req.body.name;
 
-    // TODO: This is an object. How to check this properly?
-    //req.checkBody("enabled_features", "Not a bool").isEmpty();
-    enabled_features = req.body.enabled_features;
-
-
     // Optional fields
+    if (req.body.enabled_features) {
+        // TODO: This is an object. How to check this properly?
+        //req.checkBody("enabled_features", "Not a bool").isEmpty();
+        enabled_features = req.body.enabled_features;
+    } else {
+        enabled_features = {};
+    }
+
     if (req.body.description) {
         req.checkBody("description", "Must contain only ascii characters").isAscii();
         description = req.body.description;
@@ -43,7 +46,7 @@ function postCourseValidation(req) {
         description = "";
     }
 
-    if (req.body.description) {
+    if (req.body.course_code) {
         req.checkBody("course_code", "Must contain only ascii characters").isAlphanumeric();
         course_code = req.body.course_code;
     } else {
@@ -57,6 +60,7 @@ function postCourseValidation(req) {
         hidden = false;
     }
 
+    // TODO: CANT CHECK BOOL LIKE THIS.
     if (req.body.autojoin) {
         req.checkBody("autojoin", "Must contain true or false").isBoolean();
         autojoin = req.body.autojoin;
@@ -242,9 +246,70 @@ function badgeValidation(req) {
     return input;
 }
 
+// checks for a course_id param
+function courseIdValidation(req) {
+    req.checkParams('course_id', 'Not a valid course id').isMongoId();
+    var inputError = req.validationErrors();
+    if (inputError) {
+        throw badInput.BAD_INPUT(inputError);
+    }
+    return {course_id: req.params.course_id};
+}
+
+// Input validation for PUT /api/courses/:course_id
+function putCourseBodyValidation(req) {
+    var input = {};
+
+    // Optional fields
+    if ('name' in req.body) {
+        req.checkBody("name", "Must contain only letters and numbers").isAscii();
+        input.name = req.body.name;
+    }
+    if ('description' in req.body) {
+        req.checkBody("description", "Must contain only ascii characters").isAscii();
+        input.description = req.body.description;
+    }
+    if ('course_code' in req.body) {
+        req.checkBody("course_code", "Must contain only ascii characters").isAlphanumeric();
+        input.course_code = req.body.course_code;
+    }
+    if ('hidden' in req.body) {
+        req.checkBody("hidden", "Must contain true or false").isBoolean();
+        input.hidden = req.body.hidden;
+    }
+    if ('autojoin' in req.body) {
+        req.checkBody("autojoin", "Must contain true or false").isBoolean();
+        input.autojoin = req.body.autojoin;
+    }
+    if ('enabled_features' in req.body) {
+        // TODO: apply better validation from postCourseValidation when it is implemented
+        input.enabled_features = req.body.enabled_features;
+    }
+
+    var inputError = req.validationErrors();
+    if (inputError) {
+        throw badInput.BAD_INPUT(inputError);
+    }
+    return input;
+}
+
+// checks that course_id and assignment_id are valid IDs
+function assignmentValidation(req) {
+    req.checkParams('course_id', 'Not a valid course id').isMongoId();
+    req.checkParams('assignment_id', 'Not a valid assignment id').isMongoId();
+    var inputError = req.validationErrors();
+    if (inputError) {
+        throw badInput.BAD_INPUT(inputError);
+    }
+    return {course_id: req.params.course_id, assignment_id: req.params.assignment_id};
+}
+
 exports.postCourseValidation = postCourseValidation;
+exports.putCourseBodyValidation = putCourseBodyValidation;
 exports.putMembersInviteValidation = putMembersInviteValidation;
 exports.postMemberInviteValidation = postMemberInviteValidation;
 exports.assignmentgroupValidation = assignmentgroupValidation;
 exports.badgeValidation = badgeValidation;
 exports.submitCodeValidation = submitCodeValidation;
+exports.courseIdValidation = courseIdValidation;
+exports.assignmentValidation = assignmentValidation;
