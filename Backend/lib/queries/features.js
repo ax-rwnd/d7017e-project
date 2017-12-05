@@ -7,6 +7,7 @@ var Test = require('../../models/schemas').Test;
 var User = require('../../models/schemas').User;
 var Badge = require('../../models/schemas').Badge;
 var Features = require('../../models/schemas').Features;
+var CourseMembers = require('../../models/schemas').CourseMembers;
 var errors = require('../errors.js');
 var logger = require('../logger.js');
 
@@ -24,9 +25,19 @@ function getBadge(badge_id) {
 }
 
 function updateBadge(badge_id, data) {
-    return Badge.findOneAndUpdate({"_id": badge_id}, data, { runValidators: true }).then(function(badge) {
+    return Badge.findOneAndUpdate({"_id": badge_id}, data, { runValidators: true, new: true}).then(function(badge) {
         if(badge === null)
             throw errors.BADGE_DO_NOT_EXIST;
+        return badge;
+    });
+}
+
+function deleteBadge(badge_id) {
+    return Badge.findOneAndRemove({_id: badge_id})
+    .then(badge => {
+        if (!badge) {
+            throw errors.BADGE_DO_NOT_EXIST;
+        }
         return badge;
     });
 }
@@ -125,7 +136,46 @@ function getNumberOfCompletedAssignmentsByFeatureID(feature_id) {
     });
 }
 
-async function getFeaturesOfCourse(course_id) {
+function getFeaturesOfCourse(course_id) {
+
+    let json = {};
+
+    return getNumberOfAssignments(course_id).then(function(total_assignments) {
+
+         json.total_assignments = total_assignments;
+
+         CourseMembers.find({course: course_id}, 'features')
+         .populate({path: 'features', model: 'Features'})
+         .then(function(features) {
+             console.log('features');
+             console.log(features);
+
+             for(let feature of features) {
+                 feature.completed_assignments = feature.progress.length;
+                 json.features.push(feature);
+             }
+
+             return json;
+
+         });
+    });
+
+    /*
+    return CourseMembers.findOne({course: course_id, user: user_id}, 'features')
+    .then(function(feature) {
+
+        if(!feature) {
+            throw errors.NOT_FOUND;
+        } else {
+            getNumberOfAssignments(course_id)
+            .then(function(total_assignments) {
+                feature.total_assignments = total_assignments;
+                feature.completed_assignments = feature.progress.length;
+                return feature;
+            });
+        }
+    });
+
     let json = {};
 
     json.total_assignments = await getNumberOfAssignments(course_id);
@@ -156,11 +206,25 @@ async function getFeaturesOfCourse(course_id) {
         json.features.push(feature);
     }
 
-    return json;
+    return json;*/
 }
 
-async function getFeatureOfUserID(course_id, user_id) {
-    let course = await Course.findById(course_id)
+function getFeatureOfUserID(course_id, user_id) {
+    return CourseMembers.findOne({course: course_id, user: user_id}, 'features')
+    .then(function(feature) {
+        if(feature === null) {
+            throw errors.NOT_FOUND;
+        } else {
+            getNumberOfAssignments(course_id)
+            .then(function(total_assignments) {
+                feature.total_assignments = total_assignments;
+                feature.completed_assignments = feature.progress.length;
+                return feature;
+            });
+        }
+    });
+
+    /*let course = await Course.findById(course_id)
     .populate({
         path: 'features', model:'Features',
         populate: [
@@ -208,23 +272,24 @@ async function getFeatureOfUserID(course_id, user_id) {
                 return feature;
             }
         }*/
-    }
+    //}
 
     // User had no feature in that course create it
-    let new_feature = await createFeature(user_id, course_id);
+    /*let new_feature = await createFeature(user_id, course_id);
 
     let feature = await getFeatureByID(new_feature._id);
 
     feature.total_assignments = await getNumberOfAssignments(course_id);
     feature.completed_assignments = feature.progress.length;
 
-    return feature;
+    return feature;*/
 }
 
 exports.createBadge = createBadge;
 exports.getBadge = getBadge;
 exports.getBadgeByCourseID = getBadgeByCourseID;
 exports.updateBadge = updateBadge;
+exports.deleteBadge = deleteBadge;
 exports.getCourseByID = getCourseByID;
 exports.getCourseByAssignmentID = getCourseByAssignmentID;
 exports.getNumberOfAssignments = getNumberOfAssignments;

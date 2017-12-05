@@ -3,6 +3,7 @@
 var mongoose = require('mongoose'); //Database communication
 var queries = require('../lib/queries/features');
 var logger = require('../lib/logger');
+var errors = require('../lib/errors');
 
 //see if all mandatory tests are passed
 function passAllMandatoryTests(data) {
@@ -16,22 +17,10 @@ function passAllMandatoryTests(data) {
     return true;
 }
 
-async function getFeature(user_id, assignment_id) {
-    let course = await queries.getCourseByAssignmentID(assignment_id);
-
-    for (let feature_item of course.features) {
-        let feature = await queries.getFeatureByID(feature_item);
-
-        if(feature === null) {
-            logger.log("warn",'Feature '+feature_item+' in course '+course._id+' is null and should be removed!');
-        } else {
-            if(feature.user._id.equals(user_id)) {
-                return feature;
-            }
-        }
-    }
-
-    return await queries.createFeature(user_id, course._id);
+function getFeature(user_id, assignment_id) {
+    return queries.getCourseByAssignmentID(assignment_id).then(function(course) {
+        return queries.getFeatureOfUserID(course._id, user_id);
+    });
 }
 
 function arrayContainsArray (superset, subset) {
