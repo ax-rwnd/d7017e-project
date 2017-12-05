@@ -719,8 +719,8 @@ function getAssignmentTests(course_id, assignment_id) {
     });
 }
 
-function createAssignment(name, description, hidden, languages, course_id) {
-    var newAssignment = new Assignment({name: name, description: description, hidden: hidden, tests: {io: [], lint: false}, optionaal_tests: {io: [], lint: false}, languages: languages});
+function createAssignment(name, description, hidden, lint, languages, course_id) {
+    var newAssignment = new Assignment({name: name, description: description, hidden: hidden, tests: {io: [], lint: lint}, optionaal_tests: {io: [], lint: lint}, languages: languages});
     return newAssignment.save().then(function (createdAssignment) {
         if (!createdAssignment) {
             console.log("Error: Assignment not created");
@@ -741,7 +741,7 @@ function createAssignment(name, description, hidden, languages, course_id) {
     });
 }
 
-function createTest(stdout, stdin, args, lint, assignment_id) {
+function createTest(stdout, stdin, args, assignment_id) {
     var newTest = new Test({stdout: stdout, stdin: stdin, args: args});
 
     return newTest.save().then(function (createdTest) {
@@ -756,7 +756,7 @@ function createTest(stdout, stdin, args, lint, assignment_id) {
             }
             return Assignment.update(
                 { _id: assignment_id },
-                { $push: { 'tests.io': createdTest._id }, $set: { 'tests.lint': lint } }
+                { $push: { 'tests.io': createdTest._id }}
             ).then( function (v) {
                 return createdTest;
             });

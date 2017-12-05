@@ -772,9 +772,10 @@ module.exports = function(router) {
         var name = req.body.name;
         var desc = req.body.description;
         var hidden = req.body.hidden;
+        var lint = req.body.lint;
         var languages = req.body.languages;
 
-        queries.createAssignment(name, desc, hidden, languages, course_id).then(function (assignment) {
+        queries.createAssignment(name, desc, hidden, lint, languages, course_id).then(function (assignment) {
             return res.status(201).json(assignment);
         })
         .catch(function (err) {
@@ -943,7 +944,6 @@ module.exports = function(router) {
         var stdout = req.body.stdout;
         var stdin = req.body.stdin;
         var args = req.body.args;
-        var lint = req.body.lint;
 
         if (!mongoose.Types.ObjectId.isValid(assignment_id) || !mongoose.Types.ObjectId.isValid(course_id) || !typecheck.isString(stdout) || !typecheck.isString(stdin) || !Array.isArray(args)) {
             return next(errors.BAD_INPUT);
@@ -951,7 +951,7 @@ module.exports = function(router) {
 
         permission.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
         .then(function () {
-            return queries.createTest(stdout, stdin, args, lint, assignment_id);
+            return queries.createTest(stdout, stdin, args, assignment_id);
         })
         .then(function (test) {
             return res.status(201).json(test);
