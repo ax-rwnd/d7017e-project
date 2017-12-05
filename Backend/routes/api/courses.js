@@ -482,25 +482,30 @@ module.exports = function(router) {
 
     // Update an assignment
     router.put('/:course_id/assignments/:assignment_id', function (req, res, next) {
+        // imhere
+        let {course_id, assignment_id} = inputValidation.assignmentValidation(req);
+        let body = inputValidation.putAssignmentBodyValidation(req);
 
-        // TODO
-
-        return res.json({});
+        permission.checkIfAssignmentInCourse(course_id, assignment_id)
+        .then(function () {
+            return permission.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access);
+        })
+        .then(function () {
+            return queries.updateAssignment(assignment_id, body);
+        })
+        .then(function () {
+            return res.json({});
+        })
+        .catch(function (err) {
+            next(err);
+        });
     });
 
     // Delete an assignment
     router.delete('/:course_id/assignments/:assignment_id', function (req, res, next) {
-        var course_id = req.params.course_id;
-        var assignment_id = req.params.assignment_id;
-        if (!mongoose.Types.ObjectId.isValid(course_id)) {
-            return next(errors.BAD_INPUT);
-        }
-        if (!mongoose.Types.ObjectId.isValid(assignment_id)) {
-            return next(errors.BAD_INPUT);
-        }
+        let {course_id, assignment_id} = inputValidation.assignmentValidation(req);
         permission.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
-        // ensure the course actually owns the assignment
-        // TODO: use lib/perssion
+        .then(() => permission.checkIfAssignmentInCourse(course_id, assignment_id))
         .then(() => queries.deleteAssignment(assignment_id))
         .then(() => {
             // respond with empty body
@@ -603,7 +608,10 @@ module.exports = function(router) {
             return next(errors.BAD_INPUT);
         }
 
-        permission.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
+        permission.checkIfAssignmentInCourse(course_id, assignment_id)
+        .then(function () {
+            return permission.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access);
+        })
         .then(function () {
             return queries.getAssignmentTests(course_id, assignment_id);
         })
