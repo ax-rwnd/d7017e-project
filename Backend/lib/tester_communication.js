@@ -16,8 +16,6 @@ function validateCode(user_id, lang, code, assignment_id) {
 
     return queries.getTestsFromAssignment(assignment_id)
     .then(function (tests) {
-        console.log("TJA");
-        console.log(tests.tests);
         /*if(!tests.hasOwnProperty('tests') || tests.tests === undefined) {
             logger.log("error",'Assignment', assignment_id, 'did not have tests object.');
             return res.sendStatus(500);
@@ -63,8 +61,6 @@ function validateCode(user_id, lang, code, assignment_id) {
                     "optional_tests": tests.optional_tests
                 }
             }, function (error, response, body) {
-                console.log("HAEJ");
-                console.log(body);
                 if(error || response.statusCode != 200) {
                     if(response) {
                         logger.log("error",'Tester returned', response.statusCode);

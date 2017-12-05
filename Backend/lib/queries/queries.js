@@ -85,18 +85,12 @@ function getTestsFromAssignment(assignmentID) {
         path: 'optional_tests.io',
         model: 'Test'
     })
-    //.populate("tests.io")
-    //.populate("optional_tests.io")
     .then(function (assignment) {
-        console.log(assignment);
         if (!assignment) {
             throw errors.ASSIGNMENT_DOES_NOT_EXIST;
         }
         var tests = {'tests':assignment.tests, 'optional_tests':assignment.optional_tests};
-        console.log("VADDOE");
-        console.log(tests.tests);
         return tests;
-
     }); 
 
 
@@ -333,22 +327,6 @@ function checkIfUserAlreadyInCourse(user_id, course_id, optionalCourseFieldsToRe
     });
 }
 
-// TODO: WILL BE AFFECTED BY NEW ASSIGNMENT GROUPING
-// checks if an assignment is in the course or not
-function checkIfAssignmentInCourse(assignment_id, course_id) {
-    return Course.findById(course_id).then(function (courseObject) {
-        var assignmentFound = false;
-        courseObject.assignments.forEach(function(element) {
-            if (element == assignment_id) {
-                assignmentFound = true;
-            }
-        });
-        if (assignmentFound === false) {
-            throw errors.ASSIGNMENT_NOT_IN_COURSE;
-        }
-    });
-}
-
 function checkIfRequestAlreadySent(user_id, course_id, type) {
     return JoinRequest.count({inviteType: type, user: user_id, course: course_id})
     .then(function (count) {
@@ -508,8 +486,7 @@ function updateCourse(id, set_props) {
         ).then(raw => {
             // check if the course update was ok
             if (raw.ok !== 1) {
-                // TODO: make a real error message!
-                throw new Error('Mongo error: failed to add to user.courses');
+                throw errors.FAILED_TO_UPDATE_COURSE;
             // check if the course existed
             } else if (raw.n === 0) {
                 throw errors.COURSE_DOES_NOT_EXIST;
@@ -705,6 +682,28 @@ function getAssignment(id, fields) {
 }
 */
 
+function updateAssignment(id, set_props) {
+    return Assignment.findById(id, "name description hidden languages").then(function (assignment) {
+        if (!assignment) {
+            throw errors.ASSIGNMENT_DOES_NOT_EXIST;
+        }
+
+        return Assignment.update(
+            {_id: id},
+            {$set: set_props},
+            {runValidators: true}
+        ).then(raw => {
+            // check if the assignemt update was ok
+            if (raw.ok !== 1) {
+                throw errors.FAILED_TO_UPDATE_ASSIGNMENT;
+            // check if the assignment existed
+            } else if (raw.n === 0) {
+                throw errors.ASSIGNMENTT_DOES_NOT_EXIST;
+            }
+        });
+    });
+}
+
 function getTest(id, fields) {
     var wantedFields = fields || "stdout stdin args";
 
@@ -729,8 +728,7 @@ function updateTest(id, set_props) {
         ).then(raw => {
             // check if the test update was ok
             if (raw.ok !== 1) {
-                // TODO: make a real error message!
-                throw new Error('Mongo error: Failed to update test');
+                throw errors.FAILED_TO_UPDATE_TEST;
             // check if the test existed
             } else if (raw.n === 0) {
                 throw errors.TEST_DOES_NOT_EXIST;
@@ -1235,7 +1233,6 @@ exports.searchDB = searchDB;
 exports.checkIfTeacherOrAdmin = checkIfTeacherOrAdmin;
 exports.checkIfUserAlreadyInCourseObject = checkIfUserAlreadyInCourseObject;
 exports.checkIfUserAlreadyInCourse = checkIfUserAlreadyInCourse;
-exports.checkIfAssignmentInCourse = checkIfAssignmentInCourse;
 exports.checkIfRequestAlreadySent = checkIfRequestAlreadySent;
 exports.createRequestToCourse = createRequestToCourse;
 exports.checkIfUserExist = checkIfUserExist;
@@ -1263,3 +1260,4 @@ exports.createAssignmentgroup = createAssignmentgroup;
 exports.getAssignmentgroupByID = getAssignmentgroupByID;
 exports.updateAssignmentgroup = updateAssignmentgroup;
 exports.deleteAssignmentgroup = deleteAssignmentgroup;
+exports.updateAssignment = updateAssignment;

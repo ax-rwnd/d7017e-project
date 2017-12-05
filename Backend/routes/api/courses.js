@@ -482,10 +482,23 @@ module.exports = function(router) {
 
     // Update an assignment
     router.put('/:course_id/assignments/:assignment_id', function (req, res, next) {
+        // imhere
+        let {course_id, assignment_id} = inputValidation.assignmentValidation(req);
+        let body = inputValidation.putAssignmentBodyValidation(req);
 
-        // TODO
-
-        return res.json({});
+        permission.checkIfAssignmentInCourse(course_id, assignment_id)
+        .then(function () {
+            return permission.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access);
+        })
+        .then(function () {
+            return queries.updateAssignment(assignment_id, body);
+        })
+        .then(function () {
+            return res.json({});
+        })
+        .catch(function (err) {
+            next(err);
+        });
     });
 
     // Delete an assignment
@@ -524,20 +537,6 @@ module.exports = function(router) {
         });
     });
 
-/*
-    //TODO: It is currently not checked if the requested assignment actually belongs to the specified course
-    router.get('/:course_id/assignments/:assignment_id', function (req, res, next) {
-        var course_id = req.params.course_id;
-        var assignment_id = req.params.assignment_id;
-
-        queries.getAssignment(assignment_id, "name description hidden languages").then(function (assignment) {
-            return res.json(assignment);
-        })
-        .catch(function (err) {
-            next(err);
-        });
-    });
-*/
 
     //submit user code to Tester service for code validation
     router.post('/:course_id/assignments/:assignment_id/submit', function(req, res, next) {
@@ -545,27 +544,24 @@ module.exports = function(router) {
         var code = req.body.code;
         var assignment_id = req.params.assignment_id;
         var course_id = req.params.course_id;
-        
-        /*if (!mongoose.Types.ObjectId.isValid(assignment_id) || !mongoose.Types.ObjectId.isValid(course_id)) {
-            return next(errors.BAD_INPUT);
-        }*/
 
         var input;
         try {
-            input = inputValidation.submitCodeValidation(req);
+            input = inputValidation.assignmentAndCourseValidation(req);
         } catch(error) {
             return next(error);
         }
 
-        return testerCom.validateCode(req.user.id, lang, code, assignment_id)
-        .then(function (testerResponse) {
-            console.log(testerResponse);
-            return res.json(testerResponse);
+        permission.checkIfAssignmentInCourse(course_id, assignment_id)
+        .then(function () {
+            return testerCom.validateCode(req.user.id, lang, code, assignment_id)
+            .then(function (testerResponse) {
+                return res.json(testerResponse);
+            });
         })
         .catch(function (err) {
             next(err);
         });
-        //testerCom.validateCode(req.user.id, lang, code, assignment_id);
     });
 
     // TODO: SHOULD BE REMOVED ONCE NEW ROUTE PATH IS USED BY FRONTEND
@@ -591,11 +587,14 @@ module.exports = function(router) {
         var code = req.body.code || "";
         var lang = req.body.lang || "";
 
-        if (!mongoose.Types.ObjectId.isValid(assignment_id) || !mongoose.Types.ObjectId.isValid(course_id)) {
-            return next(errors.BAD_INPUT);
+        var input;
+        try {
+            input = inputValidation.assignmentAndCourseValidation(req);
+        } catch(error) {
+            return next(error);
         }
 
-        queries.checkIfAssignmentInCourse(assignment_id, course_id).then(function () {
+        permission.checkIfAssignmentInCourse(course_id, assignment_id).then(function () {
             queries.saveCode(req.user.id, assignment_id, code, lang).then(function (draft) {
                 return res.status(201).json(draft);
             });
@@ -610,19 +609,14 @@ module.exports = function(router) {
         var assignment_id = req.params.assignment_id;
         var course_id = req.params.course_id;
 
-        if (!mongoose.Types.ObjectId.isValid(assignment_id) || !mongoose.Types.ObjectId.isValid(course_id)) {
-            return next(errors.BAD_INPUT);
+        var input;
+        try {
+            input = inputValidation.assignmentAndCourseValidation(req);
+        } catch(error) {
+            return next(error);
         }
 
-        /*queries.checkIfAssignmentInCourse(assignment_id, course_id).then(function () {
-            queries.getCode(req.user.id, assignment_id).then(function (draft) {
-                return res.json(draft);
-            });
-        })
-        .catch(function (err) {
-            next(err);
-        });*/
-        queries.checkIfAssignmentInCourse(assignment_id, course_id).then(function () {
+        permission.checkIfAssignmentInCourse(course_id, assignment_id).then(function () {
             queries.getCode(req.user.id, assignment_id).then(function (draft) {
                 return res.json(draft);
             });

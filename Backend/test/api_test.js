@@ -288,6 +288,7 @@ describe('/api', () => {
                         name: 'Lesson 2 in Mocha tests',
                         description: 'Write tests with Mocha',
                         hidden: false,
+                        lint: true,
                         languages: 'javascript'
                     })
                     .set('Authorization', 'Bearer ' + access_tokens.user)
@@ -309,6 +310,18 @@ describe('/api', () => {
                         assert(Array.isArray(res.body.assignments), 'should be an array');
                         assert(res.body.assignments.length > 0, 'array should not be empty');
                     });
+            });
+        });
+
+        describe('PUT /api/courses/:course_id/assignments/:assignment_id', () => {
+            it('modifies decription and tests.lint successfully', () => {
+                return request(runner.server)
+                    .put('/api/courses/' + course_id + '/assignments/' + assignment_id1)
+                    .send({
+                        description: 'Write tests with Mocha (modified)',
+                        'tests.lint': false
+                    }).set('Authorization', 'Bearer ' + access_tokens.admin)
+                    .expect(200);
             });
         });
 
