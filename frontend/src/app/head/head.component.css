@@ -24,3 +24,9 @@
   pointer-events: none;
   cursor: default;
 }
+
+.brandclass {
+  letter-spacing: 6pt;
+  font-family: serif;
+  margin-left: 0pt;
+  }
