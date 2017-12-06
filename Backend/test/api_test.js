@@ -170,7 +170,7 @@ describe('/api', () => {
 
                 assignmentgroup.name = "assignmentgroup1";
 
-                request(runner.server)
+                return request(runner.server)
                     .post('/api/courses/' + course_id + '/assignmentgroups')
                     .send(assignmentgroup)
                     .set('Authorization', 'Bearer ' + access_tokens.admin)
@@ -184,7 +184,7 @@ describe('/api', () => {
 
                 assignmentgroup.name = "assignmentgroup2";
 
-                request(runner.server)
+                return request(runner.server)
                     .post('/api/courses/' + course_id + '/assignmentgroups')
                     .send(assignmentgroup)
                     .set('Authorization', 'Bearer ' + access_tokens.admin)
