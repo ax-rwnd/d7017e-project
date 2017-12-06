@@ -208,6 +208,30 @@ module.exports = function(router) {
         });
     });
 
+    router.get('/:course_id/members/invite', function (req, res, next) {
+        var input;
+        try {
+            input = inputValidation.getMembersInviteValidation(req);
+        }
+        catch(error) {
+            return next(error);
+        }
+
+        var p;
+        p = permission.checkIfTeacherOrAdmin(req.user.id, input.course_id, req.user.access).
+            then(function () {
+                if (input.inviteType === "all") {
+                    return queries.getCourseInvites(input.course_id);
+                } else {
+                    return queries.getCourseInvites(input.course_id, input.inviteType);
+                }
+            });
+
+        p.then(function(inviteArray) {
+            return res.json({invites: inviteArray});
+        })
+        .catch(next);
+    });
 
     // TODO:
     // Tests
@@ -288,7 +312,7 @@ module.exports = function(router) {
         if (input.user_id === req.user.id) {
             p = queries.acceptInviteToCourse(input.user_id, input.course_id);
         } else {
-            p = permission.checkIfTeacherOrAdmin(input.user_id, input.course_id, req.user.access).then(function () {
+            p = permission.checkIfTeacherOrAdmin(req.user.id, input.course_id, req.user.access).then(function () {
                         return queries.acceptPendingToCourse(input.user_id, input.course_id);
                 });
         }

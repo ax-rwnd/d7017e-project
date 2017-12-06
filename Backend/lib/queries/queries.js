@@ -432,7 +432,11 @@ function deleteTest(test_id, assignment_id) {
 
 
 function getCourseInvites(course_id, type) {
-    return JoinRequest.find({inviteType: type, course: course_id}, "user -_id").populate("user", "username email");
+    if (type) {
+        return JoinRequest.find({inviteType: type, course: course_id}, "inviteType user -_id").populate("user", "username email");
+    } else {
+        return JoinRequest.find({course: course_id}, "inviteType user -_id").populate("user", "username email");
+    }
 }
 
 function getUserInvites(user_id, type) {
