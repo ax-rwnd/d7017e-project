@@ -889,57 +889,56 @@ function getCoursesEnabledFeatures(course_id) {
 }
 
 function searchDB(query, categories, user_id) {
-
-    console.log(1);
     return getAssignmentIDsByUser(user_id)
     .then(assignment_ids => {
+        return getUserCourses(user_id)
+        .then(function(course_ids) {
+            let promises = [];
+            let json = {
+                courses: [],
+                assignments: [],
+                users: []
+            };
 
-        console.log(2);
+            if(categories) {
+                categories = categories.split(',');
 
-        let promises = [];
-        let json = {
-            courses: [],
-            assignments: [],
-            users: []
-        };
-
-        if(categories) {
-            categories = categories.split(',');
-
-            if (categories.indexOf('courses') !== -1) {
-                promises.push(searchDBCourses(query, user_id));
-            }
-            if (categories.indexOf('assignments') !== -1) {
+                if (categories.indexOf('courses') !== -1) {
+                    promises.push(searchDBCourses(query, course_ids));
+                }
+                if (categories.indexOf('assignments') !== -1) {
+                    promises.push(searchDBAssignments(query, assignment_ids));
+                }
+                if (categories.indexOf('users') !== -1) {
+                    promises.push(searchDBUsers(query));
+                }
+            } else {
+                promises.push(searchDBCourses(query, course_ids));
                 promises.push(searchDBAssignments(query, assignment_ids));
-            }
-            if (categories.indexOf('users') !== -1) {
                 promises.push(searchDBUsers(query));
             }
-        } else {
-            promises.push(searchDBCourses(query, user_id));
-            promises.push(searchDBAssignments(query, assignment_ids));
-            promises.push(searchDBUsers(query));
-        }
 
-        return Promise.all(promises).then(function(results) {
+            return Promise.all(promises)
+            .then(function(results) {
 
-            for(let result of results) {
-                for(var key in result) json[key] = result[key];
-            }
+                for(let result of results) {
+                    for(var key in result) json[key] = result[key];
+                }
 
-            return json;
+                return json;
+            });
         });
     });
 }
 
-function searchDBCourses(query, user_id) {
-    return Course.find({$text: {$search: '\"'+query+'\"'}, 'students': user_id, 'hidden': false}, {score: {$meta: "textScore"}})
-        .select('-__v -hidden -features -assignments -students -enabled_features')
+function searchDBCourses(query, course_ids) {
+    return Course.find({$text: {$search: '\"'+query+'\"'}, '_id': course_ids, 'hidden': false}, {score: {$meta: "textScore"}})
+        .select('-__v -hidden -features -assignments -students -enabled_features -assignmentgroups')
+        .populate({path: 'owner', model: 'User'})
         .sort({score: {$meta: "textScore"}})
-        .limit(20).then(docs => {
-            return {'courses': docs};
-        }).catch(err => {
-            logger.log("error",err);
+        .limit(20)
+        .then(results => {
+            return {'courses': results};
         });
 }
 
@@ -947,10 +946,9 @@ function searchDBAssignments(query, assignment_ids) {
     return Assignment.find({$text: {$search: '\"'+query+'\"'}, '_id': assignment_ids, 'hidden': false}, {score: {$meta: "textScore"}})
         .select('-__v -tests -optional_tests -hidden -languages')
         .sort({score: {$meta: "textScore"}})
-        .limit(20).then(docs => {
-            return {'assignments': docs};
-        }).catch(err => {
-            logger.log("error",err);
+        .limit(20)
+        .then(results => {
+            return {'assignments': results};
         });
 }
 
@@ -958,10 +956,9 @@ function searchDBUsers(query) {
     return User.find({$text: {$search: '\"'+query+'\"'}}, {score: {$meta: "textScore"}})
         .select('-__v -tokens -providers')
         .sort({score: {$meta: "textScore"}})
-        .limit(20).then(docs => {
-            return {'users': docs};
-        }).catch(err => {
-            logger.log("error",err);
+        .limit(20)
+        .then(results => {
+            return {'users': results};
         });
 }
 
@@ -970,15 +967,9 @@ function getAssignmentIDsByUser(user_id) {
     return getUserCourses(user_id, '_id')
     .then(function(courses) {
 
-        // Get IDs of courses user is in
-        let ids = [];
-        for(let course of courses.courses) {
-            ids.push(course._id);
-        }
-
         // Get assignemnts from courses
         let assignment_promises = [];
-        for(let id of ids) {
+        for(let id of courses) {
             assignment_promises.push(getCourseAssignments(id, 'assignments')
             .then(assignment => {
                 return assignment;
@@ -1098,7 +1089,7 @@ function removeInviteOrPendingToCourse (user_id, course_id) {
         if (!inviteObject) {
             throw errors.NO_INVITE_FOUND;
         }
-    })
+    });
 }
 
 function getCourseMembers1(course_id) {

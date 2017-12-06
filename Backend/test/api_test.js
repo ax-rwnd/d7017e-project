@@ -145,7 +145,7 @@ describe('/api', () => {
         describe('PUT /api/courses/:course_id', () => {
             it('modifies the course code successfully', () => {
                 let course_updated = {
-                    name: 'Introduction to Automated Testing in JavaScript (updated)',
+                    name: 'Introduction to Automated Testing in JavaScript with small m in mocha (updated)',
                     description: 'In this course you will use Mocha and supertest to create automated tests for NodeJS applications. (updated)',
                     hidden: false,
                     course_code: 'DtestingtestingE',
@@ -724,9 +724,9 @@ describe('/api', () => {
             });
         });
 
-        describe.skip('GET /api/search', () => {
+        describe('GET /api/search', () => {
             it('Return search results', () => {
-                let query = '?query=Mocha';
+                let query = '?query=mocha';
                 let route = '/api/search';
                 return request(runner.server)
                     .get(route+query)
@@ -740,12 +740,13 @@ describe('/api', () => {
                         assert(res.body.hasOwnProperty('users'), 'Result did not have property users');
                         assert(Array.isArray(res.body.users), 'Property users was not an array');
 
+                        assert(res.body.courses.length > 0, 'Property courses was empty');
                         assert(res.body.assignments.length > 0, 'Property assignments was empty');
                     });
             });
         });
 
-        describe.skip('GET /api/search', () => {
+        describe('GET /api/search', () => {
             it('Return search results with "categories" as filter', () => {
                 let query = '?query=program&categories=users,courses';
                 let route = '/api/search';
@@ -766,7 +767,7 @@ describe('/api', () => {
             });
         });
 
-        describe.skip('GET /api/search', () => {
+        describe('GET /api/search', () => {
             it('Search with hyphen', () => {
                 let query = '?query=fake-admin-00';
                 let route = '/api/search';
