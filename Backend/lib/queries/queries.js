@@ -1163,7 +1163,7 @@ function addInviteToCourse(user_id, course_id) {
 function generateInviteCode(course_id, expiresIn) {
     var code = randomstring.generate(config.get('Courses.invite_link_length'));
     var exp = (expiresIn === "never") // Won't set expiresAt if link never expires
-        ? undefined 
+        ? undefined
         : Date.now() + (expiresIn || config.get("Courses.invite_link_ttl"));
 
     if (!mongoose.Types.ObjectId.isValid(course_id)) {
@@ -1234,7 +1234,7 @@ function getAllInviteCodes(course, userObject) {
             return codes;
         });
     });
-    
+
 }
 
 function getAssignmentgroupsByCourseID(course_id) {
@@ -1249,13 +1249,13 @@ function getAssignmentgroupsByCourseID(course_id) {
     .then(course => {
         let assignmentgroups = course.assignmentgroups;
 
-        for(let assignmentgroup of assignmentgroups) {
+        /*for(let assignmentgroup of assignmentgroups) {
             for(let assignment of assignmentgroup.assignments) {
                 if(assignment.assignment.hidden) {
                     assignmentgroup.assignments.pop(assignment);
                 }
             }
-        }
+        }*/
 
         return assignmentgroups;
     });
