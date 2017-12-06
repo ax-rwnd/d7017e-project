@@ -1066,7 +1066,19 @@ function acceptInviteToCourse(user_id, course_id) {
             throw errors.NO_INVITE_FOUND;
         }
         return Features.createFeature(user_id, course_id).then(function (featureObject) {
-            // TODO: CHANGE FEATURE FIELD
+            var memberObject = new CourseMember({role: "student", course: course_id, user: user_id, features: featureObject._id});
+            return memberObject.save();
+        });
+    });
+}
+
+function acceptPendingToCourse(user_id, course_id) {
+    return JoinRequest.findOneAndRemove({inviteType: "pending", user: user_id, course: course_id})
+    .then(function(deletedInvite) {
+        if (!deletedInvite) {
+            throw errors.NO_INVITE_FOUND;
+        }
+        return Features.createFeature(user_id, course_id).then(function (featureObject) {
             var memberObject = new CourseMember({role: "student", course: course_id, user: user_id, features: featureObject._id});
             return memberObject.save();
         });
@@ -1074,16 +1086,9 @@ function acceptInviteToCourse(user_id, course_id) {
 }
 
 function addMemberToCourse(user_id, course_id) {
-    return JoinRequest.findOneAndRemove({inviteType: "pending", user: user_id, course: course_id})
-    .then(function(deletedInvite) {
-        if (!deletedInvite) {
-            throw errors.NO_INVITE_FOUND;
-        }
-        return Features.createFeature(user_id, course_id).then(function (featureObject) {
-            // TODO: CHANGE FEATURE FIELD
-            var memberObject = new CourseMember({role: "student", course: course_id, user: user_id, features: featureObject._id});
-            return memberObject.save();
-        });
+    return Features.createFeature(user_id, course_id).then(function (featureObject) {
+        var memberObject = new CourseMember({role: "student", course: course_id, user: user_id, features: featureObject._id});
+        return memberObject.save();
     });
 }
 
@@ -1111,6 +1116,20 @@ function getUserMemberCourses1(user_id) {
 
 function getUserMemberStatus(course_id, user_id) {
     return CourseMember.findOne({user: user_id, course: course_id}, "role");
+}
+
+function getCourseAutoJoin(course_id) {
+    return Course.findById(course_id, "autojoin -_id");
+}
+
+function addPendingToCourse(user_id, course_id) {
+    var pendingObject = new JoinRequest({user: user_id, course: course_id, inviteType: "pending"});
+    return pendingObject.save();
+}
+
+function addInviteToCourse(user_id, course_id) {
+    var inviteObject = new JoinRequest({user: user_id, course: course_id, inviteType: "invite"});
+    return inviteObject.save();
 }
 
 function generateInviteLink(course_id, expiresIn) {
@@ -1218,6 +1237,10 @@ exports.getUserTeacherCourses1 = getUserTeacherCourses1;
 exports.getUserStudentCourses1 = getUserStudentCourses1;
 exports.getUserMemberCourses1 = getUserMemberCourses1;
 exports.getUserMemberStatus = getUserMemberStatus;
+exports.getCourseAutoJoin = getCourseAutoJoin;
+exports.acceptPendingToCourse = acceptPendingToCourse;
+exports.addInviteToCourse = addInviteToCourse;
+exports.addPendingToCourse = addPendingToCourse;
 
 exports.getTestsFromAssignment = getTestsFromAssignment;
 exports.findOrCreateUser = findOrCreateUser;
