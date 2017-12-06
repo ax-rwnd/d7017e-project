@@ -14,8 +14,8 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
   // Style constants
   protected width = 200;
   protected height = 200;
-  private readonly borderThickness = 2;
-  private readonly lineThickness = 1;
+  protected readonly borderThickness = 2;
+  protected readonly lineThickness = 1;
   protected radius = 4;
   protected sensitivity = this.radius;
   protected img = new Image(this.width, this.height);
@@ -150,27 +150,6 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
     });
   }
 
-    /*
-    return new Promise( (resolve: any, reject: any) => {
-      this.loadProgress()
-        .then( () => {
-          this.backendService.getCourseAssignments(this.courseCode).then((data: any) => {
-            // TODO: temporary shim to implement coords
-            this.assignments = data.assignments;
-
-            for (let i = 0; i < data.assignments.length; i++) {
-              this.assignments[i].x = i * 10;
-              this.assignments[i].y = 10;
-            }
-
-            resolve(this.assignments);
-          });
-        })
-        .catch( (err) => {
-          console.error('adventuremap failed to load assignments ', err);
-        });
-    });*/
-
   loadProgress() {
     // Load the user's course progress
 
@@ -219,7 +198,7 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
       const next = this.assignments[index + 1];
 
       ctx.beginPath();
-      ctx.lineWidth = 1;
+      ctx.lineWidth = this.lineThickness;
       ctx.strokeStyle = 'black';
       ctx.moveTo(current.coords.x, current.coords.y);
       ctx.lineTo(next.coords.x, next.coords.y);
@@ -231,14 +210,11 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
     // Draw dot
     ctx.beginPath();
     ctx.arc(current.coords.x, current.coords.y, this.radius, 0, 2 * Math.PI, false);
-
-    // TODO: this is dependent on the linearity of the responses
-    // perhaps it could be done better with cooperation from backend
     ctx.strokeStyle = 'black';
 
     // Set fill stule
     if (this.lastAssignment !== undefined &&
-        this.lastAssignment.assignment._id === current.assignment_id) {
+        this.lastAssignment._id === current._id) {
       ctx.fillStyle = 'blue';
     } else if (this.userProgress.completed_assignments >= index) {
       ctx.fillStyle = 'red';
@@ -250,10 +226,10 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
     // Set stroke style
     if (this.selectedAssignment !== undefined &&
       this.selectedAssignment.assignment_id === current.assignment_id) {
-      ctx.lineWidth = 2;
+      ctx.lineWidth = this.borderThickness;
       ctx.strokeStyle = '#5f5';
     } else {
-      ctx.lineWidth = 1;
+      ctx.lineWidth = this.borderThickness;
       ctx.strokeStyle = 'black';
     }
 
