@@ -754,7 +754,7 @@ describe('/api', () => {
     });
 
     describe('tester', () => {
-        describe.skip('POST /api/courses/:course_id/assignments/:assignment_id/submit', () => {
+        describe('POST /api/courses/:course_id/assignments/:assignment_id/submit', () => {
             it('run assignments tests', () => {
                 return request(runner.server)
                     .post('/api/courses/' + course_id + '/assignments/' + assignment_id1 + '/submit')

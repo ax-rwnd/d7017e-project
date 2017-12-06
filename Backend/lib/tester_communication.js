@@ -66,7 +66,7 @@ function validateCode(user_id, lang, code, assignment_id) {
                         logger.log("error",'Tester returned', response.statusCode);
                     }
                     logger.log("error",error);
-                    return error;
+                    reject(error);
                     //res.sendStatus(response.statusCode);
                 } else {
 
