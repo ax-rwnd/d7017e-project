@@ -793,9 +793,6 @@ describe('/api', () => {
                     })
                     .expect(200)
                     .then(res => {
-                        // TODO
-                        console.log("SUBMIT RESPONSE");
-                        console.log(res.body);
                         assert(assignment_id1 == res.body.assignment_id, 'response is not contain the correct assignment_id');
                     });
             });
