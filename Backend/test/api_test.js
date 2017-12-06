@@ -427,25 +427,6 @@ describe('/api', () => {
             });
         });
 
-        describe('POST /api/courses/:course_id/assignments/:assignment_id/submit', () => {
-
-            it('run assignments tests', () => {
-                return request(runner.server)
-                    .post('/api/courses/' + course_id + '/assignments/' + assignment_id1 + '/submit')
-                    .set('Authorization', 'Bearer ' + access_tokens.user)
-                    .send({
-                        'lang': 'python3',
-                        'code': 'print(\"sockerkaka\")'
-                    })
-                    .expect(200)
-                    .then(res => {
-                        console.log(res.body);
-                        //assert(res.body.passed == true);
-                        assert(assignment_id1 == res.body.assignment_id, 'response does not contain the correct assignment_id');
-                    });
-            });
-        });
-
         describe('POST /:course_id/assignments/:assignment_id/draft', () => {
             it('saves an empty draft to the database', () => {
                 return request(runner.server)
@@ -801,7 +782,7 @@ describe('/api', () => {
     });
 
     describe('tester', () => {
-        describe.skip('POST /api/courses/:course_id/assignments/:assignment_id/submit', () => {
+        describe('POST /api/courses/:course_id/assignments/:assignment_id/submit', () => {
             it('run assignments tests', () => {
                 return request(runner.server)
                     .post('/api/courses/' + course_id + '/assignments/' + assignment_id1 + '/submit')
