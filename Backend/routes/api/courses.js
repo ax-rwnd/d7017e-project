@@ -182,32 +182,30 @@ module.exports = function(router) {
     });
 
 
-
-
-    // TODO
-    // Documentation
-    // TESTS
-    //
-    // Admin and teacher of course can get all current outstanding invites to the course.
-    router.get('/:course_id/students/invite', function (req, res, next) {
-        var course_id = req.params.course_id;
-
-        if (!mongoose.Types.ObjectId.isValid(course_id)) {
-            return next(errors.BAD_INPUT);
+    router.get('/:course_id/members/invite', function (req, res, next) {
+        var input;
+        try {
+            input = inputValidation.getMembersInviteValidation(req);
+        }
+        catch(error) {
+            return next(error);
         }
 
-        permission.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
-        .then(function () {
-            return queries.getCourseInvites(course_id, "invite");
-        })
-        .then(function (courseInvites) {
-            return res.json(courseInvites);
-        })
-        .catch(function (error) {
-            return next(error);
-        });
-    });
+        var p;
+        p = permission.checkIfTeacherOrAdmin(req.user.id, input.course_id, req.user.access).
+            then(function () {
+                if (input.inviteType === "all") {
+                    return queries.getCourseInvites(input.course_id);
+                } else {
+                    return queries.getCourseInvites(input.course_id, input.inviteType);
+                }
+            });
 
+        p.then(function(inviteArray) {
+            return res.json({invites: inviteArray});
+        })
+        .catch(next);
+    });
 
     // TODO:
     // Tests
@@ -284,11 +282,12 @@ module.exports = function(router) {
         catch(error) {
             return next(error);
         }
+
         var p;
         if (input.user_id === req.user.id) {
             p = queries.acceptInviteToCourse(input.user_id, input.course_id);
         } else {
-            p = permission.checkIfTeacherOrAdmin(input.user_id, input.course_id, req.user.access).then(function () {
+            p = permission.checkIfTeacherOrAdmin(req.user.id, input.course_id, req.user.access).then(function () {
                         return queries.acceptPendingToCourse(input.user_id, input.course_id);
                 });
         }
@@ -298,45 +297,28 @@ module.exports = function(router) {
         .catch(next);
     });
 
-    // TODO
-    // Documentation
-    // Test
-    //
-    // Admin and teacher of course can remove an already made invite.
-    // User can decline (remove) an recieved invite to :course_id.
-    router.delete('/:course_id/students/invite', function (req, res, next) {
-        var course_id = req.params.course_id;
-        var student_id = req.body.student_id;
 
-        if (!student_id) {
-            student_id = req.user.id;
+    router.delete('/:course_id/members/invite', function (req, res, next) {
+        var input;
+        try {
+            input = inputValidation.deleteMembersInviteValidation(req);
         }
-
-        if (!mongoose.Types.ObjectId.isValid(student_id) || !mongoose.Types.ObjectId.isValid(course_id)) {
-            return next(errors.BAD_INPUT);
-        }
-
-        // First check if deleting own invitation then
-        // Remove invitation if own. If not own check if admin/teacher of course then
-        // remove invitation
-        // Thrown errors will halt execution
-        queries.returnPromiseForChainStart()
-        .then(function () {
-            if (student_id === req.user.id) {
-                return queries.findAndRemoveRequest(student_id, course_id, "invite");
-            } else {
-                return permission.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
-                .then(function () {
-                  return queries.findAndRemoveRequest(student_id, course_id, "invite");
-                });
-            }
-        })
-        .then(function () {
-            return res.sendStatus(200).json({});
-        })
-        .catch(function (error) {
+        catch(error) {
             return next(error);
-        });
+        }
+
+        var p;
+        if (input.user_id === req.user.id) {
+            p = queries.removeInviteOrPendingToCourse(input.user_id, input.course_id);
+        } else {
+            p = permission.checkIfTeacherOrAdmin(req.user.id, input.course_id, req.user.access).then(function () {
+                        return queries.removeInviteOrPendingToCourse(input.user_id, input.course_id);
+                });
+        }
+        p.then(function () {
+            return res.status(200).json({});
+        })
+        .catch(next);
     });
 
 

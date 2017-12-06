@@ -433,7 +433,11 @@ function deleteTest(test_id, assignment_id) {
 
 
 function getCourseInvites(course_id, type) {
-    return JoinRequest.find({inviteType: type, course: course_id}, "user -_id").populate("user", "username email");
+    if (type) {
+        return JoinRequest.find({inviteType: type, course: course_id}, "inviteType user -_id").populate("user", "username email");
+    } else {
+        return JoinRequest.find({course: course_id}, "inviteType user -_id").populate("user", "username email");
+    }
 }
 
 function getUserInvites(user_id, type) {
@@ -1089,6 +1093,14 @@ function addMemberToCourse(user_id, course_id) {
     });
 }
 
+function removeInviteOrPendingToCourse (user_id, course_id) {
+    return JoinRequest.findOneAndRemove({user:user_id, course: course_id}).then(function(inviteObject) {
+        if (!inviteObject) {
+            throw errors.NO_INVITE_FOUND;
+        }
+    })
+}
+
 function getCourseMembers1(course_id) {
     return CourseMember.find({course: course_id}, "role user -_id").populate("user", "username email");
 }
@@ -1238,6 +1250,7 @@ exports.getCourseAutoJoin = getCourseAutoJoin;
 exports.acceptPendingToCourse = acceptPendingToCourse;
 exports.addInviteToCourse = addInviteToCourse;
 exports.addPendingToCourse = addPendingToCourse;
+exports.removeInviteOrPendingToCourse = removeInviteOrPendingToCourse;
 
 exports.getTestsFromAssignment = getTestsFromAssignment;
 exports.findOrCreateUser = findOrCreateUser;
