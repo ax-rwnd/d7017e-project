@@ -96,6 +96,7 @@ export class CoursesComponent implements OnInit {
     this.tests = {};
   }
 
+  /*
   toggleView() {
     this.teacherViewBool = !this.teacherViewBool;
     if (this.teacherViewBool) {
@@ -107,8 +108,11 @@ export class CoursesComponent implements OnInit {
       this.currentCourse = this.currentCourseSaved;
     }
   }
+  */
 
   /* Decides if toggle button should be shown. */
+
+  /*
   toggleHelper(): boolean {
     const myCourse = this.userService.userInfo.teaching.find((curr) => curr._id === this.currentCourseSaved.id);
     if (myCourse !== undefined) {
@@ -116,6 +120,8 @@ export class CoursesComponent implements OnInit {
     }
     return false;
   }
+  */
+
 }
 
 interface AssignmentGroup {
