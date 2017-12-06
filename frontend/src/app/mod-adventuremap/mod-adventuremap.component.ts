@@ -23,6 +23,7 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
   // Backend state
   private userProgress: any;
   protected assignments: any[];
+  protected assignmentGroups: any[];
 
   // Frontend state
   protected lastAssignment: any;
@@ -87,7 +88,7 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
 
   setTextValues() {
     // Set the assignment text and url
-      // Update map
+
     this.assignmentText = (this.selectedAssignment === undefined) ?
                           'Pick an assignment' : this.selectedAssignment.name;
     this.assignmentId = (this.selectedAssignment === undefined) ?
@@ -104,11 +105,18 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
         this.setTextValues();
 
         this.drawMap();
+      })
+      .catch(err => {
+        console.error('adventuremap failed to update', err);
       });
   }
 
   loadAssignments() {
     // Load assingments for the map
+    this.backendService.getAssignmentGroupsCourse(this.courseCode).then((data: any) => {
+      this.assignmentGroups = data.assignmentgroups;
+    })
+      .catch((err) => console.error('could not get groups in adventuremap', err));
 
     return new Promise( (resolve: any, reject: any) => {
       this.loadProgress()
@@ -126,8 +134,7 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
           });
         })
         .catch( (err) => {
-          console.error('failed loading progress in adventuremap', err);
-          reject(err);
+          console.error('adventuremap failed to load assignments ', err);
         });
     });
   }
@@ -139,7 +146,10 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
       this.backendService.getFeaturesCourseMe(this.courseCode).then( (data: any) => {
         this.userProgress = data;
         resolve(this.userProgress);
-      });
+      })
+        .catch(err => {
+          console.error('adventuremap failed to load progress', err);
+        });
     });
   }
 

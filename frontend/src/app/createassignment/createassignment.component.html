@@ -1,85 +1,74 @@
 <app-head></app-head>
 
 <div id="cont" class="content" [@content]="sidebarState">
-<div class="container">
-  <h2>Create Assignment</h2>
-  <div class="form-group">
-    <h4>Assignment name:</h4>
-    <input (text)="assignmentName" class="form-control" placeholder="Hello Assignment" [(ngModel)]="assignmentName">
-    <input type="checkbox" name="linttest" (click)="testLint()" class="question" tooltip="asd">Test code syntax using lint
-    <button type="button" class="question" tooltip="Test code syntax using lint"><span class="glyphicon glyphicon-question-sign"></span></button>
-  </div>
+  <div class="container">
+    <h2>Create Assignment</h2>
+    <div class="form-group">
 
-  <!--
-  <div id="assignmentDescription" appScroller>
-    <div ace-editor [(text)]="content" [mode]="'markdown'" [theme]="'eclipse'" [options]="{maxLines: 1000, printMargin: false}" [readOnly]="false" [autoUpdateContent]="true" [durationBeforeCallback]="1000"(textChanged)="onChange(content)"  style="min-height: 100%; width:100%; overflow: auto;">
+      <h4>Assignment name:</h4>
+      <input (text)="assignmentName" class="form-control" placeholder="Hello Assignment" [(ngModel)]="assignmentName">
+      <input type="checkbox" name="linttest" (click)="testLint()" class="question" tooltip="asd">Test code syntax using lint
+      <button type="button" class="question" tooltip="Test code syntax using lint"><span class="glyphicon glyphicon-question-sign"></span></button>
     </div>
-  </div>
-  <div id="preview" appScroller>
-    <div Markdown [data]="content" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/themes/prism.min.css"></div>
-  </div>
-  -->
-  <div id="desc">
-    <h4>Description</h4>
-    <tabset>
-      <tab heading="Write" id="tab1">
+
+    <div id="desc">
+      <h4>Description</h4>
+
+      <tabset>
+        <tab heading="Write" id="tab1">
         <div class="assignmentDescription" appScroller>
-          <div ace-editor [(text)]="content" [mode]="'markdown'" [theme]="'eclipse'" [options]="{maxLines: 1000, printMargin: false}" [readOnly]="false" [autoUpdateContent]="true" [durationBeforeCallback]="1000"(textChanged)="onChange(content)"  style="min-height: 500px; width:100%; overflow: auto;"></div>
+          <!-- Ace Editor for the assignment body -->
+
+          <div ace-editor [(text)]="content" [mode]="'markdown'" [theme]="'eclipse'"
+            [options]="{maxLines: 1000, printMargin: false}" [readOnly]="false" [autoUpdateContent]="true"
+            [durationBeforeCallback]="1000"(textChanged)="onChange(content)" 
+            style="min-height: 500px; width:100%; overflow: auto;"></div>
         </div>
-      </tab>
-      <tab heading="Preview">
-        <div class="preview" appScroller>
-          <div Markdown [data]="content" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/themes/prism.min.css"></div>
-        </div>
-      </tab>
-    </tabset>
-  </div>
+        </tab>
+        <tab heading="Preview">
+          <!-- Markdown preview -->
 
-  <div>
-    <!--<button class="btn" (click)="openModal(markdownTutorial)">markdown guide</button>-->
-
-    <a href="https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet">Markdown guide</a>
-
-  </div>
-
-  <div id="addTests">
-    <h4>Code tests</h4>
-    <button class="btn btn-primary" (click)="openModal(testModal)">Add Test</button>
-  </div>
-
-  <div *ngFor='let fb of unitTests' id="test">
-    <div id="testInfo">
-      <h4>{{fb[0]}} Test</h4>
-      <div *ngIf="fb[1]"> Input: {{fb[1]}} </div>
-      <div *ngIf="fb[2]"> Output: {{fb[2]}} </div>
+          <div class="preview" appScroller>
+            <div Markdown [data]="content" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/themes/prism.min.css"></div>
+          </div>
+        </tab>
+      </tabset>
     </div>
-    <div id="testEdit">
-      <div style="align:right">
-        <button class="btn btn-primary" (click)="openModalEdit(editTest); testType=fb[0]; editT=unitTests.indexOf(fb)">Edit test</button>
+
+    <div>
+      <a href="https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet">Markdown guide</a>
+    </div>
+
+    <div id="addTests">
+      <h4>Code tests</h4>
+      <button class="btn btn-primary" (click)="openModal(testModal)">Add Test</button>
+    </div>
+
+    <!-- Test editing section -->
+    <div *ngFor='let fb of unitTests' id="test">
+      <div id="testInfo">
+        <h4>{{fb[0]}} Test</h4>
+        <div *ngIf="fb[1]"> Input: {{fb[1]}} </div>
+        <div *ngIf="fb[2]"> Output: {{fb[2]}} </div>
+      </div>
+      <div id="testEdit">
+        <div style="align:right">
+          <button class="btn btn-primary" (click)="openModalEdit(editTest); testType=fb[0]; editT=unitTests.indexOf(fb)">Edit test</button>
+        </div>
       </div>
     </div>
-  </div>
-  <!--
-     <h4>{{fb}} test</h4>
 
-<div class="dropdown" style="float:left;">
-      <button class="dropbtn">Add tests</button>
-      <div class="dropdown-content" style="left:0;">
-        <a (click)="addTest('io')">I/O test</a>
-        <a (click)="addTest('lint')">Lint test</a>
-        <a (click)="addTest('codeSize')">CodeSize test</a>
-      </div>
+    <div id="footer">
+      <button class="btn btn-primary" (click)="submitNewAssignment()">Submit Assignment</button>
     </div>
-  -->
 
   </div>
-</div>
-<div id="footer">
-  <button class="btn btn-primary" (click)="submitNewAssignment()">Submit Assignment</button>
 </div>
 
 
 <ng-template #testModal>
+  <!-- A modal dialog for creating and modifying tests -->
+
   <div class="modal-header">
     <h4 class="modal-title pull-left">Add I/O Test to assignment</h4>
     <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">

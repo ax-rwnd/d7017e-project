@@ -134,8 +134,10 @@ export class CreatecourseComponent implements OnInit {
   updateCourse(enabled_features: Object) {
     this.backendService.updateCourse(this.course.id, this.form.value.name, this.content,
       !this.form.value.nothidden, this.form.value.code, enabled_features, this.form.value.autojoin)
-      .then((response: any) => { // when put, should get back empty object
-        location.reload();
+      .then((response: any) => {
+        // update course in courseService so don't have to refresh page
+        this.courseService.updateTeacherCourse(this.course.id, this.form.value.name, this.content,
+          !this.form.value.nothidden, this.form.value.code, enabled_features, this.form.value.autojoin);
         this.toastService.success('Course updated!');
         console.log(response);
       })
@@ -157,7 +159,7 @@ export class CreatecourseComponent implements OnInit {
       badges: this.course ? this.course.enabled_features.badges : false,
       map: this.course ? this.course.enabled_features.adventuremap : false,
       leaderboard: this.course ? this.course.enabled_features.leaderboard : false,
-      public: this.course ? !this.course.hidden : false, // if it's not hidden it is public
+      nothidden: this.course ? !this.course.hidden : false, // if it's not hidden it is public
       autojoin: this.course ? this.course.autojoin : false,
     });
   }
@@ -184,7 +186,7 @@ function createCourseForm() {
     badges: new FormControl(false),
     map: new FormControl(false),
     leaderboard: new FormControl(false),
-    public: new FormControl(false),
+    nothidden: new FormControl(false),
     autojoin: new FormControl(false),
   });
 }

@@ -129,19 +129,31 @@ The structure below is the following:
   getMyCourses() {
     // Get courses that the logged in user is participating in as a 'student'
 
-    return this.apiGet('/api/users/me/courses');
+    return this.apiGet('/api/users/me/member?role=student');
   }
 
   getMyTeachedCourses() {
     // Get courses that the current user has write permissions for, i.e. as a 'teacher'
 
-    return this.apiGet('/api/users/me/teaching');
+    return this.apiGet('/api/users/me/member?role=teacher');
   }
 
   getFeaturesCourseMe (course_id: string) {
     // Get feature state for a user in a course
 
     return this.apiGet('/api/courses/' + course_id + '/features/me');
+  }
+
+  getMyPendingReq() {
+    // Get user's pending request invites to a course
+
+    return this.apiGet('/api/users/me/invites?type=pending');
+  }
+
+  getMyInvites() {
+    // Get user's invites to a course
+
+    return this.apiGet('/api/users/me/invites?type=invite');
   }
 
 // ---------- 2. USER(S) calls --------- //
@@ -177,6 +189,12 @@ The structure below is the following:
     // Get details for a specific course
 
     return this.apiGet('/api/courses/' + id);
+  }
+
+  getCourseStudents(course_id: string) {
+    // Get students in a course
+
+    return this.apiGet('/api/courses/' + course_id + '/members');
   }
 
   deleteCourse(course_id: string) {
@@ -258,6 +276,18 @@ The structure below is the following:
     return this.apiGet('/api/courses/' + course_id + '/assignments/' + assignment_id);
   }
 
+  getAssignmentGroupsCourse(course_id: string) {
+    // Find the assignment groups for the course
+
+    return this.apiGet('/api/courses/' + course_id + '/assignmentgroups');
+  }
+
+  getAssignmentGroup(course_id: string, assignmentgroup_id: string) {
+    // Retrieve an assignment group
+
+    return this.apiGet('/api/courses/' + course_id + '/assignmentgroups/' + assignmentgroup_id);
+  }
+
 // -- Create, update and submit -- //
 
   createAssignment(course_id: any, assignmentName: string, description: string, languages: string[]) {
@@ -312,17 +342,19 @@ The structure below is the following:
 
 // -- Invite(s) -- //
 
-  getMyInvites() {
-    // Find invites for me
+  /*
+ getMyInvites() {
+   // Find invites for me
 
-    return this.apiGet('/api/users/courses/invite');
-  }
+   return this.apiGet('/api/users/courses/invite');
+ }
+ */
 
-  postInvitationToCourse(course_id: ObjectID, student_id: ObjectID) {
-    // Send an invitation for a student to join a course
+  postInvitationToCourse(course_id: string, student_id: string) {
+    // Send an invitation for a student to join a course, if user sends its id it's a join request to a course
 
     const body = {'student_id': student_id};
-    return this.apiPost('/api/courses/' + course_id + '/students/invite', body);
+    return this.apiPost('/api/courses/' + course_id + '/members/invite', body);
   }
 
   acceptInvite(course_id: ObjectID, student_id: ObjectID) {
@@ -336,14 +368,17 @@ The structure below is the following:
 
 // -- Pending -- //
 
-  getMyPendingRequests() {
-    return this.apiGet('/api/users/courses/pending');
-  }
+  /*
+getMyPendingRequests() {
+  return this.apiGet('/api/users/courses/pending');
+}
+*/
 
   getPendingUsers(course_id) {
     // Get the users waiting to join a course
 
-    return this.apiGet('/api/courses/' + course_id + '/students/pending');
+    // return this.apiGet('/api/courses/' + course_id + '/students/pending');
+    return this.apiGet('/api/courses/' + course_id + '/students/invite');
   }
 
   acceptPending(student_id, course_id) {
@@ -381,5 +416,15 @@ The structure below is the following:
     // TODO: is this still relevant?
 
     return this.apiGet('/auth/login/ltu?ticket=' + ticket + '&service=' + service);
+  }
+
+// -- Invite link -- //
+  getInviteLink(course: string) {
+    return this.apiGet('/api/courses/' + course + '/invitelink ');
+  }
+
+// -- Join invite link -- //
+  joinInviteLink(hash: string) {
+    return this.apiGet('/api/courses/join/' + hash);
   }
 }

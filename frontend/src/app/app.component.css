@@ -7,11 +7,15 @@
   margin-left: var(--wSidebar);
 }
 
-.courseTitle {
+.course-title {
   color: #20202c;
   padding-left: 5%;
   text-transform: uppercase;
   font-weight: 100;
+}
+
+.no-courses-text {
+  margin-left: 6%;
 }
 
 /* Sidebar */

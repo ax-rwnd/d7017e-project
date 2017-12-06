@@ -12,6 +12,7 @@ import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import { BackendService } from '../services/backend.service';
 import { ToastService } from '../services/toast.service';
 import {UserService} from '../services/user.service';
+import { environment } from '../../environments/environment';
 import { DragulaService } from 'ng2-dragula';
 
 @Component({
@@ -32,8 +33,9 @@ export class TeacherCoursesComponent implements OnInit {
   teachCourses: any;
   sidebarState; // state of sidebar
   progress: any;
+  students: any[] = [];
+  teachers: any[] = [];
   currentCourse: any;
-  currentCourseSaved: any;
   possibleStudents: any[];
   form: FormGroup;
   modalRef: BsModalRef;
@@ -42,7 +44,6 @@ export class TeacherCoursesComponent implements OnInit {
     search: ''
   };
   groupName: string;
-  teacherViewBool = false;
   selectedBadge: string;
   badges: Array<Object> = [
     {key: 'bronze_medal_badge', name: 'Bronze medal'},
@@ -64,6 +65,7 @@ export class TeacherCoursesComponent implements OnInit {
   tests: any;
   badgeName: string;
   badgeDescription: string;
+  inviteLink: string;
   groups: any[];
   options_bag = {
   };
@@ -102,27 +104,53 @@ export class TeacherCoursesComponent implements OnInit {
 
     this.route.params.subscribe( (params: any) => {
       // Grab the current course
-      this.currentCourse = this.courseService.GetCourse(params.course);
-      this.currentCourseSaved = this.currentCourse;
-      console.log('course', this.currentCourse);
+      this.setCurrentCourse(params.course);
       // Assign groups for assignments
-      if (this.assignmentService.courseAssignments[this.currentCourse.id] !== undefined) {
+      this.setAssignments();
+      // Get pending requests
+      this.setPendingReqs();
+
+    });
+  }
+
+  setPendingReqs() {
+    this.backendService.getPendingUsers(this.currentCourse.id)
+      .then(response => {
+        console.log('pending', response);
+        this.pendingReqs = response;
+      })
+      .catch(err => console.error('Get pending users failed', err));
+  }
+
+  setCurrentCourse(course) {
+    this.currentCourse = this.courseService.GetCourse(course);
+
+    // Grab enrolled students
+    this.backendService.getCourseStudents(course).then((data: any) => {
+      for (const member of data.members) {
+        if (member.role === 'student') {
+          this.students.push(member);
+        } else if (member.role === 'teacher') {
+          this.teachers.push(member);
+        }
+      }
+      console.log('members', data.members);
+    })
+      .catch(err => console.error('failed to get members', err));
+
+    console.log('course', this.currentCourse);
+  }
+
+  setAssignments() {if (this.assignmentService.courseAssignments[this.currentCourse.id] !== undefined) {
         this.assignmentGroups = this.assignmentService.courseAssignments[this.currentCourse.id];
-        // this.assignmentGroups = this.assignmentService.courseAssignments['default'];
-        console.log('assignments', this.assignmentGroups);
+        // this.assignmentGroups = this.assignmentService.courseAssignments['default'];console.log('assignments', this.assignmentGroups);
       } else {
         this.assignmentGroups = this.assignmentService.courseAssignments['default'];
         console.log('assignments', this.assignmentGroups);
       }
       this.selectedAssignments = [{'assignment': this.flattenAssignments()[0], 'possible': this.flattenAssignments()}];
 
-      this.backendService.getPendingUsers(this.currentCourse.id)
-        .then(response => {
-          console.log('pending', response);
-          this.pendingReqs = response;
-        })
-        .catch(err => console.error('Get pending users failed', err));
-    });
+
   }
 
   ngOnInit() {
@@ -236,6 +264,12 @@ export class TeacherCoursesComponent implements OnInit {
     this.backendService.postNewBadge(this.selectedBadge, this.badgeName, this.badgeDescription, this.currentCourse.id,
       [], assignments)
       .then(response => console.log('badge created: ', response));
+  }
+
+  generateInviteLink() {
+    this.backendService.getInviteLink(this.currentCourse.id).then((resp: any) => {
+      this.inviteLink = environment.frontend_ip + '/join/' + resp.code;
+    });
   }
 
 }

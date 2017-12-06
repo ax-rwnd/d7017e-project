@@ -26,16 +26,6 @@ export class ModAdventuremapEditorComponent extends ModAdventuremapComponent imp
 
   }
 
-    /*  ngAfterViewInit() {
-    this.canvas = this.mapCanvas.nativeElement;
-    this.context = this.canvas.getContext('2d');
-    this.update();
-
-    // Allow users to select assignments
-    this.canvas.addEventListener('click',
-      this.handleClick(), false);
-  }*/
-
   drawPoint(ctx: CanvasRenderingContext2D, current: any, index: number) {
     // Draw the points in a manner relevant to the subclass
 
@@ -54,11 +44,13 @@ export class ModAdventuremapEditorComponent extends ModAdventuremapComponent imp
       ctx.lineWidth = 1;
       ctx.strokeStyle = 'black';
     }
-    ctx.stroke();
 
+    ctx.stroke();
   }
 
   handleClick() {
+    // Handle the event that the user clicks the map
+
     return (ev: any) => {
       // Hittest the nodes
       const rect: any = (this as any).canvas.getBoundingClientRect();
