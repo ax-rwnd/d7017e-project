@@ -16,18 +16,26 @@ export class CourseService {
   }
 
   CreateCourse(id, name, code, course_info, progress, score, badges, leaderboard) {
+    // Create a course and populate it/fill with some defaults
+
+    // Setup values/defaults
     const progValue = progress ? 0 : false;
     const scoreValue = score ? 0 : false;
     const badgesArr = badges ? [] : false;
     const lbArr = leaderboard ? [{name: 'anonymous', score: 20}, {name: 'anonymous', score: 10}, {name: 'you', score: 10},
         {name: 'anonymous', score: 0}, {name: 'anonymous', score: 0}] : false;
     const progress_assignments = newProgress(0, 0);
+
+    // TODO: this should probably be class?
     return newCourse(id, name, code, course_info, newRewards(progValue, scoreValue, badgesArr, lbArr), progress_assignments);
   }
 
   GetCourse(courseId) {
+    // Find a course with some ID
+
     const parti = this.courses.find((current) => current.id === courseId);
     const teach = this.teaching.find((current) => current.id === courseId);
+
     return (parti === undefined) ? teach : parti;
   }
 
@@ -36,25 +44,30 @@ export class CourseService {
   }
 
   GetAllCoursesForUser() {
+    // Find all courses belonging to a user
+    // Basically a passthrough for updateCourses?
+
     const promise = new Promise((resolve, reject) => {
       this.backendService.getMyCourses()
         .then(response => {
-          console.log('getCoursesForUser', response);
-         // getTeachCourses(response, this.backendService, this);
+
           updateCourses(response, this.backendService, this, this.assignmentService)
             .then(resolve)
             .catch(reject);
         })
         .catch(reject);
     });
+
     return promise;
   }
 
   GetAllTeachingCourses() {
+    // Find all courses that a users teaches
+
     const promise = new Promise((resolve, reject) => {
       this.backendService.getMyTeachedCourses()
         .then( response => {
-          console.log('getTeacherCourse:', response);
+
           getTeachCourses(response, this.backendService, this, this.assignmentService)
             .then(resolve)
             .catch(reject);
@@ -65,16 +78,23 @@ export class CourseService {
   }
 
   addTeacherCourse(course) {
+    // Add a teacher to a course
+
+    // Add the course to the local list of courses teached
     this.teaching.push(newTeachCourse(course));
+
+    // Add course to the list of courses in the database
     setAssignmentsForCourse(course._id, this.backendService, this.assignmentService)
       .then( done => {
         return this.teachCourses.next(this.teaching);
       })
-      .catch(err => { console.log('err in catch', err);
+      .catch(err => { console.log('err in', this.addTeacherCourse.name, err);
       });
   }
 
   updateTeacherCourse(id: string, name: string, content: string, hidden: boolean, code: string, en_feat: Object, autojoin: boolean) {
+    // Update some properties of a course
+
     const course = this.GetCourse(id);
     course.name = name;
     course.course_info = content;
@@ -82,13 +102,14 @@ export class CourseService {
     course.code = code;
     course.enabled_features = en_feat;
     course.autojoin = autojoin;
+
     return this.teachCourses.next(this.teaching);
   }
 
   UpdateCourseProgress(courseId, progress) {
     // Updates the progress field of the course, not to be confused with reward.progress
-    let i;
-    for (i = 0; i < this.courses.length; i++) {
+
+    for (let i = 0; i < this.courses.length; i++) {
       if (this.courses[i].id === courseId) {
         this.courses[i].progress = progress;
       }
@@ -109,21 +130,27 @@ export class CourseService {
 
   GetProgress(courseId) {
     // Returns progress for a course
-    let course: Course;
-    course = this.GetCourse(courseId);
+
+    const course: Course = this.GetCourse(courseId);
     return  (course.progress.completed / course.progress.total) * 100;
   }
 
-  GetTeacherStudentViewHelper(Course) {
-    return getTeacherStudentView(Course, this.backendService, this, this.assignmentService).then(res => {
+  GetTeacherStudentViewHelper(course) {
+    // TODO: is this used?
+
+    return getTeacherStudentView(course, this.backendService, this, this.assignmentService).then(res => {
       return res;
     });
   }
 }
 
 function getTeachCourses(response, backendService, courseService, assignmentService) {
+  // Get the courses that a user is teaching
+  // TODO: fixthis
+
   const courses = response.teaching;
   const promiseArray = [];
+
   console.log('Teachresponse:', response);
   for (let i = 0; i < courses.length; i++) {
     promiseArray.push(backendService.getCourse(courses[i]._id)
@@ -131,12 +158,16 @@ function getTeachCourses(response, backendService, courseService, assignmentServ
           courseService.teaching.push(newTeachCourse(course));
       })
       .catch());
+
     promiseArray.push(setAssignmentsForCourse(courses[i]._id, backendService, assignmentService));
   }
+
   return Promise.all(promiseArray);
 }
 
 function setAssignmentsForCourse(course_id, backendService, assignmentService): Promise<any> {
+  // Add assignments to a course
+
   return new Promise((resolve, reject) => {
     backendService.getCourseAssignments(course_id)
       .then(assignmentsResponse => {
@@ -213,6 +244,8 @@ function updateCourseFeatures(courseId, backendService, courseService) {
 
 function getCourseIndex(courseId, courseService) {
   // Returns the index of the given course
+  // TODO: why do we need the index again?
+
   let i;
   for (i = 0; i < courseService.courses.length; i++) {
     if (courseService.courses[i].id === courseId) {
@@ -223,10 +256,12 @@ function getCourseIndex(courseId, courseService) {
 }
 
 function handleFeatureResponse(response: any) {
-  let progress;
+  // TODO: is this used?
+
   const score = false;
-  let badges;
   const leaderboard = false;
+  let progress;
+  let badges;
   if (response.progress !== undefined) {
     progress = response.progress;
   } else {
@@ -234,6 +269,8 @@ function handleFeatureResponse(response: any) {
   }
   if (response.badges !== undefined) {
     badges = [];
+
+    // TODO: HARDCODED!
     for (let i = 0; i < response.badges.length; i++) {
       if (response.badges[i] === '59ff02b9d86066321c71afce') {
         badges[badges.length] = 'bronze_medal_badge';
@@ -246,6 +283,9 @@ function handleFeatureResponse(response: any) {
   }
   return newRewards(progress, score, badges, leaderboard);
 }
+
+// TODO: interfaces are useful because they don't add any overhead, they're removed at compile-time
+//   either keep interfaces and use them properly or replace them with classes
 
 function newTeachCourse(course: Object) {
   const code = course.hasOwnProperty('course_code') ? course['course_code'] : '';
