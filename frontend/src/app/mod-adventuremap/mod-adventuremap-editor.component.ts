@@ -26,17 +26,31 @@ export class ModAdventuremapEditorComponent extends ModAdventuremapComponent imp
 
   }
 
-  ngAfterViewInit() {
-    this.canvas = this.mapCanvas.nativeElement;
-    this.context = this.canvas.getContext('2d');
-    this.update();
+  drawPoint(ctx: CanvasRenderingContext2D, current: any, index: number) {
+    // Draw the points in a manner relevant to the subclass
 
-    // Allow users to select assignments
-    this.canvas.addEventListener('click',
-      this.handleClick(), false);
+    // Fill the point
+    ctx.beginPath();
+    ctx.arc(current.x, current.y, this.radius, 0, 2 * Math.PI, false);
+    ctx.fillStyle = 'red';
+    ctx.fill();
+
+    // Stroke the border
+    if (this.selectedAssignment !== undefined &&
+      this.selectedAssignment._id === current._id) {
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = '#5f5';
+    } else {
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = 'black';
+    }
+
+    ctx.stroke();
   }
 
   handleClick() {
+    // Handle the event that the user clicks the map
+
     return (ev: any) => {
       // Hittest the nodes
       const rect: any = (this as any).canvas.getBoundingClientRect();

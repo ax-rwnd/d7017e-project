@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { BsModalRef } from 'ngx-bootstrap/modal/modal-options.class';
@@ -63,7 +63,8 @@ export class CoursesComponent implements OnInit {
 
   constructor(private courseService: CourseService, private route: ActivatedRoute, private headService: HeadService,
               private fb: FormBuilder, private assignmentService: AssignmentService, private modalService: BsModalService,
-              private backendService: BackendService, private toastService: ToastService, private userService: UserService) {
+              private backendService: BackendService, private toastService: ToastService, private userService: UserService,
+              private router: Router) {
 
     // Subscribe to the sidebar state
     this.headService.stateChange.subscribe(sidebarState => {
@@ -83,13 +84,6 @@ export class CoursesComponent implements OnInit {
         console.log('assignments', this.assignmentGroups);
       }
 
-      this.backendService.getPendingUsers(this.currentCourse.id)
-        .then(response => {
-          console.log('pending', response);
-          this.pendingReqs = response;
-        })
-        .catch(err => console.error('Get pending users failed', err));
-
     });
   }
 
@@ -99,115 +93,7 @@ export class CoursesComponent implements OnInit {
     this.possibleStudents = [];
     this.selectedBadge = 'bronze_medal_badge';
     this.form = this.fb.group(this.defaultForm);
-    this.selectedAssignments = [{'assignment': this.flattenAssignments()[0], 'possible': this.flattenAssignments()}];
     this.tests = {};
-  }
-
-  getProgress() {
-    // Retrieve progress from courseService
-    // TODO: deprecated?
-
-    return (this.courseService.GetProgress(this.currentCourse.id));
-  }
-
-  openModal(modal, type) {
-    // Open a modal dialog box
-    if (type === 'createBadge') {
-      for (const a of this.flattenAssignments()) {
-        this.backendService.getAssignment(a.course_id, a.id)
-          .then(response => {
-            const tests = response['tests']['io'].concat(response['optional_tests']['io']);
-            for (let i = 0; i < tests.length; i++) {
-              tests[i]['checked'] = false;
-            }
-            this.tests[a.id] = tests;
-          });
-      }
-    }
-    this.modalRef = this.modalService.show(modal);
-  }
-  getTests(assignment) {
-    console.log('get tests ', assignment);
-    return this.tests[assignment.assignment['id']];
-  }
-
-  acceptAllReqs() { // iterate through pending list
-    for (const req of this.pendingReqs) {
-      this.acceptReq(req.user['_id']);
-    }
-  }
-
-  acceptReq(student_id) {
-    this.backendService.acceptPending(student_id, this.currentCourse.id)
-      .then( response => {
-        this.toastService.success('Request accepted!');
-        // console.log('Accepted req:', response); // Object error stuff, need to check, but works
-      })
-      .catch(err => console.error('Accept failed', err));
-  }
-
-  declineReq(user_id) { // need to rewrite delete in backend.service
-    console.log(user_id);
-  }
-
-  invite(student_id) {
-    // Invite a student to this course
-
-    this.backendService.postInvitationToCourse(this.currentCourse.id, student_id)
-      .then(response => this.toastService.success('Student invited!'))
-      .catch(err => console.error('Invitation failed', err));
-  }
-
-  search() {
-    // Perform a search for students through the backend
-
-    this.possibleStudents = [];
-    this.backendService.getSearch(this.form.value.search)
-      .then((response: any) => {
-
-        // Populate matches
-        for (const user of response.users as any[]) {
-          this.possibleStudents.push({name: user.username, id: user._id});
-        }
-      })
-      .catch(err => console.error('Search failed', err));
-  }
-
-  flattenAssignments() {
-    const assignments = [];
-    for (const group of this.assignmentGroups) {
-      for (const a of group.assignments) {
-        assignments.push(a);
-      }
-    }
-    return assignments;
-  }
-
-  removeGoal(index) {
-    this.selectedAssignments.splice(index, 1);
-  }
-
-  addGoal() {
-    this.selectedAssignments.push({'assignment': this.flattenAssignments()[0], 'possible': this.flattenAssignments()});
-  }
-
-  submitBadge() {
-    const assignments = [];
-
-    for (const a of this.selectedAssignments) {
-      const assignmentTests = [];
-      for (const t in this.tests[a['assignment'].id]) {
-        const test = this.tests[a['assignment'].id][t];
-        if (test['checked'] === true) {
-          assignmentTests.push(test._id);
-        }
-      }
-      assignments.push({'assignment': a['assignment'].id, 'tests': assignmentTests, 'code_size': 100});
-    }
-    console.log('submit', assignments);
-    this.backendService.postNewBadge(this.selectedBadge, this.badgeName, this.badgeDescription, this.currentCourse.id,
-      [], assignments)
-      .then(response => console.log('badge created: ', response));
   }
 
   toggleView() {

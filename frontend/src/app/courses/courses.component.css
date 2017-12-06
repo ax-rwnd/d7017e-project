@@ -1,50 +1,3 @@
-.progress-margin {
-  margin-left: 10px;
-  margin-right: 10px;
-}
-
-.glyph-button {
-  color: #133756;
-  background: none;
-  border: none;
-}
-
-.glyph-accept {
-  color: darkgreen;
-  background: none;
-  border: none;
-}
-
-.glyph-decline {
-  color: darkred;
-  background: none;
-  border: none;
-}
-
-.table-button-text {
-  font-size: 0.7em;
-}
-
-.option-text {
-  font-size: 0.7em;
-}
-
-.blue-text {
-  color: #133756;
-}
-
-.white-text {
-  color: white;
-}
-
-.assignment {
-  background-color: #133756;
-  border-radius: 0.5em;
-  padding: 2%;
-  margin: 1%;
-  color: white;
-  font-weight: normal;
-}
 
 .gamification-header {
   background-color: #133756;
@@ -52,12 +5,6 @@
   font-weight: bold;
 }
 
-.assignment-header {
-  background-color: #133756;
-  color: white;
-  font-weight: bold;
-  cursor: pointer;
-}
 
 .gamification-block {
   background-color: rgba(29, 117, 175, 0.27);
@@ -67,31 +14,4 @@
 .assignment {
   cursor: pointer;
   font-weight: bold;
-}
-
-.user-list {
-  margin-bottom: 10px;
-  background-color: rgba(29,117,175,0.27);
-}
-
-.select-list {
-  width: 90%;
-  margin-left: 10%;
-}
-
-.tests {
-  margin-left: 10%;
-  margin-right: 5px;
-}
-
-.test-box {
-  margin-left: 10px;
-}
-
-.select-remove {
-  float: left;
-}
-
-.select-block {
-  margin-bottom: 5px;
 }
