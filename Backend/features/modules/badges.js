@@ -20,10 +20,10 @@ function init(emitter, name) {
 }
 
 async function run(data) {
-
     let newBadges = [];
 
-    let feature = await helper.getFeature(data.user_id, data.assignment_id);
+    let feature = await queries.getFeatureOfUserID(data.course_id, data.user_id);
+    feature = feature.features;
 
     // Merge result with existing data
     feature.progress = mergeResultWithProgress(data, feature.progress);
@@ -37,7 +37,7 @@ async function run(data) {
         achievedNewBadge = false;
         for(let badge of badges) {
             // Calculate a new badge
-            let badge = calcBadge(feature.badges, feature.progress, badge);
+            badge = calcBadge(feature.badges, feature.progress, badge);
             if(badge !== undefined && feature.badges.indexOf(badge) === -1) {
                 let result = await queries.addBadgeToFeature(badge, feature._id);
                 newBadges.push(await queries.getBadge(badge));
@@ -83,7 +83,7 @@ function calcBadge(badges, progress, badge) {
         // Find assignment in progress
         let assignment_progress;
         for(let p of progress) {
-            if(p.assignment.equals(assignment.assignment)) {
+            if(p.assignment == assignment.assignment) {
                 assignment_progress = p;
                 break;
             }
@@ -97,7 +97,7 @@ function calcBadge(badges, progress, badge) {
         for(let test of assignment.tests) {
             let passed = false;
             for(let test_progress of assignment_progress.tests) {
-                if(test.equals(test_progress.test) && test_progress.result === true) {
+                if(test == test_progress.test && test_progress.result === true) {
                     passed = true;
                 }
             }
@@ -116,7 +116,7 @@ function calcBadge(badges, progress, badge) {
         }
     }
 
-    return badge.badge_id;
+    return badge._id;
 }
 
 exports.init = init;

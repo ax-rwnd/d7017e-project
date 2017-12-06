@@ -85,13 +85,14 @@ function getTestsFromAssignment(assignmentID) {
         path: 'optional_tests.io',
         model: 'Test'
     })
+    .lean()
     .then(function (assignment) {
         if (!assignment) {
             throw errors.ASSIGNMENT_DOES_NOT_EXIST;
         }
         var tests = {'tests':assignment.tests, 'optional_tests':assignment.optional_tests};
         return tests;
-    }); 
+    });
 
 
 }
@@ -1171,7 +1172,7 @@ function validateInviteLink(code, user_id) {
             }
         });
 
-        
+
     });
 }
 
@@ -1192,6 +1193,7 @@ function createAssignmentgroup(assignmentgroupObject, course_id) {
 
 function getAssignmentgroupByID(assignmentgroup_id) {
     return Assignmentgroup.findById(assignmentgroup_id)
+    .populate({path: 'assignments.assignment', model: 'Assignment'})
     .then(function(assignmentgroup) {
         if(assignmentgroup === null)
             throw errors.ASSIGNMENTGROUP_DO_NOT_EXIST;
