@@ -418,11 +418,17 @@ getMyPendingRequests() {
 
 // -- Invite link -- //
   getInviteLink(course: string) {
-    return this.apiGet('/api/courses/' + course + '/invitelink ');
+    const body = {expires: true};
+    return this.apiPost('/api/courses/' + course + '/invitecodes', body);
   }
 
 // -- Join invite link -- //
   joinInviteLink(hash: string) {
     return this.apiGet('/api/courses/join/' + hash);
+  }
+
+// -- Get all invite links for course -- //
+  getAllInviteLinks(course: string) {
+    return this.apiGet('/api/courses/' + course + '/invitecodes');
   }
 }
