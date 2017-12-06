@@ -73,7 +73,7 @@ export class UserComponent implements OnInit {
     this.backendService.cancelPendingJoin(course_id)
       .then(success => {
         console.log(success);
-        this.backendService.getMyPendingRequests()
+        this.backendService.getMyPendingReq()
         .then(response => {
           this.pending = response;
         });
@@ -159,7 +159,7 @@ export class UserComponent implements OnInit {
       .catch(err => console.error('Decline course invite failed', err));
   }
   getPending() {
-    this.backendService.getMyPendingRequests()
+    this.backendService.getMyPendingReq()
       .then(pending => {
         this.pending = pending;
         console.log('pending', this.pending);
