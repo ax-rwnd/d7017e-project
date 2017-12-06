@@ -70,7 +70,7 @@ export class UserComponent implements OnInit {
 
   cancelRequest(course_id) {
     console.log('request id', course_id);
-    this.backendService.cancelPendingJoin(course_id)
+    this.backendService.declineInvite(course_id, this.userService.userInfo.id)
       .then(success => {
         console.log(success);
         this.backendService.getMyPendingReq()
@@ -134,7 +134,7 @@ export class UserComponent implements OnInit {
       .catch(err => console.error('Join course request failed', err));
   }
   acceptInvite(course_id) {
-    this.backendService.acceptInvite(course_id, new ObjectID(this.userService.userInfo.id))
+    this.backendService.acceptInvite(course_id, this.userService.userInfo.id)
       .then(response => {
         console.log(response);
         this.getInvites();
@@ -142,7 +142,7 @@ export class UserComponent implements OnInit {
       .catch(err => console.error('Accept course invite failed', err));
   }
   declineInvite(course_id) {
-    this.backendService.declineInvite(course_id)
+    this.backendService.declineInvite(course_id, this.userService.userInfo.id)
       .then(response => {
         console.log(response);
         this.getInvites();
