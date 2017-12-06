@@ -22,9 +22,7 @@ export class JoinCourseComponent implements OnInit {
   }
   joinCourse(courseID: string) {
     this.backendService.joinInviteLink(courseID).then((resp: any) => {
-      console.log('join course resp: ', resp);
-      console.log('courseID: ', courseID);
-      this.router.navigate(['/courses/' + courseID]);
+      this.router.navigate(['/courses/' + resp.course]);
     }).catch( (resp: any) => {
       this.router.navigate(['/user']);
     });
