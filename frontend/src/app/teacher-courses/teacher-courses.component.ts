@@ -67,11 +67,6 @@ export class TeacherCoursesComponent implements OnInit {
   badgeDescription: string;
   inviteLink: string;
   groups: any[];
-  options_bag = {
-  };
-  options_assignments = {
-
-  };
 
   constructor(private courseService: CourseService, private route: ActivatedRoute, private headService: HeadService,
               private fb: FormBuilder, private assignmentService: AssignmentService, private modalService: BsModalService,
@@ -184,7 +179,8 @@ export class TeacherCoursesComponent implements OnInit {
   }
 
   createAssignmentGroup() {
-    this.backendService.postAssignmentGroup(this.currentCourse.id, this.groupName);
+    this.backendService.postAssignmentGroup(this.currentCourse.id, this.groupName)
+      .then(response => console.log('group', response));
   }
 
   acceptAllReqs() { // iterate through pending list
