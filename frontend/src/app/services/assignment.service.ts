@@ -1,31 +1,34 @@
 import { Injectable } from '@angular/core';
+import { BackendService } from './backend.service';
 
 @Injectable()
 export class AssignmentService {
   courseAssignments = {};
-  constructor() {
+  constructor(private backendService: BackendService) {
     const a = [{id: '1', name: 'Assignment 1', description: 'description', available: true},
       {id: '2', name: 'Assignment 2', description: 'description', available: true},
       {id: '3', name: 'Assignment 3', description: 'description', available: false},
       {id: '4', name: 'Assignment 4', description: 'description', available: false},
       {id: '5', name: 'Assignment 5', available: false}];
-    const e = [{id: '1', name: 'Exercise 1', description: 'description', available: true},
-      {id: '2', name: 'Exercise 2', description: 'description', available: true},
-      {id: '3', name: 'Exercise 3', description: 'description', available: true},
-      {id: '4', name: 'Exercise 4', description: 'description', available: true},
-      {id: '5', name: 'Exercise 5', description: 'description', available: true}];
-    /*const special = {name: 'Special exercises', collapse: true, availability: 'locked', assignments: e, groups: []};
-    const aLvl1 = {name: 'Level 1', collapse: false, availability: false, assignments: a, groups: []};
-    const aLvl2 = {name: 'Level 2', collapse: true, availability: 'unlocked', assignments: a, groups: []};
-    const aLvl3 = {name: 'Level 3', collapse: true, availability: 'unlocked', assignments: a, groups: []};
-    const eLvl1 = {name: 'Level 1', collapse: false, availability: false, assignments: e, groups: []};
-    const eLvl2 = {name: 'Level 2', collapse: true, availability: 'unlocked', assignments: e, groups: []};
-    const eLvl3 = {name: 'Level 3', collapse: true, availability: 'unlocked', assignments: e, groups: [special]};*/
     const assignmentGroups = [];
     assignmentGroups[0] = {name: 'Assignments', collapse: true, availability: false, assignments: a, groups: []};
-    assignmentGroups[1] = {name: 'Exercises', collapse: true, availability: false, assignments: e, groups: []};
     this.courseAssignments['default'] = assignmentGroups;
   }
+
+  getAssignmentsForCourse(course_id): Promise<any> {
+    // Set assignments to a course
+
+    return new Promise((resolve, reject) => {
+      this.backendService.getCourseAssignments(course_id)
+        .then(assignmentsResponse => {
+          console.log('AssignmentsResp:', assignmentsResponse);
+          this.AddCourseAssignments(course_id, assignmentsResponse['assignments']);
+          resolve();
+        })
+        .catch(reject);
+    });
+  }
+
   AddCourseAssignments(course_id: string, assignments: any[]) {
     const a = [];
     for (let i = 0; i < assignments.length; i++) {
@@ -39,7 +42,6 @@ export class AssignmentService {
       course_id = 'default';
     }
     console.log('course id ', course_id);
-    console.log('assignments', this.courseAssignments[course_id])
     for (let i = 0; i < this.courseAssignments[course_id].length; i++) {
       const a = getAssignmentHelper(this.courseAssignments[course_id][i], assignment_id);
       if (a !== false) {
