@@ -1110,7 +1110,7 @@ function removeInviteOrPendingToCourse (user_id, course_id) {
         if (!inviteObject) {
             throw errors.NO_INVITE_FOUND;
         }
-    })
+    });
 }
 
 function getCourseMembers1(course_id) {
