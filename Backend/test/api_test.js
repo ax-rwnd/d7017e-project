@@ -556,7 +556,7 @@ describe('/api', () => {
                     .set('Authorization', 'Bearer ' + access_tokens.admin)
                     .expect(200)
                     .then(res => {
-                        
+
                     });
             });
         });
@@ -750,7 +750,7 @@ describe('/api', () => {
             });
         });
 
-        describe.skip('GET /api/search', () => {
+        describe('GET /api/search', () => {
             it('Fails on bad query parameter', () => {
                 let query = '?iambad=program';
                 let route = '/api/search';
@@ -759,14 +759,12 @@ describe('/api', () => {
                     .set('Authorization', 'Bearer ' + access_tokens.user)
                     .expect(400)
                     .then(res => {
-                        console.log(res.error.text.message);
-                        console.log('Bad input. Expected: "?query=XYZ"');
-                        assert(res.error.text.message == 'Bad input. Expected: "?query=XYZ"', 'query was misspelled');
+                        assert(res.body.message == 'Bad input. Expected: "?query=XYZ"', 'query was misspelled');
                     });
             });
         });
 
-        describe.skip('GET /api/search', () => {
+        describe('GET /api/search', () => {
             it('Too short query data', () => {
                 let query = '?query=hi';
                 let route = '/api/search';
@@ -775,9 +773,7 @@ describe('/api', () => {
                     .set('Authorization', 'Bearer ' + access_tokens.user)
                     .expect(400)
                     .then(res => {
-                        console.log(res.error.text.message);
-                        console.log('Bad input. Expected query with length atleast ' + config.get('Search.min_query_length'));
-                        assert(res.error.text.message == 'Bad input. Expected query with length atleast ' + config.get('Search.min_query_length'), 'Too short query data');
+                        assert(res.body.message == 'Bad input. Expected query with length atleast ' + config.get('Search.min_query_length'), 'Too short query data');
                     });
             });
         });
