@@ -31,6 +31,8 @@ export class TeacherCoursesComponent implements OnInit {
   teachCourses: any;
   sidebarState; // state of sidebar
   progress: any;
+  students: any[] = [];
+  teachers: any[] = [];
   currentCourse: any;
   currentCourseSaved: any;
   possibleStudents: any[];
@@ -96,6 +98,20 @@ export class TeacherCoursesComponent implements OnInit {
 
   setCurrentCourse(course) {
     this.currentCourse = this.courseService.GetCourse(course);
+
+    // Grab enrolled students
+    this.backendService.getCourseStudents(course).then((data: any) => {
+      for (const member of data.members) {
+        if (member.role === 'student') {
+          this.students.push(member);
+        } else if (member.role === 'teacher') {
+          this.teachers.push(member);
+        }
+      }
+      console.log('members', data.members);
+    })
+      .catch(err => console.error('failed to get members', err));
+
     this.currentCourseSaved = this.currentCourse;
     console.log('course', this.currentCourse);
   }

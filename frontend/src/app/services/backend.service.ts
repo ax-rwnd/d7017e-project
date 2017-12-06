@@ -179,6 +179,12 @@ The structure below is the following:
     return this.apiGet('/api/courses/' + id);
   }
 
+  getCourseStudents(course_id: string) {
+    // Get students in a course
+
+    return this.apiGet('/api/courses/' + course_id + '/members');
+  }
+
   deleteCourse(course_id: string) {
     // Delete course with certain id
 

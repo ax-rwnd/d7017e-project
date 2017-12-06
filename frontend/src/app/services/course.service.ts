@@ -40,7 +40,7 @@ export class CourseService {
   }
 
   AddCourse(course) {
-    this.courses[this.courses.length] = course;
+    this.courses.push(course);
   }
 
   GetAllCoursesForUser() {
