@@ -193,11 +193,102 @@ function getMembersInviteValidation (req) {
 
     var inputError = req.validationErrors();
     if (inputError) {
-        console.log(inputError);
         throw badInput.BAD_INPUT(inputError);
     }
 
     var input = {course_id: course_id, inviteType: inviteType};
+    return input;
+}
+
+// Input Validation for GET /api/courses/:course_id/members
+function getMembersValidation (req) {
+    // required
+    var course_id;
+
+    // optional
+    var role;
+
+    //req
+    req.checkParams("course_id", "Not a valid course id").isMongoId();
+    course_id = req.params.course_id;
+
+    //optional
+    if (!req.query.role) {
+        role = "all";
+    } else {
+        req.checkQuery("role", "Not a valid invite type").isIn(['student', 'teacher']);
+
+        role = req.query.role;
+    }
+
+    var inputError = req.validationErrors();
+    if (inputError) {
+        throw badInput.BAD_INPUT(inputError);
+    }
+
+    var input = {course_id: course_id, role: role};
+    return input;
+}
+
+// Input Validation for GET /api/users/me/member
+function getMeMemberValidation (req) {
+    // optional
+    var role;
+
+    //optional
+    if (!req.query.role) {
+        role = "all";
+    } else {
+        req.checkQuery("role", "Not a valid invite type").isIn(['student', 'teacher']);
+        role = req.query.role;
+    }
+
+    var inputError = req.validationErrors();
+    if (inputError) {
+        throw badInput.BAD_INPUT(inputError);
+    }
+
+    var input = {role: role};
+    return input;
+}
+
+// Input Validation for GET /api/user/me/invites
+function getMeInvitesValidation (req) {
+    // optional
+    var type;
+
+    //optional
+    if (!req.query.type) {
+        type = "all";
+    } else {
+        req.checkQuery("type", "Not a valid invite type").isIn(['invite', 'pending']);
+        type = req.query.type;
+    }
+
+    var inputError = req.validationErrors();
+    if (inputError) {
+        throw badInput.BAD_INPUT(inputError);
+    }
+
+    var input = {type: type};
+    return input;
+}
+
+// Input Validation for GET /api/users/me/:course_id/status
+function getMeStatusValidation (req) {
+    // required
+    var course_id;
+
+    //req
+    req.checkParams("course_id", "Not a valid course id").isMongoId();
+    course_id = req.params.course_id;
+
+    var inputError = req.validationErrors();
+    if (inputError) {
+        throw badInput.BAD_INPUT(inputError);
+    }
+
+    var input = {course_id: course_id};
     return input;
 }
 
@@ -418,3 +509,7 @@ exports.assignmentValidation = assignmentValidation;
 exports.putAssignmentBodyValidation = putAssignmentBodyValidation;
 exports.getMembersInviteValidation = getMembersInviteValidation;
 exports.deleteMembersInviteValidation = deleteMembersInviteValidation;
+exports.getMembersValidation = getMembersValidation;
+exports.getMeMemberValidation = getMeMemberValidation;
+exports.getMeInvitesValidation = getMeInvitesValidation;
+exports.getMeStatusValidation = getMeStatusValidation;
