@@ -16,45 +16,35 @@
         <markdown [data]="currentCourse.course_info"></markdown>
         <br>
         <h3>Assignments</h3>
-        <div class="row wrapper">
-          <div class="col-lg-6 bottom-margin container">
+        <div class="row">
+          <div class="col-lg-6 bottom-margin">
             <h4>Groups
               <button (click)="openModal(createGroup, 'createGroup')" class="glyph-button pull-right">
                 <span class="option-text">CREATE GROUP</span>
               </button>
             </h4>
-            <span *ngIf="groups.length === 0">
+            <span *ngIf="assignmentGroups[0].groups.length === 0">
               No groups created yet...
             </span>
-          <div *ngFor="let group of groups" class="well">
-            <div dragula="bag-one" id="left{{group.name}}" [dragulaModel]='group.assignments'>
-              {{group.name}}
-              <div *ngFor='let assignment of group.assignments' class="assignment">
-                {{assignment.name}}
-                <button type="button" class="glyph-button white-text pull-right">
-                  <span class="glyphicon glyphicon-edit" style="font-size: 1.2em;"></span>
-                </button>
-              </div>
+            <div *ngFor="let group of assignmentGroups[0].groups" class="assignment">
+              {{group}}
             </div>
-
           </div>
-        </div>
-        <div class="col-lg-6 container">
-          <h4>Assignments
-            <button class="glyph-button pull-right" [routerLink]="['/courses', currentCourse.id, 'createNewAssignment']">
-              <span class="option-text">CREATE ASSIGNMENT</span>
-            </button>
-          </h4>
-          <span *ngIf="assignmentGroups[0].assignments.length === 0">
+          <div class="col-lg-6">
+            <h4>Assignments
+              <button class="glyph-button pull-right"
+                      [routerLink]="['/courses', currentCourse.id, 'createNewAssignment']">
+                <span class="option-text">CREATE ASSIGNMENT</span>
+              </button>
+            </h4>
+            <span *ngIf="assignmentGroups[0].assignments.length === 0">
               No assignments created yet...
             </span>
-            <div dragula="bag-one" id="right" [dragulaModel]='assignmentGroups[0].assignments'>
-              <div *ngFor="let assignment of assignmentGroups[0].assignments" class="assignment">
-                {{assignment.name}}
-                <button type="button" class="glyph-button white-text pull-right">
-                  <span class="glyphicon glyphicon-edit" style="font-size: 1.2em;"></span>
-                </button>
-              </div>
+            <div *ngFor="let assignment of assignmentGroups[0].assignments" class="assignment">
+              {{assignment.name}}
+              <button type="button" class="glyph-button white-text pull-right">
+                <span class="glyphicon glyphicon-edit" style="font-size: 1.2em;"></span>
+              </button>
             </div>
           </div>
         </div>
@@ -63,6 +53,8 @@
       </span>
       </div>
       <div class="col-lg-4">
+        <button type="button" class="glyph-decline" (click)="invite('5a27b809f109c87f8bfae08f')"><span
+          class="glyphicon glyphicon-ok"></span></button>
         <h4>Pending requests
           <button class="glyph-button pull-right" (click)="acceptAllReqs()">
             <span class="table-button-text">ACCEPT ALL</span>
@@ -128,7 +120,7 @@
     </div>
     <br>
     <div>
-      <label> Invite link </label>
+      <label> generate invite link </label>
       <div>
         <button class="btn" (click)="generateInviteLink()">Create invite link</button>
       </div>

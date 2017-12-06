@@ -190,7 +190,7 @@ export class TeacherCoursesComponent implements OnInit {
   }
 
   acceptReq(student_id) {
-    this.backendService.acceptPending(student_id, this.currentCourse.id)
+    this.backendService.acceptInvite(student_id, this.currentCourse.id)
       .then( response => {
         this.toastService.success('Request accepted!');
         // console.log('Accepted req:', response); // Object error stuff, need to check, but works
