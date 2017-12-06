@@ -170,7 +170,7 @@ describe('/api', () => {
 
                 assignmentgroup.name = "assignmentgroup1";
 
-                request(runner.server)
+                return request(runner.server)
                     .post('/api/courses/' + course_id + '/assignmentgroups')
                     .send(assignmentgroup)
                     .set('Authorization', 'Bearer ' + access_tokens.admin)
@@ -184,7 +184,7 @@ describe('/api', () => {
 
                 assignmentgroup.name = "assignmentgroup2";
 
-                request(runner.server)
+                return request(runner.server)
                     .post('/api/courses/' + course_id + '/assignmentgroups')
                     .send(assignmentgroup)
                     .set('Authorization', 'Bearer ' + access_tokens.admin)
@@ -205,19 +205,6 @@ describe('/api', () => {
                     .then(res => {
                         assert(Array.isArray(res.body.assignmentgroups), 'should be an array');
                         assert(res.body.assignmentgroups.length === 2, 'not length 2');
-                    });
-            });
-        });
-
-        describe('GET /api/courses/:course_id/assignmentgroups/:assignmentgroup_id', () => {
-            it('get an assignmentgroup', () => {
-                return request(runner.server)
-                    .get('/api/courses/' + course_id + '/assignmentgroups/' + assignmentgroup_id1)
-                    .set('Authorization', 'Bearer ' + access_tokens.user)
-                    .expect(200)
-                    .then(res => {
-                        assert(ObjectId.isValid(res.body._id), 'response is not a valid ObjectId');
-                        assert(assignmentgroup_id1 == res.body._id, 'response is not the requested test');
                     });
             });
         });
@@ -324,6 +311,19 @@ describe('/api', () => {
                             .then(res => {
                                 assert(res.body.assignments.length === 1, 'not length 1');
                             });
+                    });
+            });
+        });
+
+        describe('GET /api/courses/:course_id/assignmentgroups/:assignmentgroup_id', () => {
+            it('get an assignmentgroup', () => {
+                return request(runner.server)
+                    .get('/api/courses/' + course_id + '/assignmentgroups/' + assignmentgroup_id1)
+                    .set('Authorization', 'Bearer ' + access_tokens.user)
+                    .expect(200)
+                    .then(res => {
+                        assert(ObjectId.isValid(res.body._id), 'response is not a valid ObjectId');
+                        assert(assignmentgroup_id1 == res.body._id, 'response is not the requested test');
                     });
             });
         });
@@ -574,8 +574,8 @@ describe('/api', () => {
                     .set('Authorization', 'Bearer ' + access_tokens.admin)
                     .expect(200)
                     .then(res => {
-                        assert(Array.isArray(res.body.features.badges), 'not an array');
-                        assert(Array.isArray(res.body.features.progress), 'not an array');
+                        assert(Array.isArray(res.body.badges), 'not an array');
+                        assert(Array.isArray(res.body.progress), 'not an array');
                     });
             });
         });
@@ -689,7 +689,7 @@ describe('/api', () => {
         });
     });
 
-    describe.skip('/search', () => {
+    describe('/search', () => {
         describe('Check config so that minimun query length is set', () => {
             it('Minimum query length is set', () => {
                 assert(config.get('Search.min_query_length') !== undefined, 'Search.min_query_length in config is not set');
@@ -724,7 +724,7 @@ describe('/api', () => {
             });
         });
 
-        describe('GET /api/search', () => {
+        describe.skip('GET /api/search', () => {
             it('Return search results', () => {
                 let query = '?query=Mocha';
                 let route = '/api/search';
@@ -745,7 +745,7 @@ describe('/api', () => {
             });
         });
 
-        describe('GET /api/search', () => {
+        describe.skip('GET /api/search', () => {
             it('Return search results with "categories" as filter', () => {
                 let query = '?query=program&categories=users,courses';
                 let route = '/api/search';
@@ -766,7 +766,7 @@ describe('/api', () => {
             });
         });
 
-        describe('GET /api/search', () => {
+        describe.skip('GET /api/search', () => {
             it('Search with hyphen', () => {
                 let query = '?query=fake-admin-00';
                 let route = '/api/search';
@@ -782,7 +782,7 @@ describe('/api', () => {
     });
 
     describe('tester', () => {
-        describe.skip('POST /api/courses/:course_id/assignments/:assignment_id/submit', () => {
+        describe('POST /api/courses/:course_id/assignments/:assignment_id/submit', () => {
             it('run assignments tests', () => {
                 return request(runner.server)
                     .post('/api/courses/' + course_id + '/assignments/' + assignment_id1 + '/submit')
@@ -793,11 +793,9 @@ describe('/api', () => {
                     })
                     .expect(200)
                     .then(res => {
-                        // TODO
-                        console.log(res.body);
                         assert(assignment_id1 == res.body.assignment_id, 'response is not contain the correct assignment_id');
                     });
-            });
+            }).timeout(15000);
         });
 
         describe('GET /api/tester/languages', () => {

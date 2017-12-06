@@ -140,6 +140,67 @@ function putMembersInviteValidation (req) {
     return input;
 }
 
+// Input Validation for DELETE /api/courses/:course_id/members/invite
+function deleteMembersInviteValidation (req) {
+    // required
+    var course_id;
+
+    // optional
+    var user_id;
+
+    //req
+    req.checkParams("course_id", "Not a valid course id").isMongoId();
+    course_id = req.params.course_id;
+
+    //optional
+    if (!req.body.user_id) {
+        user_id = req.user.id;
+    } else {
+        req.checkBody("user_id", "Not a valid user id").isMongoId();
+        user_id = req.body.user_id;
+    }
+
+    var inputError = req.validationErrors();
+    if (inputError) {
+        throw badInput.BAD_INPUT(inputError);
+    }
+
+    var input = {course_id: course_id, user_id: user_id};
+    return input;
+}
+
+
+// Input Validation for GET /api/courses/:course_id/members/invite
+function getMembersInviteValidation (req) {
+    // required
+    var course_id;
+
+    // optional
+    var inviteType;
+
+    //req
+    req.checkParams("course_id", "Not a valid course id").isMongoId();
+    course_id = req.params.course_id;
+
+    //optional
+    if (!req.query.type) {
+        inviteType = "all";
+    } else {
+        req.checkQuery("type", "Not a valid invite type").isIn(['invite', 'pending']);
+
+        inviteType = req.query.type;
+    }
+
+    var inputError = req.validationErrors();
+    if (inputError) {
+        console.log(inputError);
+        throw badInput.BAD_INPUT(inputError);
+    }
+
+    var input = {course_id: course_id, inviteType: inviteType};
+    return input;
+}
+
 // Input Validation for checking course_id and assignment_id
 function assignmentAndCourseValidation (req) {
     var course_id; // required
@@ -412,3 +473,5 @@ exports.courseIdValidation = courseIdValidation;
 exports.assignmentValidation = assignmentValidation;
 exports.putAssignmentBodyValidation = putAssignmentBodyValidation;
 exports.postAssignmentBodyValidation = postAssignmentBodyValidation;
+exports.getMembersInviteValidation = getMembersInviteValidation;
+exports.deleteMembersInviteValidation = deleteMembersInviteValidation;
