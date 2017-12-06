@@ -417,4 +417,14 @@ getMyPendingRequests() {
 
     return this.apiGet('/auth/login/ltu?ticket=' + ticket + '&service=' + service);
   }
+
+// -- Invite link -- //
+  getInviteLink(course: string) {
+    return this.apiGet('/api/courses/' + course + '/invitelink ');
+  }
+
+// -- Join invite link -- //
+  joinInviteLink(hash: string) {
+    return this.apiGet('/api/courses/join/' + hash);
+  }
 }

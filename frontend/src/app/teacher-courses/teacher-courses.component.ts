@@ -12,6 +12,7 @@ import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import { BackendService } from '../services/backend.service';
 import { ToastService } from '../services/toast.service';
 import {UserService} from '../services/user.service';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-teacher-courses',
@@ -34,7 +35,6 @@ export class TeacherCoursesComponent implements OnInit {
   students: any[] = [];
   teachers: any[] = [];
   currentCourse: any;
-  currentCourseSaved: any;
   possibleStudents: any[];
   form: FormGroup;
   modalRef: BsModalRef;
@@ -43,7 +43,6 @@ export class TeacherCoursesComponent implements OnInit {
     search: ''
   };
   groupName: string;
-  teacherViewBool = false;
   selectedBadge: string;
   badges: Array<Object> = [
     {key: 'bronze_medal_badge', name: 'Bronze medal'},
@@ -62,6 +61,7 @@ export class TeacherCoursesComponent implements OnInit {
   tests: any;
   badgeName: string;
   badgeDescription: string;
+  inviteLink: string;
 
   constructor(private courseService: CourseService, private route: ActivatedRoute, private headService: HeadService,
               private fb: FormBuilder, private assignmentService: AssignmentService, private modalService: BsModalService,
@@ -112,7 +112,6 @@ export class TeacherCoursesComponent implements OnInit {
     })
       .catch(err => console.error('failed to get members', err));
 
-    this.currentCourseSaved = this.currentCourse;
     console.log('course', this.currentCourse);
   }
 
@@ -237,6 +236,12 @@ export class TeacherCoursesComponent implements OnInit {
     this.backendService.postNewBadge(this.selectedBadge, this.badgeName, this.badgeDescription, this.currentCourse.id,
       [], assignments)
       .then(response => console.log('badge created: ', response));
+  }
+
+  generateInviteLink() {
+    this.backendService.getInviteLink(this.currentCourse.id).then((resp: any) => {
+      this.inviteLink = environment.frontend_ip + '/join/' + resp.code;
+    });
   }
 
 }

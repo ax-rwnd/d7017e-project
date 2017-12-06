@@ -1,92 +1,99 @@
 <app-head></app-head>
 <div id="cont" class="content" [@content]="sidebarState">
   <div class="container">
-  <h1>
-    <span *ngIf="currentCourse.code">{{currentCourse.code}} - </span> {{currentCourse.name}}
-  </h1>
-  <button type="button" class="btn btn-primary" (click)="openModal(createBadge, 'createBadge')">Create badge</button>
-  <div class="row">
-    <!-- Display the course description, markdown style -->
-    <div class="col-lg-8">
-      <h3>Course
-        <button type="button" class="glyph-button" [routerLink]="['/user/updateCourse', currentCourse.id]">
-          <span class="glyphicon glyphicon-edit"></span>
-        </button>
-      </h3>
-      <markdown [data]="currentCourse.course_info"></markdown>
-      <br>
-      <h3>Assignments</h3>
-      <div class="row">
-        <div class="col-lg-6 bottom-margin">
-          <h4>Groups
-            <button (click)="openModal(createGroup, 'createGroup')" class="glyph-button pull-right">
-              <span class="option-text">CREATE GROUP</span>
-            </button>
-          </h4>
-          <span *ngIf="assignmentGroups[0].groups.length === 0">
+    <h1>
+      <span *ngIf="currentCourse.code">{{currentCourse.code}} - </span> {{currentCourse.name}}
+    </h1>
+    <button type="button" class="btn btn-primary" (click)="openModal(createBadge, 'createBadge')">Create badge</button>
+    <div class="row">
+      <!-- Display the course description, markdown style -->
+      <div class="col-lg-8">
+        <h3>Course
+          <button type="button" class="glyph-button" [routerLink]="['/user/updateCourse', currentCourse.id]">
+            <span class="glyphicon glyphicon-edit"></span>
+          </button>
+        </h3>
+        <markdown [data]="currentCourse.course_info"></markdown>
+        <br>
+        <h3>Assignments</h3>
+        <div class="row">
+          <div class="col-lg-6 bottom-margin">
+            <h4>Groups
+              <button (click)="openModal(createGroup, 'createGroup')" class="glyph-button pull-right">
+                <span class="option-text">CREATE GROUP</span>
+              </button>
+            </h4>
+            <span *ngIf="assignmentGroups[0].groups.length === 0">
               No groups created yet...
             </span>
-          <div *ngFor="let group of assignmentGroups[0].groups" class="assignment">
-            {{group}}
+            <div *ngFor="let group of assignmentGroups[0].groups" class="assignment">
+              {{group}}
+            </div>
           </div>
-        </div>
-        <div class="col-lg-6">
-          <h4>Assignments
-            <button class="glyph-button pull-right" [routerLink]="['/courses', currentCourse.id, 'createNewAssignment']">
-              <span class="option-text">CREATE ASSIGNMENT</span>
-            </button>
-          </h4>
-          <span *ngIf="assignmentGroups[0].assignments.length === 0">
+          <div class="col-lg-6">
+            <h4>Assignments
+              <button class="glyph-button pull-right"
+                      [routerLink]="['/courses', currentCourse.id, 'createNewAssignment']">
+                <span class="option-text">CREATE ASSIGNMENT</span>
+              </button>
+            </h4>
+            <span *ngIf="assignmentGroups[0].assignments.length === 0">
               No assignments created yet...
             </span>
-          <div *ngFor="let assignment of assignmentGroups[0].assignments" class="assignment">
-            {{assignment.name}}
-            <button type="button" class="glyph-button white-text pull-right">
-              <span class="glyphicon glyphicon-edit" style="font-size: 1.2em;"></span>
-            </button>
+            <div *ngFor="let assignment of assignmentGroups[0].assignments" class="assignment">
+              {{assignment.name}}
+              <button type="button" class="glyph-button white-text pull-right">
+                <span class="glyphicon glyphicon-edit" style="font-size: 1.2em;"></span>
+              </button>
+            </div>
           </div>
         </div>
-      </div>
-      <span *ngIf="currentCourse.enabled_features.adventuremap">
+        <span *ngIf="currentCourse.enabled_features.adventuremap">
         <app-mod-adventuremap-editor [courseCode]="currentCourse.id"></app-mod-adventuremap-editor>
       </span>
-    </div>
-    <div class="col-lg-4">
-      <h4>Pending requests
-        <button class="glyph-button pull-right" (click)="acceptAllReqs()">
-          <span class="table-button-text">ACCEPT ALL</span>
-        </button>
-      </h4>
-      <table class="table table-hover">
-        <tbody>
-        <tr *ngIf="pendingReqs && pendingReqs.length === 0">
-          <td>No pending requests...</td>
-        </tr>
-        <tr *ngFor="let req of pendingReqs">
-          <td>{{req.user['username']}}</td>
-          <td><button type="button" class="glyph-accept" (click)="acceptReq(req.user['_id'])"><span class="glyphicon glyphicon-ok"></span></button></td>
-          <td><button type="button" class="glyph-decline" (click)="declineReq(req.user['_id'])"><span class="glyphicon glyphicon-remove"></span></button></td>
-        </tr>
-        </tbody>
-      </table>
-      <br>
-      <h4>Enrolled students
-        <button class="glyph-button pull-right" (click)="openModal(inviteStudentModal)">
-          <span class="table-button-text">ADD STUDENT</span>
-        </button>
-      </h4>
-      <table class="table table-hover">
-        <tbody>
-        <tr *ngIf="students.length === 0">
-          <td>No students are enrolled to this course...</td>
-        </tr>
-        <tr *ngFor="let student of students">
-          <td>{{student.user.username}}</td>
-        </tr>
-        </tbody>
-      </table>
-    </div>
-  </div> <!-- for end row -->
+      </div>
+      <div class="col-lg-4">
+        <h4>Pending requests
+          <button class="glyph-button pull-right" (click)="acceptAllReqs()">
+            <span class="table-button-text">ACCEPT ALL</span>
+          </button>
+        </h4>
+        <table class="table table-hover">
+          <tbody>
+          <tr *ngIf="pendingReqs && pendingReqs.length === 0">
+            <td>No pending requests...</td>
+          </tr>
+          <tr *ngFor="let req of pendingReqs">
+            <td>{{req.user['username']}}</td>
+            <td>
+              <button type="button" class="glyph-accept" (click)="acceptReq(req.user['_id'])"><span
+                class="glyphicon glyphicon-ok"></span></button>
+            </td>
+            <td>
+              <button type="button" class="glyph-decline" (click)="declineReq(req.user['_id'])"><span
+                class="glyphicon glyphicon-remove"></span></button>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+        <br>
+        <h4>Enrolled students
+          <button class="glyph-button pull-right" (click)="openModal(inviteStudentModal)">
+            <span class="table-button-text">ADD STUDENT</span>
+          </button>
+        </h4>
+        <table class="table table-hover">
+          <tbody>
+          <tr *ngIf="students.length === 0">
+            <td>No students are enrolled to this course...</td>
+          </tr>
+          <tr *ngFor="let student of students">
+            <td>{{student.user.username}}</td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div> <!-- for end row -->
   </div>
 </div>
 
@@ -100,13 +107,29 @@
     </button>
   </div>
   <div class="modal-body">
-    <form (ngSubmit)="search()" [formGroup]="form" novalidate>
-      <div class="form-group">
-        <label for="search">Search term</label>
-        <input type="text" class="form-control" id="search" formControlName="search" ngModel required>
+    <div>
+      <form (ngSubmit)="search()" [formGroup]="form" novalidate>
+        <div class="form-group">
+          <label for="search">Search term</label>
+          <input type="text" class="form-control" id="search" formControlName="search" ngModel required>
+        </div>
+        <button class="btn" type="submit">Search</button>
+      </form>
+    </div>
+    <br>
+    <div>
+      <label> generate invite link </label>
+      <div>
+        <button class="btn" (click)="generateInviteLink()">Create invite link</button>
       </div>
-      <button class="btn" type="submit">Search</button>
-    </form>
+      <br>
+      <div>
+        <form>
+          <input type="text" class="form-control" id="inviteLink" value="{{inviteLink}}" readonly>
+        </form>
+      </div>
+
+    </div>
   </div>
   <div class="modal-body">
     <div class="well-sm user-list" *ngFor="let p of possibleStudents">
@@ -114,7 +137,9 @@
         <div class="col-md-10">
           <h4>{{p.name}}</h4>
         </div>
-        <div class="col-md-2"> <button class="btn" (click)="invite(p.id)">Invite</button> </div>
+        <div class="col-md-2">
+          <button class="btn" (click)="invite(p.id)">Invite</button>
+        </div>
       </div>
     </div>
   </div>
@@ -149,7 +174,7 @@
     <div class="form-group">
       <div class="select-block" *ngFor="let selected of selectedAssignments; let i = index">
         <button class="glyphicon glyphicon-minus btn btn-danger select-remove" (click)="removeGoal(i)"></button>
-        <select class="form-control select-list"  [(ngModel)]="selectedAssignments[i]['assignment']">
+        <select class="form-control select-list" [(ngModel)]="selectedAssignments[i]['assignment']">
           <option *ngFor="let assignment of selected['possible']" [ngValue]="assignment">{{assignment.name}}</option>
         </select>
         <div class="tests row">
@@ -157,7 +182,8 @@
             <div *ngFor="let test of tests[selected.assignment['id']]; let j = index" class="pull-left test-box">
               <label class="label-norm form-check-label">
                 <input class="form-check-input" [(ngModel)]="test['checked']" type="checkbox"> Test {{j+1}}
-                <label type="button" class="question" tooltip="Stdin: {{test['stdin']}}, Stdout: {{test['stdout']}}, Args: {{test['args']}}">
+                <label type="button" class="question"
+                       tooltip="Stdin: {{test['stdin']}}, Stdout: {{test['stdout']}}, Args: {{test['args']}}">
                   <span class="glyphicon glyphicon-question-sign"></span></label>
               </label>
             </div>
