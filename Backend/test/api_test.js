@@ -574,8 +574,8 @@ describe('/api', () => {
                     .set('Authorization', 'Bearer ' + access_tokens.admin)
                     .expect(200)
                     .then(res => {
-                        assert(Array.isArray(res.body.features.badges), 'not an array');
-                        assert(Array.isArray(res.body.features.progress), 'not an array');
+                        assert(Array.isArray(res.body.badges), 'not an array');
+                        assert(Array.isArray(res.body.progress), 'not an array');
                     });
             });
         });
@@ -689,7 +689,7 @@ describe('/api', () => {
         });
     });
 
-    describe.skip('/search', () => {
+    describe('/search', () => {
         describe('Check config so that minimun query length is set', () => {
             it('Minimum query length is set', () => {
                 assert(config.get('Search.min_query_length') !== undefined, 'Search.min_query_length in config is not set');
@@ -724,7 +724,7 @@ describe('/api', () => {
             });
         });
 
-        describe('GET /api/search', () => {
+        describe.skip('GET /api/search', () => {
             it('Return search results', () => {
                 let query = '?query=Mocha';
                 let route = '/api/search';
@@ -745,7 +745,7 @@ describe('/api', () => {
             });
         });
 
-        describe('GET /api/search', () => {
+        describe.skip('GET /api/search', () => {
             it('Return search results with "categories" as filter', () => {
                 let query = '?query=program&categories=users,courses';
                 let route = '/api/search';
@@ -766,7 +766,7 @@ describe('/api', () => {
             });
         });
 
-        describe('GET /api/search', () => {
+        describe.skip('GET /api/search', () => {
             it('Search with hyphen', () => {
                 let query = '?query=fake-admin-00';
                 let route = '/api/search';
@@ -795,7 +795,7 @@ describe('/api', () => {
                     .then(res => {
                         assert(assignment_id1 == res.body.assignment_id, 'response is not contain the correct assignment_id');
                     });
-            });
+            }).timeout(15000);
         });
 
         describe('GET /api/tester/languages', () => {

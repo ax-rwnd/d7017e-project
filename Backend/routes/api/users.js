@@ -98,19 +98,6 @@ module.exports = function (router) {
         }
     });
 
-// SHOULD BE REMOVED
-/*
-    router.get('/:user_id/courses', function (req, res, next) {
-        var user_id = req.params.user_id;
-        queries.getUserCourses(user_id, constants.FIELDS.COURSE.BASE_FIELDS).then(function (courses) {
-            return res.json(courses);
-        })
-        .catch(function (err) {
-            next(err);
-        });
-    });
-*/
-
     router.get('/me/invites', function (req, res, next) {
         var query = req.query.type;
 

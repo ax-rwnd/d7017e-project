@@ -563,17 +563,6 @@ function deleteAssignment(assignment_id, course_id) {
     });
 }
 
-function getUserCourses(id, fields) {
-    var wantedFields = fields || "name description hidden teachers students assignments course_code";
-
-    return User.findById(id, "courses").populate("courses", wantedFields).then(function (courseList) {
-        if (!courseList) {
-            throw errors.NO_COURSES_EXISTS;
-        }
-        return courseList;
-    });
-}
-
 function getUserTeacherCourses(id, fields) {
     var wantedFields = fields || "name description hidden teachers students assignments course_code";
 
@@ -896,7 +885,12 @@ function getCoursesEnabledFeatures(course_id) {
 }
 
 function searchDB(query, categories, user_id) {
-    return getAssignmentIDsByUser(user_id).then(assignment_ids => {
+
+    console.log(1);
+    return getAssignmentIDsByUser(user_id)
+    .then(assignment_ids => {
+
+        console.log(2);
 
         let promises = [];
         let json = {
@@ -969,7 +963,8 @@ function searchDBUsers(query) {
 
 // Helper function for searchDB()
 function getAssignmentIDsByUser(user_id) {
-    return getUserCourses(user_id, '_id').then(function(courses) {
+    return getUserCourses(user_id, '_id')
+    .then(function(courses) {
 
         // Get IDs of courses user is in
         let ids = [];
@@ -980,14 +975,16 @@ function getAssignmentIDsByUser(user_id) {
         // Get assignemnts from courses
         let assignment_promises = [];
         for(let id of ids) {
-            assignment_promises.push(getCourseAssignments(id, 'assignments').then(assignment => {
+            assignment_promises.push(getCourseAssignments(id, 'assignments')
+            .then(assignment => {
                 return assignment;
             }));
         }
 
         // Get assignment IDs from assignments
         let assignment_ids = [];
-        return Promise.all(assignment_promises).then(course => {
+        return Promise.all(assignment_promises)
+        .then(course => {
             for(let assignments of course) {
                 for(let assignment of assignments.assignments) {
                     assignment_ids.push(assignment._id);
@@ -1014,7 +1011,7 @@ function getHighestPermissionCourse(course_id, user_id) {
     });
 }
 
-function getUserCourses1(user_id) {
+function getUserCourses(user_id) {
     return CourseMember.find({user: user_id}).distinct('course');
 }
 
@@ -1221,7 +1218,7 @@ function deleteAssignmentgroup(assignmentgroup_id, course_id) {
     });
 }
 
-exports.getUserCourses1 = getUserCourses1;
+exports.getUserCourses = getUserCourses;
 exports.getCourses1 = getCourses1;
 exports.tempSaveMember = tempSaveMember;
 exports.getAllCourses = getAllCourses;
