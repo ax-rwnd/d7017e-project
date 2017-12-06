@@ -120,7 +120,7 @@ export class TeacherCoursesComponent implements OnInit {
     this.backendService.getPendingUsers(this.currentCourse.id)
       .then(response => {
         console.log('pending', response);
-        this.pendingReqs = response;
+        this.pendingReqs = response['invites'];
       })
       .catch(err => console.error('Get pending users failed', err));
   }
@@ -198,7 +198,7 @@ export class TeacherCoursesComponent implements OnInit {
   }
 
   acceptReq(student_id) {
-    this.backendService.acceptInvite(student_id, this.currentCourse.id)
+    this.backendService.acceptInvite(this.currentCourse.id, student_id)
       .then( response => {
         this.toastService.success('Request accepted!');
         // console.log('Accepted req:', response); // Object error stuff, need to check, but works
@@ -206,8 +206,12 @@ export class TeacherCoursesComponent implements OnInit {
       .catch(err => console.error('Accept failed', err));
   }
 
-  declineReq(user_id) { // need to rewrite delete in backend.service
-    console.log(user_id);
+  declineReq(student_id) { // need to rewrite delete in backend.service
+    this.backendService.declineInvite(this.currentCourse.id, student_id)
+    .then( response => {
+      this.toastService.success('Invitation removed!');
+    })
+    .catch(err => console.error('Invitation remove failed', err));
   }
 
   invite(student_id) {
