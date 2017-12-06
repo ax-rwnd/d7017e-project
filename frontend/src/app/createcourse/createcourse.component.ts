@@ -139,7 +139,7 @@ export class CreatecourseComponent implements OnInit {
         this.courseService.updateTeacherCourse(this.course.id, this.form.value.name, this.content,
           !this.form.value.nothidden, this.form.value.code, enabled_features, this.form.value.autojoin);
         this.toastService.success('Course updated!');
-        console.log(response);
+        window.scrollTo({left: 0, top: 0, behavior: 'smooth'});
       })
       .catch(err => console.error('Update course failed:', err));
   }

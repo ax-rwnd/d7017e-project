@@ -71,7 +71,7 @@ export class CourseService {
     this.teaching.push(nCourse);
 
     // Add assignments to the course that have been created
-    setAssignmentsForCourse(course['_id'], this.backendService, this.assignmentService)
+    this.assignmentService.getAssignmentsForCourse(course['_id'])
       .then( done => {
         return this.teachCourses.next(this.teaching);
       })
@@ -129,22 +129,9 @@ function getTeachCourses(response: Object, backendService, courseService, assign
         courseService.teaching.push(nCourse);
       })
       .catch());
-    promiseArray.push(setAssignmentsForCourse(course._id, backendService, assignmentService)); // Set assignments for assignments
+    promiseArray.push(assignmentService.getAssignmentsForCourse(course._id)); // Set assignments for assignments
   }
   return Promise.all(promiseArray);
-}
-
-function setAssignmentsForCourse(course_id, backendService, assignmentService): Promise<any> {
-  // Set assignments to a course
-
-  return new Promise((resolve, reject) => {
-    backendService.getCourseAssignments(course_id)
-      .then(assignmentsResponse => {
-        assignmentService.AddCourseAssignments(course_id, assignmentsResponse.assignments);
-        resolve();
-      })
-      .catch(reject);
-  });
 }
 
 function updateCourses(response, backendService, courseService, assignmentService) {
