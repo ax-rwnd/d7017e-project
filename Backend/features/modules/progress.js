@@ -19,19 +19,20 @@ function init(emitter, name) {
 }
 
 function run(data) {
+
     let progress = {};
 
     return queries.getFeatureOfUserID(data.course_id, data.user_id)
     .then(function(feature) {
-        feature = feature.features;
         return queries.updateFeatureProgress(data.user_id, feature._id, data.assignment_id, helper.prepareProgressData(data))
         .then(function() {
             return queries.getFeatureOfUserID(data.course_id, data.user_id)
             .then(function(feature) {
                 return queries.getNumberOfAssignments(data.course_id)
                 .then(function(numberOfAssignments) {
+
                     progress.total = numberOfAssignments;
-                    progress.completed = feature.features.progress.length;
+                    progress.completed = feature.progress.length;
 
                     return progress;
                 });

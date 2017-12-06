@@ -36,28 +36,23 @@ function emitEvent(result) {
         result.passed = helper.passAllMandatoryTests(result);
 
         if(!result.passed) {
-            resolve(result);
-            return;
+            return resolve(result);
         }
 
-        //queries.getFeatureOfUserID(result.course_id, result.user_id)
-        //.then(function(feature) {
-        //    console.log(feature);
-        //helper.getFeature(result.user_id, result.assignment_id).then(function(feature) {
-            emitter.emit('handleFeatures', result)
-            .then(function(data) {
-                result.features = createResultjson(data);
-                resolve(result);
-            });
-        //}).catch(function(err) {
-        //    throw new Error(err);
-        //});
+        emitter.emit('handleFeatures', result)
+        .then(function(data) {
+            result.features = createResultjson(data);
+            return resolve(result);
+        })
+        .catch(function(err) {
+            throw new Error(err);
+        });
     });
 }
 
 function createResultjson(data) {
     let json = {};
-    
+
     data.forEach(function(item) {
 
         if(Object.keys(item).length != 1) {

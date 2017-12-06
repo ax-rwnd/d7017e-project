@@ -111,12 +111,15 @@ module.exports = function (router) {
         }
     });
 
+<<<<<<< HEAD
     // TODO:
     // Tests
     // Documentation
     //
     // User can get invites he have recieved and requests he have sent.
     // Query parameter "type" take either "pending" or "invite" if user only wants one type of invites.
+=======
+>>>>>>> a28e82aebc08b14985e7580d1c802434cf383a5a
     router.get('/me/invites', function (req, res, next) {
         var input;
         try {

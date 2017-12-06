@@ -145,7 +145,7 @@ describe('/api', () => {
         describe('PUT /api/courses/:course_id', () => {
             it('modifies the course code successfully', () => {
                 let course_updated = {
-                    name: 'Introduction to Automated Testing in JavaScript (updated)',
+                    name: 'Introduction to Automated Testing in JavaScript with small m in mocha (updated)',
                     description: 'In this course you will use Mocha and supertest to create automated tests for NodeJS applications. (updated)',
                     hidden: false,
                     course_code: 'DtestingtestingE',
@@ -257,10 +257,10 @@ describe('/api', () => {
                         name: 'Introduction to Mocha tests',
                         description: 'Write tests with Mocha',
                         hidden: false,
-                        lint: true,
+                        tests: {lint: true},
                         languages: 'javascript'
                     })
-                    .set('Authorization', 'Bearer ' + access_tokens.user)
+                    .set('Authorization', 'Bearer ' + access_tokens.admin)
                     .expect(201)
                     .then(res => {
                         assert(ObjectId.isValid(res.body._id), 'response is not a valid ObjectId');
@@ -275,10 +275,10 @@ describe('/api', () => {
                         name: 'Lesson 2 in Mocha tests',
                         description: 'Write tests with Mocha',
                         hidden: false,
-                        lint: true,
+                        tests: {lint: true},
                         languages: 'javascript'
                     })
-                    .set('Authorization', 'Bearer ' + access_tokens.user)
+                    .set('Authorization', 'Bearer ' + access_tokens.admin)
                     .expect(201)
                     .then(res => {
                         assert(ObjectId.isValid(res.body._id), 'response is not a valid ObjectId');
@@ -574,8 +574,8 @@ describe('/api', () => {
                     .set('Authorization', 'Bearer ' + access_tokens.admin)
                     .expect(200)
                     .then(res => {
-                        assert(Array.isArray(res.body.features.badges), 'not an array');
-                        assert(Array.isArray(res.body.features.progress), 'not an array');
+                        assert(Array.isArray(res.body.badges), 'not an array');
+                        assert(Array.isArray(res.body.progress), 'not an array');
                     });
             });
         });
@@ -689,7 +689,7 @@ describe('/api', () => {
         });
     });
 
-    describe.skip('/search', () => {
+    describe('/search', () => {
         describe('Check config so that minimun query length is set', () => {
             it('Minimum query length is set', () => {
                 assert(config.get('Search.min_query_length') !== undefined, 'Search.min_query_length in config is not set');
@@ -726,7 +726,7 @@ describe('/api', () => {
 
         describe('GET /api/search', () => {
             it('Return search results', () => {
-                let query = '?query=Mocha';
+                let query = '?query=mocha';
                 let route = '/api/search';
                 return request(runner.server)
                     .get(route+query)
@@ -740,6 +740,7 @@ describe('/api', () => {
                         assert(res.body.hasOwnProperty('users'), 'Result did not have property users');
                         assert(Array.isArray(res.body.users), 'Property users was not an array');
 
+                        assert(res.body.courses.length > 0, 'Property courses was empty');
                         assert(res.body.assignments.length > 0, 'Property assignments was empty');
                     });
             });
@@ -795,7 +796,7 @@ describe('/api', () => {
                     .then(res => {
                         assert(assignment_id1 == res.body.assignment_id, 'response is not contain the correct assignment_id');
                     });
-            });
+            }).timeout(15000);
         });
 
         describe('GET /api/tester/languages', () => {

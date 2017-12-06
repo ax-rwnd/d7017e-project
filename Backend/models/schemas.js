@@ -20,9 +20,9 @@ var assignmentSchema = new Schema({
         io: [{ type: Schema.Types.ObjectId, ref: 'Test', required: false }],
         lint: Boolean
     },
-    languages: [String]
+    languages: [{type: String, required: true}]
 });
-assignmentSchema.index({name: 'text', description: 'text'}, {weights: {name: 5, description: 1}});
+assignmentSchema.index({name: 'text', description: 'text'}, {weights: {name: 10, description: 1}});
 
 var assignmentgroupSchema = new Schema({
     name: {type: String, required: true},
@@ -100,7 +100,7 @@ var courseSchema = new Schema({
         adventuremap: Boolean
     }
 });
-courseSchema.index({course_code: 'text', name: 'text', description: 'text'}, {weights: {course_code: 10, name: 5, description: 1}});
+courseSchema.index({course_code: 'text', name: 'text', description: 'text'}, {weights: {course_code: 50, name: 10, description: 1}});
 
 /*
 * Feature schemas

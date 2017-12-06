@@ -142,11 +142,31 @@ function getFeaturesOfCourse(course_id) {
          json.features = [];
 
          return CourseMembers.find({course: course_id}, 'features')
-         .populate({path: 'features', model: 'Features'})
+         .populate({
+             path: 'features', model:'Features',
+             populate: [
+                 {
+                     path: 'user', model: 'User'
+                 },{
+                     path: 'badges', model: 'Badge'
+                 },{
+                     path: 'progress.tests.test', model: 'Test'
+                 },{
+                     path: 'progress.assignment', model: 'Assignment'
+                 },{
+                     path: 'progress.assignment.optional_tests.io', model: 'Test'
+                 },{
+                     path: 'progress.assignment.tests.io', model: 'Test'
+                 }
+             ]})
          .lean()
          .then(function(features) {
              for(let feature of features) {
-                 feature.completed_assignments = feature.features.progress.length;
+                 feature = feature.features;
+                 
+                 delete feature.user.tokens;
+
+                 feature.completed_assignments = feature.progress.length;
                  json.features.push(feature);
              }
              return json;
@@ -156,13 +176,33 @@ function getFeaturesOfCourse(course_id) {
 
 function getFeatureOfUserID(course_id, user_id) {
     return CourseMembers.findOne({course: course_id, user: user_id}, 'features')
-    .populate({path: 'features', model:'Features'})
+    .populate({
+        path: 'features', model:'Features',
+        populate: [
+            {
+                path: 'user', model: 'User'
+            },{
+                path: 'badges', model: 'Badge'
+            },{
+                path: 'progress.tests.test', model: 'Test'
+            },{
+                path: 'progress.assignment', model: 'Assignment'
+            },{
+                path: 'progress.assignment.optional_tests.io', model: 'Test'
+            },{
+                path: 'progress.assignment.tests.io', model: 'Test'
+            }
+        ]})
     .lean()
     .then(function(feature) {
+        feature = feature.features;
+
+        delete feature.user.tokens;
+
         return getNumberOfAssignments(course_id)
         .then(function(total_assignments) {
             feature.total_assignments = total_assignments;
-            feature.completed_assignments = feature.features.progress.length;
+            feature.completed_assignments = feature.progress.length;
             return feature;
         });
     });

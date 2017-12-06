@@ -20,10 +20,10 @@ function init(emitter, name) {
 }
 
 async function run(data) {
+
     let newBadges = [];
 
     let feature = await queries.getFeatureOfUserID(data.course_id, data.user_id);
-    feature = feature.features;
 
     // Merge result with existing data
     feature.progress = mergeResultWithProgress(data, feature.progress);
