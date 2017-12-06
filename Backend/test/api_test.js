@@ -54,7 +54,7 @@ describe('/api', () => {
     let assignment_id1;
     let assignment_id2;
     let test_id;
-    let invitelink;
+    let invitecode;
     let badge_id;
     let badge_id2;
 
@@ -484,31 +484,31 @@ describe('/api', () => {
             });
         });
 
-        describe('GET /api/courses/:course_id/invitelink', () => {
-            it('Generate invite link', () => {
+        describe('POST /api/courses/:course_id/invitecodes', () => {
+            it('Generate invite code', () => {
                 return request(runner.server)
-                    .get('/api/courses/' + course_id + '/invitelink')
+                    .post('/api/courses/' + course_id + '/invitecodes')
                     .set('Authorization', 'Bearer ' + access_tokens.admin)
                     .expect(201)
                     .then(res => {
                         assert(res.body.code, 'does not return a code');
                         assert.equal(res.body.course, course_id);
 
-                        invitelink = res.body.code;
+                        invitecode = res.body.code;
                     });
             });
-            it('Try generating invite link without permission', () => {
+            it('Try generating invite code without permission', () => {
                 return request(runner.server)
-                    .get('/api/courses/' + course_id + '/invitelink')
+                    .post('/api/courses/' + course_id + '/invitecodes')
                     .set('Authorization', 'Bearer ' + access_tokens.user)
                     .expect(403);
             });
         });
 
-        describe('GET /api/courses/join/:code', () => {
-            it('Join a course using an invite link', () => {
+        describe('POST /api/courses/invitecodes/:code/join', () => {
+            it('Join a course using an invite code', () => {
                 return request(runner.server)
-                    .get('/api/courses/join/' + invitelink)
+                    .post('/api/courses/invitecodes/' + invitecode + '/join')
                     .set('Authorization', 'Bearer ' + access_tokens.user)
                     .expect(200)
                     .then(res => {
@@ -516,6 +516,45 @@ describe('/api', () => {
                         assert.equal(res.body.course, course_id);
                         assert.equal(res.body.role, "student");
                         assert(res.body.features, "did not return user");
+                    });
+            });
+        });
+
+        describe('GET /api/courses/invitecodes/:code', () => {
+            it('Get an invite code', () => {
+                return request(runner.server)
+                    .get('/api/courses/invitecodes/' + invitecode)
+                    .set('Authorization', 'Bearer ' + access_tokens.admin)
+                    .expect(200)
+                    .then(res => {
+                        assert.equal(res.body.course, course_id);
+                        assert.equal(res.body.code, invitecode);
+                        assert.equal(res.body.uses, 1);
+                    });
+            });
+        });
+
+        describe('GET /api/courses/:course_id/invitecodes', () => {
+            it('Get all invite codes', () => {
+                return request(runner.server)
+                    .get('/api/courses/' + course_id + '/invitecodes')
+                    .set('Authorization', 'Bearer ' + access_tokens.admin)
+                    .expect(200)
+                    .then(res => {
+                        
+                    });
+            });
+        });
+
+        describe('DELETE /api/courses/invitecodes/:code', () => {
+            it('Revoke an invite code', () => {
+                return request(runner.server)
+                    .delete('/api/courses/invitecodes/' + invitecode)
+                    .set('Authorization', 'Bearer ' + access_tokens.admin)
+                    .expect(200)
+                    .then(res => {
+                        assert.equal(res.body.course, course_id);
+                        assert.equal(res.body.code, invitecode);
                     });
             });
         });
