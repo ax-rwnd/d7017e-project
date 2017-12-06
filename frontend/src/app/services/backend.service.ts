@@ -350,20 +350,21 @@ The structure below is the following:
  }
  */
 
-  postInvitationToCourse(course_id: ObjectID, student_id: ObjectID) {
-    // Send an invitation for a student to join a course
+  postInvitationToCourse(course_id: string, student_id: string) {
+    // Send an invitation for a student to join a course, if user sends its id it's a join request to a course
 
     const body = {'student_id': student_id};
-    return this.apiPost('/api/courses/' + course_id + '/students/invite', body);
+    return this.apiPost('/api/courses/' + course_id + '/members/invite', body);
   }
 
-  acceptInvite(course_id: ObjectID, student_id: ObjectID) {
-    return this.apiPut('/api/courses/' + course_id + '/students/invite', {'student_id': student_id});
+  acceptInvite(course_id: string, student_id: string) {
+    const body = {'student_id': student_id};
+    return this.apiPut('/api/courses/' + course_id + '/members/invite', body);
   }
 
-  declineInvite(course_id: ObjectID) {
-    const body = {};
-    return this.apiDelete('/api/courses/' + course_id + '/students/invite', body);
+  declineInvite(course_id: string, student_id: string) {
+    const body = {'student_id': student_id};
+    return this.apiDelete('/api/courses/' + course_id + '/members/invite', body);
   }
 
 // -- Pending -- //
@@ -378,26 +379,7 @@ getMyPendingRequests() {
     // Get the users waiting to join a course
 
     // return this.apiGet('/api/courses/' + course_id + '/students/pending');
-    return this.apiGet('/api/courses/' + course_id + '/students/invite');
-  }
-
-  acceptPending(student_id, course_id) {
-    // Admin or teacher can accept an request to join the course.
-
-    const body = {'student_id': student_id};
-    return this.apiPut('/api/courses/' + course_id + '/students/pending', body);
-  }
-
-  postJoinRequest(course_id: ObjectID, student_id: ObjectID) {
-    // Send a request to join a course
-
-    const body = {'student_id': student_id};
-    return this.apiPost('/api/courses/' + course_id + '/students/pending', body);
-  }
-
-  cancelPendingJoin(course_id: ObjectID) {
-    const body = {};
-    return this.apiDelete('/api/courses/' + course_id + '/students/pending', body);
+    return this.apiGet('/api/courses/' + course_id + '/members/invite?type=pending');
   }
 
 // ----------- 7. OTHER calls ----------- //

@@ -3,35 +3,23 @@ import {BackendService} from './backend.service';
 import {AssignmentService} from './assignment.service';
 import {assign} from 'rxjs/util/assign';
 import { Subject } from 'rxjs/Subject';
+import {Course} from '../../course';
+import {Reward} from '../../reward';
 
 @Injectable()
 export class CourseService {
   courses: Course[];
   teaching: Course[];
-  teachCourses = new Subject<Course[]>();
+  teachCourses = new Subject<Course[]>(); // to subscribe on the teaching array, will only change when create course
   updated = false;
   constructor(private backendService: BackendService, private assignmentService: AssignmentService) {
     this.courses = [];
     this.teaching = [];
   }
 
-  CreateCourse(id, name, code, course_info, progress, score, badges, leaderboard) {
-    // Create a course and populate it/fill with some defaults
-
-    // Setup values/defaults
-    const progValue = progress ? 0 : false;
-    const scoreValue = score ? 0 : false;
-    const badgesArr = badges ? [] : false;
-    const lbArr = leaderboard ? [{name: 'anonymous', score: 20}, {name: 'anonymous', score: 10}, {name: 'you', score: 10},
-        {name: 'anonymous', score: 0}, {name: 'anonymous', score: 0}] : false;
-    const progress_assignments = newProgress(0, 0);
-
-    // TODO: this should probably be class?
-    return newCourse(id, name, code, course_info, newRewards(progValue, scoreValue, badgesArr, lbArr), progress_assignments);
-  }
-
-  GetCourse(courseId) {
-    // Find a course with some ID
+  GetCourse(courseId: string): Course {
+    // Find a course with some ID from the either courses (student) or teaching array
+    // Used for ex get the current course in course component
 
     const parti = this.courses.find((current) => current.id === courseId);
     const teach = this.teaching.find((current) => current.id === courseId);
@@ -39,11 +27,9 @@ export class CourseService {
     return (parti === undefined) ? teach : parti;
   }
 
-  AddCourse(course) {
-    this.courses.push(course);
-  }
-
   GetAllCoursesForUser() {
+    // Will fetch all courses for user from backend
+
     const promise = new Promise((resolve, reject) => {
       this.backendService.getMyCourses() // student, array with courses
         .then(response => {
@@ -73,14 +59,19 @@ export class CourseService {
     return promise;
   }
 
-  addTeacherCourse(course) {
+  addTeacherCourse(course: Object) {
     // Add a teacher to a course
 
     // Add the course to the local list of courses teached
-    this.teaching.push(newTeachCourse(course));
+    // this.teaching.push(newTeachCourse(course));
+    const code = course.hasOwnProperty('course_code') ? course['course_code'] : '';
+    const rewards = newRewards('', '', '', '');
+    const nCourse = newCourse(course['_id'], course['name'], code, course['description'], rewards, '', course['hidden'],
+      course['enabled_features'], course['stundents'], course['teachers'], course['autojoin']);
+    this.teaching.push(nCourse);
 
-    // Add course to the list of courses in the database
-    setAssignmentsForCourse(course._id, this.backendService, this.assignmentService)
+    // Add assignments to the course that have been created
+    setAssignmentsForCourse(course['_id'], this.backendService, this.assignmentService)
       .then( done => {
         return this.teachCourses.next(this.teaching);
       })
@@ -88,32 +79,21 @@ export class CourseService {
       });
   }
 
-  updateTeacherCourse(id: string, name: string, content: string, hidden: boolean, code: string, en_feat: Object, autojoin: boolean) {
+  updateTeacherCourse(course_id: string, name: string, info: string, hidden: boolean, code: string, en_feat: Object, autojoin: boolean) {
     // Update some properties of a course
 
-    const course = this.GetCourse(id);
+    const course = this.GetCourse(course_id);
     course.name = name;
-    course.course_info = content;
+    course.course_info = info;
     course.hidden = hidden;
     course.code = code;
     course.enabled_features = en_feat;
     course.autojoin = autojoin;
-
     return this.teachCourses.next(this.teaching);
   }
 
-  UpdateCourseProgress(courseId, progress) {
-    // Updates the progress field of the course, not to be confused with reward.progress
-
-    for (let i = 0; i < this.courses.length; i++) {
-      if (this.courses[i].id === courseId) {
-        this.courses[i].progress = progress;
-      }
-    }
-  }
-
   UpdateCourse(courseId) {
-    // Fetches the course with the given id from backend and replace the current version
+    // Fetches the features from course with the given id from backend and replace the current version
     // Returns a promise
 
     const promise = new Promise((resolve, reject) => {
@@ -122,13 +102,6 @@ export class CourseService {
         .catch(reject);
     });
     return promise;
-  }
-
-  GetProgress(courseId) {
-    // Returns progress for a course
-
-    const course: Course = this.GetCourse(courseId);
-    return  (course.progress.completed / course.progress.total) * 100;
   }
 
   GetTeacherStudentViewHelper(course) {
@@ -140,25 +113,29 @@ export class CourseService {
   }
 }
 
-function getTeachCourses(response, backendService, courseService, assignmentService) {
+function getTeachCourses(response: Object, backendService, courseService, assignmentService): Promise<any> {
   // Get all info for each teach course the user has
 
-  const courses = response.courses;
+  const courses = response['courses']; // Array of courses
   const promiseArray = [];
   for (let i = 0; i < courses.length; i++) {
     const course = courses[i].course;
-    promiseArray.push(backendService.getCourse(course._id)
+    promiseArray.push(backendService.getCourse(course._id) // Fetch info for each course from database
       .then(info => {
-        courseService.teaching.push(newTeachCourse(info));
+        const code = course.hasOwnProperty('course_code') ? info['course_code'] : '';
+        const rewards = newRewards('', '', '', '');
+        const nCourse = newCourse(info['_id'], info['name'], code, info['description'], rewards, '', info['hidden'],
+          info['enabled_features'], info['stundents'], info['teachers'], info['autojoin']);
+        courseService.teaching.push(nCourse);
       })
       .catch());
-    promiseArray.push(setAssignmentsForCourse(course._id, backendService, assignmentService));
+    promiseArray.push(setAssignmentsForCourse(course._id, backendService, assignmentService)); // Set assignments for assignments
   }
   return Promise.all(promiseArray);
 }
 
 function setAssignmentsForCourse(course_id, backendService, assignmentService): Promise<any> {
-  // Add assignments to a course
+  // Set assignments to a course
 
   return new Promise((resolve, reject) => {
     backendService.getCourseAssignments(course_id)
@@ -183,14 +160,11 @@ function updateCourses(response, backendService, courseService, assignmentServic
       .then(featureResponse => {
         const rewards = handleFeatureResponse(featureResponse);
         const progress = newProgress(featureResponse.total_assignments, featureResponse.completed_assignments);
-        const nCourse = newCourse(course._id, course.name, course.course_code, course.description, rewards, progress);
-        courseService.AddCourse(nCourse);
+        const nCourse = newCourse(course._id, course.name, course.course_code, course.description, rewards, progress,
+          '', '', '', '', ''); // Since not a teacher course
+        courseService.courses.push(nCourse);
       })
-      .catch( err => {
-        const rewards = newRewards(false, false, false, false);
-        const progress = newProgress(0, 0);
-        const nCourse = newCourse(course._id, course.name, course.course_code, course.description, rewards, progress);
-        courseService.AddCourse(nCourse);
+      .catch( err => { console.log('Error fetching features:', err);
       }));
     promiseArray.push(backendService.getCourseAssignments(course._id)
       .then(assignmentsResponse => {
@@ -205,7 +179,8 @@ function getTeacherStudentView(course, backendService, courseService, assignment
     backendService.getFeaturesCourseMe(course.id).then(resp => {
       const rewards = handleFeatureResponse(resp);
       const progress = newProgress(resp.total_assignments, resp.completed_assignments);
-      const course2 = newCourse(course.id, course.name, course.code, course.desc, rewards, progress);
+      const course2 = newCourse(course.id, course.name, course.code, course.desc, rewards, progress,
+        '', '', '', '', '');
       resolve(course2);
     });
   });
@@ -218,25 +193,21 @@ function updateCourseFeatures(courseId, backendService, courseService) {
 
   const currentCourse = courseService.GetCourse(courseId);
   const index = getCourseIndex(courseId, courseService);
+ // TODO: courses.indexOf(currentCourse) === -1, course don't exist
 
   return backendService.getFeaturesCourseMe(courseId)
     .then(featureResponse => {
       const rewards = handleFeatureResponse(featureResponse);
       const progress = newProgress(featureResponse.total_assignments, featureResponse.completed_assignments);
       const course = newCourse(currentCourse.id, currentCourse.name, currentCourse.code,
-        currentCourse.course_info, rewards, progress);
+        currentCourse.course_info, rewards, progress, '', '', '', '', '');
       courseService.courses[index] = course;
     })
-    .catch( err => {
-      const rewards = newRewards(false, false, false, false);
-      const progress = newProgress(0, 0);
-      const course = newCourse(currentCourse.id, currentCourse.name, currentCourse.code,
-        currentCourse.course_info, rewards, progress);
-      courseService.courses[index] = course;
+    .catch( err => { console.log('Error getting features:', err);
     });
 }
 
-function getCourseIndex(courseId, courseService) {
+function getCourseIndex(courseId: string, courseService): number {
   // Returns the index of the given course
   // TODO: needs testing
 
@@ -247,7 +218,7 @@ function getCourseIndex(courseId, courseService) {
   return index;
 }
 
-function handleFeatureResponse(response: any) {
+function handleFeatureResponse(response: any): Reward {
   // TODO: is this used?
 
   const score = false;
@@ -276,38 +247,23 @@ function handleFeatureResponse(response: any) {
   return newRewards(progress, score, badges, leaderboard);
 }
 
-// TODO: interfaces are useful because they don't add any overhead, they're removed at compile-time
-//   either keep interfaces and use them properly or replace them with classes
-
-function newTeachCourse(course: Object) {
-  const code = course.hasOwnProperty('course_code') ? course['course_code'] : '';
-  return {
-    id: course['_id'],
-    name: course['name'],
-    code: code,
-    course_info: course['description'],
-    hidden: course['hidden'],
-    enabled_features: course['enabled_features'],
-    students: course['students'],
-    teachers: course['teachers'],
-    autojoin: course['autojoin'],
-    rewards: newRewards('', '', '', ''),
-    progress: '',
-  };
-}
-
-function newCourse(id, name, code, course_info, rewards, progress) {
+function newCourse(id, name, code, course_info, rewards, progress, hidden, en_feat, students, teachers, autojoin): Course {
   return {
     id: id,
     name: name,
     code: code,
     course_info: course_info,
     rewards: rewards,
-    progress: progress
+    progress: progress,
+    hidden: hidden,
+    enabled_features: en_feat,
+    students: students,
+    teachers: teachers,
+    autojoin: autojoin,
   };
 }
 
-function newRewards(progress, score, badges, leaderboard) {
+function newRewards(progress, score, badges, leaderboard): Reward {
   return {
     progress: progress,
     score: score,
@@ -321,31 +277,4 @@ function newProgress(total, completed) {
     total: total,
     completed: completed
   };
-}
-
-interface Progress {
-  total: number;
-  completed: number;
-}
-
-interface Course {
-  id: string;
-  name: string;
-  code: string;
-  course_info: string;
-  rewards: Rewards;
-  progress: any;
-  // Additional teacher course info
-  hidden: boolean;
-  enabled_features: Object;
-  students: any[];
-  teachers: any[];
-  autojoin: boolean;
-}
-
-interface Rewards {
-  progress: any;
-  score: any;
-  badges: any;
-  leaderboard: any;
 }

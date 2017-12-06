@@ -13,6 +13,7 @@ import { BackendService } from '../services/backend.service';
 import { ToastService } from '../services/toast.service';
 import {UserService} from '../services/user.service';
 import { environment } from '../../environments/environment';
+import { DragulaService } from 'ng2-dragula';
 
 @Component({
   selector: 'app-teacher-courses',
@@ -53,20 +54,24 @@ export class TeacherCoursesComponent implements OnInit {
     {key: 'bronze_trophy_badge', name: 'Bronze trophy'},
     {key: 'silver_trophy_badge', name: 'Silver trophy'},
     {key: 'gold_trophy_badge', name: 'Gold trophy'},
-    {key: 'badge1', name: 'Smiley'},
     {key: 'badge2', name: 'Silver trophy 2'},
+    {key: 'goldbadge', name: 'Gold trophy 2'},
+    {key: 'badge1', name: 'Smiley'},
     {key: 'badge3', name: 'Lightning'},
+    {key: 'brainbadge', name: 'Brain'},
+    {key: 'starbadge', name: 'Star'},
   ];
   selectedAssignments: any[];
   tests: any;
   badgeName: string;
   badgeDescription: string;
   inviteLink: string;
+  groups: any[];
 
   constructor(private courseService: CourseService, private route: ActivatedRoute, private headService: HeadService,
               private fb: FormBuilder, private assignmentService: AssignmentService, private modalService: BsModalService,
               private backendService: BackendService, private toastService: ToastService, private userService: UserService,
-              private router: Router) {
+              private router: Router, private dragulaService: DragulaService) {
 
     // Subscribe to the sidebar state
     this.headService.stateChange.subscribe(sidebarState => {
@@ -76,6 +81,8 @@ export class TeacherCoursesComponent implements OnInit {
       this.teachCourses = teachCourses;
     });
 
+    this.setDragula();
+
     this.route.params.subscribe( (params: any) => {
       // Grab the current course
       this.setCurrentCourse(params.course);
@@ -84,6 +91,28 @@ export class TeacherCoursesComponent implements OnInit {
       // Get pending requests
       this.setPendingReqs();
 
+    });
+  }
+
+  setDragula() {
+    const bag: any = this.dragulaService.find('bag-one');
+    if (bag) { // If bag already exist, need to destroy it and create a new one
+      this.dragulaService.destroy('bag-one');
+    }
+    this.dragulaService.setOptions('bag-one', {
+      copy: function (el, source) {
+        // To copy only elements in right container, the left container can still be sorted
+        return source.id === 'right';
+      },
+      removeOnSpill: function (el, source) {
+        // To copy only elements in right container, the left container can still be sorted
+        return source.id !== 'right';
+      },
+      copySortSource: false,
+      accepts: function(el, target, source, sibling) {
+        // To avoid draggin from left to right container
+        return target.id !== 'right';
+      }
     });
   }
 
@@ -115,15 +144,16 @@ export class TeacherCoursesComponent implements OnInit {
     console.log('course', this.currentCourse);
   }
 
-  setAssignments() {
-    if (this.assignmentService.courseAssignments[this.currentCourse.id] !== undefined) {
-      this.assignmentGroups = this.assignmentService.courseAssignments[this.currentCourse.id];
-      console.log('assignments', this.assignmentGroups);
-    } else {
-      this.assignmentGroups = this.assignmentService.courseAssignments['default'];
-      console.log('assignments', this.assignmentGroups);
-    }
-    this.selectedAssignments = [{'assignment': this.flattenAssignments()[0], 'possible': this.flattenAssignments()}];
+  setAssignments() {if (this.assignmentService.courseAssignments[this.currentCourse.id] !== undefined) {
+        this.assignmentGroups = this.assignmentService.courseAssignments[this.currentCourse.id];
+        // this.assignmentGroups = this.assignmentService.courseAssignments['default'];console.log('assignments', this.assignmentGroups);
+      } else {
+        this.assignmentGroups = this.assignmentService.courseAssignments['default'];
+        console.log('assignments', this.assignmentGroups);
+      }
+      this.selectedAssignments = [{'assignment': this.flattenAssignments()[0], 'possible': this.flattenAssignments()}];
+
+
   }
 
   ngOnInit() {
@@ -134,6 +164,7 @@ export class TeacherCoursesComponent implements OnInit {
     this.form = this.fb.group(this.defaultForm);
     this.selectedAssignments = [{'assignment': this.flattenAssignments()[0], 'possible': this.flattenAssignments()}];
     this.tests = {};
+    this.groups = [{name: 'Group1', assignments: []}, {name: 'Group2', assignments: []}, {name: 'Group3', assignments: []}];
   }
 
   openModal(modal, type) {
@@ -156,7 +187,8 @@ export class TeacherCoursesComponent implements OnInit {
   }
 
   createAssignmentGroup() {
-    this.backendService.postAssignmentGroup(this.currentCourse.id, this.groupName);
+    this.backendService.postAssignmentGroup(this.currentCourse.id, this.groupName)
+      .then(response => console.log('group', response));
   }
 
   acceptAllReqs() { // iterate through pending list
@@ -166,7 +198,7 @@ export class TeacherCoursesComponent implements OnInit {
   }
 
   acceptReq(student_id) {
-    this.backendService.acceptPending(student_id, this.currentCourse.id)
+    this.backendService.acceptInvite(student_id, this.currentCourse.id)
       .then( response => {
         this.toastService.success('Request accepted!');
         // console.log('Accepted req:', response); // Object error stuff, need to check, but works

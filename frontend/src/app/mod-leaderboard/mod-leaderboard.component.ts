@@ -28,8 +28,7 @@ export class ModLeaderboardComponent extends GameelementComponent implements OnC
     // Update the leaderboard
 
     this.backendService.getFeaturesCourse(this.courseCode).then((data: any) => {
-      const students: any[] = data.features;
-
+      const students: any[] = data.features; // array with students features
       // Get list of students
       let leaderList = students.map(student => {
         return {name: student.user.username, score: student.completed_assignments};
