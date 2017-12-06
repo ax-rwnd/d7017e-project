@@ -44,30 +44,26 @@ export class CourseService {
   }
 
   GetAllCoursesForUser() {
-    // Find all courses belonging to a user
-    // Basically a passthrough for updateCourses?
-
     const promise = new Promise((resolve, reject) => {
-      this.backendService.getMyCourses()
+      this.backendService.getMyCourses() // student, array with courses
         .then(response => {
-
+          console.log('getCoursesForUser', response['courses']);
           updateCourses(response, this.backendService, this, this.assignmentService)
             .then(resolve)
             .catch(reject);
         })
         .catch(reject);
     });
-
     return promise;
   }
 
   GetAllTeachingCourses() {
-    // Find all courses that a users teaches
+    // Page won't show if this fail, check in Auth map. Fetch all courses that a user is teacher in
 
     const promise = new Promise((resolve, reject) => {
       this.backendService.getMyTeachedCourses()
         .then( response => {
-
+          console.log('getTeacherCourse:', response['courses']);
           getTeachCourses(response, this.backendService, this, this.assignmentService)
             .then(resolve)
             .catch(reject);
@@ -145,27 +141,19 @@ export class CourseService {
 }
 
 function getTeachCourses(response, backendService, courseService, assignmentService) {
-  // Get the courses that a user is teaching
-  // TODO: fixthis
+  // Get all info for each teach course the user has
 
   const courses = response.courses;
   const promiseArray = [];
-
-  for (const c of courses) {
-    const cInner = c.course;
-
-    // Grab courses from the backend
-    promiseArray.push(backendService.getCourse(cInner._id)
-      .then(course => {
-          courseService.teaching.push(newTeachCourse(course));
+  for (let i = 0; i < courses.length; i++) {
+    const course = courses[i].course;
+    promiseArray.push(backendService.getCourse(course._id)
+      .then(info => {
+        courseService.teaching.push(newTeachCourse(info));
       })
-      .catch(err => {
-        console.error('failed to push to courseservice in', this.getTeachCourses.name, err);
-      }));
-
-    promiseArray.push(setAssignmentsForCourse(cInner._id, backendService, assignmentService));
+      .catch());
+    promiseArray.push(setAssignmentsForCourse(course._id, backendService, assignmentService));
   }
-
   return Promise.all(promiseArray);
 }
 
@@ -190,22 +178,23 @@ function updateCourses(response, backendService, courseService, assignmentServic
   const promiseArray = [];
 
   for (let i = 0; i < courses.length; i++) {
-    promiseArray.push(backendService.getFeaturesCourseMe(courses[i]._id)
+    const course = courses[i].course;
+    promiseArray.push(backendService.getFeaturesCourseMe(course._id)
       .then(featureResponse => {
         const rewards = handleFeatureResponse(featureResponse);
         const progress = newProgress(featureResponse.total_assignments, featureResponse.completed_assignments);
-        const course = newCourse(courses[i]._id, courses[i].name, courses[i].course_code, courses[i].description, rewards, progress);
-        courseService.AddCourse(course);
+        const nCourse = newCourse(course._id, course.name, course.course_code, course.description, rewards, progress);
+        courseService.AddCourse(nCourse);
       })
       .catch( err => {
         const rewards = newRewards(false, false, false, false);
         const progress = newProgress(0, 0);
-        const course = newCourse(courses[i]._id, courses[i].name, courses[i].course_code, courses[i].description, rewards, progress);
-        courseService.AddCourse(course);
+        const nCourse = newCourse(course._id, course.name, course.course_code, course.description, rewards, progress);
+        courseService.AddCourse(nCourse);
       }));
-    promiseArray.push(backendService.getCourseAssignments(courses[i]._id)
+    promiseArray.push(backendService.getCourseAssignments(course._id)
       .then(assignmentsResponse => {
-        assignmentService.AddCourseAssignments(courses[i]._id, assignmentsResponse.assignments);
+        assignmentService.AddCourseAssignments(course._id, assignmentsResponse.assignments);
       }));
   }
   return Promise.all(promiseArray);

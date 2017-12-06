@@ -144,6 +144,18 @@ The structure below is the following:
     return this.apiGet('/api/courses/' + course_id + '/features/me');
   }
 
+  getMyPendingReq() {
+    // Get user's pending request invites to a course
+
+    return this.apiGet('/api/users/me/invites?type=pending');
+  }
+
+  getMyInvites() {
+    // Get user's invites to a course
+
+    return this.apiGet('/api/users/me/invites?type=invite');
+  }
+
 // ---------- 2. USER(S) calls --------- //
 
   getUser(id: ObjectID) {
@@ -318,11 +330,13 @@ The structure below is the following:
 
 // -- Invite(s) -- //
 
-  getMyInvites() {
-    // Find invites for me
+  /*
+ getMyInvites() {
+   // Find invites for me
 
-    return this.apiGet('/api/users/courses/invite');
-  }
+   return this.apiGet('/api/users/courses/invite');
+ }
+ */
 
   postInvitationToCourse(course_id: ObjectID, student_id: ObjectID) {
     // Send an invitation for a student to join a course
@@ -342,14 +356,17 @@ The structure below is the following:
 
 // -- Pending -- //
 
-  getMyPendingRequests() {
-    return this.apiGet('/api/users/courses/pending');
-  }
+  /*
+getMyPendingRequests() {
+  return this.apiGet('/api/users/courses/pending');
+}
+*/
 
   getPendingUsers(course_id) {
     // Get the users waiting to join a course
 
-    return this.apiGet('/api/courses/' + course_id + '/students/pending');
+    // return this.apiGet('/api/courses/' + course_id + '/students/pending');
+    return this.apiGet('/api/courses/' + course_id + '/students/invite');
   }
 
   acceptPending(student_id, course_id) {
