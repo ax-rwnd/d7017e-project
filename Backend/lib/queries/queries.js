@@ -748,8 +748,20 @@ function getAssignmentTests(course_id, assignment_id) {
     });
 }
 
-function createAssignment(name, description, hidden, lint, languages, course_id) {
-    var newAssignment = new Assignment({name: name, description: description, hidden: hidden, tests: {io: [], lint: lint}, optionaal_tests: {io: [], lint: lint}, languages: languages});
+function createAssignment(course_id, props) {
+    var newAssignment = new Assignment({
+        name: props.name,
+        description: props.description,
+        hidden: props.hidden, tests: {
+            io: props.tests.io,
+            lint: props.tests.lint
+        },
+        optional_tests: {
+            io: props.optional_tests.io,
+            lint: props.optional_tests.lint
+        },
+        languages: props.languages
+    });
     return newAssignment.save().then(function (createdAssignment) {
         if (!createdAssignment) {
             throw errors.ASSINGMENT_NOT_CREATED;

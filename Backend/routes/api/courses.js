@@ -450,14 +450,14 @@ module.exports = function(router) {
 
     // Creates an assignment for a course
     router.post('/:course_id/assignments', function (req, res, next) {
-        var course_id = req.params.course_id;
-        var name = req.body.name;
-        var desc = req.body.description;
-        var hidden = req.body.hidden;
-        var lint = req.body.lint;
-        var languages = req.body.languages;
+        let {course_id} = inputValidation.courseIdValidation(req);
+        let body = inputValidation.postAssignmentBodyValidation(req);
 
-        queries.createAssignment(name, desc, hidden, lint, languages, course_id).then(function (assignment) {
+        permission.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
+        .then(function () {
+            return queries.createAssignment(course_id, body);
+        })
+        .then(function (assignment) {
             return res.status(201).json(assignment);
         })
         .catch(function (err) {
