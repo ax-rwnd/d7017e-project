@@ -1023,7 +1023,15 @@ function getUserCourses(user_id) {
 }
 
 function getCourses1() {
-    return Course.find({hidden: false}, constants.FIELDS.COURSE.BASE_FIELDS);
+    return Course.find({hidden: false}, constants.FIELDS.COURSE.BASE_FIELDS)
+    .populate({path: 'owner', model: 'User'})
+    .lean()
+    .then(function(courses) {
+        for(let course of courses) {
+            delete course.owner.tokens;
+        }
+        return courses;
+    });
 }
 
 function getUsersHiddenCourses (user_id) {
@@ -1192,7 +1200,27 @@ function validateInviteLink(code, user_id) {
 }
 
 function getAssignmentgroupsByCourseID(course_id) {
-    return Course.findById(course_id, 'assignmentgroups');
+    return Course.findById(course_id, 'assignmentgroups')
+    .populate({path: 'assignmentgroups', model: 'Assignmentgroup',
+    populate: [
+        {
+            path: 'assignments.assignment', model: 'Assignment'
+        }
+    ]})
+    .lean()
+    .then(course => {
+        let assignmentgroups = course.assignmentgroups;
+
+        for(let assignmentgroup of assignmentgroups) {
+            for(let assignment of assignmentgroup.assignments) {
+                if(assignment.assignment.hidden) {
+                    assignmentgroup.assignments.pop(assignment);
+                }
+            }
+        }
+
+        return assignmentgroups;
+    });
 }
 
 function createAssignmentgroup(assignmentgroupObject, course_id) {

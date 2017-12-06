@@ -17,10 +17,10 @@ const FIELDS = {
     },
     COURSE: {
         MODEL: require('../models/schemas').Course,
-        BASE_FIELDS: "name description course_code",
+        BASE_FIELDS: "name description course_code owner",
         ADMIN: "course_code name description autojoin hidden enabled_features teachers students invited pending assignments assignmentgroups",
         TEACHER: "course_code name description autojoin hidden enabled_features teachers students invited pending assignments assignmentgroups",
-        STUDENT: "course_code name description assignments assignmentgroups",
+        STUDENT: "course_code name description assignments assignmentgroups owner",
         POPULATE_FIELDS: "teachers students assignments assignmentgroups"
     },
     TEACHERS: {

@@ -990,7 +990,7 @@ module.exports = function(router) {
         }
 
         return queries.getAssignmentgroupsByCourseID(course_id)
-        .then(assignmentgroups => res.json(assignmentgroups))
+        .then(assignmentgroups => res.json({assignmentgroups: assignmentgroups}))
         .catch(next);
     });
 
