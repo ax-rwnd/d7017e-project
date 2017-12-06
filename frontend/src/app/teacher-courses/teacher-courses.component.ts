@@ -81,7 +81,25 @@ export class TeacherCoursesComponent implements OnInit {
       this.teachCourses = teachCourses;
     });
 
-    dragulaService.setOptions('bag-one', {
+    this.setDragula();
+
+    this.route.params.subscribe( (params: any) => {
+      // Grab the current course
+      this.setCurrentCourse(params.course);
+      // Assign groups for assignments
+      this.setAssignments();
+      // Get pending requests
+      this.setPendingReqs();
+
+    });
+  }
+
+  setDragula() {
+    const bag: any = this.dragulaService.find('bag-one');
+    if (bag) { // If bag already exist, need to destroy it and create a new one
+      this.dragulaService.destroy('bag-one');
+    }
+    this.dragulaService.setOptions('bag-one', {
       copy: function (el, source) {
         // To copy only elements in right container, the left container can still be sorted
         return source.id === 'right';
@@ -95,16 +113,6 @@ export class TeacherCoursesComponent implements OnInit {
         // To avoid draggin from left to right container
         return target.id !== 'right';
       }
-    });
-
-    this.route.params.subscribe( (params: any) => {
-      // Grab the current course
-      this.setCurrentCourse(params.course);
-      // Assign groups for assignments
-      this.setAssignments();
-      // Get pending requests
-      this.setPendingReqs();
-
     });
   }
 
