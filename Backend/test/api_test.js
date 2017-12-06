@@ -144,11 +144,17 @@ describe('/api', () => {
 
         describe('PUT /api/courses/:course_id', () => {
             it('modifies the course code successfully', () => {
+                let course_updated = {
+                    name: 'Introduction to Automated Testing in JavaScript (updated)',
+                    description: 'In this course you will use Mocha and supertest to create automated tests for NodeJS applications. (updated)',
+                    hidden: false,
+                    course_code: 'DtestingtestingE',
+                    enabled_features: {badges: false, progressbar: true}
+                };
                 return request(runner.server)
                     .put('/api/courses/' + course_id)
-                    .send({
-                        course_code: 'DtestingtestingE'
-                    }).set('Authorization', 'Bearer ' + access_tokens.admin)
+                    .send(course_updated)
+                    .set('Authorization', 'Bearer ' + access_tokens.admin)
                     .expect(200);
             });
         });
@@ -279,9 +285,10 @@ describe('/api', () => {
                 return request(runner.server)
                     .post('/api/courses/' + course_id + '/assignments')
                     .send({
-                        name: 'Introduction to Mocha tests',
+                        name: 'Lesson 2 in Mocha tests',
                         description: 'Write tests with Mocha',
                         hidden: false,
+                        lint: true,
                         languages: 'javascript'
                     })
                     .set('Authorization', 'Bearer ' + access_tokens.user)
@@ -353,6 +360,18 @@ describe('/api', () => {
             });
         });
 
+        describe('PUT /api/courses/:course_id/assignments/:assignment_id', () => {
+            it('modifies decription and tests.lint successfully', () => {
+                return request(runner.server)
+                    .put('/api/courses/' + course_id + '/assignments/' + assignment_id1)
+                    .send({
+                        description: 'Write tests with Mocha (modified)',
+                        'tests.lint': false
+                    }).set('Authorization', 'Bearer ' + access_tokens.admin)
+                    .expect(200);
+            });
+        });
+
         describe('POST /api/courses/:course_id/assignments/:assignment_id/tests', () => {
             it('returns a test id', () => {
                 return request(runner.server)
@@ -408,10 +427,29 @@ describe('/api', () => {
             });
         });
 
-        describe('POST /:course_id/assignments/:assignment_id/save', () => {
+        describe('POST /api/courses/:course_id/assignments/:assignment_id/submit', () => {
+
+            it('run assignments tests', () => {
+                return request(runner.server)
+                    .post('/api/courses/' + course_id + '/assignments/' + assignment_id1 + '/submit')
+                    .set('Authorization', 'Bearer ' + access_tokens.user)
+                    .send({
+                        'lang': 'python3',
+                        'code': 'print(\"sockerkaka\")'
+                    })
+                    .expect(200)
+                    .then(res => {
+                        console.log(res.body);
+                        //assert(res.body.passed == true);
+                        assert(assignment_id1 == res.body.assignment_id, 'response does not contain the correct assignment_id');
+                    });
+            });
+        });
+
+        describe('POST /:course_id/assignments/:assignment_id/draft', () => {
             it('saves an empty draft to the database', () => {
                 return request(runner.server)
-                    .post('/api/courses/' + course_id + '/assignments/' + assignment_id1 + '/save')
+                    .post('/api/courses/' + course_id + '/assignments/' + assignment_id1 + '/draft')
                     .set('Authorization', 'Bearer ' + access_tokens.user)
                     .send()
                     .expect(201)
@@ -427,7 +465,7 @@ describe('/api', () => {
                     code: 'print(\"hello world\")\n'
                 };
                 return request(runner.server)
-                    .post('/api/courses/' + course_id + '/assignments/' + assignment_id1 + '/save')
+                    .post('/api/courses/' + course_id + '/assignments/' + assignment_id1 + '/draft')
                     .set('Authorization', 'Bearer ' + access_tokens.user)
                     .send(draft)
                     .expect(201)
@@ -493,7 +531,10 @@ describe('/api', () => {
                     .set('Authorization', 'Bearer ' + access_tokens.user)
                     .expect(200)
                     .then(res => {
-                        assert.equal(res.body.success, true);
+                        assert.equal(res.body.user, user_id);
+                        assert.equal(res.body.course, course_id);
+                        assert.equal(res.body.role, "student");
+                        assert(res.body.features, "did not return user");
                     });
             });
         });

@@ -76,24 +76,24 @@ const FIELDS = {
 // var Assignment, User, Test = require('../../models/schemas.js');
 
 //get all tests related to a specific assignment.
-function getTestsFromAssignment(assignmentID, callback) {
-    Assignment.findById(assignmentID)
+function getTestsFromAssignment(assignmentID) {
+    return Assignment.findById(assignmentID, "tests")
     .populate({
         path: 'tests.io',
         model: 'Test'
     }).populate({
         path: 'optional_tests.io',
         model: 'Test'
-    }).lean().exec(function (err, assignmentObject) {
-        /*if (!assignmentObject) {
-            console.log("assignment not found!")
+    })
+    .then(function (assignment) {
+        if (!assignment) {
             throw errors.ASSIGNMENT_DOES_NOT_EXIST;
-        } */    //THIS ERROR NEEDS TO BE THROWN AND HANDLED
-        let json = {};
-        json.tests = assignmentObject.tests;
-        json.optional_tests = assignmentObject.optional_tests;
-        callback(json);
-    });
+        }
+        var tests = {'tests':assignment.tests, 'optional_tests':assignment.optional_tests};
+        return tests;
+    }); 
+
+
 }
 
 function getUser(id, fields) {
@@ -485,8 +485,7 @@ function updateCourse(id, set_props) {
         ).then(raw => {
             // check if the course update was ok
             if (raw.ok !== 1) {
-                // TODO: make a real error message!
-                throw new Error('Mongo error: failed to add to user.courses');
+                throw errors.FAILED_TO_UPDATE_COURSE;
             // check if the course existed
             } else if (raw.n === 0) {
                 throw errors.COURSE_DOES_NOT_EXIST;
@@ -690,6 +689,28 @@ function getAssignment(id, fields) {
 }
 */
 
+function updateAssignment(id, set_props) {
+    return Assignment.findById(id, "name description hidden languages").then(function (assignment) {
+        if (!assignment) {
+            throw errors.ASSIGNMENT_DOES_NOT_EXIST;
+        }
+
+        return Assignment.update(
+            {_id: id},
+            {$set: set_props},
+            {runValidators: true}
+        ).then(raw => {
+            // check if the assignemt update was ok
+            if (raw.ok !== 1) {
+                throw errors.FAILED_TO_UPDATE_ASSIGNMENT;
+            // check if the assignment existed
+            } else if (raw.n === 0) {
+                throw errors.ASSIGNMENTT_DOES_NOT_EXIST;
+            }
+        });
+    });
+}
+
 function getTest(id, fields) {
     var wantedFields = fields || "stdout stdin args";
 
@@ -714,8 +735,7 @@ function updateTest(id, set_props) {
         ).then(raw => {
             // check if the test update was ok
             if (raw.ok !== 1) {
-                // TODO: make a real error message!
-                throw new Error('Mongo error: Failed to update test');
+                throw errors.FAILED_TO_UPDATE_TEST;
             // check if the test existed
             } else if (raw.n === 0) {
                 throw errors.TEST_DOES_NOT_EXIST;
@@ -977,6 +997,22 @@ function getAssignmentIDsByUser(user_id) {
     });
 }
 
+// TODO: WILL BE AFFECTED BY NEW MEMBER SYSTEM
+// returns "teacher", "admin" or "student": the highest access level for a course
+function getHighestPermissionCourse(course_id, user_id) {
+    getUser(user_id, "teaching").then(function (userObject) {
+        var role = "";
+        if (userObject.teaching.indexOf(course_id) !== -1) {
+            role = "teacher";
+        } else if (userObject.access === constants.ACCESS.ADMIN) {
+            role = "admin";
+        } else {
+            role = "student";
+        }
+        return role;
+    });
+}
+
 function getUserCourses1(user_id) {
     return CourseMember.find({user: user_id}).distinct('course');
 }
@@ -1076,12 +1112,14 @@ function getUserMemberStatus(course_id, user_id) {
     return CourseMember.findOne({user: user_id, course: course_id}, "role");
 }
 
-function generateInviteLink(course_id) {
+function generateInviteLink(course_id, expiresIn) {
     var code = randomstring.generate();
+    var exp = Date.now() + (expiresIn || config.get("Courses.invite_link_ttl"));
+
     if (!mongoose.Types.ObjectId.isValid(course_id)) {
             throw errors.INVALID_ID;
     }
-    var newLink = new InviteLink({code: code, course: course_id});
+    var newLink = new InviteLink({code: code, course: course_id, expiresAt: exp});
     return newLink.save().then(function (obj) {
         return obj;
     });
@@ -1098,11 +1136,19 @@ function validateInviteLink(code, user_id) {
             });
         }
 
-        return Features.createFeature(user_id, obj.course).then(function (featureObject) {
-            // Add student to course
-            var memberObject = new CourseMember({role: "student", course: obj.course, user: user_id, features: featureObject._id});
-            return memberObject.save();
+        return CourseMember.findOne({user: user_id, course: obj.course}).then(function (res) {
+            if (!res) {
+                return Features.createFeature(user_id, obj.course).then(function (featureObject) {
+                    // Add student to course
+                    var memberObject = new CourseMember({role: "student", course: obj.course, user: user_id, features: featureObject._id});
+                    return memberObject.save();
+                });
+            } else {
+                throw errors.USER_ALREADY_IN_COURSE;
+            }
         });
+
+        
     });
 }
 
@@ -1226,3 +1272,4 @@ exports.createAssignmentgroup = createAssignmentgroup;
 exports.getAssignmentgroupByID = getAssignmentgroupByID;
 exports.updateAssignmentgroup = updateAssignmentgroup;
 exports.deleteAssignmentgroup = deleteAssignmentgroup;
+exports.updateAssignment = updateAssignment;

@@ -137,10 +137,7 @@ module.exports = function(router) {
     // Deletes course with id :course_id
     // Only admin and teacher of course can delete course
     router.delete('/:course_id', function (req, res, next) {
-        var course_id = req.params.course_id;
-        if (!mongoose.Types.ObjectId.isValid(course_id)) {
-            return next(errors.BAD_INPUT);
-        }
+        let {course_id} = inputValidation.courseIdValidation(req);
         permission.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
         .then(() => {
             return queries.deleteCourse(course_id);
@@ -153,24 +150,11 @@ module.exports = function(router) {
     // Modify course with id :course_id
     // Must be teacher or higher
     router.put('/:course_id', function (req, res, next) {
-        let course_id = req.params.course_id;
-        if (!mongoose.Types.ObjectId.isValid(course_id)) {
-            return next(errors.BAD_INPUT);
-        }
-
-        let b = req.body;
-        let clean_b = {};
-        if (b.hasOwnProperty('course_code')) clean_b.course_code = b.course_code;
-        if (b.hasOwnProperty('name')) clean_b.name = b.name;
-        if (b.hasOwnProperty('description')) clean_b.description = b.description;
-        if (b.hasOwnProperty('hidden')) clean_b.hidden = b.hidden;
-        if (b.hasOwnProperty('autojoin')) clean_b.autojoin = b.autojoin;
-        // note that ALL fields in enabled_features are allowed
-        if (b.hasOwnProperty('enabled_features')) clean_b.enabled_features = b.enabled_features;
-
+        let {course_id} = inputValidation.courseIdValidation(req);
+        let body = inputValidation.putCourseBodyValidation(req);
         permission.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
         .then(() => {
-            return queries.updateCourse(course_id, clean_b);
+            return queries.updateCourse(course_id, body);
         }).then(() => {
             // send an empty response
             res.json({});
@@ -233,8 +217,9 @@ module.exports = function(router) {
 
     // NOT DONE
     router.post('/:course_id/members/invite', function (req, res, next) {
+        var input;
         try {
-            var input = inputValidation.putMembersInviteValidation(req);
+            input = inputValidation.putMembersInviteValidation(req);
         }
         catch(error) {
             return next(error);
@@ -245,11 +230,11 @@ module.exports = function(router) {
             p = permission.checkUserNotInCourse(input.user_id, input.course_id).then(function () {
                     return permission.checkIfAlreadyInvited(input.user_id, input.course_id).then(function () {
 
-                    })
+                    });
                 })
                 .then(function () {
 
-                })
+                });
         }
 
     });
@@ -261,8 +246,9 @@ module.exports = function(router) {
     //
     //
     router.put('/:course_id/members/invite', function (req, res, next) {
+        var input;
         try {
-            var input = inputValidation.putMembersInviteValidation(req);
+            input = inputValidation.putMembersInviteValidation(req);
         }
         catch(error) {
             return next(error);
@@ -403,7 +389,7 @@ module.exports = function(router) {
     });
 */
     router.delete('/:course_id/members', function (req, res, next) {
-        return res.json({fail: "Bosse"})
+        return res.json({fail: "Bosse"});
     });
 
 
@@ -497,25 +483,29 @@ module.exports = function(router) {
 
     // Update an assignment
     router.put('/:course_id/assignments/:assignment_id', function (req, res, next) {
+        let {course_id, assignment_id} = inputValidation.assignmentValidation(req);
+        let body = inputValidation.putAssignmentBodyValidation(req);
 
-        // TODO
-
-        return res.json({});
+        permission.checkIfAssignmentInCourse(course_id, assignment_id)
+        .then(function () {
+            return permission.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access);
+        })
+        .then(function () {
+            return queries.updateAssignment(assignment_id, body);
+        })
+        .then(function () {
+            return res.json({});
+        })
+        .catch(function (err) {
+            next(err);
+        });
     });
 
     // Delete an assignment
     router.delete('/:course_id/assignments/:assignment_id', function (req, res, next) {
-        var course_id = req.params.course_id;
-        var assignment_id = req.params.assignment_id;
-        if (!mongoose.Types.ObjectId.isValid(course_id)) {
-            return next(errors.BAD_INPUT);
-        }
-        if (!mongoose.Types.ObjectId.isValid(assignment_id)) {
-            return next(errors.BAD_INPUT);
-        }
+        let {course_id, assignment_id} = inputValidation.assignmentValidation(req);
         permission.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
-        // ensure the course actually owns the assignment
-        // TODO: use lib/perssion
+        .then(() => permission.checkIfAssignmentInCourse(course_id, assignment_id))
         .then(() => queries.deleteAssignment(assignment_id, course_id))
         .then(() => {
             // respond with empty body
@@ -526,9 +516,19 @@ module.exports = function(router) {
     router.get('/:course_id/invitelink', function (req, res, next) {
         var course_id = req.params.course_id;
 
+        if (req.query.expires) {
+            var expires = (+req.query.expires);
+            // throw Bad input if number is NaN or too small
+            if (expires !== expires || expires <= 0) {
+                return next(errors.BAD_INPUT);
+            }
+            // Increase number from milliseconds to hours
+            expires = expires * 60 * 60 * 1000;
+        }
+
         permission.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access).then(function () {
-            return queries.generateInviteLink(course_id).then(function (obj) {
-                res.status(201).json({course: obj.course, code: obj.code});
+            return queries.generateInviteLink(course_id, expires).then(function (obj) {
+                res.status(201).json({course: obj.course, code: obj.code, expiresAt: obj.expiresAt});
             });
         })
         .catch(function (err) {
@@ -540,38 +540,41 @@ module.exports = function(router) {
         var code = req.params.code;
 
         queries.validateInviteLink(code, req.user.id).then(function (result) {
-            res.json({success: true});
+            res.json({user: result.user, course: result.course, role: result.role, features: result.features});
         })
         .catch(function (err) {
             next(err);
         });
     });
 
-/*
-    //TODO: It is currently not checked if the requested assignment actually belongs to the specified course
-    router.get('/:course_id/assignments/:assignment_id', function (req, res, next) {
-        var course_id = req.params.course_id;
-        var assignment_id = req.params.assignment_id;
 
-        queries.getAssignment(assignment_id, "name description hidden languages").then(function (assignment) {
-            return res.json(assignment);
-        })
-        .catch(function (err) {
-            next(err);
-        });
-    });
-*/
-
-    //Submit code to tester
-    router.post('/:course_id/assignments/:assignment_id/submit', function(req, res) {
-
+    //submit user code to Tester service for code validation
+    router.post('/:course_id/assignments/:assignment_id/submit', function(req, res, next) {
         var lang = req.body.lang;
         var code = req.body.code;
         var assignment_id = req.params.assignment_id;
+        var course_id = req.params.course_id;
 
-        testerCom.validateCode(req.user.id, lang, code, assignment_id, res);
+        var input;
+        try {
+            input = inputValidation.assignmentAndCourseValidation(req);
+        } catch(error) {
+            return next(error);
+        }
+
+        permission.checkIfAssignmentInCourse(course_id, assignment_id)
+        .then(function () {
+            return testerCom.validateCode(req.user.id, lang, code, assignment_id)
+            .then(function (testerResponse) {
+                return res.json(testerResponse);
+            });
+        })
+        .catch(function (err) {
+            next(err);
+        });
     });
 
+    // TODO: SHOULD BE REMOVED ONCE NEW ROUTE PATH IS USED BY FRONTEND
     // Save draft to assignment
     // course_id not used, should route be changed? Implement some check?
     router.post('/:course_id/assignments/:assignment_id/save', function (req, res, next) {
@@ -587,12 +590,46 @@ module.exports = function(router) {
         });
     });
 
+    // save a user-draft (code) for an assignment
+    router.post('/:course_id/assignments/:assignment_id/draft', function (req, res, next) {
+        var assignment_id = req.params.assignment_id;
+        var course_id = req.params.course_id;
+        var code = req.body.code || "";
+        var lang = req.body.lang || "";
+
+        var input;
+        try {
+            input = inputValidation.assignmentAndCourseValidation(req);
+        } catch(error) {
+            return next(error);
+        }
+
+        permission.checkIfAssignmentInCourse(course_id, assignment_id).then(function () {
+            queries.saveCode(req.user.id, assignment_id, code, lang).then(function (draft) {
+                return res.status(201).json(draft);
+            });
+        })
+        .catch(function (err) {
+            next(err);
+        });
+    });
+
     // Retrieve the saved assignment draft, will create and return an empty draft if it doesn't already exist.
     router.get('/:course_id/assignments/:assignment_id/draft', function (req, res, next) {
         var assignment_id = req.params.assignment_id;
+        var course_id = req.params.course_id;
 
-        queries.getCode(req.user.id, assignment_id).then(function (draft) {
-            res.json(draft);
+        var input;
+        try {
+            input = inputValidation.assignmentAndCourseValidation(req);
+        } catch(error) {
+            return next(error);
+        }
+
+        permission.checkIfAssignmentInCourse(course_id, assignment_id).then(function () {
+            queries.getCode(req.user.id, assignment_id).then(function (draft) {
+                return res.json(draft);
+            });
         })
         .catch(function (err) {
             next(err);
@@ -608,7 +645,10 @@ module.exports = function(router) {
             return next(errors.BAD_INPUT);
         }
 
-        permission.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
+        permission.checkIfAssignmentInCourse(course_id, assignment_id)
+        .then(function () {
+            return permission.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access);
+        })
         .then(function () {
             return queries.getAssignmentTests(course_id, assignment_id);
         })
@@ -632,7 +672,10 @@ module.exports = function(router) {
             return next(errors.BAD_INPUT);
         }
 
-        permission.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
+        permission.checkIfAssignmentInCourse(course_id, assignment_id)
+        .then(function () {
+            return permission.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access);
+        })
         .then(function () {
             return queries.createTest(stdout, stdin, args, assignment_id);
         })
@@ -682,7 +725,13 @@ module.exports = function(router) {
             return next(errors.BAD_INPUT);
         }
 
-        permission.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
+        permission.checkIfTestInAssignment(assignment_id, test_id)
+        .then(function () {
+            return permission.checkIfAssignmentInCourse(course_id, assignment_id);
+        })
+        .then(function () {
+            return permission.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access);
+        })
         .then(function () {
             return queries.deleteTest(test_id, assignment_id);
         })
@@ -728,7 +777,13 @@ module.exports = function(router) {
             }
         }
 
-        permission.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
+        permission.checkIfTestInAssignment(assignment_id, test_id)
+        .then(function () {
+            return permission.checkIfAssignmentInCourse(course_id, assignment_id);
+        })
+        .then(function () {
+            return permission.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access);
+        })
         .then(function () {
             return queries.updateTest(test_id, clean_b);
         })

@@ -46,7 +46,7 @@ function postCourseValidation(req) {
         description = "";
     }
 
-    if (req.body.description) {
+    if (req.body.course_code) {
         req.checkBody("course_code", "Must contain only ascii characters").isAlphanumeric();
         course_code = req.body.course_code;
     } else {
@@ -140,6 +140,26 @@ function putMembersInviteValidation (req) {
     return input;
 }
 
+// Input Validation for checking course_id and assignment_id
+function assignmentAndCourseValidation (req) {
+    var course_id; // required
+    var assignment_id; // required
+    
+    // req
+    req.checkParams("course_id", "Not a valid course id").isMongoId();
+    course_id = req.params.course_id;
+    req.checkParams("assignment_id", "Not a valid assignment id").isMongoId();
+    assignment_id = req.params.assignment_id;
+
+    var inputError = req.validationErrors();
+    if (inputError) {
+        throw badInput.BAD_INPUT(inputError);
+    }
+
+    var input = {course_id: course_id, assignment_id: assignment_id};
+    return input;
+}
+
 function assignmentgroupValidation(req) {
 
     let input = {};
@@ -226,8 +246,112 @@ function badgeValidation(req) {
     return input;
 }
 
+// checks for a course_id param
+function courseIdValidation(req) {
+    req.checkParams('course_id', 'Not a valid course id').isMongoId();
+    var inputError = req.validationErrors();
+    if (inputError) {
+        throw badInput.BAD_INPUT(inputError);
+    }
+    return {course_id: req.params.course_id};
+}
+
+// Input validation for PUT /api/courses/:course_id
+function putCourseBodyValidation(req) {
+    var input = {};
+
+    // Optional fields
+    if ('name' in req.body) {
+        req.checkBody("name", "Must contain only letters and numbers").isAscii();
+        input.name = req.body.name;
+    }
+    if ('description' in req.body) {
+        req.checkBody("description", "Must contain only ascii characters").isAscii();
+        input.description = req.body.description;
+    }
+    if ('course_code' in req.body) {
+        req.checkBody("course_code", "Must contain only ascii characters").isAlphanumeric();
+        input.course_code = req.body.course_code;
+    }
+    if ('hidden' in req.body) {
+        req.checkBody("hidden", "Must contain true or false").isBoolean();
+        input.hidden = req.body.hidden;
+    }
+    if ('autojoin' in req.body) {
+        req.checkBody("autojoin", "Must contain true or false").isBoolean();
+        input.autojoin = req.body.autojoin;
+    }
+    if ('enabled_features' in req.body) {
+        // TODO: apply better validation from postCourseValidation when it is implemented
+        input.enabled_features = req.body.enabled_features;
+    }
+
+    var inputError = req.validationErrors();
+    if (inputError) {
+        throw badInput.BAD_INPUT(inputError);
+    }
+    return input;
+}
+
+// Input validation for PUT /api/courses/:course_id/assignments/:assignment_id
+function putAssignmentBodyValidation(req) {
+    var input = {};
+
+    // Optional fields
+    if ('name' in req.body) {
+        req.checkBody("name", "Must contain only letters and numbers").isAscii();
+        input.name = req.body.name;
+    }
+    if ('description' in req.body) {
+        req.checkBody("description", "Must contain only ascii characters").isAscii();
+        input.description = req.body.description;
+    }
+    if ('hidden' in req.body) {
+        req.checkBody("hidden", "Must contain true or false").isBoolean();
+        input.hidden = req.body.hidden;
+    }
+    if ('tests' in req.body) {
+        if ('lint' in req.body.tests) {
+            req.checkBody("tests.lint", "Must contain true or false").isBoolean();
+            input.tests.lint = req.body.tests.lint;
+        }
+    }
+    if ('optional_tests' in req.body) {
+        if ('lint' in req.body.optional_tests) {
+            req.checkBody("optional_tests.lint", "Must contain true or false").isBoolean();
+            input.optional_tests.lint = req.body.optional_tests.lint;
+        }
+    }
+    if ('languages' in req.body) {
+        req.checkBody("languages", "Must contain only ascii characters").isAscii();
+        input.languages = req.body.languages;
+    }
+
+    var inputError = req.validationErrors();
+    if (inputError) {
+        throw badInput.BAD_INPUT(inputError);
+    }
+    return input;
+}
+
+// checks that course_id and assignment_id are valid IDs
+function assignmentValidation(req) {
+    req.checkParams('course_id', 'Not a valid course id').isMongoId();
+    req.checkParams('assignment_id', 'Not a valid assignment id').isMongoId();
+    var inputError = req.validationErrors();
+    if (inputError) {
+        throw badInput.BAD_INPUT(inputError);
+    }
+    return {course_id: req.params.course_id, assignment_id: req.params.assignment_id};
+}
+
 exports.postCourseValidation = postCourseValidation;
+exports.putCourseBodyValidation = putCourseBodyValidation;
 exports.putMembersInviteValidation = putMembersInviteValidation;
 exports.postMemberInviteValidation = postMemberInviteValidation;
 exports.assignmentgroupValidation = assignmentgroupValidation;
 exports.badgeValidation = badgeValidation;
+exports.assignmentAndCourseValidation = assignmentAndCourseValidation;
+exports.courseIdValidation = courseIdValidation;
+exports.assignmentValidation = assignmentValidation;
+exports.putAssignmentBodyValidation = putAssignmentBodyValidation;
