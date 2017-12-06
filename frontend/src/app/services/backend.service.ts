@@ -50,7 +50,7 @@ Http requests:
       .toPromise()
       .then(response => response)
       .catch(err => {
-        this.toastService.error(err.error);
+        this.ToastError(err.error);
         throw err;
       });
   }
@@ -62,7 +62,7 @@ Http requests:
       .toPromise()
       .then(response => response)
       .catch(err => {
-        this.toastService.error(err.error);
+        this.ToastError(err.error);
         throw err;
       });
   }
@@ -74,7 +74,7 @@ Http requests:
       .toPromise()
       .then(response => response)
       .catch(err => {
-        this.toastService.error(err.error);
+        this.ToastError(err.error);
         throw err;
       });
   }
@@ -91,9 +91,19 @@ Http requests:
       .toPromise()
       .then(response => response)
       .catch(err => {
-        this.toastService.error(err.error);
+        this.ToastError(err.error);
         throw err;
       });
+  }
+
+  private ToastError(error) {
+    // Process errors and display the appropriate toasts
+    this.toastService.error(error.message, 'Oops');
+    if (error.hasOwnProperty('badinput')) {
+      for (const bad of error.badinput) {
+        this.toastService.error(bad.msg,  bad.param);
+      }
+    }
   }
 
 /*
