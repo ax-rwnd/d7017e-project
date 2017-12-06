@@ -350,11 +350,11 @@ The structure below is the following:
  }
  */
 
-  postInvitationToCourse(course_id: ObjectID, student_id: ObjectID) {
-    // Send an invitation for a student to join a course
+  postInvitationToCourse(course_id: string, student_id: string) {
+    // Send an invitation for a student to join a course, if user sends its id it's a join request to a course
 
     const body = {'student_id': student_id};
-    return this.apiPost('/api/courses/' + course_id + '/students/invite', body);
+    return this.apiPost('/api/courses/' + course_id + '/members/invite', body);
   }
 
   acceptInvite(course_id: ObjectID, student_id: ObjectID) {
