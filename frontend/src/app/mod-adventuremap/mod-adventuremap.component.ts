@@ -120,6 +120,12 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
         // Grab the available groups
         this.assignmentGroups = data.assignmentgroups;
 
+        if (this.assignmentGroups && this.assignmentGroups.length <= 0) {
+          console.warn('no groups...');
+          return;
+        } else {
+        }
+
         // Grab details about the specific group
         this.backendService.getAssignmentGroup(this.courseCode, this.assignmentGroups[this.groupIndex]).then((nestdata: any) => {
           this.assignments = nestdata.assignments;
