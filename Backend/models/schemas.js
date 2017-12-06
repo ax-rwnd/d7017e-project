@@ -20,7 +20,7 @@ var assignmentSchema = new Schema({
         io: [{ type: Schema.Types.ObjectId, ref: 'Test', required: false }],
         lint: Boolean
     },
-    languages: [String]
+    languages: [{type: String, required: true}]
 });
 assignmentSchema.index({name: 'text', description: 'text'}, {weights: {name: 5, description: 1}});
 

@@ -270,10 +270,10 @@ describe('/api', () => {
                         name: 'Introduction to Mocha tests',
                         description: 'Write tests with Mocha',
                         hidden: false,
-                        lint: true,
+                        tests: {lint: true},
                         languages: 'javascript'
                     })
-                    .set('Authorization', 'Bearer ' + access_tokens.user)
+                    .set('Authorization', 'Bearer ' + access_tokens.admin)
                     .expect(201)
                     .then(res => {
                         assert(ObjectId.isValid(res.body._id), 'response is not a valid ObjectId');
@@ -288,10 +288,10 @@ describe('/api', () => {
                         name: 'Lesson 2 in Mocha tests',
                         description: 'Write tests with Mocha',
                         hidden: false,
-                        lint: true,
+                        tests: {lint: true},
                         languages: 'javascript'
                     })
-                    .set('Authorization', 'Bearer ' + access_tokens.user)
+                    .set('Authorization', 'Bearer ' + access_tokens.admin)
                     .expect(201)
                     .then(res => {
                         assert(ObjectId.isValid(res.body._id), 'response is not a valid ObjectId');
