@@ -276,6 +276,18 @@ The structure below is the following:
     return this.apiGet('/api/courses/' + course_id + '/assignments/' + assignment_id);
   }
 
+  getAssignmentGroupsCourse(course_id: string) {
+    // Find the assignment groups for the course
+
+    return this.apiGet('/api/courses/' + course_id + '/assignmentgroups');
+  }
+
+  getAssignmentGroup(course_id: string, assignmentgroup_id: string) {
+    // Retrieve an assignment group
+
+    return this.apiGet('/api/courses/' + course_id + '/assignmentgroups/' + assignmentgroup_id);
+  }
+
 // -- Create, update and submit -- //
 
   createAssignment(course_id: any, assignmentName: string, description: string, languages: string[]) {
