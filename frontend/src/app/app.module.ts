@@ -65,6 +65,7 @@ import { ModAdventuremapEditorComponent } from './mod-adventuremap/mod-adventure
 import { ModBadgesComponent } from './mod-badges/mod-badges.component';
 import { ModBadgesSingleComponent } from './mod-badges/mod-badges-single.component';
 import { TeacherCoursesComponent } from './teacher-courses/teacher-courses.component';
+import { JoinCourseComponent } from './join-course/join-course.component';
 
 
 const appRoutes: Routes = [
@@ -77,7 +78,8 @@ const appRoutes: Routes = [
   { path: 'createAssignmentTest', component: CreateassignmentComponent, canActivate: [AuthGuard]},
   { path: 'courses/:course/createNewAssignment', component: CreateassignmentComponent, canActivate: [AuthGuard]},
   { path: 'user/createCourse', component: CreatecourseComponent, canActivate: [AuthGuard]},
-  { path: 'user/updateCourse/:course', component: CreatecourseComponent, canActivate: [AuthGuard]}
+  { path: 'user/updateCourse/:course', component: CreatecourseComponent, canActivate: [AuthGuard]},
+  { path: 'join/:courseID', component: JoinCourseComponent, canActivate: [AuthGuard]}
 ];
 
 
@@ -107,6 +109,7 @@ const appRoutes: Routes = [
     ModAdventuremapEditorComponent,
     ModAdventuremapLargeComponent,
     TeacherCoursesComponent,
+    JoinCourseComponent,
   ],
   imports: [
     AceEditorModule,
