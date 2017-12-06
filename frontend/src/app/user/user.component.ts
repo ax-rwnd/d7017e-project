@@ -104,15 +104,6 @@ export class UserComponent implements OnInit {
       .catch(err => console.error('Get courses for search modal failed'));
   }
 
-  createCourse() {
-    // Adds a course to the course service
-
-    const course = this.courseService.CreateCourse('10000', this.form.value.name,
-      this.form.value.code, this.form.value.info, this.form.value.progress,
-      this.form.value.score, this.form.value.badges, this.form.value.leaderboard);
-    this.courseService.AddCourse(course);
-  }
-
   searchCourse() {
     // Find a course to join
 
@@ -135,7 +126,7 @@ export class UserComponent implements OnInit {
 
   join(course_id) {
     // Join a course
-    this.backendService.postJoinRequest(course_id, new ObjectID(this.userService.userInfo.id))
+    this.backendService.postInvitationToCourse(course_id, this.userService.userInfo.id)
       .then(response => {
         console.log(response);
         this.getPending();
