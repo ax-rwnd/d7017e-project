@@ -98,11 +98,13 @@ export class UserComponent implements OnInit {
           } else {
             name = courses[i].name;
           }
-          this.possibleCourses[i] = {name: name, id: courses[i]._id};
+          const owner = courses[i].owner.username;
+          this.possibleCourses[i] = {name: name, id: courses[i]._id, owner: owner};
         }
       })
       .catch(err => console.error('Get courses for search modal failed'));
   }
+
 
   searchCourse() {
     // Find a course to join
