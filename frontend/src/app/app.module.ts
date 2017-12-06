@@ -15,6 +15,8 @@ import { ModalModule } from 'ngx-bootstrap';
 import { TooltipModule } from 'ngx-bootstrap/tooltip';
 import { AngularFontAwesomeModule } from 'angular-font-awesome/angular-font-awesome';
 
+import { DragulaModule } from 'ng2-dragula';
+
 import { AceEditorModule } from 'ng2-ace-editor';
 import { MarkdownModule } from 'angular2-markdown';
 
@@ -107,25 +109,26 @@ const appRoutes: Routes = [
     TeacherCoursesComponent,
   ],
   imports: [
-    BrowserModule,
-    FormsModule,
-    ReactiveFormsModule,
-    BrowserAnimationsModule,
     AceEditorModule,
-    MarkdownModule.forRoot(),
     AlertModule.forRoot(),
-    ButtonsModule.forRoot(),
+    AngularFontAwesomeModule,
+    BrowserAnimationsModule,
+    BrowserModule,
     BsDropdownModule.forRoot(),
+    ButtonsModule.forRoot(),
     CollapseModule.forRoot(),
-    TabsModule.forRoot(),
-    TooltipModule.forRoot(),
+    DragulaModule,
     HttpClientModule,
     HttpModule,
-    AngularFontAwesomeModule,
+    FormsModule,
+    MarkdownModule.forRoot(),
     ModalModule.forRoot(),
+    ReactiveFormsModule,
     RouterModule.forRoot(
       appRoutes
     ),
+    TabsModule.forRoot(),
+    TooltipModule.forRoot(),
     ToastModule.forRoot()
   ],
   providers: [

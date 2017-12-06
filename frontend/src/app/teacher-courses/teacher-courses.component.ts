@@ -12,6 +12,7 @@ import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import { BackendService } from '../services/backend.service';
 import { ToastService } from '../services/toast.service';
 import {UserService} from '../services/user.service';
+import { DragulaService } from 'ng2-dragula';
 
 @Component({
   selector: 'app-teacher-courses',
@@ -52,19 +53,28 @@ export class TeacherCoursesComponent implements OnInit {
     {key: 'bronze_trophy_badge', name: 'Bronze trophy'},
     {key: 'silver_trophy_badge', name: 'Silver trophy'},
     {key: 'gold_trophy_badge', name: 'Gold trophy'},
-    {key: 'badge1', name: 'Smiley'},
     {key: 'badge2', name: 'Silver trophy 2'},
+    {key: 'goldbadge', name: 'Gold trophy 2'},
+    {key: 'badge1', name: 'Smiley'},
     {key: 'badge3', name: 'Lightning'},
+    {key: 'brainbadge', name: 'Brain'},
+    {key: 'starbadge', name: 'Star'},
   ];
   selectedAssignments: any[];
   tests: any;
   badgeName: string;
   badgeDescription: string;
+  groups: any[];
+  options_bag = {
+  };
+  options_assignments = {
+
+  };
 
   constructor(private courseService: CourseService, private route: ActivatedRoute, private headService: HeadService,
               private fb: FormBuilder, private assignmentService: AssignmentService, private modalService: BsModalService,
               private backendService: BackendService, private toastService: ToastService, private userService: UserService,
-              private router: Router) {
+              private router: Router, private dragulaService: DragulaService) {
 
     // Subscribe to the sidebar state
     this.headService.stateChange.subscribe(sidebarState => {
@@ -72,6 +82,22 @@ export class TeacherCoursesComponent implements OnInit {
 
     this.courseService.teachCourses.subscribe( teachCourses => {
       this.teachCourses = teachCourses;
+    });
+
+    dragulaService.setOptions('bag-one', {
+      copy: function (el, source) {
+        // To copy only elements in right container, the left container can still be sorted
+        return source.id === 'right';
+      },
+      removeOnSpill: function (el, source) {
+        // To copy only elements in right container, the left container can still be sorted
+        return source.id !== 'right';
+      },
+      copySortSource: false,
+      accepts: function(el, target, source, sibling) {
+        // To avoid draggin from left to right container
+        return target.id !== 'right';
+      }
     });
 
     this.route.params.subscribe( (params: any) => {
@@ -82,6 +108,7 @@ export class TeacherCoursesComponent implements OnInit {
       // Assign groups for assignments
       if (this.assignmentService.courseAssignments[this.currentCourse.id] !== undefined) {
         this.assignmentGroups = this.assignmentService.courseAssignments[this.currentCourse.id];
+        // this.assignmentGroups = this.assignmentService.courseAssignments['default'];
         console.log('assignments', this.assignmentGroups);
       } else {
         this.assignmentGroups = this.assignmentService.courseAssignments['default'];
@@ -106,6 +133,7 @@ export class TeacherCoursesComponent implements OnInit {
     this.form = this.fb.group(this.defaultForm);
     this.selectedAssignments = [{'assignment': this.flattenAssignments()[0], 'possible': this.flattenAssignments()}];
     this.tests = {};
+    this.groups = [{name: 'Group1', assignments: []}, {name: 'Group2', assignments: []}, {name: 'Group3', assignments: []}];
   }
 
   openModal(modal, type) {
