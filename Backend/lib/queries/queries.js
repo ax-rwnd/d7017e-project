@@ -140,7 +140,6 @@ function getUsers(id_array, fields) {
         // Make a promise for each id
         var temp = User.findById(id_array[i], wantedFields).then(function (user) {
             if (!user) {
-                console.log("User not found");
                 throw errors.USER_NOT_FOUND;
             }
             return user;
@@ -539,8 +538,8 @@ function deleteCourseMembers(course_id) {
     });
 }
 
-function deleteAssignment(id) {
-    return Assignment.findOneAndRemove({_id: id})
+function deleteAssignment(assignment_id, course_id) {
+    return Assignment.findOneAndRemove({_id: assignment_id})
     .then(ass => {
         if (!ass) {
             throw errors.ASSIGNMENT_DOES_NOT_EXIST;
@@ -550,7 +549,17 @@ function deleteAssignment(id) {
         let del_tests = Test.remove({_id: {$in: allTests}});
         // drafts
         let del_drafts = Draft.remove({assignment: ass._id});
-        return Promise.all([del_tests, del_drafts]);
+        // assignmentgroups
+        let del_fromAssignmentgroups = Course.findById(course_id, 'assignmentgroups')
+        .populate({path: 'assignmentgroups', model: 'Assignmentgroup'})
+        .then(function(course) {
+            for(let assignmentgroup of course.assignmentgroups) {
+                assignmentgroup.assignments = assignmentgroup.assignments.filter(assignment => assignment.assignment != assignment_id);
+                return assignmentgroup.save();
+            }
+        });
+
+        return Promise.all([del_tests, del_drafts, del_fromAssignmentgroups]);
     });
 }
 
@@ -659,9 +668,7 @@ function getAssignment(assignment_id, roll, fields) {
         if (!assignment) {
             throw errors.ASSIGNMENT_DOES_NOT_EXIST;
         }
-        console.log(assignment);
 
-        console.log(wantedFields);
         return populateObject(assignment, "assignments", wantedFields)
         .then(function(populatedAssignment) {
             return populatedAssignment[0];
@@ -731,7 +738,6 @@ function createAssignment(name, description, hidden, lint, languages, course_id)
     var newAssignment = new Assignment({name: name, description: description, hidden: hidden, tests: {io: [], lint: lint}, optionaal_tests: {io: [], lint: lint}, languages: languages});
     return newAssignment.save().then(function (createdAssignment) {
         if (!createdAssignment) {
-            console.log("Error: Assignment not created");
             throw errors.ASSINGMENT_NOT_CREATED;
         }
         //Push createdAssignment _id into course_id's assignments
@@ -754,7 +760,6 @@ function createTest(stdout, stdin, args, assignment_id) {
 
     return newTest.save().then(function (createdTest) {
         if (!createdTest) {
-            console.log("Error: Test not created");
             throw errors.TEST_NOT_CREATED;
         }
         //Push createdAssignment _id into course_id's assignments
@@ -790,7 +795,6 @@ function checkPermission(wantedFields, collection, roll) {
 // Populates all wanted fields which is a Ref.
 // Needs to be specified in FIELDS
 function populateObject(mongooseObject, schema, wantedFields) {
-    console.log(wantedFields);
     var fieldsToPopulateArray = constants.FIELDS[schema.toUpperCase()].POPULATE_FIELDS.split(" ");
     var populatePromises = [];
     var model = constants.FIELDS[schema.toUpperCase()].MODEL;
@@ -1000,10 +1004,8 @@ function tempSaveMember (user_id, course_id) {
 function saveCourseObject(user_id, courseObject) {
     var course = new Course(courseObject);
     return course.save().then(function (savedCourse) {
-        console.log(savedCourse);
         return Features.createFeature(user_id, savedCourse._id).then(function (featureObject) {
             // TODO: FIX FEATURE FIELD. WHAT SHOULD IT ADD?
-            console.log(featureObject);
             var memberObject = new CourseMember({role: "teacher", course: savedCourse._id, user: savedCourse.owner, features: featureObject._id});
             return memberObject.save().then(function () {
                 return savedCourse;

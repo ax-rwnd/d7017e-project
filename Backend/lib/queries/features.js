@@ -137,20 +137,17 @@ function getFeaturesOfCourse(course_id) {
     return getNumberOfAssignments(course_id).then(function(total_assignments) {
 
          json.total_assignments = total_assignments;
+         json.features = [];
 
-         CourseMembers.find({course: course_id}, 'features')
+         return CourseMembers.find({course: course_id}, 'features')
          .populate({path: 'features', model: 'Features'})
+         .lean()
          .then(function(features) {
-             console.log('features');
-             console.log(features);
-
              for(let feature of features) {
-                 feature.completed_assignments = feature.progress.length;
+                 feature.completed_assignments = feature.features.progress.length;
                  json.features.push(feature);
              }
-
              return json;
-
          });
     });
 
@@ -205,17 +202,15 @@ function getFeaturesOfCourse(course_id) {
 
 function getFeatureOfUserID(course_id, user_id) {
     return CourseMembers.findOne({course: course_id, user: user_id}, 'features')
+    .populate({path: 'features', model:'Features'})
+    .lean()
     .then(function(feature) {
-        if(feature === null) {
-            throw errors.NOT_FOUND;
-        } else {
-            getNumberOfAssignments(course_id)
-            .then(function(total_assignments) {
-                feature.total_assignments = total_assignments;
-                feature.completed_assignments = feature.progress.length;
-                return feature;
-            });
-        }
+        return getNumberOfAssignments(course_id)
+        .then(function(total_assignments) {
+            feature.total_assignments = total_assignments;
+            feature.completed_assignments = feature.features.progress.length;
+            return feature;
+        });
     });
 
     /*let course = await Course.findById(course_id)

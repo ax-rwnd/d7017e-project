@@ -128,7 +128,6 @@ module.exports = function(router) {
             return queries.getCourseMembers1(course_id).then(function(courseMembers) {
                 var courseObject = course.toObject();
                 courseObject.members = courseMembers;
-                console.log(courseObject);
                 return res.json(courseObject);
             });
         })
@@ -517,7 +516,7 @@ module.exports = function(router) {
         permission.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
         // ensure the course actually owns the assignment
         // TODO: use lib/perssion
-        .then(() => queries.deleteAssignment(assignment_id))
+        .then(() => queries.deleteAssignment(assignment_id, course_id))
         .then(() => {
             // respond with empty body
             res.json({});
@@ -764,8 +763,8 @@ module.exports = function(router) {
             return next(errors.BAD_INPUT);
         }
 
-        features.getFeaturesOfCourse(course_id)
-        .then(features => res.json({features: features}))
+        return features.getFeaturesOfCourse(course_id)
+        .then(features => res.json(features))
         .catch(next);
     });
 
@@ -780,7 +779,7 @@ module.exports = function(router) {
         }
 
         features.getFeatureOfUserID(course_id, user_id)
-        .then(res.json)
+        .then(feature => res.json(feature))
         .catch(next);
     });
 

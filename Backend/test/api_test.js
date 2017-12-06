@@ -293,6 +293,53 @@ describe('/api', () => {
             });
         });
 
+        describe('PUT /api/courses/:course_id/assignmentgroups/:assignmentgroup_id', () => {
+            it('add assignment to assignmentgroup', () => {
+                return request(runner.server)
+                    .get('/api/courses/' + course_id + '/assignmentgroups/' + assignmentgroup_id1)
+                    .set('Authorization', 'Bearer ' + access_tokens.user)
+                    .expect(200)
+                    .then(res => {
+                        let assignemntgroupsData = res.body;
+
+                        assignemntgroupsData.name = "AssGrp with Ass in. Ass ass baby!";
+                        let assignment = {
+                            assignment: assignment_id2
+                        };
+                        assignemntgroupsData.assignments.push(assignment);
+
+                        return request(runner.server)
+                            .put('/api/courses/' + course_id + '/assignmentgroups/' + assignmentgroup_id1)
+                            .set('Authorization', 'Bearer ' + access_tokens.admin)
+                            .send(assignemntgroupsData)
+                            .set('Content-Type', 'application/json')
+                            .expect(200)
+                            .then(res => {
+                                assert(res.body.assignments.length === 1, 'not length 1');
+                            });
+                    });
+            });
+        });
+
+        describe('DELETE /api/courses/:course_id/assignments/:assignment_id', () => {
+            it('completes without an error', () => {
+                return request(runner.server)
+                    .delete('/api/courses/' + course_id + '/assignments/' + assignment_id2)
+                    .set('Authorization', 'Bearer ' + access_tokens.admin)
+                    .expect(200)
+                    .then(res => {
+                        return request(runner.server)
+                            .get('/api/courses/' + course_id + '/assignmentgroups/' + assignmentgroup_id1)
+                            .set('Authorization', 'Bearer ' + access_tokens.user)
+                            .expect(200)
+                            .then(res => {
+                                assert(res.body.assignments.length === 0, 'not length 0');
+                            });
+                    });
+                // TODO: add assertions to check if there is some data left
+            });
+        });
+
         describe('GET /api/courses/:course_id/assignments', () => {
             it('returns a non-empty list of assignments', () => {
                 return request(runner.server)
@@ -484,7 +531,7 @@ describe('/api', () => {
     });
 
     describe('/features', () => {
-        describe.skip('GET /api/:course_id/features/', () => {
+        describe('GET /api/:course_id/features/', () => {
             it('Get features for all users in course', () => {
                 let route = '/api/courses/'+course_id+'/features/';
                 return request(runner.server)
@@ -497,7 +544,7 @@ describe('/api', () => {
             });
         });
 
-        describe.skip('GET /api/courses/:course_id/features/me', () => {
+        describe('GET /api/courses/:course_id/features/me', () => {
             it('Get feature for user in course', () => {
                 let route = '/api/courses/'+course_id+'/features/me';
                 return request(runner.server)
@@ -505,8 +552,8 @@ describe('/api', () => {
                     .set('Authorization', 'Bearer ' + access_tokens.admin)
                     .expect(200)
                     .then(res => {
-                        assert(Array.isArray(res.body.badges), 'not an array');
-                        assert(Array.isArray(res.body.progress), 'not an array');
+                        assert(Array.isArray(res.body.features.badges), 'not an array');
+                        assert(Array.isArray(res.body.features.progress), 'not an array');
                     });
             });
         });
@@ -724,6 +771,8 @@ describe('/api', () => {
                     })
                     .expect(200)
                     .then(res => {
+                        // TODO
+                        console.log(res.body);
                         assert(assignment_id1 == res.body.assignment_id, 'response is not contain the correct assignment_id');
                     });
             });
@@ -747,16 +796,6 @@ describe('/api', () => {
             it('completes without an error', () => {
                 return request(runner.server)
                     .delete('/api/courses/' + course_id + '/assignments/' + assignment_id1 + '/tests/' + test_id)
-                    .set('Authorization', 'Bearer ' + access_tokens.admin)
-                    .expect(200);
-                // TODO: add assertions to check if there is some data left
-            });
-        });
-
-        describe('DELETE /api/courses/:course_id/assignments/:assignment_id', () => {
-            it('completes without an error', () => {
-                return request(runner.server)
-                    .delete('/api/courses/' + course_id + '/assignments/' + assignment_id2)
                     .set('Authorization', 'Bearer ' + access_tokens.admin)
                     .expect(200);
                 // TODO: add assertions to check if there is some data left
