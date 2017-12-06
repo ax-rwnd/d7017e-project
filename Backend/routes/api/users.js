@@ -46,7 +46,7 @@ module.exports = function (router) {
         var specificRole = req.query.role;
 
         var p;
-        if (specificRole === "teacher") {  
+        if (specificRole === "teacher") {
             p = queries.getUserTeacherCourses1(user_id);
 
         } else if (specificRole === "student") {
@@ -60,7 +60,7 @@ module.exports = function (router) {
         })
         .catch(next);
     });
-    
+
 
     router.get('/:user_id', function (req, res, next) {
         var user_id = req.params.user_id;
@@ -70,10 +70,10 @@ module.exports = function (router) {
 
         queries.getUser(user_id, filter).then(function (user) {
             return queries.getUserMemberCourses1(user_id).then(function(userCourses) {
-                    var userObject = user.toObject();
-                    userObject.courses = userCourses;
-                    return res.json(userObject); 
-                });
+                var userObject = user.toObject();
+                userObject.courses = userCourses;
+                return res.json(userObject);
+            });
         })
         .catch(function (err) {
             next(err);

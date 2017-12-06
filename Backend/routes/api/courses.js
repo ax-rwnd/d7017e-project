@@ -128,7 +128,6 @@ module.exports = function(router) {
             return queries.getCourseMembers1(course_id).then(function(courseMembers) {
                 var courseObject = course.toObject();
                 courseObject.members = courseMembers;
-                console.log(courseObject);
                 return res.json(courseObject);
             });
         })
@@ -218,8 +217,9 @@ module.exports = function(router) {
 
     // NOT DONE
     router.post('/:course_id/members/invite', function (req, res, next) {
+        var input;
         try {
-            var input = inputValidation.putMembersInviteValidation(req);
+            input = inputValidation.putMembersInviteValidation(req);
         }
         catch(error) {
             return next(error);
@@ -246,8 +246,9 @@ module.exports = function(router) {
     //
     //
     router.put('/:course_id/members/invite', function (req, res, next) {
+        var input;
         try {
-            var input = inputValidation.putMembersInviteValidation(req);
+            input = inputValidation.putMembersInviteValidation(req);
         }
         catch(error) {
             return next(error);
@@ -505,7 +506,7 @@ module.exports = function(router) {
         let {course_id, assignment_id} = inputValidation.assignmentValidation(req);
         permission.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
         .then(() => permission.checkIfAssignmentInCourse(course_id, assignment_id))
-        .then(() => queries.deleteAssignment(assignment_id))
+        .then(() => queries.deleteAssignment(assignment_id, course_id))
         .then(() => {
             // respond with empty body
             res.json({});
@@ -817,8 +818,8 @@ module.exports = function(router) {
             return next(errors.BAD_INPUT);
         }
 
-        features.getFeaturesOfCourse(course_id)
-        .then(features => res.json({features: features}))
+        return features.getFeaturesOfCourse(course_id)
+        .then(features => res.json(features))
         .catch(next);
     });
 
@@ -833,7 +834,7 @@ module.exports = function(router) {
         }
 
         features.getFeatureOfUserID(course_id, user_id)
-        .then(res.json)
+        .then(feature => res.json(feature))
         .catch(next);
     });
 

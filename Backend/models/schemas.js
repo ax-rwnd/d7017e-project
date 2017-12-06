@@ -91,7 +91,7 @@ var courseSchema = new Schema({
     hidden: {type: Boolean, default: false},  //public or private course
     autojoin: {type: Boolean, default: false},
     owner: {type: Schema.Types.ObjectId, ref: 'User', required: false},
-    assignments: [{ type: Schema.Types.ObjectId, ref: 'Assignment', required: false }], // Remove me soon
+    assignments: [{ type: Schema.Types.ObjectId, ref: 'Assignment', required: false }],
     assignmentgroups: [{ type: Schema.Types.ObjectId, ref: 'Assignmentgroup', required: false }],
     enabled_features: {
         badges: Boolean,
