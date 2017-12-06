@@ -258,7 +258,7 @@ module.exports = function(router) {
                 })
                 .then(function () {
                     return 202;
-                }); 
+                });
         }
 
 
@@ -876,7 +876,7 @@ module.exports = function(router) {
 
         var input;
         try {
-            input = inputValidation.badgeValidation(req);
+            input = inputValidation.postBadgeValidation(req);
         } catch(error) {
             return next(error);
         }
@@ -901,7 +901,7 @@ module.exports = function(router) {
             return next(errors.BAD_INPUT);
         }
 
-        features.getBadge(badge_id)
+        return features.getBadge(badge_id)
         .then(function(badge) {
             return res.json(badge);
         })
@@ -917,10 +917,17 @@ module.exports = function(router) {
         if (!mongoose.Types.ObjectId.isValid(course_id) || !mongoose.Types.ObjectId.isValid(badge_id)) {
             return next(errors.BAD_INPUT);
         }
+        var input;
+        try {
+            input = inputValidation.putBadgeValidation(req);
+        } catch(error) {
+            return next(error);
+        }
 
-        req.body.course_id = course_id;
-
-        return features.updateBadge(badge_id, req.body)
+        return permission.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
+        .then(function() {
+            return features.updateBadge(badge_id, input);
+        })
         .then(function(badge) {
             return res.json(badge);
         })
@@ -956,7 +963,7 @@ module.exports = function(router) {
             return next(errors.BAD_INPUT);
         }
 
-        queries.getAssignmentgroupsByCourseID(course_id)
+        return queries.getAssignmentgroupsByCourseID(course_id)
         .then(assignmentgroups => res.json(assignmentgroups))
         .catch(next);
     });
@@ -997,7 +1004,7 @@ module.exports = function(router) {
             return next(errors.BAD_INPUT);
         }
 
-        queries.getAssignmentgroupByID(assignmentgroup_id)
+        return queries.getAssignmentgroupByID(assignmentgroup_id)
         .then(function(assignmentgroup) {
             return res.json(assignmentgroup);
         })
@@ -1021,7 +1028,7 @@ module.exports = function(router) {
             return next(error);
         }
 
-        permission.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
+        return permission.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
         .then(function() {
             queries.updateAssignmentgroup(input, assignmentgroup_id)
             .then(function(assignmentgroup) {
