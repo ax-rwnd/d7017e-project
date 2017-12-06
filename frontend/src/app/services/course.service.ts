@@ -227,8 +227,9 @@ function updateCourseFeatures(courseId, backendService, courseService) {
   // Updates the features of the given course
   // Returns a promise
 
-  const index = getCourseIndex(courseId, courseService);
   const currentCourse = courseService.GetCourse(courseId);
+  const index = getCourseIndex(courseId, courseService);
+
   return backendService.getFeaturesCourseMe(courseId)
     .then(featureResponse => {
       const rewards = handleFeatureResponse(featureResponse);
@@ -248,15 +249,13 @@ function updateCourseFeatures(courseId, backendService, courseService) {
 
 function getCourseIndex(courseId, courseService) {
   // Returns the index of the given course
-  // TODO: why do we need the index again?
+  // TODO: needs testing
 
-  let i;
-  for (i = 0; i < courseService.courses.length; i++) {
-    if (courseService.courses[i].id === courseId) {
-      return i;
-    }
+  const index: number = courseService.courses.findIndex((c: any) => c.id === courseId);
+  if (index === -1) {
+    throw new Error('failed to find the course');
   }
-  return 0;
+  return index;
 }
 
 function handleFeatureResponse(response: any) {
