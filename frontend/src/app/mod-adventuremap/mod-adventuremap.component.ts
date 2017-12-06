@@ -23,6 +23,7 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
   // Backend state
   private userProgress: any;
   protected assignments: any[];
+  protected assignmentGroups: any[];
 
   // Frontend state
   protected lastAssignment: any;
@@ -112,6 +113,10 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
 
   loadAssignments() {
     // Load assingments for the map
+    this.backendService.getAssignmentGroupsCourse(this.courseCode).then((data: any) => {
+      this.assignmentGroups = data.assignmentgroups;
+    })
+      .catch((err) => console.error('could not get groups in adventuremap', err));
 
     return new Promise( (resolve: any, reject: any) => {
       this.loadProgress()
