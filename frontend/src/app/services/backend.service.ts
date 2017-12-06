@@ -129,13 +129,13 @@ The structure below is the following:
   getMyCourses() {
     // Get courses that the logged in user is participating in as a 'student'
 
-    return this.apiGet('/api/users/me/courses');
+    return this.apiGet('/api/users/me/member?role=student');
   }
 
   getMyTeachedCourses() {
     // Get courses that the current user has write permissions for, i.e. as a 'teacher'
 
-    return this.apiGet('/api/users/me/teaching');
+    return this.apiGet('/api/users/me/member?role=teacher');
   }
 
   getFeaturesCourseMe (course_id: string) {

@@ -148,18 +148,22 @@ function getTeachCourses(response, backendService, courseService, assignmentServ
   // Get the courses that a user is teaching
   // TODO: fixthis
 
-  const courses = response.teaching;
+  const courses = response.courses;
   const promiseArray = [];
 
-  console.log('Teachresponse:', response);
-  for (let i = 0; i < courses.length; i++) {
-    promiseArray.push(backendService.getCourse(courses[i]._id)
+  for (const c of courses) {
+    const cInner = c.course;
+
+    // Grab courses from the backend
+    promiseArray.push(backendService.getCourse(cInner._id)
       .then(course => {
           courseService.teaching.push(newTeachCourse(course));
       })
-      .catch());
+      .catch(err => {
+        console.error('failed to push to courseservice in', this.getTeachCourses.name, err);
+      }));
 
-    promiseArray.push(setAssignmentsForCourse(courses[i]._id, backendService, assignmentService));
+    promiseArray.push(setAssignmentsForCourse(cInner._id, backendService, assignmentService));
   }
 
   return Promise.all(promiseArray);
