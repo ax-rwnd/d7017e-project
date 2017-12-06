@@ -450,7 +450,7 @@ function getUserInvites(user_id, type) {
 }
 
 function getInvitesCourseUser(user_id, course_id) {
-    return JoinRequest.find({user: user_id, course: course_id});
+    return JoinRequest.findOne({user: user_id, course: course_id}, "inviteType");
 }
 
 function returnPromiseForChainStart() {
@@ -1098,6 +1098,7 @@ function addMemberToCourse(user_id, course_id) {
 
 function removeInviteOrPendingToCourse (user_id, course_id) {
     return JoinRequest.findOneAndRemove({user:user_id, course: course_id}).then(function(inviteObject) {
+        console.log(inviteObject);
         if (!inviteObject) {
             throw errors.NO_INVITE_FOUND;
         }
@@ -1127,11 +1128,17 @@ function getUserMemberCourses1(user_id) {
 }
 
 function getUserMemberStatus(course_id, user_id) {
-    return CourseMember.findOne({user: user_id, course: course_id}, "role");
+    return CourseMember.findOne({user: user_id, course: course_id}, "role").then(function (memberObject) {
+        return memberObject;
+    });
 }
 
 function getCourseAutoJoin(course_id) {
     return Course.findById(course_id, "autojoin -_id");
+}
+
+function getCourseOwner(course_id) {
+    return Course.findById(course_id, "owner");
 }
 
 function addPendingToCourse(user_id, course_id) {
@@ -1254,6 +1261,7 @@ exports.acceptPendingToCourse = acceptPendingToCourse;
 exports.addInviteToCourse = addInviteToCourse;
 exports.addPendingToCourse = addPendingToCourse;
 exports.removeInviteOrPendingToCourse = removeInviteOrPendingToCourse;
+exports.getCourseOwner = getCourseOwner;
 
 exports.getTestsFromAssignment = getTestsFromAssignment;
 exports.findOrCreateUser = findOrCreateUser;

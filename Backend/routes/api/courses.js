@@ -162,17 +162,29 @@ module.exports = function(router) {
     });
 
 
+
+    // TODO:
+    // Tests
+    // Documentation
+    //
+    // Get all members of :course_id.
+    // Query parameter "role" takes either "student" or "teacher" if only one type of member is wanted.
     router.get('/:course_id/members', function (req, res, next) {
-        var course_id = req.params.course_id;
-        var query = req.query.role;
+        var input;
+        try {
+            input = inputValidation.getMembersValidation(req);
+        }
+        catch(error) {
+            return next(error);
+        }
 
         var p;
-        if (query === "teacher") {
-            p = queries.getCourseTeachers1(course_id);
-        } else if (query === "student") {
-            p = queries.getCourseStudents1(course_id);
+        if (input.role === "teacher") {
+            p = queries.getCourseTeachers1(input.course_id);
+        } else if (input.role === "student") {
+            p = queries.getCourseStudents1(input.course_id);
         } else {
-            p = queries.getCourseMembers1(course_id);
+            p = queries.getCourseMembers1(input.course_id);
         }
 
         p.then(function (memberArray) {
@@ -182,6 +194,12 @@ module.exports = function(router) {
     });
 
 
+    // TODO:
+    // Tests
+    // Documentation
+    //
+    // Teacher or admin can get all invites(invite, pending) regarding a :course_id.
+    // Query parameter "type" takes "invite" or "pending" if only one invite type is wanted.
     router.get('/:course_id/members/invite', function (req, res, next) {
         var input;
         try {
@@ -211,13 +229,14 @@ module.exports = function(router) {
     // Tests
     // Documentation
     //
-    //
-
-    // NOT DONE
+    // Teacher or admin can invite a user to :course_id by putting the users id in user_id body field.
+    // User can ask to join :course_id by leaving user_id blank or filling it with his own id.
+    // If course got autojoin a user who asks to join will automatically be added to the course.
+    // Statuscode 201 indicates the user been added to course. Statuscode 202 is sent if invite/pending successfully added.
     router.post('/:course_id/members/invite', function (req, res, next) {
         var input;
         try {
-            input = inputValidation.putMembersInviteValidation(req);
+            input = inputValidation.postMemberInviteValidation(req);
         }
         catch(error) {
             return next(error);
@@ -273,7 +292,8 @@ module.exports = function(router) {
     // Tests
     // Documentation
     //
-    //
+    // A teacher or admin can accept a pending request to :course_id. By adding their id in user_id body field.
+    // A user can accept an invite to :course_id by sending his own id in user_id body field or leaving it blank.
     router.put('/:course_id/members/invite', function (req, res, next) {
         var input;
         try {
@@ -298,6 +318,12 @@ module.exports = function(router) {
     });
 
 
+    // TODO:
+    // Tests
+    // Documentation
+    //
+    // A teacher can decline or take back an pending/invite to :course_id. By adding user_id of the user he wants to decline in body field user_id
+    // A user can decline or take back an invite/pending to :course_id. By adding their own user_id to user_id body field or leaving it blank.
     router.delete('/:course_id/members/invite', function (req, res, next) {
         var input;
         try {

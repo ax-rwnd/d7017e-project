@@ -6,6 +6,8 @@ var queries = require('../../lib/queries/queries');
 var errors = require('../../lib/errors.js');
 var auth = require('../../lib/authentication.js');
 var constants = require('../../lib/constants.js');
+var inputValidation = require('../../lib/inputValidation.js');
+
 
 module.exports = function (router) {
     // required query parameter `ids`:
@@ -41,18 +43,29 @@ module.exports = function (router) {
         }).catch(next);
     });
 
-    router.get('/me/member/', function (req, res, next) {
-        var user_id = req.user.id;
-        var specificRole = req.query.role;
+
+    // TODO:
+    // Tests
+    // Documentation
+    //
+    // User can get BASE_FIELDS of all courses he is a member(student or teacher) of.
+    // Query parameter "role" takes either "student" or "teacher" if user only wants one kind of courses.
+    router.get('/me/member', function (req, res, next) {
+        var input;
+        try {
+            input = inputValidation.getMeMemberValidation(req);
+        }
+        catch(error) {
+            return next(error);
+        }
 
         var p;
-        if (specificRole === "teacher") {
-            p = queries.getUserTeacherCourses1(user_id);
-
-        } else if (specificRole === "student") {
-            p = queries.getUserStudentCourses1(user_id);
+        if (input.role === "teacher") {
+            p = queries.getUserTeacherCourses1(req.user.id);
+        } else if (input.role === "student") {
+            p = queries.getUserStudentCourses1(req.user.id);
         } else {
-            p = queries.getUserMemberCourses1(user_id);
+            p = queries.getUserMemberCourses1(req.user.id);
         }
 
         p.then(function (courseList) {
@@ -98,12 +111,25 @@ module.exports = function (router) {
         }
     });
 
+
+    // TODO:
+    // Tests
+    // Documentation
+    //
+    // User can get invites he have recieved and requests he have sent.
+    // Query parameter "type" take either "pending" or "invite" if user only wants one type of invites.
     router.get('/me/invites', function (req, res, next) {
-        var query = req.query.type;
+        var input;
+        try {
+            input = inputValidation.getMeInvitesValidation(req);
+        }
+        catch(error) {
+            return next(error);
+        }
 
         var p;
-        if (req.query.type) {
-            p = queries.getUserInvites(req.user.id, query);
+        if (input.type) {
+            p = queries.getUserInvites(req.user.id, input.type);
         } else {
             p = queries.getUserInvites(req.user.id);
         }
@@ -111,9 +137,7 @@ module.exports = function (router) {
         p.then(function(inviteArray) {
             return res.json(inviteArray);
         })
-        .catch(function (error) {
-            return next(error);
-        });
+        .catch(next);
     });
 
 
@@ -122,34 +146,38 @@ module.exports = function (router) {
     // TESTS
     //
     // User can get his status to :course_id.
-    // Status can be teacher, student, invited, pending or nothing.
-    router.get('/courses/:course_id/status', function (req, res, next) {
-        var course_id = req.params.course_id;
-
-        if (!mongoose.Types.ObjectId.isValid(course_id)) {
-            return next(errors.BAD_INPUT);
+    // Status can be owner, teacher, student, invited, pending or nothing.
+    router.get('/me/:course_id/status', function (req, res, next) {
+        var input;
+        try {
+            input = inputValidation.getMeStatusValidation(req);
+        }
+        catch(error) {
+            return next(error);
         }
 
-        queries.getUserMemberStatus(course_id, req.user.id)
+        queries.getUserMemberStatus(input.course_id, req.user.id)
         .then(function (statusObject) {
             if (statusObject.role === "teacher") {
-                return "Teacher";
-            }
-            if (statusObject.role === "student") {
+                return queries.getCourseOwner(input.course_id).then(function (course) {
+                    if (course.owner === req.user.id) {
+                        return "Owner";
+                    } else {
+                        return "Teacher";
+                    }
+                });
+            } else if (statusObject.role === "student") {
                 return "Student";
             }
-            return queries.getInvitesCourseUser(req.user.id, course_id)
-            .then(function (userInvites) {
-                if (userInvites.length === 2) {
+            return queries.getInvitesCourseUser(req.user.id, input.course_id)
+            .then(function (userInvite) {
+                if (userInvite.inviteType === "invite") {
                     return "Invited";
-                }
-                if (userInvites.length === 1) {
-                    if (userInvites[0].inviteType === "invite") {
-                        return "Invited";
-                    }
+                } else if (userInvite.inviteType === "pending") {
                     return "Pending";
+                } else {
+                    return "Nothing";
                 }
-                return "Nothing";
             });
         })
         .then(function (status) {
