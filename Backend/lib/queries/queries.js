@@ -10,9 +10,10 @@ var Draft = require('../../models/schemas').Draft;
 var JoinRequest = require('../../models/schemas').JoinRequests;
 var Badge = require('../../models/schemas').Badge;
 var Feature = require('../../models/schemas').Features;
-var InviteLink = require('../../models/schemas').InviteLinks;
+var InviteCode = require('../../models/schemas').InviteCodes;
 var Features = require('./features.js');
 var Assignmentgroup = require('../../models/schemas').Assignmentgroup;
+var permission = require('../permission');
 
 var errors = require('../errors.js');
 var mongoose = require('mongoose');
@@ -525,7 +526,7 @@ function deleteCourse(id) {
         // join requests
         promises.push(JoinRequest.remove({course: course._id}));
         // invite links
-        promises.push(InviteLink.remove({course: course._id}));
+        promises.push(InviteCode.remove({course: course._id}));
         // badges
         promises.push(Badge.remove({course_id: course._id}));
 
@@ -1159,26 +1160,28 @@ function addInviteToCourse(user_id, course_id) {
     return inviteObject.save();
 }
 
-function generateInviteLink(course_id, expiresIn) {
-    var code = randomstring.generate();
-    var exp = Date.now() + (expiresIn || config.get("Courses.invite_link_ttl"));
+function generateInviteCode(course_id, expiresIn) {
+    var code = randomstring.generate(config.get('Courses.invite_link_length'));
+    var exp = (expiresIn === "never") // Won't set expiresAt if link never expires
+        ? undefined 
+        : Date.now() + (expiresIn || config.get("Courses.invite_link_ttl"));
 
     if (!mongoose.Types.ObjectId.isValid(course_id)) {
             throw errors.INVALID_ID;
     }
-    var newLink = new InviteLink({code: code, course: course_id, expiresAt: exp});
+    var newLink = new InviteCode({code: code, course: course_id, expiresAt: exp});
     return newLink.save().then(function (obj) {
-        return obj;
+        return obj.toObject();
     });
 }
 
-function validateInviteLink(code, user_id) {
-    return InviteLink.findOne({code: code}).then(function (obj) {
+function validateInviteCode(code, user_id) {
+    return InviteCode.findOne({code: code}).then(function (obj) {
         if (!obj) {
             throw errors.INVALID_LINK;
         }
         if (obj.expiresAt < Date.now()) {
-            return InviteLink.deleteOne({code: code}).then(function () {
+            return InviteCode.deleteOne({code: code}).then(function () {
                 throw errors.EXPIRED_LINK;
             });
         }
@@ -1186,9 +1189,11 @@ function validateInviteLink(code, user_id) {
         return CourseMember.findOne({user: user_id, course: obj.course}).then(function (res) {
             if (!res) {
                 return Features.createFeature(user_id, obj.course).then(function (featureObject) {
-                    // Add student to course
-                    var memberObject = new CourseMember({role: "student", course: obj.course, user: user_id, features: featureObject._id});
-                    return memberObject.save();
+                    return InviteCode.findOneAndUpdate({code: code}, {$inc: {uses: 1}}).then(function () {
+                        // Add student to course
+                        var memberObject = new CourseMember({role: "student", course: obj.course, user: user_id, features: featureObject._id});
+                        return memberObject.save();
+                    });
                 });
             } else {
                 throw errors.USER_ALREADY_IN_COURSE;
@@ -1197,6 +1202,39 @@ function validateInviteLink(code, user_id) {
 
 
     });
+}
+
+function revokeInviteCode(code, userObject) {
+    return InviteCode.findOne({code: code}).then(function (invitelink) {
+        if (!invitelink) {
+            throw errors.INVALID_LINK;
+        }
+        return permission.checkIfTeacherOrAdmin(userObject.id, invitelink.course, userObject.access).then(function () {
+            return InviteCode.findOneAndRemove({code: code}).then(function (obj) {
+                return obj;
+            });
+        });
+    });
+}
+
+function getInviteCode(code, userObject) {
+    return InviteCode.findOne({code: code}).then(function (invitelink) {
+        if (!invitelink) {
+            throw errors.INVALID_LINK;
+        }
+        return permission.checkIfTeacherOrAdmin(userObject.id, invitelink.course, userObject.access).then(function () {
+            return invitelink.toObject();
+        });
+    });
+}
+
+function getAllInviteCodes(course, userObject) {
+    return permission.checkIfTeacherOrAdmin(userObject.id, course, userObject.access).then(function () {
+        return InviteCode.find({course: course}, "code course uses createdAt expiresAt").then(function (codes) {
+            return codes;
+        });
+    });
+    
 }
 
 function getAssignmentgroupsByCourseID(course_id) {
@@ -1339,8 +1377,11 @@ exports.updateTest = updateTest;
 exports.deleteTest = deleteTest;
 exports.deleteCourse = deleteCourse;
 exports.deleteAssignment = deleteAssignment;
-exports.generateInviteLink = generateInviteLink;
-exports.validateInviteLink = validateInviteLink;
+exports.generateInviteCode = generateInviteCode;
+exports.validateInviteCode = validateInviteCode;
+exports.revokeInviteCode = revokeInviteCode;
+exports.getInviteCode = getInviteCode;
+exports.getAllInviteCodes = getAllInviteCodes;
 exports.getAssignmentgroupsByCourseID = getAssignmentgroupsByCourseID;
 exports.createAssignmentgroup = createAssignmentgroup;
 exports.getAssignmentgroupByID = getAssignmentgroupByID;

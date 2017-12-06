@@ -552,22 +552,30 @@ module.exports = function(router) {
         }).catch(next);
     });
 
-    router.get('/:course_id/invitelink', function (req, res, next) {
+    router.post('/:course_id/invitecodes', function (req, res, next) {
         var course_id = req.params.course_id;
+        var expires;
 
-        if (req.query.expires) {
-            var expires = (+req.query.expires);
-            // throw Bad input if number is NaN or too small
-            if (expires !== expires || expires <= 0) {
-                return next(errors.BAD_INPUT);
+        if (req.body.expires) {
+            if (req.body.expires === "never") {
+                expires = req.body.expires;
+            } else {
+                expires = (+req.body.expires);
+                // throw Bad input if number is NaN or too small
+                if (expires !== expires || expires <= 0) {
+                    return next(errors.BAD_INPUT);
+                }
+                // Increase number from milliseconds to hours
+                expires = expires * 60 * 60 * 1000;  
             }
-            // Increase number from milliseconds to hours
-            expires = expires * 60 * 60 * 1000;
         }
 
         permission.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access).then(function () {
-            return queries.generateInviteLink(course_id, expires).then(function (obj) {
-                res.status(201).json({course: obj.course, code: obj.code, expiresAt: obj.expiresAt});
+            return queries.generateInviteCode(course_id, expires).then(function (obj) {
+                if (!obj.expiresAt) {
+                    obj.expiresAt = "never";
+                }
+                res.status(201).json({code: obj.code, course: obj.course, uses: obj.uses, createdAt: obj.createdAt, expiresAt: obj.expiresAt});
             });
         })
         .catch(function (err) {
@@ -575,10 +583,30 @@ module.exports = function(router) {
         });
     });
 
-    router.get('/join/:code', function (req, res, next) {
+    router.get('/:course_id/invitecodes', function (req, res, next) {
+        var course = req.params.course_id;
+
+        queries.getAllInviteCodes(course, req.user).then(function (result) {
+            var obj = [];
+            for (var i = 0; i < result.length; i++) {
+                var curr = result[i].toObject();
+                curr._id = undefined;
+                if (!curr.expiresAt) {
+                    curr.expiresAt = "never";
+                }
+                obj.push(curr);
+            }
+            res.json({codes: obj});
+        })
+        .catch(function (err) {
+            next(err);
+        });
+    });
+
+    router.post('/invitecodes/:code/join', function (req, res, next) {
         var code = req.params.code;
 
-        queries.validateInviteLink(code, req.user.id).then(function (result) {
+        queries.validateInviteCode(code, req.user.id).then(function (result) {
             res.json({user: result.user, course: result.course, role: result.role, features: result.features});
         })
         .catch(function (err) {
@@ -586,6 +614,30 @@ module.exports = function(router) {
         });
     });
 
+    router.delete('/invitecodes/:code', function (req, res, next) {
+        var code = req.params.code;
+
+        queries.revokeInviteCode(code, req.user).then(function (obj) {
+            res.json({code: obj.code, course: obj.course});
+        })
+        .catch(function (err) {
+            next(err);
+        });
+    });
+
+    router.get('/invitecodes/:code', function (req, res, next) {
+        var code = req.params.code;
+
+        queries.getInviteCode(code, req.user).then(function (obj) {
+            if (!obj.expiresAt) {
+                obj.expiresAt = "never";
+            }
+            res.json({code: obj.code, course: obj.course, uses: obj.uses, createdAt: obj.createdAt, expiresAt: obj.expiresAt});
+        })
+        .catch(function (err) {
+            next(err);
+        });
+    });
 
     //submit user code to Tester service for code validation
     router.post('/:course_id/assignments/:assignment_id/submit', function(req, res, next) {

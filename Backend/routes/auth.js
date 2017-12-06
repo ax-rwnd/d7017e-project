@@ -68,7 +68,8 @@ module.exports = function (router) {
                             access_expires_in: config.get('Auth.access_ttl'),
                             refresh_token: refToken,
                             refresh_expires_in: config.get('Auth.refresh_ttl'),
-                            token_type: config.get('Auth.auth_header_prefix')
+                            token_type: config.get('Auth.auth_header_prefix'),
+                            access: userObject.access
                         });
                     })
                     .catch(function (err) {
@@ -78,9 +79,11 @@ module.exports = function (router) {
                 } else {
                     // Extract the error code
                     var error = result.serviceResponse.authenticationFailure.code;
-                    logger.log(error);
-                    next(error);
-                    //res.json({error: error});
+                    if (error === "INVALID_TICKET") {
+                        next(errors.INVALID_TICKET);
+                    } else {
+                        next(error);
+                    }
                 }
             });
         });
@@ -105,7 +108,7 @@ module.exports = function (router) {
                 res.json({
                     access_token: create_access_token(user._id, user.access),
                     token_type: config.get('Auth.auth_header_prefix'),
-                    scope: '',
+                    access: user.access,
                     expires_in: config.get('Auth.access_ttl')
                 });
             })
