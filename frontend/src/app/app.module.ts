@@ -63,7 +63,10 @@ import { ModAdventuremapEditorComponent } from './mod-adventuremap/mod-adventure
 import { ModBadgesComponent } from './mod-badges/mod-badges.component';
 import { ModBadgesSingleComponent } from './mod-badges/mod-badges-single.component';
 import { TeacherCoursesComponent } from './teacher-courses/teacher-courses.component';
+import { CourseStatisticsComponent } from './course-statistics/course-statistics.component';
 
+// statistics
+import { ChartsModule } from 'ng2-charts/ng2-charts';
 
 const appRoutes: Routes = [
   { path: '', component: LoginComponent },
@@ -75,7 +78,8 @@ const appRoutes: Routes = [
   { path: 'createAssignmentTest', component: CreateassignmentComponent, canActivate: [AuthGuard]},
   { path: 'courses/:course/createNewAssignment', component: CreateassignmentComponent, canActivate: [AuthGuard]},
   { path: 'user/createCourse', component: CreatecourseComponent, canActivate: [AuthGuard]},
-  { path: 'user/updateCourse/:course', component: CreatecourseComponent, canActivate: [AuthGuard]}
+  { path: 'user/updateCourse/:course', component: CreatecourseComponent, canActivate: [AuthGuard]},
+  { path: 'courses/:course/statistics', component: CourseStatisticsComponent, canActivate: [AuthGuard]}
 ];
 
 
@@ -105,8 +109,10 @@ const appRoutes: Routes = [
     ModAdventuremapEditorComponent,
     ModAdventuremapLargeComponent,
     TeacherCoursesComponent,
+    CourseStatisticsComponent,
   ],
   imports: [
+    ChartsModule,
     BrowserModule,
     FormsModule,
     ReactiveFormsModule,
