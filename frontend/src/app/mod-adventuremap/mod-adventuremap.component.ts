@@ -127,7 +127,7 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
         }
 
         // Grab details about the specific group
-        this.backendService.getAssignmentGroup(this.courseCode, this.assignmentGroups[this.groupIndex]).then((nestdata: any) => {
+        this.backendService.getAssignmentGroup(this.courseCode, this.assignmentGroups[this.groupIndex]._id).then((nestdata: any) => {
           this.assignments = nestdata.assignments;
 
           // Make sure that progress is loaded
