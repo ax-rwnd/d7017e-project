@@ -3,6 +3,7 @@
 var requireDir = require('require-dir');
 var EventEmitter = require('events-async');
 var helper = require('./features_helper');
+var queries = require('../lib/queries/features');
 
 var emitter = new EventEmitter();
 
@@ -30,7 +31,6 @@ function initFeatures() {
 }
 
 function emitEvent(result) {
-
     return new Promise(function (resolve, reject) {
 
         result.passed = helper.passAllMandatoryTests(result);
@@ -40,19 +40,24 @@ function emitEvent(result) {
             return;
         }
 
-        helper.getFeature(result.user_id, result.assignment_id).then(function(feature) {
-            emitter.emit('handleFeatures', result).then(function(data) {
+        //queries.getFeatureOfUserID(result.course_id, result.user_id)
+        //.then(function(feature) {
+        //    console.log(feature);
+        //helper.getFeature(result.user_id, result.assignment_id).then(function(feature) {
+            emitter.emit('handleFeatures', result)
+            .then(function(data) {
                 result.features = createResultjson(data);
                 resolve(result);
             });
-        }).catch(function(err) {
-            throw new Error(err);
-        });
+        //}).catch(function(err) {
+        //    throw new Error(err);
+        //});
     });
 }
 
 function createResultjson(data) {
     let json = {};
+    
     data.forEach(function(item) {
 
         if(Object.keys(item).length != 1) {
@@ -67,6 +72,7 @@ function createResultjson(data) {
 
         json[key] = item[key];
     });
+
     return json;
 }
 

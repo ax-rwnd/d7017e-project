@@ -25,6 +25,7 @@ function validateCode(user_id, lang, code, assignment_id) {
             logger.log("error",'Assignment', assignment_id, 'did not have io list.');
             return res.sendStatus(500);
         }*/
+
         tests.tests.io.forEach(function(test) {
             test.id = test._id;
             delete test._id;
@@ -66,7 +67,7 @@ function validateCode(user_id, lang, code, assignment_id) {
                         logger.log("error",'Tester returned', response.statusCode);
                     }
                     logger.log("error",error);
-                    return error;
+                    reject(error);
                     //res.sendStatus(response.statusCode);
                 } else {
 

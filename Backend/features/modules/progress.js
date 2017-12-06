@@ -18,20 +18,26 @@ function init(emitter, name) {
     });
 }
 
-async function run(data) {
-
-    let feature = await helper.getFeature(data.user_id, data.assignment_id);
-
-    await queries.updateFeatureProgress(data.user_id, feature._id, data.assignment_id, helper.prepareProgressData(data));
-
-    feature = await helper.getFeature(data.user_id, data.assignment_id);
-
+function run(data) {
     let progress = {};
 
-    progress.total = await queries.getNumberOfAssignments(data.course_id);
-    progress.completed = feature.progress.length;
+    return queries.getFeatureOfUserID(data.course_id, data.user_id)
+    .then(function(feature) {
+        feature = feature.features;
+        return queries.updateFeatureProgress(data.user_id, feature._id, data.assignment_id, helper.prepareProgressData(data))
+        .then(function() {
+            return queries.getFeatureOfUserID(data.course_id, data.user_id)
+            .then(function(feature) {
+                return queries.getNumberOfAssignments(data.course_id)
+                .then(function(numberOfAssignments) {
+                    progress.total = numberOfAssignments;
+                    progress.completed = feature.features.progress.length;
 
-    return progress;
+                    return progress;
+                });
+            });
+        });
+    });
 }
 
 exports.init = init;
