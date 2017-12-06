@@ -227,16 +227,47 @@ module.exports = function(router) {
 
         var p;
         if (input.user_id === req.user.id) {
-            p = permission.checkUserNotInCourse(input.user_id, input.course_id).then(function () {
-                    return permission.checkIfAlreadyInvited(input.user_id, input.course_id).then(function () {
-
-                    });
+            p = permission.checkUserNotInCourse(input.user_id, input.course_id)
+                .then(function () {
+                    return permission.checkIfAlreadyRequested(input.user_id, input.course_id);
                 })
                 .then(function () {
-
+                    return queries.getCourseAutoJoin(input.course_id);
+                })
+                .then(function (courseAutoJoin) {
+                    if(courseAutoJoin.autojoin) {
+                        return queries.addMemberToCourse(input.user_id, input.course_id)
+                        .then(function () {
+                            return 201;
+                        });
+                    } else {
+                        return queries.addPendingToCourse(input.user_id, input.course_id)
+                        .then(function () {
+                            return 202;
+                        });
+                    }
                 });
+        } else {
+            p = permission.checkIfTeacherOrAdmin(req.user.id, input.course_id, req.user.access)
+                .then(function() {
+                    return permission.checkUserNotInCourse(input.user_id, input.course_id);
+                })
+                .then(function () {
+                    return permission.checkIfAlreadyInvited(input.user_id, input.course_id);
+                })
+                .then(function () {
+                    return queries.addInviteToCourse(input.user_id, input.course_id);
+                })
+                .then(function () {
+                    return 202;
+                }); 
         }
 
+
+        p.then(function(statusCode) {
+            return res.status(statusCode).json({});
+        })
+        .catch(next);
     });
 
 
@@ -258,7 +289,7 @@ module.exports = function(router) {
             p = queries.acceptInviteToCourse(input.user_id, input.course_id);
         } else {
             p = permission.checkIfTeacherOrAdmin(input.user_id, input.course_id, req.user.access).then(function () {
-                        return queries.addMemberToCourse(input.user_id, input.course_id);
+                        return queries.acceptPendingToCourse(input.user_id, input.course_id);
                 });
         }
         p.then(function () {
