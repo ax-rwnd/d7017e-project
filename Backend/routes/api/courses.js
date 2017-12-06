@@ -236,7 +236,7 @@ module.exports = function(router) {
     router.post('/:course_id/members/invite', function (req, res, next) {
         var input;
         try {
-            input = inputValidation.postMembersInviteValidation(req);
+            input = inputValidation.postMemberInviteValidation(req);
         }
         catch(error) {
             return next(error);
