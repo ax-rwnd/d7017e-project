@@ -14,6 +14,7 @@ export class CourseService {
     this.courses = [];
     this.teaching = [];
   }
+
   CreateCourse(id, name, code, course_info, progress, score, badges, leaderboard) {
     const progValue = progress ? 0 : false;
     const scoreValue = score ? 0 : false;
@@ -23,14 +24,17 @@ export class CourseService {
     const progress_assignments = newProgress(0, 0);
     return newCourse(id, name, code, course_info, newRewards(progValue, scoreValue, badgesArr, lbArr), progress_assignments);
   }
+
   GetCourse(courseId) {
     const parti = this.courses.find((current) => current.id === courseId);
     const teach = this.teaching.find((current) => current.id === courseId);
     return (parti === undefined) ? teach : parti;
   }
+
   AddCourse(course) {
     this.courses[this.courses.length] = course;
   }
+
   GetAllCoursesForUser() {
     const promise = new Promise((resolve, reject) => {
       this.backendService.getMyCourses()
@@ -45,6 +49,7 @@ export class CourseService {
     });
     return promise;
   }
+
   GetAllTeachingCourses() {
     const promise = new Promise((resolve, reject) => {
       this.backendService.getMyTeachedCourses()
@@ -89,6 +94,7 @@ export class CourseService {
       }
     }
   }
+
   UpdateCourse(courseId) {
     // Fetches the course with the given id from backend and replace the current version
     // Returns a promise
@@ -100,6 +106,7 @@ export class CourseService {
     });
     return promise;
   }
+
   GetProgress(courseId) {
     // Returns progress for a course
     let course: Course;
@@ -179,16 +186,6 @@ function getTeacherStudentView(course, backendService, courseService, assignment
     });
   });
   return promise;
-      // courseService.AddCourse(course2);
-    /*
-    }).then(function() {
-      backendService.getCourseAssignments(course.id).then(AssignmentResp => {
-        assignmentService.AddCourseAssignments(course.id, AssignmentResp.assignments);
-      });
-    }).catch(err => {
-      console.log('err in catch', err);
-    });
-    */
 }
 
 function updateCourseFeatures(courseId, backendService, courseService) {
