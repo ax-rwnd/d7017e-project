@@ -54,7 +54,7 @@ describe('/api', () => {
     let assignment_id1;
     let assignment_id2;
     let test_id;
-    let invitelink;
+    let invitecode;
     let badge_id;
     let badge_id2;
 
@@ -145,7 +145,7 @@ describe('/api', () => {
         describe('PUT /api/courses/:course_id', () => {
             it('modifies the course code successfully', () => {
                 let course_updated = {
-                    name: 'Introduction to Automated Testing in JavaScript (updated)',
+                    name: 'Introduction to Automated Testing in JavaScript with small m in mocha (updated)',
                     description: 'In this course you will use Mocha and supertest to create automated tests for NodeJS applications. (updated)',
                     hidden: false,
                     course_code: 'DtestingtestingE',
@@ -170,7 +170,7 @@ describe('/api', () => {
 
                 assignmentgroup.name = "assignmentgroup1";
 
-                request(runner.server)
+                return request(runner.server)
                     .post('/api/courses/' + course_id + '/assignmentgroups')
                     .send(assignmentgroup)
                     .set('Authorization', 'Bearer ' + access_tokens.admin)
@@ -184,7 +184,7 @@ describe('/api', () => {
 
                 assignmentgroup.name = "assignmentgroup2";
 
-                request(runner.server)
+                return request(runner.server)
                     .post('/api/courses/' + course_id + '/assignmentgroups')
                     .send(assignmentgroup)
                     .set('Authorization', 'Bearer ' + access_tokens.admin)
@@ -196,6 +196,8 @@ describe('/api', () => {
             });
         });
 
+
+
         describe('GET /api/courses/:course_id/assignmentgroups', () => {
             it('get all assignmentgroup in a course', () => {
                 return request(runner.server)
@@ -205,19 +207,6 @@ describe('/api', () => {
                     .then(res => {
                         assert(Array.isArray(res.body.assignmentgroups), 'should be an array');
                         assert(res.body.assignmentgroups.length === 2, 'not length 2');
-                    });
-            });
-        });
-
-        describe('GET /api/courses/:course_id/assignmentgroups/:assignmentgroup_id', () => {
-            it('get an assignmentgroup', () => {
-                return request(runner.server)
-                    .get('/api/courses/' + course_id + '/assignmentgroups/' + assignmentgroup_id1)
-                    .set('Authorization', 'Bearer ' + access_tokens.user)
-                    .expect(200)
-                    .then(res => {
-                        assert(ObjectId.isValid(res.body._id), 'response is not a valid ObjectId');
-                        assert(assignmentgroup_id1 == res.body._id, 'response is not the requested test');
                     });
             });
         });
@@ -270,10 +259,10 @@ describe('/api', () => {
                         name: 'Introduction to Mocha tests',
                         description: 'Write tests with Mocha',
                         hidden: false,
-                        lint: true,
+                        tests: {lint: true},
                         languages: 'javascript'
                     })
-                    .set('Authorization', 'Bearer ' + access_tokens.user)
+                    .set('Authorization', 'Bearer ' + access_tokens.admin)
                     .expect(201)
                     .then(res => {
                         assert(ObjectId.isValid(res.body._id), 'response is not a valid ObjectId');
@@ -288,10 +277,10 @@ describe('/api', () => {
                         name: 'Lesson 2 in Mocha tests',
                         description: 'Write tests with Mocha',
                         hidden: false,
-                        lint: true,
+                        tests: {lint: true},
                         languages: 'javascript'
                     })
-                    .set('Authorization', 'Bearer ' + access_tokens.user)
+                    .set('Authorization', 'Bearer ' + access_tokens.admin)
                     .expect(201)
                     .then(res => {
                         assert(ObjectId.isValid(res.body._id), 'response is not a valid ObjectId');
@@ -324,6 +313,32 @@ describe('/api', () => {
                             .then(res => {
                                 assert(res.body.assignments.length === 1, 'not length 1');
                             });
+                    });
+            });
+        });
+
+        describe('GET /api/courses/:course_id/assignmentgroups', () => {
+            it('get all assignmentgroup in a course', () => {
+                return request(runner.server)
+                    .get('/api/courses/' + course_id + '/assignmentgroups')
+                    .set('Authorization', 'Bearer ' + access_tokens.user)
+                    .expect(200)
+                    .then(res => {
+                        assert(Array.isArray(res.body.assignmentgroups), 'should be an array');
+                        assert(res.body.assignmentgroups.length === 1, 'not length 1');
+                    });
+            });
+        });
+
+        describe('GET /api/courses/:course_id/assignmentgroups/:assignmentgroup_id', () => {
+            it('get an assignmentgroup', () => {
+                return request(runner.server)
+                    .get('/api/courses/' + course_id + '/assignmentgroups/' + assignmentgroup_id1)
+                    .set('Authorization', 'Bearer ' + access_tokens.user)
+                    .expect(200)
+                    .then(res => {
+                        assert(ObjectId.isValid(res.body._id), 'response is not a valid ObjectId');
+                        assert(assignmentgroup_id1 == res.body._id, 'response is not the requested test');
                     });
             });
         });
@@ -484,31 +499,31 @@ describe('/api', () => {
             });
         });
 
-        describe('GET /api/courses/:course_id/invitelink', () => {
-            it('Generate invite link', () => {
+        describe('POST /api/courses/:course_id/invitecodes', () => {
+            it('Generate invite code', () => {
                 return request(runner.server)
-                    .get('/api/courses/' + course_id + '/invitelink')
+                    .post('/api/courses/' + course_id + '/invitecodes')
                     .set('Authorization', 'Bearer ' + access_tokens.admin)
                     .expect(201)
                     .then(res => {
                         assert(res.body.code, 'does not return a code');
                         assert.equal(res.body.course, course_id);
 
-                        invitelink = res.body.code;
+                        invitecode = res.body.code;
                     });
             });
-            it('Try generating invite link without permission', () => {
+            it('Try generating invite code without permission', () => {
                 return request(runner.server)
-                    .get('/api/courses/' + course_id + '/invitelink')
+                    .post('/api/courses/' + course_id + '/invitecodes')
                     .set('Authorization', 'Bearer ' + access_tokens.user)
                     .expect(403);
             });
         });
 
-        describe('GET /api/courses/join/:code', () => {
-            it('Join a course using an invite link', () => {
+        describe('POST /api/courses/invitecodes/:code/join', () => {
+            it('Join a course using an invite code', () => {
                 return request(runner.server)
-                    .get('/api/courses/join/' + invitelink)
+                    .post('/api/courses/invitecodes/' + invitecode + '/join')
                     .set('Authorization', 'Bearer ' + access_tokens.user)
                     .expect(200)
                     .then(res => {
@@ -516,6 +531,45 @@ describe('/api', () => {
                         assert.equal(res.body.course, course_id);
                         assert.equal(res.body.role, "student");
                         assert(res.body.features, "did not return user");
+                    });
+            });
+        });
+
+        describe('GET /api/courses/invitecodes/:code', () => {
+            it('Get an invite code', () => {
+                return request(runner.server)
+                    .get('/api/courses/invitecodes/' + invitecode)
+                    .set('Authorization', 'Bearer ' + access_tokens.admin)
+                    .expect(200)
+                    .then(res => {
+                        assert.equal(res.body.course, course_id);
+                        assert.equal(res.body.code, invitecode);
+                        assert.equal(res.body.uses, 1);
+                    });
+            });
+        });
+
+        describe('GET /api/courses/:course_id/invitecodes', () => {
+            it('Get all invite codes', () => {
+                return request(runner.server)
+                    .get('/api/courses/' + course_id + '/invitecodes')
+                    .set('Authorization', 'Bearer ' + access_tokens.admin)
+                    .expect(200)
+                    .then(res => {
+
+                    });
+            });
+        });
+
+        describe('DELETE /api/courses/invitecodes/:code', () => {
+            it('Revoke an invite code', () => {
+                return request(runner.server)
+                    .delete('/api/courses/invitecodes/' + invitecode)
+                    .set('Authorization', 'Bearer ' + access_tokens.admin)
+                    .expect(200)
+                    .then(res => {
+                        assert.equal(res.body.course, course_id);
+                        assert.equal(res.body.code, invitecode);
                     });
             });
         });
@@ -574,8 +628,8 @@ describe('/api', () => {
                     .set('Authorization', 'Bearer ' + access_tokens.admin)
                     .expect(200)
                     .then(res => {
-                        assert(Array.isArray(res.body.features.badges), 'not an array');
-                        assert(Array.isArray(res.body.features.progress), 'not an array');
+                        assert(Array.isArray(res.body.badges), 'not an array');
+                        assert(Array.isArray(res.body.progress), 'not an array');
                     });
             });
         });
@@ -689,7 +743,7 @@ describe('/api', () => {
         });
     });
 
-    describe.skip('/search', () => {
+    describe('/search', () => {
         describe('Check config so that minimun query length is set', () => {
             it('Minimum query length is set', () => {
                 assert(config.get('Search.min_query_length') !== undefined, 'Search.min_query_length in config is not set');
@@ -705,7 +759,7 @@ describe('/api', () => {
                     .set('Authorization', 'Bearer ' + access_tokens.user)
                     .expect(400)
                     .then(res => {
-                        assert(res.error.text == 'Bad input. Expected: "?query=XYZ"', 'query was misspelled');
+                        assert(res.body.message == 'Bad input. Expected: "?query=XYZ"', 'query was misspelled');
                     });
             });
         });
@@ -719,14 +773,14 @@ describe('/api', () => {
                     .set('Authorization', 'Bearer ' + access_tokens.user)
                     .expect(400)
                     .then(res => {
-                        assert(res.error.text == 'Bad input. Expected query with length atleast ' + config.get('Search.min_query_length'), 'Too short query data');
+                        assert(res.body.message == 'Bad input. Expected query with length atleast ' + config.get('Search.min_query_length'), 'Too short query data');
                     });
             });
         });
 
         describe('GET /api/search', () => {
             it('Return search results', () => {
-                let query = '?query=Mocha';
+                let query = '?query=mocha';
                 let route = '/api/search';
                 return request(runner.server)
                     .get(route+query)
@@ -740,6 +794,7 @@ describe('/api', () => {
                         assert(res.body.hasOwnProperty('users'), 'Result did not have property users');
                         assert(Array.isArray(res.body.users), 'Property users was not an array');
 
+                        assert(res.body.courses.length > 0, 'Property courses was empty');
                         assert(res.body.assignments.length > 0, 'Property assignments was empty');
                     });
             });
@@ -782,7 +837,7 @@ describe('/api', () => {
     });
 
     describe('tester', () => {
-        describe.skip('POST /api/courses/:course_id/assignments/:assignment_id/submit', () => {
+        describe('POST /api/courses/:course_id/assignments/:assignment_id/submit', () => {
             it('run assignments tests', () => {
                 return request(runner.server)
                     .post('/api/courses/' + course_id + '/assignments/' + assignment_id1 + '/submit')
@@ -793,11 +848,9 @@ describe('/api', () => {
                     })
                     .expect(200)
                     .then(res => {
-                        // TODO
-                        console.log(res.body);
                         assert(assignment_id1 == res.body.assignment_id, 'response is not contain the correct assignment_id');
                     });
-            });
+            }).timeout(15000);
         });
 
         describe('GET /api/tester/languages', () => {

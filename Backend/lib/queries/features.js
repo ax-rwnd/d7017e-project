@@ -100,9 +100,11 @@ function getFeatureByID(features_id) {
 }
 
 function updateFeatureProgress(user_id, features_id, assignment_id, data) {
-    return Features.update({'_id': features_id, 'user': user_id, 'progress.assignment': assignment_id}, {'$set': {'progress.$': data}}, { runValidators: true }).then(function(result) {
+    return Features.update({'_id': features_id, 'user': user_id, 'progress.assignment': assignment_id}, {'$set': {'progress.$': data}}, { runValidators: true })
+    .then(function(result) {
         if(result.n === 0) {
-            return Features.update({'_id': features_id, 'user': user_id}, {'$addToSet': {'progress': data}}, { runValidators: true }).then(function(result) {
+            return Features.update({'_id': features_id, 'user': user_id}, {'$addToSet': {'progress': data}}, { runValidators: true, new: true})
+            .then(function(result) {
                 return result;
             });
         }
@@ -110,12 +112,12 @@ function updateFeatureProgress(user_id, features_id, assignment_id, data) {
 }
 
 function addBadgeToFeature(badge_id, features_id) {
-    return new Promise((resolve, reject) => {
-        getFeatureByID(features_id).then(function(feature) {
-            feature.badges.push(badge_id);
-            feature.save().then(function() {
-                resolve(true);
-            });
+    return Features.findById(features_id)
+    .then(function(feature) {
+        feature.badges.push(badge_id);
+        return feature.save()
+        .then(function(feature) {
+            return true;
         });
     });
 }
@@ -140,80 +142,40 @@ function getFeaturesOfCourse(course_id) {
          json.features = [];
 
          return CourseMembers.find({course: course_id}, 'features')
-         .populate({path: 'features', model: 'Features'})
+         .populate({
+             path: 'features', model:'Features',
+             populate: [
+                 {
+                     path: 'user', model: 'User'
+                 },{
+                     path: 'badges', model: 'Badge'
+                 },{
+                     path: 'progress.tests.test', model: 'Test'
+                 },{
+                     path: 'progress.assignment', model: 'Assignment'
+                 },{
+                     path: 'progress.assignment.optional_tests.io', model: 'Test'
+                 },{
+                     path: 'progress.assignment.tests.io', model: 'Test'
+                 }
+             ]})
          .lean()
          .then(function(features) {
              for(let feature of features) {
-                 feature.completed_assignments = feature.features.progress.length;
+                 feature = feature.features;
+                 
+                 delete feature.user.tokens;
+
+                 feature.completed_assignments = feature.progress.length;
                  json.features.push(feature);
              }
              return json;
          });
     });
-
-    /*
-    return CourseMembers.findOne({course: course_id, user: user_id}, 'features')
-    .then(function(feature) {
-
-        if(!feature) {
-            throw errors.NOT_FOUND;
-        } else {
-            getNumberOfAssignments(course_id)
-            .then(function(total_assignments) {
-                feature.total_assignments = total_assignments;
-                feature.completed_assignments = feature.progress.length;
-                return feature;
-            });
-        }
-    });
-
-    let json = {};
-
-    json.total_assignments = await getNumberOfAssignments(course_id);
-
-    let course = await Course.findById(course_id)
-    .populate({
-        path: 'features', model:'Features',
-        populate: [
-            {
-                path: 'user', model: 'User'
-            },{
-                path: 'badges', model: 'Badge'
-            },{
-                path: 'progress.tests.test', model: 'Test'
-            },{
-                path: 'progress.assignment', model: 'Assignment'
-            },{
-                path: 'progress.assignment.optional_tests.io', model: 'Test'
-            },{
-                path: 'progress.assignment.tests.io', model: 'Test'
-            }
-        ]}).lean();
-
-    json.features = [];
-    for (let feature of course.features) {
-        delete feature.user.tokens;
-        feature.completed_assignments = feature.progress.length;
-        json.features.push(feature);
-    }
-
-    return json;*/
 }
 
 function getFeatureOfUserID(course_id, user_id) {
     return CourseMembers.findOne({course: course_id, user: user_id}, 'features')
-    .populate({path: 'features', model:'Features'})
-    .lean()
-    .then(function(feature) {
-        return getNumberOfAssignments(course_id)
-        .then(function(total_assignments) {
-            feature.total_assignments = total_assignments;
-            feature.completed_assignments = feature.features.progress.length;
-            return feature;
-        });
-    });
-
-    /*let course = await Course.findById(course_id)
     .populate({
         path: 'features', model:'Features',
         populate: [
@@ -230,48 +192,20 @@ function getFeatureOfUserID(course_id, user_id) {
             },{
                 path: 'progress.assignment.tests.io', model: 'Test'
             }
-        ]}).lean();
+        ]})
+    .lean()
+    .then(function(feature) {
+        feature = feature.features;
 
-    for(let feature of course.features) {
+        delete feature.user.tokens;
 
-        if(feature.user._id == user_id) {
-            delete feature.user.tokens;
-            feature.total_assignments = await getNumberOfAssignments(course_id);
+        return getNumberOfAssignments(course_id)
+        .then(function(total_assignments) {
+            feature.total_assignments = total_assignments;
             feature.completed_assignments = feature.progress.length;
-
             return feature;
-        }
-
-        /*let feature;
-        try {
-            feature = await getFeatureByID(feature_id);
-        } catch (err) {
-            logger.log("warn",'Feature '+feature_id+' in course '+course._id+' is null and should be removed!');
-            continue;
-        }
-
-        if(feature === null) {
-            logger.log("warn",'Feature '+feature_id+' in course '+course._id+' is null and should be removed!');
-        } else {
-            if(feature.user == (user_id)) {
-
-                feature.total_assignments = await getNumberOfAssignments(course_id);
-                feature.completed_assignments = feature.progress.length;
-
-                return feature;
-            }
-        }*/
-    //}
-
-    // User had no feature in that course create it
-    /*let new_feature = await createFeature(user_id, course_id);
-
-    let feature = await getFeatureByID(new_feature._id);
-
-    feature.total_assignments = await getNumberOfAssignments(course_id);
-    feature.completed_assignments = feature.progress.length;
-
-    return feature;*/
+        });
+    });
 }
 
 exports.createBadge = createBadge;

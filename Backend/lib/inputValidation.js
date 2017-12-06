@@ -140,11 +140,163 @@ function putMembersInviteValidation (req) {
     return input;
 }
 
+// Input Validation for DELETE /api/courses/:course_id/members/invite
+function deleteMembersInviteValidation (req) {
+    // required
+    var course_id;
+
+    // optional
+    var user_id;
+
+    //req
+    req.checkParams("course_id", "Not a valid course id").isMongoId();
+    course_id = req.params.course_id;
+
+    //optional
+    if (!req.body.user_id) {
+        user_id = req.user.id;
+    } else {
+        req.checkBody("user_id", "Not a valid user id").isMongoId();
+        user_id = req.body.user_id;
+    }
+
+    var inputError = req.validationErrors();
+    if (inputError) {
+        throw badInput.BAD_INPUT(inputError);
+    }
+
+    var input = {course_id: course_id, user_id: user_id};
+    return input;
+}
+
+
+// Input Validation for GET /api/courses/:course_id/members/invite
+function getMembersInviteValidation (req) {
+    // required
+    var course_id;
+
+    // optional
+    var inviteType;
+
+    //req
+    req.checkParams("course_id", "Not a valid course id").isMongoId();
+    course_id = req.params.course_id;
+
+    //optional
+    if (!req.query.type) {
+        inviteType = "all";
+    } else {
+        req.checkQuery("type", "Not a valid invite type").isIn(['invite', 'pending']);
+
+        inviteType = req.query.type;
+    }
+
+    var inputError = req.validationErrors();
+    if (inputError) {
+        throw badInput.BAD_INPUT(inputError);
+    }
+
+    var input = {course_id: course_id, inviteType: inviteType};
+    return input;
+}
+
+// Input Validation for GET /api/courses/:course_id/members
+function getMembersValidation (req) {
+    // required
+    var course_id;
+
+    // optional
+    var role;
+
+    //req
+    req.checkParams("course_id", "Not a valid course id").isMongoId();
+    course_id = req.params.course_id;
+
+    //optional
+    if (!req.query.role) {
+        role = "all";
+    } else {
+        req.checkQuery("role", "Not a valid invite type").isIn(['student', 'teacher']);
+
+        role = req.query.role;
+    }
+
+    var inputError = req.validationErrors();
+    if (inputError) {
+        throw badInput.BAD_INPUT(inputError);
+    }
+
+    var input = {course_id: course_id, role: role};
+    return input;
+}
+
+// Input Validation for GET /api/users/me/member
+function getMeMemberValidation (req) {
+    // optional
+    var role;
+
+    //optional
+    if (!req.query.role) {
+        role = "all";
+    } else {
+        req.checkQuery("role", "Not a valid invite type").isIn(['student', 'teacher']);
+        role = req.query.role;
+    }
+
+    var inputError = req.validationErrors();
+    if (inputError) {
+        throw badInput.BAD_INPUT(inputError);
+    }
+
+    var input = {role: role};
+    return input;
+}
+
+// Input Validation for GET /api/user/me/invites
+function getMeInvitesValidation (req) {
+    // optional
+    var type;
+
+    //optional
+    if (!req.query.type) {
+        type = "all";
+    } else {
+        req.checkQuery("type", "Not a valid invite type").isIn(['invite', 'pending']);
+        type = req.query.type;
+    }
+
+    var inputError = req.validationErrors();
+    if (inputError) {
+        throw badInput.BAD_INPUT(inputError);
+    }
+
+    var input = {type: type};
+    return input;
+}
+
+// Input Validation for GET /api/users/me/:course_id/status
+function getMeStatusValidation (req) {
+    // required
+    var course_id;
+
+    //req
+    req.checkParams("course_id", "Not a valid course id").isMongoId();
+    course_id = req.params.course_id;
+
+    var inputError = req.validationErrors();
+    if (inputError) {
+        throw badInput.BAD_INPUT(inputError);
+    }
+
+    var input = {course_id: course_id};
+    return input;
+}
+
 // Input Validation for checking course_id and assignment_id
 function assignmentAndCourseValidation (req) {
     var course_id; // required
     var assignment_id; // required
-    
+
     // req
     req.checkParams("course_id", "Not a valid course id").isMongoId();
     course_id = req.params.course_id;
@@ -164,28 +316,21 @@ function assignmentgroupValidation(req) {
 
     let input = {};
 
-    // required
-    var name;
-
-    // optional
-    var assignments = [];
-    var adventuremap = {};
-
     //req
     req.checkBody("name", "Must contain only ascii characters").isAscii();
-    name = req.body.name;
+    input.name = req.body.name;
 
     //optional
     if(req.body.assignments) {
         req.checkBody('assignments')
              .custom((item)=>Array.isArray(item))
              .withMessage( "Must be array");
-        assignments = req.body.assignments;
+        input.assignments = req.body.assignments;
     }
     if(req.body.adventuremap) {
         // TODO Check object
         //req.checkBody("adventuremap", "Not a valid assignments field").isJSON();
-        adventuremap = req.body.adventuremap;
+        input.adventuremap = req.body.adventuremap;
     }
 
     var inputError = req.validationErrors();
@@ -193,35 +338,22 @@ function assignmentgroupValidation(req) {
         throw badInput.BAD_INPUT(inputError);
     }
 
-    input.name = name;
-    input.assignments = assignments;
-    input.adventuremap = adventuremap;
-
     return input;
 }
 
-function badgeValidation(req) {
+function postBadgeValidation(req) {
 
     let input = {};
 
-    // required
-    var course_id;
-    var icon;
-    var title;
-    var description;
-
-    // optional
-    var goals = {};
-    
     //req
     req.checkParams("course_id", "Not a valid course id").isMongoId();
-    course_id = req.params.course_id;
+    input.course_id = req.params.course_id;
     req.checkBody("icon", "Must contain only ascii characters").isAscii();
-    icon = req.body.icon;
+    input.icon = req.body.icon;
     req.checkBody("title", "Must contain only ascii characters").isAscii();
-    title = req.body.title;
+    input.title = req.body.title;
     req.checkBody("description", "Must contain only ascii characters").isAscii();
-    description = req.body.description;
+    input.description = req.body.description;
 
     //optional
     if(req.body.goals) {
@@ -229,7 +361,7 @@ function badgeValidation(req) {
         /*req.checkBody('assignments')
              .custom((item)=>Array.isArray(item))
              .withMessage( "Must be array");*/
-        goals = req.body.goals;
+        input.goals = req.body.goals;
     }
 
     var inputError = req.validationErrors();
@@ -237,11 +369,42 @@ function badgeValidation(req) {
         throw badInput.BAD_INPUT(inputError);
     }
 
-    input.course_id = course_id;
-    input.icon = icon;
-    input.title = title;
-    input.description = description;
-    input.goals = goals;
+    return input;
+}
+
+function putBadgeValidation(req) {
+
+    let input = {};
+
+    //req
+    req.checkParams("course_id", "Not a valid course id").isMongoId();
+    input.course_id = req.params.course_id;
+
+    // optional
+    if (req.body.icon) {
+        req.checkBody("icon", "Must contain only ascii characters").isAscii();
+        input.icon = req.body.icon;
+    }
+    if (req.body.title) {
+        req.checkBody("title", "Must contain only ascii characters").isAscii();
+        input.title = req.body.title;
+    }
+    if (req.body.description) {
+        req.checkBody("description", "Must contain only ascii characters").isAscii();
+        input.description = req.body.description;
+    }
+    if(req.body.goals) {
+        // TODO Check object
+        /*req.checkBody('assignments')
+             .custom((item)=>Array.isArray(item))
+             .withMessage( "Must be array");*/
+        input.goals = req.body.goals;
+    }
+
+    var inputError = req.validationErrors();
+    if (inputError) {
+        throw badInput.BAD_INPUT(inputError);
+    }
 
     return input;
 }
@@ -313,18 +476,74 @@ function putAssignmentBodyValidation(req) {
     if ('tests' in req.body) {
         if ('lint' in req.body.tests) {
             req.checkBody("tests.lint", "Must contain true or false").isBoolean();
+            input.tests = {};
             input.tests.lint = req.body.tests.lint;
         }
     }
     if ('optional_tests' in req.body) {
         if ('lint' in req.body.optional_tests) {
             req.checkBody("optional_tests.lint", "Must contain true or false").isBoolean();
+            input.optional_tests = {};
             input.optional_tests.lint = req.body.optional_tests.lint;
         }
     }
     if ('languages' in req.body) {
         req.checkBody("languages", "Must contain only ascii characters").isAscii();
         input.languages = req.body.languages;
+    }
+
+    var inputError = req.validationErrors();
+    if (inputError) {
+        throw badInput.BAD_INPUT(inputError);
+    }
+    return input;
+}
+
+// Input validation for POST /api/courses/:course_id/assignments
+function postAssignmentBodyValidation(req) {
+    var input = {};
+
+    // Required fields
+    req.checkBody("name", "Must contain only letters and numbers").isAscii();
+    input.name = req.body.name;
+
+    req.checkBody("hidden", "Must contain true or false").isBoolean();
+    input.hidden = req.body.hidden;
+
+    req.checkBody("languages", "Must contain only ascii characters").isAscii();
+    input.languages = req.body.languages;
+
+    input.tests = {};
+    input.tests.io = [];
+    input.optional_tests = {};
+    input.optional_tests.io = [];
+
+    // Optional fields
+    if ('description' in req.body) {
+        req.checkBody("description", "Must contain only ascii characters").isAscii();
+        input.description = req.body.description;
+    } else {
+        input.description = "";
+    }
+    if ('tests' in req.body) {
+        if ('lint' in req.body.tests) {
+            req.checkBody("tests.lint", "Must contain true or false").isBoolean();
+            input.tests.lint = req.body.tests.lint;
+        } else {
+            input.tests.lint = false;
+        }
+    } else {
+        input.tests.lint = false;
+    }
+    if ('optional_tests' in req.body) {
+        if ('lint' in req.body.optional_tests) {
+            req.checkBody("optional_tests.lint", "Must contain true or false").isBoolean();
+            input.optional_tests.lint = req.body.optional_tests.lint;
+        } else {
+            input.optional_tests.lint = false;
+        }
+    } else {
+        input.optional_tests.lint = false;
     }
 
     var inputError = req.validationErrors();
@@ -350,8 +569,16 @@ exports.putCourseBodyValidation = putCourseBodyValidation;
 exports.putMembersInviteValidation = putMembersInviteValidation;
 exports.postMemberInviteValidation = postMemberInviteValidation;
 exports.assignmentgroupValidation = assignmentgroupValidation;
-exports.badgeValidation = badgeValidation;
+exports.postBadgeValidation = postBadgeValidation;
+exports.putBadgeValidation = putBadgeValidation;
 exports.assignmentAndCourseValidation = assignmentAndCourseValidation;
 exports.courseIdValidation = courseIdValidation;
 exports.assignmentValidation = assignmentValidation;
 exports.putAssignmentBodyValidation = putAssignmentBodyValidation;
+exports.postAssignmentBodyValidation = postAssignmentBodyValidation;
+exports.getMembersInviteValidation = getMembersInviteValidation;
+exports.deleteMembersInviteValidation = deleteMembersInviteValidation;
+exports.getMembersValidation = getMembersValidation;
+exports.getMeMemberValidation = getMeMemberValidation;
+exports.getMeInvitesValidation = getMeInvitesValidation;
+exports.getMeStatusValidation = getMeStatusValidation;

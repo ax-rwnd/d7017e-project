@@ -20,9 +20,9 @@ var assignmentSchema = new Schema({
         io: [{ type: Schema.Types.ObjectId, ref: 'Test', required: false }],
         lint: Boolean
     },
-    languages: [String]
+    languages: [{type: String, required: true}]
 });
-assignmentSchema.index({name: 'text', description: 'text'}, {weights: {name: 5, description: 1}});
+assignmentSchema.index({name: 'text', description: 'text'}, {weights: {name: 10, description: 1}});
 
 var assignmentgroupSchema = new Schema({
     name: {type: String, required: true},
@@ -77,11 +77,12 @@ var courseMembers = new Schema({
     features: {type: Schema.Types.ObjectId, ref: 'Features', required: true}
 });
 
-var inviteLinks = new Schema({
+var inviteCodes = new Schema({
     code: {type: String, required: true},
     course: {type: Schema.Types.ObjectId, ref: 'Course', required: true},
+    uses: {type: Number, default: 0},
     createdAt: {type: Date, default: Date.now()},
-    expiresAt: {type: Date, default: (Date.now() + config.get("Courses.invite_link_ttl"))}
+    expiresAt: {type: Date}
 });
 
 var courseSchema = new Schema({
@@ -100,7 +101,7 @@ var courseSchema = new Schema({
         adventuremap: Boolean
     }
 });
-courseSchema.index({course_code: 'text', name: 'text', description: 'text'}, {weights: {course_code: 10, name: 5, description: 1}});
+courseSchema.index({course_code: 'text', name: 'text', description: 'text'}, {weights: {course_code: 50, name: 10, description: 1}});
 
 /*
 * Feature schemas
@@ -146,8 +147,8 @@ var CourseMembers = mongoose.model('CourseMembers', courseMembers);
 var Course = mongoose.model('Course', courseSchema);
 var Badge = mongoose.model('Badge', badgeSchema);
 var Features = mongoose.model('Features', featuresSchema);
-var InviteLinks = mongoose.model('InviteLinks', inviteLinks);
+var InviteCodes = mongoose.model('InviteCodes', inviteCodes);
 var models = {Assignment: Assignment, Assignmentgroup: Assignmentgroup, Test: Test, User: User, Draft: Draft,
-        JoinRequests: JoinRequests, InviteLinks: InviteLinks, CourseMembers: CourseMembers, Course: Course, Badge: Badge, Features: Features};
+        JoinRequests: JoinRequests, InviteCodes: InviteCodes, CourseMembers: CourseMembers, Course: Course, Badge: Badge, Features: Features};
 
 module.exports = models;

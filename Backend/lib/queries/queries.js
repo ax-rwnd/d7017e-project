@@ -10,9 +10,10 @@ var Draft = require('../../models/schemas').Draft;
 var JoinRequest = require('../../models/schemas').JoinRequests;
 var Badge = require('../../models/schemas').Badge;
 var Feature = require('../../models/schemas').Features;
-var InviteLink = require('../../models/schemas').InviteLinks;
+var InviteCode = require('../../models/schemas').InviteCodes;
 var Features = require('./features.js');
 var Assignmentgroup = require('../../models/schemas').Assignmentgroup;
+var permission = require('../permission');
 
 var errors = require('../errors.js');
 var mongoose = require('mongoose');
@@ -85,13 +86,14 @@ function getTestsFromAssignment(assignmentID) {
         path: 'optional_tests.io',
         model: 'Test'
     })
+    .lean()
     .then(function (assignment) {
         if (!assignment) {
             throw errors.ASSIGNMENT_DOES_NOT_EXIST;
         }
         var tests = {'tests':assignment.tests, 'optional_tests':assignment.optional_tests};
         return tests;
-    }); 
+    });
 
 
 }
@@ -432,7 +434,11 @@ function deleteTest(test_id, assignment_id) {
 
 
 function getCourseInvites(course_id, type) {
-    return JoinRequest.find({inviteType: type, course: course_id}, "user -_id").populate("user", "username email");
+    if (type) {
+        return JoinRequest.find({inviteType: type, course: course_id}, "inviteType user -_id").populate("user", "username email");
+    } else {
+        return JoinRequest.find({course: course_id}, "inviteType user -_id").populate("user", "username email");
+    }
 }
 
 function getUserInvites(user_id, type) {
@@ -445,7 +451,7 @@ function getUserInvites(user_id, type) {
 }
 
 function getInvitesCourseUser(user_id, course_id) {
-    return JoinRequest.find({user: user_id, course: course_id});
+    return JoinRequest.findOne({user: user_id, course: course_id}, "inviteType");
 }
 
 function returnPromiseForChainStart() {
@@ -520,7 +526,7 @@ function deleteCourse(id) {
         // join requests
         promises.push(JoinRequest.remove({course: course._id}));
         // invite links
-        promises.push(InviteLink.remove({course: course._id}));
+        promises.push(InviteCode.remove({course: course._id}));
         // badges
         promises.push(Badge.remove({course_id: course._id}));
 
@@ -559,17 +565,6 @@ function deleteAssignment(assignment_id, course_id) {
         });
 
         return Promise.all([del_tests, del_drafts, del_fromAssignmentgroups]);
-    });
-}
-
-function getUserCourses(id, fields) {
-    var wantedFields = fields || "name description hidden teachers students assignments course_code";
-
-    return User.findById(id, "courses").populate("courses", wantedFields).then(function (courseList) {
-        if (!courseList) {
-            throw errors.NO_COURSES_EXISTS;
-        }
-        return courseList;
     });
 }
 
@@ -754,8 +749,20 @@ function getAssignmentTests(course_id, assignment_id) {
     });
 }
 
-function createAssignment(name, description, hidden, lint, languages, course_id) {
-    var newAssignment = new Assignment({name: name, description: description, hidden: hidden, tests: {io: [], lint: lint}, optionaal_tests: {io: [], lint: lint}, languages: languages});
+function createAssignment(course_id, props) {
+    var newAssignment = new Assignment({
+        name: props.name,
+        description: props.description,
+        hidden: props.hidden, tests: {
+            io: props.tests.io,
+            lint: props.tests.lint
+        },
+        optional_tests: {
+            io: props.optional_tests.io,
+            lint: props.optional_tests.lint
+        },
+        languages: props.languages
+    });
     return newAssignment.save().then(function (createdAssignment) {
         if (!createdAssignment) {
             throw errors.ASSINGMENT_NOT_CREATED;
@@ -895,52 +902,56 @@ function getCoursesEnabledFeatures(course_id) {
 }
 
 function searchDB(query, categories, user_id) {
-    return getAssignmentIDsByUser(user_id).then(assignment_ids => {
+    return getAssignmentIDsByUser(user_id)
+    .then(assignment_ids => {
+        return getUserCourses(user_id)
+        .then(function(course_ids) {
+            let promises = [];
+            let json = {
+                courses: [],
+                assignments: [],
+                users: []
+            };
 
-        let promises = [];
-        let json = {
-            courses: [],
-            assignments: [],
-            users: []
-        };
+            if(categories) {
+                categories = categories.split(',');
 
-        if(categories) {
-            categories = categories.split(',');
-
-            if (categories.indexOf('courses') !== -1) {
-                promises.push(searchDBCourses(query, user_id));
-            }
-            if (categories.indexOf('assignments') !== -1) {
+                if (categories.indexOf('courses') !== -1) {
+                    promises.push(searchDBCourses(query, course_ids));
+                }
+                if (categories.indexOf('assignments') !== -1) {
+                    promises.push(searchDBAssignments(query, assignment_ids));
+                }
+                if (categories.indexOf('users') !== -1) {
+                    promises.push(searchDBUsers(query));
+                }
+            } else {
+                promises.push(searchDBCourses(query, course_ids));
                 promises.push(searchDBAssignments(query, assignment_ids));
-            }
-            if (categories.indexOf('users') !== -1) {
                 promises.push(searchDBUsers(query));
             }
-        } else {
-            promises.push(searchDBCourses(query, user_id));
-            promises.push(searchDBAssignments(query, assignment_ids));
-            promises.push(searchDBUsers(query));
-        }
 
-        return Promise.all(promises).then(function(results) {
+            return Promise.all(promises)
+            .then(function(results) {
 
-            for(let result of results) {
-                for(var key in result) json[key] = result[key];
-            }
+                for(let result of results) {
+                    for(var key in result) json[key] = result[key];
+                }
 
-            return json;
+                return json;
+            });
         });
     });
 }
 
-function searchDBCourses(query, user_id) {
-    return Course.find({$text: {$search: '\"'+query+'\"'}, 'students': user_id, 'hidden': false}, {score: {$meta: "textScore"}})
-        .select('-__v -hidden -features -assignments -students -enabled_features')
+function searchDBCourses(query, course_ids) {
+    return Course.find({$text: {$search: '\"'+query+'\"'}, '_id': course_ids, 'hidden': false}, {score: {$meta: "textScore"}})
+        .select('-__v -hidden -features -assignments -students -enabled_features -assignmentgroups')
+        .populate({path: 'owner', model: 'User'})
         .sort({score: {$meta: "textScore"}})
-        .limit(20).then(docs => {
-            return {'courses': docs};
-        }).catch(err => {
-            logger.log("error",err);
+        .limit(20)
+        .then(results => {
+            return {'courses': results};
         });
 }
 
@@ -948,10 +959,9 @@ function searchDBAssignments(query, assignment_ids) {
     return Assignment.find({$text: {$search: '\"'+query+'\"'}, '_id': assignment_ids, 'hidden': false}, {score: {$meta: "textScore"}})
         .select('-__v -tests -optional_tests -hidden -languages')
         .sort({score: {$meta: "textScore"}})
-        .limit(20).then(docs => {
-            return {'assignments': docs};
-        }).catch(err => {
-            logger.log("error",err);
+        .limit(20)
+        .then(results => {
+            return {'assignments': results};
         });
 }
 
@@ -959,34 +969,30 @@ function searchDBUsers(query) {
     return User.find({$text: {$search: '\"'+query+'\"'}}, {score: {$meta: "textScore"}})
         .select('-__v -tokens -providers')
         .sort({score: {$meta: "textScore"}})
-        .limit(20).then(docs => {
-            return {'users': docs};
-        }).catch(err => {
-            logger.log("error",err);
+        .limit(20)
+        .then(results => {
+            return {'users': results};
         });
 }
 
 // Helper function for searchDB()
 function getAssignmentIDsByUser(user_id) {
-    return getUserCourses(user_id, '_id').then(function(courses) {
-
-        // Get IDs of courses user is in
-        let ids = [];
-        for(let course of courses.courses) {
-            ids.push(course._id);
-        }
+    return getUserCourses(user_id, '_id')
+    .then(function(courses) {
 
         // Get assignemnts from courses
         let assignment_promises = [];
-        for(let id of ids) {
-            assignment_promises.push(getCourseAssignments(id, 'assignments').then(assignment => {
+        for(let id of courses) {
+            assignment_promises.push(getCourseAssignments(id, 'assignments')
+            .then(assignment => {
                 return assignment;
             }));
         }
 
         // Get assignment IDs from assignments
         let assignment_ids = [];
-        return Promise.all(assignment_promises).then(course => {
+        return Promise.all(assignment_promises)
+        .then(course => {
             for(let assignments of course) {
                 for(let assignment of assignments.assignments) {
                     assignment_ids.push(assignment._id);
@@ -1013,12 +1019,20 @@ function getHighestPermissionCourse(course_id, user_id) {
     });
 }
 
-function getUserCourses1(user_id) {
+function getUserCourses(user_id) {
     return CourseMember.find({user: user_id}).distinct('course');
 }
 
 function getCourses1() {
-    return Course.find({hidden: false}, constants.FIELDS.COURSE.BASE_FIELDS);
+    return Course.find({hidden: false}, constants.FIELDS.COURSE.BASE_FIELDS)
+    .populate({path: 'owner', model: 'User'})
+    .lean()
+    .then(function(courses) {
+        for(let course of courses) {
+            delete course.owner.tokens;
+        }
+        return courses;
+    });
 }
 
 function getUsersHiddenCourses (user_id) {
@@ -1065,7 +1079,19 @@ function acceptInviteToCourse(user_id, course_id) {
             throw errors.NO_INVITE_FOUND;
         }
         return Features.createFeature(user_id, course_id).then(function (featureObject) {
-            // TODO: CHANGE FEATURE FIELD
+            var memberObject = new CourseMember({role: "student", course: course_id, user: user_id, features: featureObject._id});
+            return memberObject.save();
+        });
+    });
+}
+
+function acceptPendingToCourse(user_id, course_id) {
+    return JoinRequest.findOneAndRemove({inviteType: "pending", user: user_id, course: course_id})
+    .then(function(deletedInvite) {
+        if (!deletedInvite) {
+            throw errors.NO_INVITE_FOUND;
+        }
+        return Features.createFeature(user_id, course_id).then(function (featureObject) {
             var memberObject = new CourseMember({role: "student", course: course_id, user: user_id, features: featureObject._id});
             return memberObject.save();
         });
@@ -1073,16 +1099,18 @@ function acceptInviteToCourse(user_id, course_id) {
 }
 
 function addMemberToCourse(user_id, course_id) {
-    return JoinRequest.findOneAndRemove({inviteType: "pending", user: user_id, course: course_id})
-    .then(function(deletedInvite) {
-        if (!deletedInvite) {
+    return Features.createFeature(user_id, course_id).then(function (featureObject) {
+        var memberObject = new CourseMember({role: "student", course: course_id, user: user_id, features: featureObject._id});
+        return memberObject.save();
+    });
+}
+
+function removeInviteOrPendingToCourse (user_id, course_id) {
+    return JoinRequest.findOneAndRemove({user:user_id, course: course_id}).then(function(inviteObject) {
+        console.log(inviteObject);
+        if (!inviteObject) {
             throw errors.NO_INVITE_FOUND;
         }
-        return Features.createFeature(user_id, course_id).then(function (featureObject) {
-            // TODO: CHANGE FEATURE FIELD
-            var memberObject = new CourseMember({role: "student", course: course_id, user: user_id, features: featureObject._id});
-            return memberObject.save();
-        });
     });
 }
 
@@ -1109,29 +1137,51 @@ function getUserMemberCourses1(user_id) {
 }
 
 function getUserMemberStatus(course_id, user_id) {
-    return CourseMember.findOne({user: user_id, course: course_id}, "role");
+    return CourseMember.findOne({user: user_id, course: course_id}, "role").then(function (memberObject) {
+        return memberObject;
+    });
 }
 
-function generateInviteLink(course_id, expiresIn) {
-    var code = randomstring.generate();
-    var exp = Date.now() + (expiresIn || config.get("Courses.invite_link_ttl"));
+function getCourseAutoJoin(course_id) {
+    return Course.findById(course_id, "autojoin -_id");
+}
+
+function getCourseOwner(course_id) {
+    return Course.findById(course_id, "owner");
+}
+
+function addPendingToCourse(user_id, course_id) {
+    var pendingObject = new JoinRequest({user: user_id, course: course_id, inviteType: "pending"});
+    return pendingObject.save();
+}
+
+function addInviteToCourse(user_id, course_id) {
+    var inviteObject = new JoinRequest({user: user_id, course: course_id, inviteType: "invite"});
+    return inviteObject.save();
+}
+
+function generateInviteCode(course_id, expiresIn) {
+    var code = randomstring.generate(config.get('Courses.invite_link_length'));
+    var exp = (expiresIn === "never") // Won't set expiresAt if link never expires
+        ? undefined 
+        : Date.now() + (expiresIn || config.get("Courses.invite_link_ttl"));
 
     if (!mongoose.Types.ObjectId.isValid(course_id)) {
             throw errors.INVALID_ID;
     }
-    var newLink = new InviteLink({code: code, course: course_id, expiresAt: exp});
+    var newLink = new InviteCode({code: code, course: course_id, expiresAt: exp});
     return newLink.save().then(function (obj) {
-        return obj;
+        return obj.toObject();
     });
 }
 
-function validateInviteLink(code, user_id) {
-    return InviteLink.findOne({code: code}).then(function (obj) {
+function validateInviteCode(code, user_id) {
+    return InviteCode.findOne({code: code}).then(function (obj) {
         if (!obj) {
             throw errors.INVALID_LINK;
         }
         if (obj.expiresAt < Date.now()) {
-            return InviteLink.deleteOne({code: code}).then(function () {
+            return InviteCode.deleteOne({code: code}).then(function () {
                 throw errors.EXPIRED_LINK;
             });
         }
@@ -1139,21 +1189,76 @@ function validateInviteLink(code, user_id) {
         return CourseMember.findOne({user: user_id, course: obj.course}).then(function (res) {
             if (!res) {
                 return Features.createFeature(user_id, obj.course).then(function (featureObject) {
-                    // Add student to course
-                    var memberObject = new CourseMember({role: "student", course: obj.course, user: user_id, features: featureObject._id});
-                    return memberObject.save();
+                    return InviteCode.findOneAndUpdate({code: code}, {$inc: {uses: 1}}).then(function () {
+                        // Add student to course
+                        var memberObject = new CourseMember({role: "student", course: obj.course, user: user_id, features: featureObject._id});
+                        return memberObject.save();
+                    });
                 });
             } else {
                 throw errors.USER_ALREADY_IN_COURSE;
             }
         });
 
-        
+
     });
 }
 
+function revokeInviteCode(code, userObject) {
+    return InviteCode.findOne({code: code}).then(function (invitelink) {
+        if (!invitelink) {
+            throw errors.INVALID_LINK;
+        }
+        return permission.checkIfTeacherOrAdmin(userObject.id, invitelink.course, userObject.access).then(function () {
+            return InviteCode.findOneAndRemove({code: code}).then(function (obj) {
+                return obj;
+            });
+        });
+    });
+}
+
+function getInviteCode(code, userObject) {
+    return InviteCode.findOne({code: code}).then(function (invitelink) {
+        if (!invitelink) {
+            throw errors.INVALID_LINK;
+        }
+        return permission.checkIfTeacherOrAdmin(userObject.id, invitelink.course, userObject.access).then(function () {
+            return invitelink.toObject();
+        });
+    });
+}
+
+function getAllInviteCodes(course, userObject) {
+    return permission.checkIfTeacherOrAdmin(userObject.id, course, userObject.access).then(function () {
+        return InviteCode.find({course: course}, "code course uses createdAt expiresAt").then(function (codes) {
+            return codes;
+        });
+    });
+    
+}
+
 function getAssignmentgroupsByCourseID(course_id) {
-    return Course.findById(course_id, 'assignmentgroups');
+    return Course.findById(course_id, 'assignmentgroups')
+    .populate({path: 'assignmentgroups', model: 'Assignmentgroup',
+    populate: [
+        {
+            path: 'assignments.assignment', model: 'Assignment'
+        }
+    ]})
+    .lean()
+    .then(course => {
+        let assignmentgroups = course.assignmentgroups;
+
+        for(let assignmentgroup of assignmentgroups) {
+            for(let assignment of assignmentgroup.assignments) {
+                if(assignment.assignment.hidden) {
+                    assignmentgroup.assignments.pop(assignment);
+                }
+            }
+        }
+
+        return assignmentgroups;
+    });
 }
 
 function createAssignmentgroup(assignmentgroupObject, course_id) {
@@ -1169,6 +1274,7 @@ function createAssignmentgroup(assignmentgroupObject, course_id) {
 
 function getAssignmentgroupByID(assignmentgroup_id) {
     return Assignmentgroup.findById(assignmentgroup_id)
+    .populate({path: 'assignments.assignment', model: 'Assignment'})
     .then(function(assignmentgroup) {
         if(assignmentgroup === null)
             throw errors.ASSIGNMENTGROUP_DO_NOT_EXIST;
@@ -1200,7 +1306,7 @@ function deleteAssignmentgroup(assignmentgroup_id, course_id) {
     });
 }
 
-exports.getUserCourses1 = getUserCourses1;
+exports.getUserCourses = getUserCourses;
 exports.getCourses1 = getCourses1;
 exports.tempSaveMember = tempSaveMember;
 exports.getAllCourses = getAllCourses;
@@ -1216,6 +1322,12 @@ exports.getUserTeacherCourses1 = getUserTeacherCourses1;
 exports.getUserStudentCourses1 = getUserStudentCourses1;
 exports.getUserMemberCourses1 = getUserMemberCourses1;
 exports.getUserMemberStatus = getUserMemberStatus;
+exports.getCourseAutoJoin = getCourseAutoJoin;
+exports.acceptPendingToCourse = acceptPendingToCourse;
+exports.addInviteToCourse = addInviteToCourse;
+exports.addPendingToCourse = addPendingToCourse;
+exports.removeInviteOrPendingToCourse = removeInviteOrPendingToCourse;
+exports.getCourseOwner = getCourseOwner;
 
 exports.getTestsFromAssignment = getTestsFromAssignment;
 exports.findOrCreateUser = findOrCreateUser;
@@ -1265,8 +1377,11 @@ exports.updateTest = updateTest;
 exports.deleteTest = deleteTest;
 exports.deleteCourse = deleteCourse;
 exports.deleteAssignment = deleteAssignment;
-exports.generateInviteLink = generateInviteLink;
-exports.validateInviteLink = validateInviteLink;
+exports.generateInviteCode = generateInviteCode;
+exports.validateInviteCode = validateInviteCode;
+exports.revokeInviteCode = revokeInviteCode;
+exports.getInviteCode = getInviteCode;
+exports.getAllInviteCodes = getAllInviteCodes;
 exports.getAssignmentgroupsByCourseID = getAssignmentgroupsByCourseID;
 exports.createAssignmentgroup = createAssignmentgroup;
 exports.getAssignmentgroupByID = getAssignmentgroupByID;
