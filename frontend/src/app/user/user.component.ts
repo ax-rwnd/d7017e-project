@@ -114,7 +114,7 @@ export class UserComponent implements OnInit {
         // Assign the correct identifier for the course
         for (const course of response.courses as any[]) {
           console.log('course', course);
-          if (course.course_code !== undefined) {
+          if (course.course_code) {
             this.possibleCourses.push({name: course.course_code, id: course._id});
           } else {
             this.possibleCourses.push({name: course.name, id: course._id});
