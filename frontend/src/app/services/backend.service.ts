@@ -392,6 +392,12 @@ getMyPendingRequests() {
     return this.apiGet('/api/courses/' + course_id + '/members/invite?type=pending');
   }
 
+  getInvitedUsers(course_id) {
+    // Get the users invited to join a course
+
+    return this.apiGet('/api/courses/' + course_id + '/members/invite?type=invite');
+  }
+
 // ----------- 7. OTHER calls ----------- //
 
 // -- Search -- //

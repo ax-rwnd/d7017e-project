@@ -40,6 +40,7 @@ export class TeacherCoursesComponent implements OnInit {
   form: FormGroup;
   modalRef: BsModalRef;
   pendingReqs: any;
+  inviteReqs: any;
   defaultForm = {
     search: ''
   };
@@ -90,7 +91,8 @@ export class TeacherCoursesComponent implements OnInit {
       this.setAssignments();
       // Get pending requests
       this.setPendingReqs();
-
+      // Get invite requests
+      this.setInviteReqs();
     });
   }
 
@@ -123,6 +125,15 @@ export class TeacherCoursesComponent implements OnInit {
         this.pendingReqs = response['invites'];
       })
       .catch(err => console.error('Get pending users failed', err));
+  }
+
+  setInviteReqs() {
+    this.backendService.getInvitedUsers(this.currentCourse.id)
+      .then(response => {
+        console.log('invited', response);
+        this.inviteReqs = response['invites'];
+      })
+      .catch(err => console.error('Get invited users failed', err));
   }
 
   setCurrentCourse(course) {
@@ -204,6 +215,12 @@ export class TeacherCoursesComponent implements OnInit {
         // console.log('Accepted req:', response); // Object error stuff, need to check, but works
       })
       .catch(err => console.error('Accept failed', err));
+  }
+
+  declineAllReqs() { // iterate through invited list
+    for (const req of this.inviteReqs) {
+      this.declineReq(req.user['_id']);
+    }
   }
 
   declineReq(student_id) { // need to rewrite delete in backend.service
