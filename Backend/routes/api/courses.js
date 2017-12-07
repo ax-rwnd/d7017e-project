@@ -162,17 +162,29 @@ module.exports = function(router) {
     });
 
 
+
+    // TODO:
+    // Tests
+    // Documentation
+    //
+    // Get all members of :course_id.
+    // Query parameter "role" takes either "student" or "teacher" if only one type of member is wanted.
     router.get('/:course_id/members', function (req, res, next) {
-        var course_id = req.params.course_id;
-        var query = req.query.role;
+        var input;
+        try {
+            input = inputValidation.getMembersValidation(req);
+        }
+        catch(error) {
+            return next(error);
+        }
 
         var p;
-        if (query === "teacher") {
-            p = queries.getCourseTeachers1(course_id);
-        } else if (query === "student") {
-            p = queries.getCourseStudents1(course_id);
+        if (input.role === "teacher") {
+            p = queries.getCourseTeachers1(input.course_id);
+        } else if (input.role === "student") {
+            p = queries.getCourseStudents1(input.course_id);
         } else {
-            p = queries.getCourseMembers1(course_id);
+            p = queries.getCourseMembers1(input.course_id);
         }
 
         p.then(function (memberArray) {
@@ -182,6 +194,12 @@ module.exports = function(router) {
     });
 
 
+    // TODO:
+    // Tests
+    // Documentation
+    //
+    // Teacher or admin can get all invites(invite, pending) regarding a :course_id.
+    // Query parameter "type" takes "invite" or "pending" if only one invite type is wanted.
     router.get('/:course_id/members/invite', function (req, res, next) {
         var input;
         try {
@@ -211,13 +229,14 @@ module.exports = function(router) {
     // Tests
     // Documentation
     //
-    //
-
-    // NOT DONE
+    // Teacher or admin can invite a user to :course_id by putting the users id in user_id body field.
+    // User can ask to join :course_id by leaving user_id blank or filling it with his own id.
+    // If course got autojoin a user who asks to join will automatically be added to the course.
+    // Statuscode 201 indicates the user been added to course. Statuscode 202 is sent if invite/pending successfully added.
     router.post('/:course_id/members/invite', function (req, res, next) {
         var input;
         try {
-            input = inputValidation.putMembersInviteValidation(req);
+            input = inputValidation.postMemberInviteValidation(req);
         }
         catch(error) {
             return next(error);
@@ -258,7 +277,7 @@ module.exports = function(router) {
                 })
                 .then(function () {
                     return 202;
-                }); 
+                });
         }
 
 
@@ -273,7 +292,8 @@ module.exports = function(router) {
     // Tests
     // Documentation
     //
-    //
+    // A teacher or admin can accept a pending request to :course_id. By adding their id in user_id body field.
+    // A user can accept an invite to :course_id by sending his own id in user_id body field or leaving it blank.
     router.put('/:course_id/members/invite', function (req, res, next) {
         var input;
         try {
@@ -298,6 +318,12 @@ module.exports = function(router) {
     });
 
 
+    // TODO:
+    // Tests
+    // Documentation
+    //
+    // A teacher can decline or take back an pending/invite to :course_id. By adding user_id of the user he wants to decline in body field user_id
+    // A user can decline or take back an invite/pending to :course_id. By adding their own user_id to user_id body field or leaving it blank.
     router.delete('/:course_id/members/invite', function (req, res, next) {
         var input;
         try {
@@ -515,22 +541,30 @@ module.exports = function(router) {
         }).catch(next);
     });
 
-    router.get('/:course_id/invitelink', function (req, res, next) {
+    router.post('/:course_id/invitecodes', function (req, res, next) {
         var course_id = req.params.course_id;
+        var expires;
 
-        if (req.query.expires) {
-            var expires = (+req.query.expires);
-            // throw Bad input if number is NaN or too small
-            if (expires !== expires || expires <= 0) {
-                return next(errors.BAD_INPUT);
+        if (req.body.expires) {
+            if (req.body.expires === "never") {
+                expires = req.body.expires;
+            } else {
+                expires = (+req.body.expires);
+                // throw Bad input if number is NaN or too small
+                if (expires !== expires || expires <= 0) {
+                    return next(errors.BAD_INPUT);
+                }
+                // Increase number from milliseconds to hours
+                expires = expires * 60 * 60 * 1000;  
             }
-            // Increase number from milliseconds to hours
-            expires = expires * 60 * 60 * 1000;
         }
 
         permission.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access).then(function () {
-            return queries.generateInviteLink(course_id, expires).then(function (obj) {
-                res.status(201).json({course: obj.course, code: obj.code, expiresAt: obj.expiresAt});
+            return queries.generateInviteCode(course_id, expires).then(function (obj) {
+                if (!obj.expiresAt) {
+                    obj.expiresAt = "never";
+                }
+                res.status(201).json({code: obj.code, course: obj.course, uses: obj.uses, createdAt: obj.createdAt, expiresAt: obj.expiresAt});
             });
         })
         .catch(function (err) {
@@ -538,10 +572,30 @@ module.exports = function(router) {
         });
     });
 
-    router.get('/join/:code', function (req, res, next) {
+    router.get('/:course_id/invitecodes', function (req, res, next) {
+        var course = req.params.course_id;
+
+        queries.getAllInviteCodes(course, req.user).then(function (result) {
+            var obj = [];
+            for (var i = 0; i < result.length; i++) {
+                var curr = result[i].toObject();
+                curr._id = undefined;
+                if (!curr.expiresAt) {
+                    curr.expiresAt = "never";
+                }
+                obj.push(curr);
+            }
+            res.json({codes: obj});
+        })
+        .catch(function (err) {
+            next(err);
+        });
+    });
+
+    router.post('/invitecodes/:code/join', function (req, res, next) {
         var code = req.params.code;
 
-        queries.validateInviteLink(code, req.user.id).then(function (result) {
+        queries.validateInviteCode(code, req.user.id).then(function (result) {
             res.json({user: result.user, course: result.course, role: result.role, features: result.features});
         })
         .catch(function (err) {
@@ -549,6 +603,30 @@ module.exports = function(router) {
         });
     });
 
+    router.delete('/invitecodes/:code', function (req, res, next) {
+        var code = req.params.code;
+
+        queries.revokeInviteCode(code, req.user).then(function (obj) {
+            res.json({code: obj.code, course: obj.course});
+        })
+        .catch(function (err) {
+            next(err);
+        });
+    });
+
+    router.get('/invitecodes/:code', function (req, res, next) {
+        var code = req.params.code;
+
+        queries.getInviteCode(code, req.user).then(function (obj) {
+            if (!obj.expiresAt) {
+                obj.expiresAt = "never";
+            }
+            res.json({code: obj.code, course: obj.course, uses: obj.uses, createdAt: obj.createdAt, expiresAt: obj.expiresAt});
+        })
+        .catch(function (err) {
+            next(err);
+        });
+    });
 
     //submit user code to Tester service for code validation
     router.post('/:course_id/assignments/:assignment_id/submit', function(req, res, next) {
@@ -865,7 +943,7 @@ module.exports = function(router) {
 
         var input;
         try {
-            input = inputValidation.badgeValidation(req);
+            input = inputValidation.postBadgeValidation(req);
         } catch(error) {
             return next(error);
         }
@@ -890,7 +968,7 @@ module.exports = function(router) {
             return next(errors.BAD_INPUT);
         }
 
-        features.getBadge(badge_id)
+        return features.getBadge(badge_id)
         .then(function(badge) {
             return res.json(badge);
         })
@@ -906,10 +984,17 @@ module.exports = function(router) {
         if (!mongoose.Types.ObjectId.isValid(course_id) || !mongoose.Types.ObjectId.isValid(badge_id)) {
             return next(errors.BAD_INPUT);
         }
+        var input;
+        try {
+            input = inputValidation.putBadgeValidation(req);
+        } catch(error) {
+            return next(error);
+        }
 
-        req.body.course_id = course_id;
-
-        return features.updateBadge(badge_id, req.body)
+        return permission.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
+        .then(function() {
+            return features.updateBadge(badge_id, input);
+        })
         .then(function(badge) {
             return res.json(badge);
         })
@@ -945,8 +1030,8 @@ module.exports = function(router) {
             return next(errors.BAD_INPUT);
         }
 
-        queries.getAssignmentgroupsByCourseID(course_id)
-        .then(assignmentgroups => res.json(assignmentgroups))
+        return queries.getAssignmentgroupsByCourseID(course_id)
+        .then(assignmentgroups => res.json({assignmentgroups: assignmentgroups}))
         .catch(next);
     });
 
@@ -986,7 +1071,7 @@ module.exports = function(router) {
             return next(errors.BAD_INPUT);
         }
 
-        queries.getAssignmentgroupByID(assignmentgroup_id)
+        return queries.getAssignmentgroupByID(assignmentgroup_id)
         .then(function(assignmentgroup) {
             return res.json(assignmentgroup);
         })
@@ -1010,7 +1095,7 @@ module.exports = function(router) {
             return next(error);
         }
 
-        permission.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
+        return permission.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access)
         .then(function() {
             queries.updateAssignmentgroup(input, assignmentgroup_id)
             .then(function(assignmentgroup) {

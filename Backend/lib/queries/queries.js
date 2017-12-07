@@ -10,9 +10,10 @@ var Draft = require('../../models/schemas').Draft;
 var JoinRequest = require('../../models/schemas').JoinRequests;
 var Badge = require('../../models/schemas').Badge;
 var Feature = require('../../models/schemas').Features;
-var InviteLink = require('../../models/schemas').InviteLinks;
+var InviteCode = require('../../models/schemas').InviteCodes;
 var Features = require('./features.js');
 var Assignmentgroup = require('../../models/schemas').Assignmentgroup;
+var permission = require('../permission');
 
 var errors = require('../errors.js');
 var mongoose = require('mongoose');
@@ -450,7 +451,7 @@ function getUserInvites(user_id, type) {
 }
 
 function getInvitesCourseUser(user_id, course_id) {
-    return JoinRequest.find({user: user_id, course: course_id});
+    return JoinRequest.findOne({user: user_id, course: course_id}, "inviteType");
 }
 
 function returnPromiseForChainStart() {
@@ -525,7 +526,7 @@ function deleteCourse(id) {
         // join requests
         promises.push(JoinRequest.remove({course: course._id}));
         // invite links
-        promises.push(InviteLink.remove({course: course._id}));
+        promises.push(InviteCode.remove({course: course._id}));
         // badges
         promises.push(Badge.remove({course_id: course._id}));
 
@@ -913,57 +914,56 @@ function getCoursesEnabledFeatures(course_id) {
 }
 
 function searchDB(query, categories, user_id) {
-
-    console.log(1);
     return getAssignmentIDsByUser(user_id)
     .then(assignment_ids => {
+        return getUserCourses(user_id)
+        .then(function(course_ids) {
+            let promises = [];
+            let json = {
+                courses: [],
+                assignments: [],
+                users: []
+            };
 
-        console.log(2);
+            if(categories) {
+                categories = categories.split(',');
 
-        let promises = [];
-        let json = {
-            courses: [],
-            assignments: [],
-            users: []
-        };
-
-        if(categories) {
-            categories = categories.split(',');
-
-            if (categories.indexOf('courses') !== -1) {
-                promises.push(searchDBCourses(query, user_id));
-            }
-            if (categories.indexOf('assignments') !== -1) {
+                if (categories.indexOf('courses') !== -1) {
+                    promises.push(searchDBCourses(query, course_ids));
+                }
+                if (categories.indexOf('assignments') !== -1) {
+                    promises.push(searchDBAssignments(query, assignment_ids));
+                }
+                if (categories.indexOf('users') !== -1) {
+                    promises.push(searchDBUsers(query));
+                }
+            } else {
+                promises.push(searchDBCourses(query, course_ids));
                 promises.push(searchDBAssignments(query, assignment_ids));
-            }
-            if (categories.indexOf('users') !== -1) {
                 promises.push(searchDBUsers(query));
             }
-        } else {
-            promises.push(searchDBCourses(query, user_id));
-            promises.push(searchDBAssignments(query, assignment_ids));
-            promises.push(searchDBUsers(query));
-        }
 
-        return Promise.all(promises).then(function(results) {
+            return Promise.all(promises)
+            .then(function(results) {
 
-            for(let result of results) {
-                for(var key in result) json[key] = result[key];
-            }
+                for(let result of results) {
+                    for(var key in result) json[key] = result[key];
+                }
 
-            return json;
+                return json;
+            });
         });
     });
 }
 
-function searchDBCourses(query, user_id) {
-    return Course.find({$text: {$search: '\"'+query+'\"'}, 'students': user_id, 'hidden': false}, {score: {$meta: "textScore"}})
-        .select('-__v -hidden -features -assignments -students -enabled_features')
+function searchDBCourses(query, course_ids) {
+    return Course.find({$text: {$search: '\"'+query+'\"'}, '_id': course_ids, 'hidden': false}, {score: {$meta: "textScore"}})
+        .select('-__v -hidden -features -assignments -students -enabled_features -assignmentgroups')
+        .populate({path: 'owner', model: 'User'})
         .sort({score: {$meta: "textScore"}})
-        .limit(20).then(docs => {
-            return {'courses': docs};
-        }).catch(err => {
-            logger.log("error",err);
+        .limit(20)
+        .then(results => {
+            return {'courses': results};
         });
 }
 
@@ -971,10 +971,9 @@ function searchDBAssignments(query, assignment_ids) {
     return Assignment.find({$text: {$search: '\"'+query+'\"'}, '_id': assignment_ids, 'hidden': false}, {score: {$meta: "textScore"}})
         .select('-__v -tests -optional_tests -hidden -languages')
         .sort({score: {$meta: "textScore"}})
-        .limit(20).then(docs => {
-            return {'assignments': docs};
-        }).catch(err => {
-            logger.log("error",err);
+        .limit(20)
+        .then(results => {
+            return {'assignments': results};
         });
 }
 
@@ -982,10 +981,9 @@ function searchDBUsers(query) {
     return User.find({$text: {$search: '\"'+query+'\"'}}, {score: {$meta: "textScore"}})
         .select('-__v -tokens -providers')
         .sort({score: {$meta: "textScore"}})
-        .limit(20).then(docs => {
-            return {'users': docs};
-        }).catch(err => {
-            logger.log("error",err);
+        .limit(20)
+        .then(results => {
+            return {'users': results};
         });
 }
 
@@ -994,15 +992,9 @@ function getAssignmentIDsByUser(user_id) {
     return getUserCourses(user_id, '_id')
     .then(function(courses) {
 
-        // Get IDs of courses user is in
-        let ids = [];
-        for(let course of courses.courses) {
-            ids.push(course._id);
-        }
-
         // Get assignemnts from courses
         let assignment_promises = [];
-        for(let id of ids) {
+        for(let id of courses) {
             assignment_promises.push(getCourseAssignments(id, 'assignments')
             .then(assignment => {
                 return assignment;
@@ -1044,7 +1036,15 @@ function getUserCourses(user_id) {
 }
 
 function getCourses1() {
-    return Course.find({hidden: false}, constants.FIELDS.COURSE.BASE_FIELDS);
+    return Course.find({hidden: false}, constants.FIELDS.COURSE.BASE_FIELDS)
+    .populate({path: 'owner', model: 'User'})
+    .lean()
+    .then(function(courses) {
+        for(let course of courses) {
+            delete course.owner.tokens;
+        }
+        return courses;
+    });
 }
 
 function getUsersHiddenCourses (user_id) {
@@ -1119,6 +1119,7 @@ function addMemberToCourse(user_id, course_id) {
 
 function removeInviteOrPendingToCourse (user_id, course_id) {
     return JoinRequest.findOneAndRemove({user:user_id, course: course_id}).then(function(inviteObject) {
+        console.log(inviteObject);
         if (!inviteObject) {
             throw errors.NO_INVITE_FOUND;
         }
@@ -1148,11 +1149,17 @@ function getUserMemberCourses1(user_id) {
 }
 
 function getUserMemberStatus(course_id, user_id) {
-    return CourseMember.findOne({user: user_id, course: course_id}, "role");
+    return CourseMember.findOne({user: user_id, course: course_id}, "role").then(function (memberObject) {
+        return memberObject;
+    });
 }
 
 function getCourseAutoJoin(course_id) {
     return Course.findById(course_id, "autojoin -_id");
+}
+
+function getCourseOwner(course_id) {
+    return Course.findById(course_id, "owner");
 }
 
 function addPendingToCourse(user_id, course_id) {
@@ -1165,26 +1172,28 @@ function addInviteToCourse(user_id, course_id) {
     return inviteObject.save();
 }
 
-function generateInviteLink(course_id, expiresIn) {
-    var code = randomstring.generate();
-    var exp = Date.now() + (expiresIn || config.get("Courses.invite_link_ttl"));
+function generateInviteCode(course_id, expiresIn) {
+    var code = randomstring.generate(config.get('Courses.invite_link_length'));
+    var exp = (expiresIn === "never") // Won't set expiresAt if link never expires
+        ? undefined
+        : Date.now() + (expiresIn || config.get("Courses.invite_link_ttl"));
 
     if (!mongoose.Types.ObjectId.isValid(course_id)) {
             throw errors.INVALID_ID;
     }
-    var newLink = new InviteLink({code: code, course: course_id, expiresAt: exp});
+    var newLink = new InviteCode({code: code, course: course_id, expiresAt: exp});
     return newLink.save().then(function (obj) {
-        return obj;
+        return obj.toObject();
     });
 }
 
-function validateInviteLink(code, user_id) {
-    return InviteLink.findOne({code: code}).then(function (obj) {
+function validateInviteCode(code, user_id) {
+    return InviteCode.findOne({code: code}).then(function (obj) {
         if (!obj) {
             throw errors.INVALID_LINK;
         }
         if (obj.expiresAt < Date.now()) {
-            return InviteLink.deleteOne({code: code}).then(function () {
+            return InviteCode.deleteOne({code: code}).then(function () {
                 throw errors.EXPIRED_LINK;
             });
         }
@@ -1192,9 +1201,11 @@ function validateInviteLink(code, user_id) {
         return CourseMember.findOne({user: user_id, course: obj.course}).then(function (res) {
             if (!res) {
                 return Features.createFeature(user_id, obj.course).then(function (featureObject) {
-                    // Add student to course
-                    var memberObject = new CourseMember({role: "student", course: obj.course, user: user_id, features: featureObject._id});
-                    return memberObject.save();
+                    return InviteCode.findOneAndUpdate({code: code}, {$inc: {uses: 1}}).then(function () {
+                        // Add student to course
+                        var memberObject = new CourseMember({role: "student", course: obj.course, user: user_id, features: featureObject._id});
+                        return memberObject.save();
+                    });
                 });
             } else {
                 throw errors.USER_ALREADY_IN_COURSE;
@@ -1205,8 +1216,61 @@ function validateInviteLink(code, user_id) {
     });
 }
 
+function revokeInviteCode(code, userObject) {
+    return InviteCode.findOne({code: code}).then(function (invitelink) {
+        if (!invitelink) {
+            throw errors.INVALID_LINK;
+        }
+        return permission.checkIfTeacherOrAdmin(userObject.id, invitelink.course, userObject.access).then(function () {
+            return InviteCode.findOneAndRemove({code: code}).then(function (obj) {
+                return obj;
+            });
+        });
+    });
+}
+
+function getInviteCode(code, userObject) {
+    return InviteCode.findOne({code: code}).then(function (invitelink) {
+        if (!invitelink) {
+            throw errors.INVALID_LINK;
+        }
+        return permission.checkIfTeacherOrAdmin(userObject.id, invitelink.course, userObject.access).then(function () {
+            return invitelink.toObject();
+        });
+    });
+}
+
+function getAllInviteCodes(course, userObject) {
+    return permission.checkIfTeacherOrAdmin(userObject.id, course, userObject.access).then(function () {
+        return InviteCode.find({course: course}, "code course uses createdAt expiresAt").then(function (codes) {
+            return codes;
+        });
+    });
+
+}
+
 function getAssignmentgroupsByCourseID(course_id) {
-    return Course.findById(course_id, 'assignmentgroups');
+    return Course.findById(course_id, 'assignmentgroups')
+    .populate({path: 'assignmentgroups', model: 'Assignmentgroup',
+    populate: [
+        {
+            path: 'assignments.assignment', model: 'Assignment'
+        }
+    ]})
+    .lean()
+    .then(course => {
+        let assignmentgroups = course.assignmentgroups;
+
+        /*for(let assignmentgroup of assignmentgroups) {
+            for(let assignment of assignmentgroup.assignments) {
+                if(assignment.assignment.hidden) {
+                    assignmentgroup.assignments.pop(assignment);
+                }
+            }
+        }*/
+
+        return assignmentgroups;
+    });
 }
 
 function createAssignmentgroup(assignmentgroupObject, course_id) {
@@ -1275,6 +1339,7 @@ exports.acceptPendingToCourse = acceptPendingToCourse;
 exports.addInviteToCourse = addInviteToCourse;
 exports.addPendingToCourse = addPendingToCourse;
 exports.removeInviteOrPendingToCourse = removeInviteOrPendingToCourse;
+exports.getCourseOwner = getCourseOwner;
 
 exports.getTestsFromAssignment = getTestsFromAssignment;
 exports.findOrCreateUser = findOrCreateUser;
@@ -1324,8 +1389,11 @@ exports.updateTest = updateTest;
 exports.deleteTest = deleteTest;
 exports.deleteCourse = deleteCourse;
 exports.deleteAssignment = deleteAssignment;
-exports.generateInviteLink = generateInviteLink;
-exports.validateInviteLink = validateInviteLink;
+exports.generateInviteCode = generateInviteCode;
+exports.validateInviteCode = validateInviteCode;
+exports.revokeInviteCode = revokeInviteCode;
+exports.getInviteCode = getInviteCode;
+exports.getAllInviteCodes = getAllInviteCodes;
 exports.getAssignmentgroupsByCourseID = getAssignmentgroupsByCourseID;
 exports.createAssignmentgroup = createAssignmentgroup;
 exports.getAssignmentgroupByID = getAssignmentgroupByID;
