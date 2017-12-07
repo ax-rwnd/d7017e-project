@@ -90,10 +90,10 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
   setTextValues() {
     // Set the assignment text and url
 
-    this.assignmentText = (this.selectedAssignment === undefined) ?
-                          'Pick an assignment' : this.selectedAssignment.name;
-    this.assignmentId = (this.selectedAssignment === undefined) ?
-                        '' : this.selectedAssignment._id;
+    this.assignmentText = (this.selectedAssignment === undefined || this.selectedAssignment.assignment === undefined) ?
+                          'Pick an assignment' : this.selectedAssignment.assignment.name;
+    this.assignmentId = (this.selectedAssignment === undefined || this.selectedAssignment.assignment === undefined) ?
+                        '' : this.selectedAssignment.assignment._id;
   }
 
   update() {
@@ -224,8 +224,8 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
     ctx.fill();
 
     // Set stroke style
-    if (this.selectedAssignment !== undefined &&
-      this.selectedAssignment.assignment_id === current.assignment_id) {
+    if (this.selectedAssignment !== undefined && this.selectedAssignment.assignment !== undefined &&
+      this.selectedAssignment.assignment._id === current.assignment._id) {
       ctx.lineWidth = this.borderThickness;
       ctx.strokeStyle = '#5f5';
     } else {

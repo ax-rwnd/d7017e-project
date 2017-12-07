@@ -74,6 +74,7 @@ export class ModAdventuremapEditorComponent extends ModAdventuremapComponent imp
       });
 
       // Determine what to do
+      console.warn('selection', toSelect, this.selectedAssignment);
       if (toSelect !== undefined) {
         this.selectedAssignment = toSelect;
       } else if (this.selectedAssignment !== undefined) {
