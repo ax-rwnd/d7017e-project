@@ -566,7 +566,7 @@ module.exports = function(router) {
                     return next(errors.BAD_INPUT);
                 }
                 // Increase number from milliseconds to hours
-                expires = expires * 60 * 60 * 1000;  
+                expires = expires * 60 * 60 * 1000;
             }
         }
 
@@ -824,7 +824,7 @@ module.exports = function(router) {
             return permission.checkIfTeacherOrAdmin(req.user.id, course_id, req.user.access);
         })
         .then(function () {
-            return queries.deleteTest(test_id, assignment_id);
+            return queries.deleteTest(test_id, assignment_id, course_id);
         })
         .then(function () {
             return res.json({});

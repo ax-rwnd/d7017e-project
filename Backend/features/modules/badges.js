@@ -36,13 +36,15 @@ async function run(data) {
         // Only iterate loop if a new badge has been completed
         achievedNewBadge = false;
         for(let badge of badges) {
-            // Calculate a new badge
-            badge = calcBadge(feature.badges, feature.progress, badge);
-            if(badge !== undefined && feature.badges.indexOf(badge) === -1) {
-                let result = await queries.addBadgeToFeature(badge, feature._id);
-                newBadges.push(await queries.getBadge(badge));
-                feature.badges.push(badge);
-                achievedNewBadge = true;
+            if(badge.goals.assignments.length !== 0 || badge.goals.badges.length !== 0) {
+                // Calculate a new badge
+                badge = calcBadge(feature.badges, feature.progress, badge);
+                if(badge !== undefined && feature.badges.indexOf(badge) === -1) {
+                    let result = await queries.addBadgeToFeature(badge, feature._id);
+                    newBadges.push(await queries.getBadge(badge));
+                    feature.badges.push(badge);
+                    achievedNewBadge = true;
+                }
             }
         }
     }
@@ -75,6 +77,7 @@ function calcBadge(badges, progress, badge) {
     // Compare badges
     if(!helper.arrayContainsArray(badges, badge.goals.badges)) {
         logger.log("warn",'Badges failed badge');
+        console.log("warn",'Badges failed badge');
         return;
     }
 
@@ -90,6 +93,7 @@ function calcBadge(badges, progress, badge) {
         }
         if(assignment_progress === undefined) {
             logger.log("warn","Assignment required for Badge as not yet been done");
+            console.log("warn","Assignment required for Badge as not yet been done");
             return;
         }
 
@@ -103,6 +107,7 @@ function calcBadge(badges, progress, badge) {
             }
             if(passed === false) {
                 logger.log("warn","Required test for badge was not completed");
+                console.log("warn","Required test for badge was not completed");
                 return;
             }
         }
@@ -111,6 +116,7 @@ function calcBadge(badges, progress, badge) {
         if("code_size" in assignment) {
             if(assignment.code_size < assignment_progress.code_size) {
                 logger.log("warn","Code size was larger than required for Badge");
+                console.log("warn","Code size was larger than required for Badge");
                 return;
             }
         }

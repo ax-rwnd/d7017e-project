@@ -24,9 +24,19 @@ function getFeature(user_id, assignment_id) {
 }
 
 function arrayContainsArray (superset, subset) {
-  return subset.every(function (value) {
-    return (superset.indexOf(value) >= 0);
-  });
+    for (let goalBadge of subset) {
+        let found = false;
+        for(let featureBadge of superset) {
+            if(goalBadge.equals(featureBadge)) {
+                found = true;
+                break;
+            }
+        }
+        if(!found) {
+            return false;
+        }
+    }
+    return true;
 }
 
 function prepareProgressData(result) {

@@ -1249,13 +1249,14 @@ function getAssignmentgroupsByCourseID(course_id) {
     .then(course => {
         let assignmentgroups = course.assignmentgroups;
 
-        /*for(let assignmentgroup of assignmentgroups) {
-            for(let assignment of assignmentgroup.assignments) {
-                if(assignment.assignment.hidden) {
-                    assignmentgroup.assignments.pop(assignment);
-                }
-            }
-        }*/
+        // TODO: handle roles so that basic access dont get assignment with hidden true
+        //for(let assignmentgroup of assignmentgroups) {
+        //    for(let assignment of assignmentgroup.assignments) {
+        //        if(assignment.assignment.hidden) {
+        //            assignmentgroup.assignments.pop(assignment);
+        //        }
+        //    }
+        //}
 
         return assignmentgroups;
     });
