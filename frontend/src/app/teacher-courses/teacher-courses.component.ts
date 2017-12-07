@@ -70,6 +70,7 @@ export class TeacherCoursesComponent implements OnInit {
   inviteLinkExample: string;
   groups: any[];
   inviteList: any;
+  createdBadges: any;
 
   constructor(private courseService: CourseService, private route: ActivatedRoute, private headService: HeadService,
               private fb: FormBuilder, private assignmentService: AssignmentService, private modalService: BsModalService,
@@ -95,6 +96,13 @@ export class TeacherCoursesComponent implements OnInit {
       this.setPendingReqs();
       // Get invite requests
       this.setInviteReqs();
+
+      this.createdBadges = {'badges': []};
+      this.backendService.getAllBadges(this.currentCourse.id)
+        .then(response => {
+          this.createdBadges = response;
+          console.log('badges', this.createdBadges);
+        });
     });
   }
 
@@ -199,14 +207,22 @@ export class TeacherCoursesComponent implements OnInit {
   openModal(modal, type) {
     // Open a modal dialog box
     if (type === 'createBadge') {
-      for (const a of this.flattenAssignments()) {
-        this.backendService.getAssignment(a.course_id, a.id)
+      console.log('assignments', this.assignmentService.courseAssignments[this.currentCourse.id]);
+      for (const a of this.assignmentService.courseAssignments[this.currentCourse.id]['assignments']) {
+        console.log('ids ', this.currentCourse.id, a.id);
+        this.backendService.getCourseAssignmentTests(this.currentCourse.id, a.id)
           .then(response => {
-            const tests = response['tests']['io'].concat(response['optional_tests']['io']);
-            for (let i = 0; i < tests.length; i++) {
-              tests[i]['checked'] = false;
+            let t = [];
+            if (response['tests'] !== undefined) {
+              t = t.concat(response['tests']['io']);
             }
-            this.tests[a.id] = tests;
+            if (response['optional_tests'] !== undefined) {
+              t = t.concat(response['optional_tests']['io']);
+            }
+            for (let i = 0; i < t.length; i++) {
+              t[i]['checked'] = false;
+            }
+            this.tests[a.id] = t;
           });
       }
     } else if (type === 'createGroup') {
@@ -300,7 +316,9 @@ export class TeacherCoursesComponent implements OnInit {
     const assignments = [];
 
     for (const a of this.selectedAssignments) {
+      console.log('a', a);
       const assignmentTests = [];
+      console.log(this.tests[a['assignment'].id]);
       for (const t in this.tests[a['assignment'].id]) {
         const test = this.tests[a['assignment'].id][t];
         if (test['checked'] === true) {
@@ -310,9 +328,14 @@ export class TeacherCoursesComponent implements OnInit {
       assignments.push({'assignment': a['assignment'].id, 'tests': assignmentTests, 'code_size': 100});
     }
     console.log('submit', assignments);
+    this.modalRef.hide();
     this.backendService.postNewBadge(this.selectedBadge, this.badgeName, this.badgeDescription, this.currentCourse.id,
       [], assignments)
-      .then(response => console.log('badge created: ', response));
+      .then(response => {
+        this.toastService.success('Badge created');
+        this.createdBadges['badges'].push(response);
+        console.log('badge', response);
+      });
   }
   submitGroups() {
     for (const group in this.groups) {
@@ -331,6 +354,20 @@ export class TeacherCoursesComponent implements OnInit {
     }
   }
 
+  deleteGroup(group) {
+    if (confirm('Are you sure to delete ' + group['name'] + '?')) {
+      console.log('delete ', group);
+      this.backendService.deleteAssignmentGroup(this.currentCourse.id, group['id'])
+        .then(response => this.toastService.success(group['name'] + 'deleted!'));
+    }
+  }
+  deleteBadge(badge) {
+    if (confirm('Are you sure to delete ' + badge['title'] + '?')) {
+      console.log('delete ', badge);
+      this.backendService.deleteBadge(this.currentCourse.id, badge['_id'])
+        .then(response => this.toastService.success(badge['title'] + 'deleted!'));
+    }
+  }
 
   getAllInviteLinks() {
     // fel id?

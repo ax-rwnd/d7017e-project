@@ -99,3 +99,12 @@
 .select-block {
   margin-bottom: 5px;
 }
+
+.fillBadge {
+  margin-right: 5px;
+  margin-bottom: 10px;
+}
+
+.delete-element {
+  cursor: pointer;
+}

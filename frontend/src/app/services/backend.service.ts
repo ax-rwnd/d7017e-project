@@ -245,6 +245,11 @@ The structure below is the following:
     return this.apiPut('/api/courses/' + course_id + '/assignmentgroups/' + assignmentgroup_id, assignmentGroup);
   }
 
+  deleteAssignmentGroup(course_id: string, group_id: string) {
+    const body = {'course_id': course_id, 'assignmentgroup_id': group_id};
+    return this.apiDelete('/api/courses/' + course_id + '/assignmentgroups/' + group_id, body);
+  }
+
 // -- Students and courses -- //
 
   getCourseUsers(id: string) {
@@ -273,6 +278,15 @@ The structure below is the following:
     const body = {'icon': icon, 'title': title, 'description': description, 'course_id': course_id, 'goals': goals};
     console.log('post body', body);
     return this.apiPost('/api/courses/' + course_id + '/badges', body);
+  }
+
+  deleteBadge(course_id: string, badge_id: string) {
+    const body = {'course_id': course_id, 'badge_id': badge_id};
+    return this.apiDelete('/api/courses/' + course_id + '/badges/' + badge_id, body);
+  }
+
+  getAllBadges(course_id: string) {
+    return this.apiGet('/api/courses/' + course_id + '/badges');
   }
 
   getEnabledFeaturesCourse (course_id: string) {
@@ -342,7 +356,7 @@ The structure below is the following:
   getCourseAssignmentTests(course_id: ObjectID, assignment_id: ObjectID) {
     // Get all tests of a specific assignment
 
-    return this.apiGet('/api/courses/' + course_id.get() + '/assignments/' + assignment_id.get() + '/tests');
+    return this.apiGet('/api/courses/' + course_id + '/assignments/' + assignment_id + '/tests');
   }
 
   // add tests to assignment
