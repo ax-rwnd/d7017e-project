@@ -80,8 +80,9 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
 
       // Hittest the nodes
       this.selectedAssignment = this.assignments.find( (el) => {
-        const dx = x - el.coords.x;
-        const dy = y - el.coords.y;
+        const local = this.scaleToLocal(el.coords);
+        const dx = x - local.x;
+        const dy = y - local.y;
         return (Math.sqrt(dx * dx + dy * dy) < this.sensitivity);
       });
 
