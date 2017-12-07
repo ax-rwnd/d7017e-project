@@ -92,6 +92,15 @@ export class CourseService {
     return this.teachCourses.next(this.teaching);
   }
 
+  removeTeacherCourse(course_id) {
+    const course = this.GetCourse(course_id);
+    const index = this.teaching.indexOf(course);
+    if (index !== -1) {
+      this.teaching.splice(index, 1);
+    }
+    return this.teachCourses.next(this.teaching);
+  }
+
   UpdateCourse(courseId) {
     // Fetches the features from course with the given id from backend and replace the current version
     // Returns a promise

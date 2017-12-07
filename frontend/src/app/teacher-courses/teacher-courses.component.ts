@@ -178,6 +178,20 @@ export class TeacherCoursesComponent implements OnInit {
     this.getAllInviteLinks();
   }
 
+  deleteCourse(course_id) {
+    this.backendService.deleteCourse(course_id)
+      .then(resp => {
+        console.log('Response delete:', resp);
+        this.router.navigate(['/user'])
+          .then( done => {
+            this.courseService.removeTeacherCourse(course_id);
+          });
+      })
+      .catch(err => {
+        console.log('Error deleting course:', err);
+      });
+  }
+
   openModal(modal, type) {
     // Open a modal dialog box
     if (type === 'createBadge') {
