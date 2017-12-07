@@ -182,10 +182,9 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
 
     if (this.assignments !== undefined) {
 
-      for (let i = 0; i < this.assignments.length; i++) {
-        const current = this.assignments[i];
+      this.assignments.forEach((current, i) => {
         this.drawAssignment(ctx, current, i);
-      }
+      });
     } else {
       console.warn('assignments were undefined during drawMap()');
     }

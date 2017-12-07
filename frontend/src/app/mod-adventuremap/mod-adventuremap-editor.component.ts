@@ -49,13 +49,17 @@ export class ModAdventuremapEditorComponent extends ModAdventuremapComponent imp
     ctx.stroke();
   }
 
-  updateGroup(groupIndex: number, updatedAssignment: any) {
+  updateGroup(groupIndex: number) {
     // Send a request to update the state of the group with new coords, etc.
     // TODO: bunch together multiple requests?
-
+    this.assignmentGroups[groupIndex].assignments = this.assignments;
     const group = this.assignmentGroups[groupIndex];
 
-    return this.backendService.putAssignmentGroup(this.courseCode, group._id, group);
+    if (group !== undefined) {
+      return this.backendService.putAssignmentGroup(this.courseCode, group._id, group);
+    } else {
+      console.error('failed to update positions, undefined group');
+    }
   }
 
   handleClick() {
@@ -80,7 +84,7 @@ export class ModAdventuremapEditorComponent extends ModAdventuremapComponent imp
       } else if (this.selectedAssignment !== undefined) {
         this.selectedAssignment.coords.x = x;
         this.selectedAssignment.coords.y = y;
-        //this.updateGroup();
+        this.updateGroup(this.groupIndex);
       } else {
         console.warn('Warning: undefined elements.');
       }
