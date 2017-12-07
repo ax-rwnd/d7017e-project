@@ -32,10 +32,25 @@ export class AssignmentService {
   AddCourseAssignments(course_id: string, assignments: any[]) {
     const a = [];
     for (let i = 0; i < assignments.length; i++) {
-      a[i] = {id: assignments[i]._id, course_id: course_id, name: assignments[i].name, languages: assignments[i].languages,
-        description: assignments[i].description, available: true};
+      a[i] = {'assignment': assignments[i]};
     }
-    this.courseAssignments[course_id] = [{name: 'Assignments', collapse: false, availability: false, assignments: a, groups: []}];
+    if (this.courseAssignments[course_id] === undefined) {
+      this.courseAssignments[course_id] = [];
+    }
+    if (this.courseAssignments[course_id]['assignments'] === undefined) {
+      this.courseAssignments[course_id]['assignments'] = [];
+    }
+    this.courseAssignments[course_id]['assignments'] = a;
+  }
+  AddCourseAssignmentGroup(course_id: string, group: any) {
+    if (this.courseAssignments[course_id] === undefined) {
+      this.courseAssignments[course_id] = [];
+    }
+    if (this.courseAssignments[course_id]['groups'] === undefined) {
+      this.courseAssignments[course_id]['groups'] = [];
+    }
+    this.courseAssignments[course_id]['groups'].push(group);
+    console.log('course groups', this.courseAssignments[course_id]['groups']);
   }
   GetAssignment(course_id: string, assignment_id: string) {
     if (this.courseAssignments[course_id] === undefined) {

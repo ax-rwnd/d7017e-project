@@ -130,6 +130,34 @@ function getTeachCourses(response: Object, backendService, courseService, assign
       })
       .catch());
     promiseArray.push(assignmentService.getAssignmentsForCourse(course._id)); // Set assignments for assignments
+    promiseArray.push(getAssignmentGroups(course._id, backendService, assignmentService));
+  }
+  return Promise.all(promiseArray);
+}
+
+function getAssignmentGroups(course_id, backendService, assignmentService) {
+  console.log('getting groups');
+  return new Promise((resolve, reject) => {
+    backendService.getAssignmentGroupsCourse(course_id)
+      .then(response => {
+        console.log('groups', response);
+        groupHelper(response, course_id, backendService, assignmentService)
+          .then(resolve)
+          .catch(reject);
+      })
+      .catch(reject);
+  });
+}
+
+function groupHelper(response, course_id, backendService, assignmentService) {
+  const promiseArray = [];
+  console.log('response', response);
+  for (let i = 0; i < response.assignmentgroups.length; i++) {
+    promiseArray.push(backendService.getAssignmentGroup(course_id, response.assignmentgroups[i]._id)
+      .then(group => {
+        console.log(group);
+        assignmentService.AddCourseAssignmentGroup(course_id, group);
+      }));
   }
   return Promise.all(promiseArray);
 }
@@ -153,9 +181,10 @@ function updateCourses(response, backendService, courseService, assignmentServic
       })
       .catch( err => { console.log('Error fetching features:', err);
       }));
-    promiseArray.push(backendService.getCourseAssignments(course._id)
+    promiseArray.push(backendService.getAssignmentGroupsCourse(course._id)
       .then(assignmentsResponse => {
-        assignmentService.AddCourseAssignments(course._id, assignmentsResponse.assignments);
+        groupHelper(assignmentsResponse, course._id, backendService, assignmentService);
+        //assignmentService.AddCourseAssignments(course._id, assignmentsResponse.assignments);
       }));
   }
   return Promise.all(promiseArray);

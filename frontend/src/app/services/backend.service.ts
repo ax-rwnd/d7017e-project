@@ -298,6 +298,11 @@ The structure below is the following:
     return this.apiGet('/api/courses/' + course_id + '/assignmentgroups');
   }
 
+  putAssignmentGroup(course_id: ObjectID, group_id: ObjectID, body) {
+    console.log('body', body);
+    return this.apiPut('/api/courses/' + course_id + '/assignmentgroups/' + group_id, body);
+  }
+
   getAssignmentGroup(course_id: string, assignmentgroup_id: string) {
     // Retrieve an assignment group
 
