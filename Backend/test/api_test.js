@@ -944,7 +944,7 @@ describe('/api', () => {
                     .set('Authorization', 'Bearer ' + access_tokens.user)
                     .expect(400)
                     .then(res => {
-                        assert(res.body.message == 'Bad input. Expected: "?query=XYZ"', 'query was misspelled');
+                        assert(res.body.error.message == 'Bad input. Expected: "?query=XYZ"', 'query was misspelled');
                     });
             });
         });
@@ -958,7 +958,7 @@ describe('/api', () => {
                     .set('Authorization', 'Bearer ' + access_tokens.user)
                     .expect(400)
                     .then(res => {
-                        assert(res.body.message == 'Bad input. Expected query with length atleast ' + config.get('Search.min_query_length'), 'Too short query data');
+                        assert(res.body.error.message == 'Bad input. Expected query with length atleast ' + config.get('Search.min_query_length'), 'Too short query data');
                     });
             });
         });
