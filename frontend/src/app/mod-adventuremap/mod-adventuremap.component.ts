@@ -24,6 +24,7 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
   private userProgress: any;
   protected assignments: any[];
   protected assignmentGroups: any[];
+  protected groupIndex = 0;
 
   // Frontend state
   protected lastAssignment: any;
@@ -76,8 +77,8 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
 
       // Hittest the nodes
       this.selectedAssignment = this.assignments.find( (el) => {
-        const dx = x - el.x;
-        const dy = y - el.y;
+        const dx = x - el.coords.x;
+        const dy = y - el.coords.y;
         return (Math.sqrt(dx * dx + dy * dy) < this.sensitivity);
       });
 
@@ -112,12 +113,44 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
   }
 
   loadAssignments() {
-    // Load assingments for the map
-    this.backendService.getAssignmentGroupsCourse(this.courseCode).then((data: any) => {
-      this.assignmentGroups = data.assignmentgroups;
-    })
-      .catch((err) => console.error('could not get groups in adventuremap', err));
+    // Load assingments- and assignment groups from map
 
+    return new Promise ((resolve: any, reject: any) => {
+      this.backendService.getAssignmentGroupsCourse(this.courseCode).then((data: any) => {
+        // Grab the available groups
+        this.assignmentGroups = data.assignmentgroups;
+
+        if (this.assignmentGroups && this.assignmentGroups.length <= 0) {
+          console.warn('no groups...');
+          return;
+        } else {
+        }
+
+        // Grab details about the specific group
+        this.backendService.getAssignmentGroup(this.courseCode, this.assignmentGroups[this.groupIndex]._id).then((nestdata: any) => {
+          this.assignments = nestdata.assignments;
+
+          // Make sure that progress is loaded
+          this.loadProgress().then((progress: any) => {
+            console.warn('loaded progress', progress);
+            resolve(this.assignments);
+          })
+          .catch( (err) => {
+            console.error('could not load progress', err);
+          });
+
+        })
+        .catch((err) => console.error('could not load assignments from group', err));
+
+      })
+      .catch((err) => {
+        console.error('could not get groups in adventuremap', err);
+        reject(err);
+      });
+    });
+  }
+
+    /*
     return new Promise( (resolve: any, reject: any) => {
       this.loadProgress()
         .then( () => {
@@ -136,8 +169,7 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
         .catch( (err) => {
           console.error('adventuremap failed to load assignments ', err);
         });
-    });
-  }
+    });*/
 
   loadProgress() {
     // Load the user's course progress
@@ -175,6 +207,8 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
         const current = this.assignments[i];
         this.drawAssignment(ctx, current, i);
       }
+    } else {
+      console.warn('assignments were undefined during drawMap()');
     }
   }
 
@@ -187,8 +221,8 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
       ctx.beginPath();
       ctx.lineWidth = 1;
       ctx.strokeStyle = 'black';
-      ctx.moveTo(current.x, current.y);
-      ctx.lineTo(next.x, next.y);
+      ctx.moveTo(current.coords.x, current.coords.y);
+      ctx.lineTo(next.coords.x, next.coords.y);
       ctx.stroke();
     }
   }
@@ -196,7 +230,7 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
   drawPoint(ctx: CanvasRenderingContext2D, current: any, index: number) {
     // Draw dot
     ctx.beginPath();
-    ctx.arc(current.x, current.y, this.radius, 0, 2 * Math.PI, false);
+    ctx.arc(current.coords.x, current.coords.y, this.radius, 0, 2 * Math.PI, false);
 
     // TODO: this is dependent on the linearity of the responses
     // perhaps it could be done better with cooperation from backend
@@ -204,7 +238,7 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
 
     // Set fill stule
     if (this.lastAssignment !== undefined &&
-        this.lastAssignment._id === current._id) {
+        this.lastAssignment.assignment._id === current.assignment_id) {
       ctx.fillStyle = 'blue';
     } else if (this.userProgress.completed_assignments >= index) {
       ctx.fillStyle = 'red';
@@ -215,7 +249,7 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
 
     // Set stroke style
     if (this.selectedAssignment !== undefined &&
-      this.selectedAssignment._id === current._id) {
+      this.selectedAssignment.assignment_id === current.assignment_id) {
       ctx.lineWidth = 2;
       ctx.strokeStyle = '#5f5';
     } else {
@@ -228,6 +262,7 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
 
   drawAssignment(ctx: CanvasRenderingContext2D, current: any, index: number) {
     // Draw information for one assignment
+
 
     this.strokePath(ctx, current, index);
     this.drawPoint(ctx, current, index);

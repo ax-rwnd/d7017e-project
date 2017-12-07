@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Location } from '@angular/common';
 import {BackendService} from '../services/backend.service';
 import { trigger, state, style, animate, transition } from '@angular/animations';
 import { HeadService } from '../services/head.service';
@@ -7,7 +8,7 @@ import titleContains = until.titleContains;
 import {FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { BsModalRef } from 'ngx-bootstrap/modal/modal-options.class';
-import {ActivatedRoute} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import { ToastService } from '../services/toast.service';
 
 @Component({
@@ -24,7 +25,7 @@ import { ToastService } from '../services/toast.service';
   ]
 })
 export class CreateassignmentComponent implements OnInit {
-
+  errorMessage: string;
   assignmentName: string;
   supportedLanguages: any[];
   languages: string[];
@@ -32,10 +33,7 @@ export class CreateassignmentComponent implements OnInit {
   unitTests: any[];
   lintTest: boolean;
   courseId: string;
-
   markdownExampleCode: string;
-
-
   editT: any; // used for checking which test should be edited
   sidebarState; // state of sidebar
   modalRef: BsModalRef;
@@ -50,9 +48,11 @@ export class CreateassignmentComponent implements OnInit {
 
   constructor(private backendService: BackendService, private headService: HeadService,
               private modalService: BsModalService, private fb: FormBuilder, private route: ActivatedRoute,
-              private toastService: ToastService) {
+              private toastService: ToastService, private _location: Location, private router: Router) {
+
     this.route.params.subscribe(params => this.courseId = params['course']);
     this.headService.stateChange.subscribe(sidebarState => { this.sidebarState = sidebarState; });
+
   }
 
   ngOnInit() {
@@ -62,6 +62,11 @@ export class CreateassignmentComponent implements OnInit {
     this.languages = [];
     this.form = this.fb.group(this.defaultForm);
     this.unitTests = [];
+    this.errorMessage = '';
+  }
+
+  goBack() {
+    this._location.back();
   }
 
   onChangeAssignmentName(aN) {
@@ -113,19 +118,30 @@ export class CreateassignmentComponent implements OnInit {
     }
   }
 
-  submitNewAssignment() {
+  submitAssignment() {
     // Submits the assignment to the backend
     // TODO: this function should work, but requires more testing, the backend
     //  could not serve the correct response
+    if (this.assignmentName === '' || this.content === '') {
+      this.errorMessage = '* Please fill in all required fields';
+      window.scrollTo({left: 0, top: 0, behavior: 'smooth'});
+    } else {
+      this.errorMessage = '';
+      this.createAssignment();
+    }
+  }
 
+  createAssignment() {
     this.backendService.createAssignment(this.courseId, this.assignmentName, this.content, this.languages)
       .then((response: any) => {
         const assignmentId = response._id;
         console.warn('assignmentId was', assignmentId);
+        console.log('Response create assignment:', response);
         for (const test of this.unitTests) {
           this.backendService.createTest(this.courseId, test, assignmentId, this.lintTest);
         }
         this.toastService.success('Assignment Created!');
+        // Should redirect here to course page
       })
       .catch(err => console.error('Create assignment failed', err));
   }

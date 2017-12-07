@@ -31,13 +31,13 @@ export class ModAdventuremapEditorComponent extends ModAdventuremapComponent imp
 
     // Fill the point
     ctx.beginPath();
-    ctx.arc(current.x, current.y, this.radius, 0, 2 * Math.PI, false);
+    ctx.arc(current.coords.x, current.coords.y, this.radius, 0, 2 * Math.PI, false);
     ctx.fillStyle = 'red';
     ctx.fill();
 
     // Stroke the border
     if (this.selectedAssignment !== undefined &&
-      this.selectedAssignment._id === current._id) {
+      this.selectedAssignment.assignment._id === current.assignment._id) {
       ctx.lineWidth = 2;
       ctx.strokeStyle = '#5f5';
     } else {
@@ -58,8 +58,8 @@ export class ModAdventuremapEditorComponent extends ModAdventuremapComponent imp
       const y = ev.clientY - rect.top;
 
       const toSelect = this.assignments.find( (el) => {
-        const dx = x - el.x;
-        const dy = y - el.y;
+        const dx = x - el.coords.x;
+        const dy = y - el.coords.y;
         return (Math.sqrt(dx * dx + dy * dy) < this.sensitivity);
       });
 
@@ -67,8 +67,8 @@ export class ModAdventuremapEditorComponent extends ModAdventuremapComponent imp
       if (toSelect !== undefined) {
         this.selectedAssignment = toSelect;
       } else if (this.selectedAssignment !== undefined) {
-        this.selectedAssignment.x = x;
-        this.selectedAssignment.y = y;
+        this.selectedAssignment.coords.x = x;
+        this.selectedAssignment.coords.y = y;
       } else {
         console.warn('Warning: undefined elements.');
       }

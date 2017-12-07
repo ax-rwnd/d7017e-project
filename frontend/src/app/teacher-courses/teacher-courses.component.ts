@@ -40,6 +40,7 @@ export class TeacherCoursesComponent implements OnInit {
   form: FormGroup;
   modalRef: BsModalRef;
   pendingReqs: any;
+  inviteReqs: any;
   defaultForm = {
     search: ''
   };
@@ -67,6 +68,7 @@ export class TeacherCoursesComponent implements OnInit {
   badgeDescription: string;
   inviteLink: string;
   groups: any[];
+  inviteList: any;
 
   constructor(private courseService: CourseService, private route: ActivatedRoute, private headService: HeadService,
               private fb: FormBuilder, private assignmentService: AssignmentService, private modalService: BsModalService,
@@ -81,7 +83,26 @@ export class TeacherCoursesComponent implements OnInit {
       this.teachCourses = teachCourses;
     });
 
-    dragulaService.setOptions('bag-one', {
+    this.setDragula();
+
+    this.route.params.subscribe( (params: any) => {
+      // Grab the current course
+      this.setCurrentCourse(params.course);
+      // Assign groups for assignments
+      this.setAssignments();
+      // Get pending requests
+      this.setPendingReqs();
+      // Get invite requests
+      this.setInviteReqs();
+    });
+  }
+
+  setDragula() {
+    const bag: any = this.dragulaService.find('bag-one');
+    if (bag) { // If bag already exist, need to destroy it and create a new one
+      this.dragulaService.destroy('bag-one');
+    }
+    this.dragulaService.setOptions('bag-one', {
       copy: function (el, source) {
         // To copy only elements in right container, the left container can still be sorted
         return source.id === 'right';
@@ -96,25 +117,24 @@ export class TeacherCoursesComponent implements OnInit {
         return target.id !== 'right';
       }
     });
-
-    this.route.params.subscribe( (params: any) => {
-      // Grab the current course
-      this.setCurrentCourse(params.course);
-      // Assign groups for assignments
-      this.setAssignments();
-      // Get pending requests
-      this.setPendingReqs();
-
-    });
   }
 
   setPendingReqs() {
     this.backendService.getPendingUsers(this.currentCourse.id)
       .then(response => {
         console.log('pending', response);
-        this.pendingReqs = response;
+        this.pendingReqs = response['invites'];
       })
       .catch(err => console.error('Get pending users failed', err));
+  }
+
+  setInviteReqs() {
+    this.backendService.getInvitedUsers(this.currentCourse.id)
+      .then(response => {
+        console.log('invited', response);
+        this.inviteReqs = response['invites'];
+      })
+      .catch(err => console.error('Get invited users failed', err));
   }
 
   setCurrentCourse(course) {
@@ -155,6 +175,7 @@ export class TeacherCoursesComponent implements OnInit {
     this.tests = {};
     console.log('teacher, groups', this.groups);
     console.log('teacher, assignments', this.assignments);
+    this.getAllInviteLinks();
   }
 
   openModal(modal, type) {
@@ -188,7 +209,7 @@ export class TeacherCoursesComponent implements OnInit {
   }
 
   acceptReq(student_id) {
-    this.backendService.acceptPending(student_id, this.currentCourse.id)
+    this.backendService.acceptInvite(this.currentCourse.id, student_id)
       .then( response => {
         this.toastService.success('Request accepted!');
         // console.log('Accepted req:', response); // Object error stuff, need to check, but works
@@ -196,8 +217,18 @@ export class TeacherCoursesComponent implements OnInit {
       .catch(err => console.error('Accept failed', err));
   }
 
-  declineReq(user_id) { // need to rewrite delete in backend.service
-    console.log(user_id);
+  declineAllReqs() { // iterate through invited list
+    for (const req of this.inviteReqs) {
+      this.declineReq(req.user['_id']);
+    }
+  }
+
+  declineReq(student_id) { // need to rewrite delete in backend.service
+    this.backendService.declineInvite(this.currentCourse.id, student_id)
+    .then( response => {
+      this.toastService.success('Invitation removed!');
+    })
+    .catch(err => console.error('Invitation remove failed', err));
   }
 
   invite(student_id) {
@@ -276,6 +307,15 @@ export class TeacherCoursesComponent implements OnInit {
   generateInviteLink() {
     this.backendService.getInviteLink(this.currentCourse.id).then((resp: any) => {
       this.inviteLink = environment.frontend_ip + '/join/' + resp.code;
+    });
+  }
+
+  getAllInviteLinks() {
+    // fel id?
+    console.log('is this the correct course id: ', this.currentCourse.id);
+    this.backendService.getAllInviteLinks(this.currentCourse.id).then((resp: any) => {
+      this.inviteList = resp;
+      console.log('invite list:', this.inviteList);
     });
   }
 

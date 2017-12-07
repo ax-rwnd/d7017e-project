@@ -50,7 +50,7 @@ Http requests:
       .toPromise()
       .then(response => response)
       .catch(err => {
-        this.toastService.error(err.error);
+        this.ToastError(err.error);
         throw err;
       });
   }
@@ -62,7 +62,7 @@ Http requests:
       .toPromise()
       .then(response => response)
       .catch(err => {
-        this.toastService.error(err.error);
+        this.ToastError(err.error);
         throw err;
       });
   }
@@ -74,7 +74,7 @@ Http requests:
       .toPromise()
       .then(response => response)
       .catch(err => {
-        this.toastService.error(err.error);
+        this.ToastError(err.error);
         throw err;
       });
   }
@@ -91,9 +91,19 @@ Http requests:
       .toPromise()
       .then(response => response)
       .catch(err => {
-        this.toastService.error(err.error);
+        this.ToastError(err.error);
         throw err;
       });
+  }
+
+  private ToastError(error) {
+    // Process errors and display the appropriate toasts
+    this.toastService.error(error.message, 'Oops');
+    if (error.hasOwnProperty('badinput')) {
+      for (const bad of error.badinput) {
+        this.toastService.error(bad.msg,  bad.param);
+      }
+    }
   }
 
 /*
@@ -358,17 +368,18 @@ The structure below is the following:
   postInvitationToCourse(course_id: string, student_id: string) {
     // Send an invitation for a student to join a course, if user sends its id it's a join request to a course
 
-    const body = {'student_id': student_id};
+    const body = {'user_id': student_id};
     return this.apiPost('/api/courses/' + course_id + '/members/invite', body);
   }
 
-  acceptInvite(course_id: ObjectID, student_id: ObjectID) {
-    return this.apiPut('/api/courses/' + course_id + '/students/invite', {'student_id': student_id});
+  acceptInvite(course_id: string, student_id: string) {
+    const body = {'user_id': student_id};
+    return this.apiPut('/api/courses/' + course_id + '/members/invite', body);
   }
 
-  declineInvite(course_id: ObjectID) {
-    const body = {};
-    return this.apiDelete('/api/courses/' + course_id + '/students/invite', body);
+  declineInvite(course_id: string, student_id: string) {
+    const body = {'user_id': student_id};
+    return this.apiDelete('/api/courses/' + course_id + '/members/invite', body);
   }
 
 // -- Pending -- //
@@ -383,26 +394,13 @@ getMyPendingRequests() {
     // Get the users waiting to join a course
 
     // return this.apiGet('/api/courses/' + course_id + '/students/pending');
-    return this.apiGet('/api/courses/' + course_id + '/students/invite');
+    return this.apiGet('/api/courses/' + course_id + '/members/invite?type=pending');
   }
 
-  acceptPending(student_id, course_id) {
-    // Admin or teacher can accept an request to join the course.
+  getInvitedUsers(course_id) {
+    // Get the users invited to join a course
 
-    const body = {'student_id': student_id};
-    return this.apiPut('/api/courses/' + course_id + '/students/pending', body);
-  }
-
-  postJoinRequest(course_id: ObjectID, student_id: ObjectID) {
-    // Send a request to join a course
-
-    const body = {'student_id': student_id};
-    return this.apiPost('/api/courses/' + course_id + '/students/pending', body);
-  }
-
-  cancelPendingJoin(course_id: ObjectID) {
-    const body = {};
-    return this.apiDelete('/api/courses/' + course_id + '/students/pending', body);
+    return this.apiGet('/api/courses/' + course_id + '/members/invite?type=invite');
   }
 
 // ----------- 7. OTHER calls ----------- //
@@ -425,11 +423,17 @@ getMyPendingRequests() {
 
 // -- Invite link -- //
   getInviteLink(course: string) {
-    return this.apiGet('/api/courses/' + course + '/invitelink ');
+    const body = {expires: true};
+    return this.apiPost('/api/courses/' + course + '/invitecodes', body);
   }
 
 // -- Join invite link -- //
   joinInviteLink(hash: string) {
     return this.apiGet('/api/courses/join/' + hash);
+  }
+
+// -- Get all invite links for course -- //
+  getAllInviteLinks(course: string) {
+    return this.apiGet('/api/courses/' + course + '/invitecodes');
   }
 }

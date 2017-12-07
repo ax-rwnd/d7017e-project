@@ -70,7 +70,7 @@ export class UserComponent implements OnInit {
 
   cancelRequest(course_id) {
     console.log('request id', course_id);
-    this.backendService.cancelPendingJoin(course_id)
+    this.backendService.declineInvite(course_id, this.userService.userInfo.id)
       .then(success => {
         console.log(success);
         this.backendService.getMyPendingReq()
@@ -98,11 +98,13 @@ export class UserComponent implements OnInit {
           } else {
             name = courses[i].name;
           }
-          this.possibleCourses[i] = {name: name, id: courses[i]._id};
+          const owner = courses[i].owner.username;
+          this.possibleCourses[i] = {name: name, id: courses[i]._id, owner: owner};
         }
       })
       .catch(err => console.error('Get courses for search modal failed'));
   }
+
 
   searchCourse() {
     // Find a course to join
@@ -114,7 +116,7 @@ export class UserComponent implements OnInit {
         // Assign the correct identifier for the course
         for (const course of response.courses as any[]) {
           console.log('course', course);
-          if (course.course_code !== undefined) {
+          if (course.course_code) {
             this.possibleCourses.push({name: course.course_code, id: course._id});
           } else {
             this.possibleCourses.push({name: course.name, id: course._id});
@@ -134,7 +136,7 @@ export class UserComponent implements OnInit {
       .catch(err => console.error('Join course request failed', err));
   }
   acceptInvite(course_id) {
-    this.backendService.acceptInvite(course_id, new ObjectID(this.userService.userInfo.id))
+    this.backendService.acceptInvite(course_id, this.userService.userInfo.id)
       .then(response => {
         console.log(response);
         this.getInvites();
@@ -142,7 +144,7 @@ export class UserComponent implements OnInit {
       .catch(err => console.error('Accept course invite failed', err));
   }
   declineInvite(course_id) {
-    this.backendService.declineInvite(course_id)
+    this.backendService.declineInvite(course_id, this.userService.userInfo.id)
       .then(response => {
         console.log(response);
         this.getInvites();
