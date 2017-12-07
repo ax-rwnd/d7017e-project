@@ -440,6 +440,7 @@ module.exports = function(router) {
     router.get('/:course_id/assignments', function (req, res, next) {
         var course_id = req.params.course_id;
 
+        // TODO: Display hidden assignments to students?
         queries.getCourseAssignments(course_id, "name description hidden languages").then(function (assignments) {
             return res.json(assignments);
         })
@@ -465,33 +466,21 @@ module.exports = function(router) {
         });
     });
 
-    // Return assignment bases on permissions
+    // Return specified assignment
     router.get('/:course_id/assignments/:assignment_id', function (req, res, next) {
-        var roll;
-        var course_id = req.params.course_id;
-        var assignment_id = req.params.assignment_id;
-        var wantedFields = req.query.fields || null;
+        let {course_id, assignment_id} = inputValidation.assignmentValidation(req);
 
-        if (!mongoose.Types.ObjectId.isValid(course_id) || !mongoose.Types.ObjectId.isValid(assignment_id)) {
-            return next(errors.BAD_INPUT);
-        }
-
-        queries.getUser(req.user.id, "teaching").then(function (userObject) {
-            if (userObject.teaching.indexOf(course_id) !== -1) {
-                roll = "teacher";
-            } else if (req.user.access === constants.ACCESS.ADMIN) {
-                roll = "admin";
-            } else {
-                roll = "student";
-            }
-            if (!queries.checkPermission(wantedFields, "assignments", roll)) {
-                throw errors.INSUFFICIENT_PERMISSION;
-            }
-            return queries.getAssignment(assignment_id, roll, wantedFields)
-            .then(function (assignmentObject) {
-                return res.json(assignmentObject);
-            });
-        }).catch(next);
+        permission.checkIfAssignmentInCourse(course_id, assignment_id)
+        .then(function () {
+            // TODO: Should students be able to get hidden assignments from this endpoint?
+            return queries.getAssignment1(assignment_id, "name description hidden tests optional_tests languages");
+        })
+        .then(function (assignmentObject) {
+            return res.json(assignmentObject);
+        })
+        .catch(function (err) {
+            next(err);
+        });
     });
 
     // Update an assignment

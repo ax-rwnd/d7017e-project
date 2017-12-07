@@ -669,6 +669,18 @@ function getAssignment(assignment_id, roll, fields) {
     });
 }
 
+// Alernative to getAssignment that doesn't mess around with permissions
+function getAssignment1(id, fields) {
+    var wantedFields = fields || "name description hidden tests optional_tests languages";
+
+    return Assignment.findById(id, wantedFields).then(function (assignment) {
+        if (!assignment) {
+            throw errors.ASSIGNMENT_DOES_NOT_EXIST;
+        }
+        return assignment;
+    });
+}
+
 
 /*
 function getAssignment(id, fields) {
@@ -1320,3 +1332,4 @@ exports.getAssignmentgroupByID = getAssignmentgroupByID;
 exports.updateAssignmentgroup = updateAssignmentgroup;
 exports.deleteAssignmentgroup = deleteAssignmentgroup;
 exports.updateAssignment = updateAssignment;
+exports.getAssignment1 = getAssignment1;
