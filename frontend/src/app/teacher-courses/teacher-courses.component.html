@@ -5,6 +5,7 @@
       <span *ngIf="currentCourse.code">{{currentCourse.code}} - </span> {{currentCourse.name}}
     </h1>
     <button type="button" class="btn btn-primary" (click)="openModal(createBadge, 'createBadge')">Create badge</button>
+    <button type="button" class="btn btn-primary" (click)="deleteCourse(currentCourse.id)">Delete course</button>
     <div class="row">
       <!-- Display the course description, markdown style -->
       <div class="col-lg-8">
