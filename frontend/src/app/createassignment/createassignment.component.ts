@@ -10,6 +10,7 @@ import { BsModalService } from 'ngx-bootstrap/modal';
 import { BsModalRef } from 'ngx-bootstrap/modal/modal-options.class';
 import {ActivatedRoute, Router} from '@angular/router';
 import { ToastService } from '../services/toast.service';
+import {AssignmentService} from '../services/assignment.service';
 
 @Component({
   selector: 'app-createassignment',
@@ -48,7 +49,8 @@ export class CreateassignmentComponent implements OnInit {
 
   constructor(private backendService: BackendService, private headService: HeadService,
               private modalService: BsModalService, private fb: FormBuilder, private route: ActivatedRoute,
-              private toastService: ToastService, private _location: Location, private router: Router) {
+              private toastService: ToastService, private _location: Location, private router: Router,
+              private assignmentService: AssignmentService) {
 
     this.route.params.subscribe(params => this.courseId = params['course']);
     this.headService.stateChange.subscribe(sidebarState => { this.sidebarState = sidebarState; });
@@ -137,11 +139,12 @@ export class CreateassignmentComponent implements OnInit {
         const assignmentId = response._id;
         console.warn('assignmentId was', assignmentId);
         console.log('Response create assignment:', response);
+        this.assignmentService.addAssignment(response, this.courseId);
         for (const test of this.unitTests) {
           this.backendService.createTest(this.courseId, test, assignmentId, this.lintTest);
         }
         this.toastService.success('Assignment Created!');
-        // Should redirect here to course page
+        this.router.navigate(['/teaching', this.courseId]);
       })
       .catch(err => console.error('Create assignment failed', err));
   }

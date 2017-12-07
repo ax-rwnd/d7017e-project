@@ -93,6 +93,9 @@ export class CoursesComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.route.params.subscribe( (params: any) => { // so might not need subscribe in constructor
+      this.currentCourse = this.courseService.GetCourse(params.course);
+    });
     this.teachCourses = this.courseService.teaching;
     this.sidebarState = this.headService.getCurrentState();
     this.possibleStudents = [];

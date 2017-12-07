@@ -82,7 +82,7 @@
         </div>
       </div>
       <div class="col-lg-4">
-        <h4>Pending requests
+        <h4>Requests from students
           <button class="glyph-button pull-right" (click)="acceptAllReqs()">
             <span class="table-button-text">ACCEPT ALL</span>
           </button>
@@ -106,7 +106,7 @@
           </tbody>
         </table>
         <br>
-        <h4>Invitations
+        <h4>Invitations to students
           <button class="glyph-button pull-right" (click)="declineAllReqs()">
             <span class="table-button-text">REMOVE ALL</span>
           </button>
@@ -119,7 +119,7 @@
           <tr *ngFor="let req of inviteReqs">
             <td>{{req.user['username']}}</td>
             <td>
-              <button type="button" class="glyph-accept" (click)="acceptReq(req.user['_id'])"><span
+              <button style="visibility: hidden;" type="button" class="glyph-accept" (click)="acceptReq(req.user['_id'])"><span
                 class="glyphicon glyphicon-ok"></span></button>
             </td>
             <td>
