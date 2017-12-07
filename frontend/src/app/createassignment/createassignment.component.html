@@ -1,38 +1,45 @@
 <app-head></app-head>
 
 <div id="cont" class="content" [@content]="sidebarState">
+  <button *ngIf="sidebarState === 'inactive'" style="float:left;" class="glyph-button" (click)="goBack()"><span class="glyphicon glyphicon-circle-arrow-left"></span></button>
+
   <div class="container">
-    <h2>Create Assignment</h2>
-    <div class="form-group">
-
-      <h4>Assignment name:</h4>
-      <input (text)="assignmentName" class="form-control" placeholder="Hello Assignment" [(ngModel)]="assignmentName">
-      <input type="checkbox" name="linttest" (click)="testLint()" class="question" tooltip="asd">Test code syntax using lint
-      <button type="button" class="question" tooltip="Test code syntax using lint"><span class="glyphicon glyphicon-question-sign"></span></button>
-    </div>
-
-    <div id="desc">
-      <h4>Description</h4>
-
-      <tabset>
-        <tab heading="Write" id="tab1">
-        <div class="assignmentDescription" appScroller>
-          <!-- Ace Editor for the assignment body -->
-
-          <div ace-editor [(text)]="content" [mode]="'markdown'" [theme]="'eclipse'"
-            [options]="{maxLines: 1000, printMargin: false}" [readOnly]="false" [autoUpdateContent]="true"
-            [durationBeforeCallback]="1000"(textChanged)="onChange(content)" 
-            style="min-height: 500px; width:100%; overflow: auto;"></div>
+    <h2>Create Assignment <span class="required">{{errorMessage}}</span></h2>
+    <br>
+    <div class="row">
+      <div class="col-lg-6">
+        <div class="form-group">
+          <label class="label-norm">Assignment name</label> <span class="required">*</span>
+          <input (text)="assignmentName" class="form-control" placeholder="Assignment name" [(ngModel)]="assignmentName">
         </div>
-        </tab>
-        <tab heading="Preview">
-          <!-- Markdown preview -->
-
-          <div class="preview" appScroller>
-            <div Markdown [data]="content" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/themes/prism.min.css"></div>
-          </div>
-        </tab>
-      </tabset>
+      </div>
+    </div>
+    <form class="form-group">
+      <div class="form-check">
+        <label class="label-norm form-check-label" style="margin-left: 1%;">
+          <input type="checkbox" name="linttest" (click)="testLint()" class="question"> Test code syntax using lint
+          <button type="button" class="question" tooltip="Test code syntax using lint"> <span class="glyphicon glyphicon-question-sign"></span></button>
+        </label>
+      </div>
+    </form>
+    <div class="form-group">
+      <!-- Start of course description -->
+      <label class="label-norm" for="desc">Assignment description</label> <span class="required">*</span>
+      <div id="desc">
+        <tabset>
+          <tab heading="Write" id="write">
+            <div class="assignmentDescription" appScroller>
+              <div ace-editor [(text)]="content" [mode]="'markdown'" [theme]="'eclipse'" [options]="{maxLines: 1000, printMargin: false}" [readOnly]="false" [autoUpdateContent]="true" [durationBeforeCallback]="1000" (textChanged)="onChange(content)"  style="min-height: 100%; width:100%; overflow: auto;"></div>
+            </div>
+          </tab>
+          <tab heading="Preview" id="preview">
+            <div class="preview" appScroller>
+              <div Markdown [data]="content" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/themes/prism.min.css"></div>
+            </div>
+          </tab>
+        </tabset>
+      </div>
+      <!-- End of course description -->
     </div>
 
     <div>
@@ -59,7 +66,7 @@
     </div>
 
     <div id="footer">
-      <button class="btn btn-primary" (click)="submitNewAssignment()">Submit Assignment</button>
+      <button class="btn btn-primary" (click)="submitAssignment()">Create Assignment</button>
     </div>
 
   </div>

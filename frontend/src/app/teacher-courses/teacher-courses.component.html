@@ -145,6 +145,7 @@
       <label> generate invite link </label>
       <div>
         <button class="btn" (click)="generateInviteLink()">Create invite link</button>
+        <button class="btn" (click)="openModal(viewInvites)">View invite links</button>
       </div>
       <br>
       <div>
@@ -239,5 +240,39 @@
   </div>
   <div class="modal-footer">
     <button class="btn btn-primary" (click)="createAssignmentGroup()" type="submit">Submit</button>
+  </div>
+</ng-template>
+
+<ng-template #viewInvites>
+  <div class="modal-body">
+    <table class="table table-hover">
+      <thead>
+      <tr>
+        <th>Invite code</th>
+        <th>Usages</th>
+        <th>Expires</th>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </tr>
+      </thead>
+      <tbody *ngFor="let test of inviteList;">
+      <tr *ngFor="let obj of test;">
+        <td>{{obj.code}}</td>
+        <td>{{obj.uses}}</td>
+        <td>{{obj.expiresAt}}</td>
+      </tr>
+      <tr>
+        <td>Mary</td>
+        <td>Moe</td>
+        <td>mary@example.com</td>
+      </tr>
+      <tr>
+        <td>July</td>
+        <td>Dooley</td>
+        <td>july@example.com</td>
+      </tr>
+      </tbody>
+    </table>
   </div>
 </ng-template>

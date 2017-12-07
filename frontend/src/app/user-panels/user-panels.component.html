@@ -1,14 +1,19 @@
 <div class="gamification-block panel panel-default">
   <div class="panel-heading gamification-header clearfix pointer" (click)="toggleCollapse()">
-    <h4 class="pull-left">
-      <span *ngIf="course.code">{{course.code}} - </span> {{course.name}}
-    </h4>
     <span *ngIf="teaching; else studentCourse">
-      <button class="btn btn-primary pull-right" [routerLink]="['/teaching', course.id]">Go to course</button>
+      <h4 class="pull-left" [routerLink]="['/teaching', course.id]">
+        <span *ngIf="course.code">{{course.code}} - </span> {{course.name}}
+      </h4>
     </span>
     <ng-template #studentCourse>
-      <button class="btn btn-primary pull-right" [routerLink]="['/courses', course.id]">Go to course</button>
+      <h4 class="pull-left" [routerLink]="['/courses', course.id]">
+        <span *ngIf="course.code">{{course.code}} - </span> {{course.name}}
+      </h4>
     </ng-template>
+    <button class="btn btn-primary pull-right">
+      <span *ngIf="collapsed"> <span class="glyphicon glyphicon-menu-down"></span> </span>
+      <span *ngIf="!collapsed"> <span class="glyphicon glyphicon-menu-up"></span> </span>
+    </button>
   </div>
   <div class="panel-body" [collapse]="collapsed"> <!-- [ngClass]="{hide: collapsed}" -->
     <ng-content></ng-content>

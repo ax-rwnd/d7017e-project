@@ -68,6 +68,7 @@ export class TeacherCoursesComponent implements OnInit {
   badgeDescription: string;
   inviteLink: string;
   groups: any[];
+  inviteList: any;
 
   constructor(private courseService: CourseService, private route: ActivatedRoute, private headService: HeadService,
               private fb: FormBuilder, private assignmentService: AssignmentService, private modalService: BsModalService,
@@ -176,6 +177,7 @@ export class TeacherCoursesComponent implements OnInit {
     this.selectedAssignments = [{'assignment': this.flattenAssignments()[0], 'possible': this.flattenAssignments()}];
     this.tests = {};
     this.groups = [{name: 'Group1', assignments: []}, {name: 'Group2', assignments: []}, {name: 'Group3', assignments: []}];
+    this.getAllInviteLinks();
   }
 
   openModal(modal, type) {
@@ -294,6 +296,15 @@ export class TeacherCoursesComponent implements OnInit {
   generateInviteLink() {
     this.backendService.getInviteLink(this.currentCourse.id).then((resp: any) => {
       this.inviteLink = environment.frontend_ip + '/join/' + resp.code;
+    });
+  }
+
+  getAllInviteLinks() {
+    // fel id?
+    console.log('is this the correct course id: ', this.currentCourse.id);
+    this.backendService.getAllInviteLinks(this.currentCourse.id).then((resp: any) => {
+      this.inviteList = resp;
+      console.log('invite list:', this.inviteList);
     });
   }
 
