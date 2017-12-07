@@ -71,6 +71,10 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
   }
 
   handleClick() {
+    if (!this.initialized) {
+      console.warn('component not initialized, hold on!');
+      return;
+    }
     return (ev: any) => {
       // Handle click for this kind of event
 
@@ -80,6 +84,7 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
 
       // Hittest the nodes
       this.selectedAssignment = this.assignments.find( (el) => {
+        console.log('element', el);
         const local = this.scaleToLocal(el.coords);
         const dx = x - local.x;
         const dy = y - local.y;
