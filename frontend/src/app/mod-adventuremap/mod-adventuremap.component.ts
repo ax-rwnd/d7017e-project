@@ -46,7 +46,7 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
       this.drawMap();
     };
 
-    this.img.src = '/assets/images/ck4.gif';
+    this.img.src = '/assets/images/map.png';
   }
 
   ngAfterViewInit() {

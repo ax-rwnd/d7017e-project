@@ -16,6 +16,6 @@ export class ModAdventuremapLargeComponent extends ModAdventuremapComponent impl
     this.img.onload = () => {
       this.drawMap();
     };
-    this.img.src = '/assets/images/ck4.gif';
+    this.img.src = '/assets/images/map.png';
   }
 }

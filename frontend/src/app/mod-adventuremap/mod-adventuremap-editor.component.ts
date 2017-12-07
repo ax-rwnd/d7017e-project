@@ -22,7 +22,7 @@ export class ModAdventuremapEditorComponent extends ModAdventuremapComponent imp
     this.img.onload = () => {
       this.drawMap();
     };
-    this.img.src = '/assets/images/ck4.gif';
+    this.img.src = '/assets/images/map.png';
 
   }
 
