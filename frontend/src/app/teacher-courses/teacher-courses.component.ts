@@ -67,6 +67,7 @@ export class TeacherCoursesComponent implements OnInit {
   badgeName: string;
   badgeDescription: string;
   inviteLink: string;
+  inviteLinkExample: string;
   groups: any[];
   inviteList: any;
 
@@ -176,6 +177,7 @@ export class TeacherCoursesComponent implements OnInit {
     console.log('teacher, groups', this.groups);
     console.log('teacher, assignments', this.assignments);
     this.getAllInviteLinks();
+    this.inviteLinkExample = environment.frontend_ip + '/join/';
   }
 
   deleteCourse(course_id) {
@@ -276,6 +278,14 @@ export class TeacherCoursesComponent implements OnInit {
     return ass;
   }
 
+  flattenInviteLinks() {
+    const links = [];
+    for (const a of this.inviteList.codes) {
+      links.push(a);
+    }
+    return links;
+  }
+
   removeGoal(index) {
     this.selectedAssignments.splice(index, 1);
   }
@@ -318,21 +328,28 @@ export class TeacherCoursesComponent implements OnInit {
     }
   }
 
-  generateInviteLink() {
-    this.backendService.getInviteLink(this.currentCourse.id).then((resp: any) => {
-      this.inviteLink = environment.frontend_ip + '/join/' + resp.code;
-    });
-  }
-
   getAllInviteLinks() {
     // fel id?
     console.log('is this the correct course id: ', this.currentCourse.id);
     this.backendService.getAllInviteLinks(this.currentCourse.id).then((resp: any) => {
       this.inviteList = resp;
-      console.log('invite list:', this.inviteList);
+      this.inviteList = this.flattenInviteLinks();
     });
   }
 
+  generateInviteLink() {
+    this.backendService.getInviteLink(this.currentCourse.id).then((resp: any) => {
+      this.inviteLink = environment.frontend_ip + '/join/' + resp.code;
+      this.getAllInviteLinks();
+    });
+  }
+
+  deleteInviteLink(link: string) {
+    this.backendService.deleteInviteLink(link).then( (resp: any) => {
+      console.log('success, deleted: ' + link, resp);
+      this.getAllInviteLinks();
+    });
+  }
 }
 
 interface AssignmentGroup {

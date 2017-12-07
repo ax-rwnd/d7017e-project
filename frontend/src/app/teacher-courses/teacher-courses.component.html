@@ -263,31 +263,32 @@
     <table class="table table-hover">
       <thead>
       <tr>
-        <th>Invite code</th>
-        <th>Usages</th>
-        <th>Expires</th>
-        <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+        <th class="text-center">Invite code</th>
+        <th class="text-center">Usages</th>
+        <th class="text-center">Expires</th>
+        <th class="text-center">Cancel</th>
+        <button type="button" class="close text-center" aria-label="Close" (click)="modalRef.hide()">
           <span aria-hidden="true">&times;</span>
         </button>
       </tr>
       </thead>
-      <tbody *ngFor="let test of inviteList;">
-      <tr *ngFor="let obj of test;">
-        <td>{{obj.code}}</td>
-        <td>{{obj.uses}}</td>
-        <td>{{obj.expiresAt}}</td>
-      </tr>
-      <tr>
-        <td>Mary</td>
-        <td>Moe</td>
-        <td>mary@example.com</td>
-      </tr>
-      <tr>
-        <td>July</td>
-        <td>Dooley</td>
-        <td>july@example.com</td>
+      <tbody>
+      <tr *ngFor="let obj of inviteList;">
+        <td class="text-center">{{obj.code}}</td>
+        <td class="text-center">{{obj.uses}}</td>
+        <td class="text-center">{{obj.expiresAt}}</td>
+        <td>
+          <button type="button button-hover" class="close" aria-label="Close" (click)="deleteInviteLink(obj.code)">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </td>
       </tr>
       </tbody>
     </table>
+  </div>
+  <div class="modal-footer">
+    <div class="text-center">
+       example: {{inviteLinkExample}}<span style="color: red">xB4bttgh</span>
+    </div>
   </div>
 </ng-template>
