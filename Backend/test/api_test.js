@@ -384,9 +384,22 @@ describe('/api', () => {
                     .put('/api/courses/' + course_id + '/assignments/' + assignment_id1)
                     .send({
                         description: 'Write tests with Mocha (modified)',
-                        'tests.lint': false
+                        tests: {lint: false}
                     }).set('Authorization', 'Bearer ' + access_tokens.admin)
                     .expect(200);
+            });
+        });
+
+        describe('GET /api/courses/:course_id/assignments/:assignment_id', () => {
+            it('returns the correct assignment', () => {
+                return request(runner.server)
+                    .get('/api/courses/' + course_id + '/assignments/' + assignment_id1)
+                    .set('Authorization', 'Bearer ' + access_tokens.user)
+                    .expect(200)
+                    .then(res => {
+                        assert(res.body.description === 'Write tests with Mocha (modified)', 'description does not match expected value');
+                        assert(res.body.tests.lint === false, 'tests.lint does not match expected value');
+                    });
             });
         });
 
