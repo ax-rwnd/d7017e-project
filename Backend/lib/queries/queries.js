@@ -1181,9 +1181,14 @@ function generateInviteCode(course_id, expiresIn) {
     if (!mongoose.Types.ObjectId.isValid(course_id)) {
             throw errors.INVALID_ID;
     }
-    var newLink = new InviteCode({code: code, course: course_id, expiresAt: exp});
-    return newLink.save().then(function (obj) {
-        return obj.toObject();
+    return Course.findById(course_id).then(function (course) {
+        if (!course) {
+            throw errors.COURSE_DOES_NOT_EXIST;
+        }
+        var newLink = new InviteCode({code: code, course: course_id, expiresAt: exp});
+        return newLink.save().then(function (obj) {
+            return obj.toObject();
+        });    
     });
 }
 
