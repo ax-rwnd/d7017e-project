@@ -1,9 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { BsModalRef } from 'ngx-bootstrap/modal/modal-options.class';
-
 import { CourseService } from '../services/course.service';
 import { trigger, state, style, animate, transition } from '@angular/animations';
 import { HeadService } from '../services/head.service';
@@ -86,6 +84,10 @@ export class TeacherCoursesComponent implements OnInit {
 
     this.assignmentService.assignmentsSub.subscribe( assignments => {
       this.assignments = assignments;
+    });
+
+    this.assignmentService.assignmentsSub.subscribe( groups => {
+      this.groups = groups;
     });
 
     this.setDragula();
@@ -217,9 +219,13 @@ export class TeacherCoursesComponent implements OnInit {
     this.modalRef = this.modalService.show(modal);
   }
 
-  createAssignmentGroup() {
+   createAssignmentGroup() {
     this.backendService.postAssignmentGroup(this.currentCourse.id, this.groupName)
-      .then(response => console.log('group', response));
+      .then(response => {
+        console.log('group', response);
+        this.toastService.success('Group Created!');
+        this.assignmentService.addAssignmentGroup(response, this.currentCourse.id);
+      });
   }
 
   acceptAllReqs() { // iterate through pending list
@@ -318,15 +324,11 @@ export class TeacherCoursesComponent implements OnInit {
   }
   submitGroups() {
     for (const group in this.groups) {
-      const a = [];
       const body = Object.assign({}, this.groups[group]);
       body['assignments'] = [];
       for (const i in this.groups[group]['assignments']) {
-        console.log('assignments', this.groups[group]['assignments']);
-        console.log('assignment sign:', this.groups[group]['assignments'][i], 'i:', i);
         body['assignments'].push({assignment: this.groups[group]['assignments'][i].id});
       }
-      console.log('group', this.groups[group]);
       this.backendService.putAssignmentGroup(this.currentCourse.id, this.groups[group].id, body)
         .then(response => console.log('group put', response))
         .catch(err => console.log('error', err));

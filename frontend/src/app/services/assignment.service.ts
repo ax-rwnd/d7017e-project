@@ -9,6 +9,7 @@ import { Subject } from 'rxjs/Subject';
 export class AssignmentService {
   courseAssignments = {};
   assignmentsSub = new Subject<any>();
+  groupSub = new Subject<any>();
 
   constructor(private backendService: BackendService) {
 
@@ -66,6 +67,12 @@ export class AssignmentService {
     const assignment = newAssignment(assign['_id'], assign['name'], assign['languages'], assign['description']);
     this.courseAssignments[course_id]['assignments'].push(assignment);
     return this.assignmentsSub.next(this.courseAssignments[course_id]['assignments']);
+  }
+
+  addAssignmentGroup(gr: Object, course_id: string) {
+    const group = newAssignmentsgroup(gr['_id'], gr['name'], []);
+    this.courseAssignments[course_id]['groups'].push(group);
+    return this.groupSub.next(this.courseAssignments[course_id]['groups']);
   }
 
   GetAssignment(course_id: string, group_id: string, assignment_id: string): Assignment { // when you click on an assignment
