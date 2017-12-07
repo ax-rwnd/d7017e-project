@@ -1246,12 +1246,16 @@ function getInviteCode(code, userObject) {
 }
 
 function getAllInviteCodes(course, userObject) {
-    return permission.checkIfTeacherOrAdmin(userObject.id, course, userObject.access).then(function () {
-        return InviteCode.find({course: course}, "code course uses createdAt expiresAt").then(function (codes) {
-            return codes;
+    return Course.findById(course).then(function (obj) {
+        if (!obj) {
+            throw errors.COURSE_DOES_NOT_EXIST;
+        }
+        return permission.checkIfTeacherOrAdmin(userObject.id, course, userObject.access).then(function () {
+            return InviteCode.find({course: course}, "code course uses createdAt expiresAt").then(function (codes) {
+                return codes;
+            });
         });
-    });
-
+    })
 }
 
 function getAssignmentgroupsByCourseID(course_id) {
