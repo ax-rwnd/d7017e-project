@@ -115,7 +115,7 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
   loadAssignments() {
     // Load assingments- and assignment groups from map
 
-    return new Promise ((resolve: any, reject: any) => {
+  return new Promise ((resolve: any, reject: any) => {
       this.backendService.getAssignmentGroupsCourse(this.courseCode).then((data: any) => {
         // Grab the available groups
         this.assignmentGroups = data.assignmentgroups;
@@ -213,8 +213,8 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
     ctx.strokeStyle = 'black';
 
     // Set fill stule
-    if (this.lastAssignment !== undefined &&
-        this.lastAssignment._id === current._id) {
+    if (this.lastAssignment !== undefined && this.lastAssignment.assignment !== undefined &&
+        this.lastAssignment.assignment._id === current.assignment._id) {
       ctx.fillStyle = 'blue';
     } else if (this.userProgress.completed_assignments >= index) {
       ctx.fillStyle = 'red';

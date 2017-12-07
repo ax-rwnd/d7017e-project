@@ -37,7 +37,7 @@ export class ModAdventuremapEditorComponent extends ModAdventuremapComponent imp
     ctx.fill();
 
     // Stroke the border
-    if (this.selectedAssignment !== undefined &&
+    if (this.selectedAssignment !== undefined && this.selectedAssignment.assignment !== undefined &&
       this.selectedAssignment.assignment._id === current.assignment._id) {
       ctx.lineWidth = this.borderThickness;
       ctx.strokeStyle = '#5f5';
