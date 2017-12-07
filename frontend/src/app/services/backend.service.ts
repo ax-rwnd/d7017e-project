@@ -239,10 +239,10 @@ The structure below is the following:
     return this.apiPost('/api/courses/' + course_id + '/assignmentgroups', body);
   }
 
-  putAssignmentGroup(course_id: string, assignmentgroup_id: any, body: any) {
+  putAssignmentGroup(course_id: string, assignmentgroup_id: any, assignmentGroup: any) {
     // Update an assignment group
 
-    return this.apiPut('/api/courses/' + course_id + '/assignmentgroups/' + assignmentgroup_id, body);
+    return this.apiPut('/api/courses/' + course_id + '/assignmentgroups/' + assignmentgroup_id, assignmentGroup);
   }
 
 // -- Students and courses -- //

@@ -49,6 +49,15 @@ export class ModAdventuremapEditorComponent extends ModAdventuremapComponent imp
     ctx.stroke();
   }
 
+  updateGroup(groupIndex: number, updatedAssignment: any) {
+    // Send a request to update the state of the group with new coords, etc.
+    // TODO: bunch together multiple requests?
+
+    const group = this.assignmentGroups[groupIndex];
+
+    return this.backendService.putAssignmentGroup(this.courseCode, group._id, group);
+  }
+
   handleClick() {
     // Handle the event that the user clicks the map
 
@@ -70,6 +79,7 @@ export class ModAdventuremapEditorComponent extends ModAdventuremapComponent imp
       } else if (this.selectedAssignment !== undefined) {
         this.selectedAssignment.coords.x = x;
         this.selectedAssignment.coords.y = y;
+        //this.updateGroup();
       } else {
         console.warn('Warning: undefined elements.');
       }
