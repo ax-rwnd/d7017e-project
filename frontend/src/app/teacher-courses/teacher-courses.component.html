@@ -30,14 +30,18 @@
             <div dragula="bag-one" id="left{{group.name}}" [dragulaModel]='group.assignments'>
               {{group.name}}
               <div *ngFor='let assignment of group.assignments' class="assignment">
-                {{assignment.name}}
+                {{assignment.assignment.name}}
                 <button type="button" class="glyph-button white-text pull-right">
                   <span class="glyphicon glyphicon-edit" style="font-size: 1.2em;"></span>
                 </button>
               </div>
             </div>
-
           </div>
+            <h4>
+              <button (click)="submitGroups()" class="glyph-button pull-right">
+                <span class="option-text">SUBMIT GROUPS</span>
+              </button>
+            </h4>
         </div>
         <div class="col-lg-6 container">
           <h4>Assignments
@@ -45,12 +49,12 @@
               <span class="option-text">CREATE ASSIGNMENT</span>
             </button>
           </h4>
-          <span *ngIf="assignmentGroups[0].assignments.length === 0">
+          <span *ngIf="assignments.length === 0">
               No assignments created yet...
             </span>
-            <div dragula="bag-one" id="right" [dragulaModel]='assignmentGroups[0].assignments'>
-              <div *ngFor="let assignment of assignmentGroups[0].assignments" class="assignment">
-                {{assignment.name}}
+            <div dragula="bag-one" id="right" [dragulaModel]='assignments'>
+              <div *ngFor="let assignment of assignments" class="assignment">
+                {{assignment.assignment.name}}
                 <button type="button" class="glyph-button white-text pull-right">
                   <span class="glyphicon glyphicon-edit" style="font-size: 1.2em;"></span>
                 </button>

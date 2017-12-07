@@ -28,7 +28,7 @@ import {UserService} from '../services/user.service';
   ]
 })
 export class CoursesComponent implements OnInit {
-  assignmentGroups: AssignmentGroup[];
+  assignmentGroups: any[];
   teachCourses: any;
   sidebarState; // state of sidebar
   progress: any;
@@ -77,13 +77,12 @@ export class CoursesComponent implements OnInit {
       console.log('course', this.currentCourse);
       // Assign groups for assignments
       if (this.assignmentService.courseAssignments[this.currentCourse.id] !== undefined) {
-        this.assignmentGroups = this.assignmentService.courseAssignments[this.currentCourse.id];
-        console.log('assignments', this.assignmentGroups);
+        this.assignmentGroups = this.assignmentService.courseAssignments[this.currentCourse.id]['groups'];
+        console.log('assignments', this.assignmentService.courseAssignments[this.currentCourse.id]);
       } else {
         this.assignmentGroups = this.assignmentService.courseAssignments['default'];
         console.log('assignments', this.assignmentGroups);
       }
-
     });
   }
 

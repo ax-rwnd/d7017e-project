@@ -9,7 +9,7 @@
         No assignments available for the moment...
       </span>
     <div [routerLink]="['/courses', courseCode, 'assignment', a.id]" *ngFor="let a of assignmentGroup.assignments" class="assignment well">
-      {{a.name}}
+      {{a['assignment'].name}}
     </div>
   </div>
   <div *ngFor="let g of assignmentGroup.groups">

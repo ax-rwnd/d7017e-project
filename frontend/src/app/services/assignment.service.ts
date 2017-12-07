@@ -4,7 +4,7 @@ import { Injectable } from '@angular/core';
 export class AssignmentService {
   courseAssignments = {};
   constructor() {
-    const a = [{id: '1', name: 'Assignment 1', description: 'description', available: true},
+    /*const a = [{id: '1', name: 'Assignment 1', description: 'description', available: true},
       {id: '2', name: 'Assignment 2', description: 'description', available: true},
       {id: '3', name: 'Assignment 3', description: 'description', available: false},
       {id: '4', name: 'Assignment 4', description: 'description', available: false},
@@ -14,7 +14,7 @@ export class AssignmentService {
       {id: '3', name: 'Exercise 3', description: 'description', available: true},
       {id: '4', name: 'Exercise 4', description: 'description', available: true},
       {id: '5', name: 'Exercise 5', description: 'description', available: true}];
-    /*const special = {name: 'Special exercises', collapse: true, availability: 'locked', assignments: e, groups: []};
+    const special = {name: 'Special exercises', collapse: true, availability: 'locked', assignments: e, groups: []};
     const aLvl1 = {name: 'Level 1', collapse: false, availability: false, assignments: a, groups: []};
     const aLvl2 = {name: 'Level 2', collapse: true, availability: 'unlocked', assignments: a, groups: []};
     const aLvl3 = {name: 'Level 3', collapse: true, availability: 'unlocked', assignments: a, groups: []};
@@ -22,17 +22,32 @@ export class AssignmentService {
     const eLvl2 = {name: 'Level 2', collapse: true, availability: 'unlocked', assignments: e, groups: []};
     const eLvl3 = {name: 'Level 3', collapse: true, availability: 'unlocked', assignments: e, groups: [special]};*/
     const assignmentGroups = [];
-    assignmentGroups[0] = {name: 'Assignments', collapse: true, availability: false, assignments: a, groups: []};
-    assignmentGroups[1] = {name: 'Exercises', collapse: true, availability: false, assignments: e, groups: []};
+    /*assignmentGroups[0] = {name: 'Assignments', collapse: true, availability: false, assignments: a, groups: []};
+    assignmentGroups[1] = {name: 'Exercises', collapse: true, availability: false, assignments: e, groups: []};*/
     this.courseAssignments['default'] = assignmentGroups;
   }
   AddCourseAssignments(course_id: string, assignments: any[]) {
     const a = [];
     for (let i = 0; i < assignments.length; i++) {
-      a[i] = {id: assignments[i]._id, course_id: course_id, name: assignments[i].name, languages: assignments[i].languages,
-        description: assignments[i].description, available: true};
+      a[i] = {'assignment': assignments[i]};
     }
-    this.courseAssignments[course_id] = [{name: 'Assignments', collapse: false, availability: false, assignments: a, groups: []}];
+    if (this.courseAssignments[course_id] === undefined) {
+      this.courseAssignments[course_id] = [];
+    }
+    if (this.courseAssignments[course_id]['assignments'] === undefined) {
+      this.courseAssignments[course_id]['assignments'] = [];
+    }
+    this.courseAssignments[course_id]['assignments'] = a;
+  }
+  AddCourseAssignmentGroup(course_id: string, group: any) {
+    if (this.courseAssignments[course_id] === undefined) {
+      this.courseAssignments[course_id] = [];
+    }
+    if (this.courseAssignments[course_id]['groups'] === undefined) {
+      this.courseAssignments[course_id]['groups'] = [];
+    }
+    this.courseAssignments[course_id]['groups'].push(group);
+    console.log('course groups', this.courseAssignments[course_id]['groups']);
   }
   GetAssignment(course_id: string, assignment_id: string) {
     if (this.courseAssignments[course_id] === undefined) {

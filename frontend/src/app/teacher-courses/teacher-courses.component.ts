@@ -29,7 +29,7 @@ import { DragulaService } from 'ng2-dragula';
 ]
 })
 export class TeacherCoursesComponent implements OnInit {
-  assignmentGroups: AssignmentGroup[];
+  assignments: any[];
   teachCourses: any;
   sidebarState; // state of sidebar
   progress: any;
@@ -137,15 +137,12 @@ export class TeacherCoursesComponent implements OnInit {
   }
 
   setAssignments() {if (this.assignmentService.courseAssignments[this.currentCourse.id] !== undefined) {
-        this.assignmentGroups = this.assignmentService.courseAssignments[this.currentCourse.id];
+        this.assignments = this.assignmentService.courseAssignments[this.currentCourse.id]['assignments'];
+        this.groups = this.assignmentService.courseAssignments[this.currentCourse.id]['groups'];
+
+        this.selectedAssignments = [{'assignment': this.flattenAssignments(), 'possible': this.flattenAssignments()}];
         // this.assignmentGroups = this.assignmentService.courseAssignments['default'];console.log('assignments', this.assignmentGroups);
-      } else {
-        this.assignmentGroups = this.assignmentService.courseAssignments['default'];
-        console.log('assignments', this.assignmentGroups);
       }
-      this.selectedAssignments = [{'assignment': this.flattenAssignments()[0], 'possible': this.flattenAssignments()}];
-
-
   }
 
   ngOnInit() {
@@ -154,9 +151,10 @@ export class TeacherCoursesComponent implements OnInit {
     this.possibleStudents = [];
     this.selectedBadge = 'bronze_medal_badge';
     this.form = this.fb.group(this.defaultForm);
-    this.selectedAssignments = [{'assignment': this.flattenAssignments()[0], 'possible': this.flattenAssignments()}];
+    this.selectedAssignments = [{'assignment': this.flattenAssignments(), 'possible': this.flattenAssignments()}];
     this.tests = {};
-    this.groups = [{name: 'Group1', assignments: []}, {name: 'Group2', assignments: []}, {name: 'Group3', assignments: []}];
+    console.log('teacher, groups', this.groups);
+    console.log('teacher, assignments', this.assignments);
   }
 
   openModal(modal, type) {
@@ -226,13 +224,11 @@ export class TeacherCoursesComponent implements OnInit {
   }
 
   flattenAssignments() {
-    const assignments = [];
-    for (const group of this.assignmentGroups) {
-      for (const a of group.assignments) {
-        assignments.push(a);
-      }
+    const ass = [];
+    for (const a of this.assignments) {
+      ass.push(a);
     }
-    return assignments;
+    return ass;
   }
 
   removeGoal(index) {
@@ -240,7 +236,7 @@ export class TeacherCoursesComponent implements OnInit {
   }
 
   addGoal() {
-    this.selectedAssignments.push({'assignment': this.flattenAssignments()[0], 'possible': this.flattenAssignments()});
+    this.selectedAssignments.push({'assignment': this.flattenAssignments(), 'possible': this.flattenAssignments()});
   }
 
   submitBadge() {
@@ -260,6 +256,21 @@ export class TeacherCoursesComponent implements OnInit {
     this.backendService.postNewBadge(this.selectedBadge, this.badgeName, this.badgeDescription, this.currentCourse.id,
       [], assignments)
       .then(response => console.log('badge created: ', response));
+  }
+  submitGroups() {
+    for (const group in this.groups) {
+      const a = [];
+      const body = Object.assign({}, this.groups[group]);
+      body['assignments'] = [];
+      for (const i in this.groups[group]['assignments']) {
+        console.log('assignment', this.groups[group]['assignments']);
+        body['assignments'].push({assignment: this.groups[group]['assignments'][i]['assignment']._id});
+      }
+      console.log('group', this.groups[group]);
+      this.backendService.putAssignmentGroup(this.currentCourse.id, this.groups[group]._id, body)
+        .then(response => console.log('group put', response))
+        .catch(err => console.log('error', err));
+    }
   }
 
   generateInviteLink() {
