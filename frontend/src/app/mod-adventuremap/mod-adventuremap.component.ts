@@ -12,10 +12,13 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
   @Input() courseCode: string;
 
   // Style constants
-  protected width = 200;
-  protected height = 200;
+  protected readonly baseWidth = 200;
+  protected readonly baseHeight = 200;
   protected readonly borderThickness = 2;
   protected readonly lineThickness = 1;
+
+  protected width = this.baseWidth;
+  protected height = this.baseHeight;
   protected radius = 4;
   protected sensitivity = this.radius;
   protected img = new Image(this.width, this.height);
@@ -196,19 +199,32 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
     if (index < this.assignments.length - 1) {
       const next = this.assignments[index + 1];
 
+      const local = this.scaleToLocal(current.coords);
+      const localNext = this.scaleToLocal(next.coords);
+
       ctx.beginPath();
       ctx.lineWidth = this.lineThickness;
       ctx.strokeStyle = 'black';
-      ctx.moveTo(current.coords.x, current.coords.y);
-      ctx.lineTo(next.coords.x, next.coords.y);
+      ctx.moveTo(local.x, local.y);
+      ctx.lineTo(localNext.x, localNext.y);
       ctx.stroke();
     }
+  }
+
+  scaleToLocal(coord: any) {
+    return {x: coord.x * this.baseWidth / this.width, y: coord.y * this.baseHeight / this.height};
+  }
+
+  scaleToBase(coord: any) {
+    return {x: coord.x *  this.width / this.baseWidth, y: coord.y * this.height / this.baseHeight};
   }
 
   drawPoint(ctx: CanvasRenderingContext2D, current: any, index: number) {
     // Draw dot
     ctx.beginPath();
-    ctx.arc(current.coords.x, current.coords.y, this.radius, 0, 2 * Math.PI, false);
+
+    const local = this.scaleToLocal(current.coords);
+    ctx.arc(local.x, local.y, this.radius, 0, 2 * Math.PI, false);
     ctx.strokeStyle = 'black';
 
     // Set fill stule

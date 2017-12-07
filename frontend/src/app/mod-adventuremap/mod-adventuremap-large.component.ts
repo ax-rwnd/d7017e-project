@@ -9,8 +9,8 @@ import { Component, OnInit } from '@angular/core';
 
 export class ModAdventuremapLargeComponent extends ModAdventuremapComponent implements OnInit {
   ngOnInit() {
-    this.width = 512;
-    this.height = 512;
+    this.width = 2 * this.baseWidth;
+    this.height = 2 * this.baseHeight;
 
     // Setup the viewport to reload once the image has loaded
     this.img.onload = () => {
