@@ -1,9 +1,13 @@
 import { Injectable } from '@angular/core';
 import { BackendService } from './backend.service';
+import { Assignmentsgroup } from '../../assignmentsgroup';
+import { Assignment } from '../../assignment';
+import { Assignments } from '../../assignments';
 
 @Injectable()
 export class AssignmentService {
   courseAssignments = {};
+
   constructor(private backendService: BackendService) {
 
   }
@@ -15,11 +19,45 @@ export class AssignmentService {
       this.backendService.getCourseAssignments(course_id)
         .then(assignmentsResponse => {
           console.log('AssignmentsResp:', assignmentsResponse);
-          this.AddCourseAssignments(course_id, assignmentsResponse['assignments']);
+          //this.AddCourseAssignments(course_id, assignmentsResponse['assignments']);
+          this.setAssignmentsForCourse(course_id, assignmentsResponse['assignments']);
           resolve();
         })
         .catch(reject);
     });
+  }
+
+  getAssignmentGroups(course_id, backendService) {
+    console.log('getting groups');
+    return new Promise((resolve, reject) => {
+      backendService.getAssignmentGroupsCourse(course_id)
+        .then(response => {
+          const groups = response['assignmentgroups'];
+          this.setGroupsForCourse(course_id, groups);
+          resolve();
+        })
+        .catch(reject);
+    });
+  }
+
+  setGroupsForCourse(course_id: string, groups: any[]) {
+    const groupList = getGroupList(groups);
+    console.log('GroupList:', groupList);
+    if (this.courseAssignments[course_id]) {
+      this.courseAssignments[course_id]['groups'] = groupList;
+    } else { // Not defined yet
+      this.courseAssignments[course_id] = newAssignments(groupList, '');
+    }
+    console.log('courseAssignments:', this.courseAssignments);
+  }
+
+  setAssignmentsForCourse(course_id: string, assignments: any[]) {
+    const assignList = getAssignmentList(assignments);
+    if (this.courseAssignments[course_id]) {
+      this.courseAssignments[course_id]['assignments'] = assignList;
+    } else {
+      this.courseAssignments[course_id] = newAssignments('', assignList);
+    }
   }
 
   AddCourseAssignments(course_id: string, assignments: any[]) {
@@ -35,6 +73,7 @@ export class AssignmentService {
     }
     this.courseAssignments[course_id]['assignments'] = a;
   }
+
   AddCourseAssignmentGroup(course_id: string, group: any) {
     if (this.courseAssignments[course_id] === undefined) {
       this.courseAssignments[course_id] = [];
@@ -45,67 +84,57 @@ export class AssignmentService {
     this.courseAssignments[course_id]['groups'].push(group);
     console.log('course groups', this.courseAssignments[course_id]['groups']);
   }
-  GetAssignment(course_id: string, assignment_id: string) {
-    if (this.courseAssignments[course_id] === undefined) {
-      course_id = 'default';
-    }
-    console.log('course id ', course_id);
-    for (let i = 0; i < this.courseAssignments[course_id].length; i++) {
-      const a = getAssignmentHelper(this.courseAssignments[course_id][i], assignment_id);
-      if (a !== false) {
-        return a;
-      }
-    }
-    return false;
-  }
-  numberOfAssignments(course: string) {
-    if (this.courseAssignments[course] === undefined) {
-      course = 'default';
-    }
-    return numberOfAssignmentsHelper(this.courseAssignments[course]);
+
+  GetAssignment(course_id: string, group_id: string, assignment_id: string): Assignment { // when you click on an assignment
+    const groups = this.courseAssignments[course_id].groups;
+    const group = groups.find((current) => current.id === group_id);
+    const assignments = group.assignments;
+    return assignments.find((current) => current.id === assignment_id);
   }
 }
 
-function numberOfAssignmentsHelper(groups: AssignmentGroup[]) {
-  let number = 0;
-  if (groups === []) {
-    return number;
-  } else {
-    for (let i = 0; i < groups.length; i++) {
-      number += groups[i].assignments.length + numberOfAssignmentsHelper(groups[i].groups);
-    }
+function getGroupList(groups: any): Assignmentsgroup[] {
+  const groupList: Assignmentsgroup[] = [];
+  for (const group of groups) {
+    const assignList = getAssignmentList(group.assignments);
+    groupList.push(newAssignmentsgroup(group._id, group.name, assignList));
   }
-  return number;
+  return groupList;
 }
 
-function getAssignmentHelper(group: AssignmentGroup, assignment_id: string) {
-  for (let i = 0; i < group.assignments.length; i++) {
-    if (group.assignments[i].id === assignment_id) {
-      return group.assignments[i];
+function getAssignmentList(assignments: any): Assignment[] {
+  const assignmentsList: Assignment[] = [];
+  for (const assign of assignments) {
+    let assignment = assign;
+    if (assign.assignment) {
+      assignment = assign.assignment;
     }
+    assignmentsList.push(newAssignment(assignment._id, assignment.name, assignment.languages, assignment.description));
   }
-  for (let i = 0; i < group.groups.length; i++) {
-    const a = getAssignmentHelper(group.groups[i], assignment_id);
-    if (a !== false) {
-      return a;
-    }
-  }
-  return false;
+  return assignmentsList;
 }
 
-interface AssignmentGroup {
-  name: string;
-  collapse: boolean;
-  availability: any;
-  assignments: Assignment[];
-  groups: AssignmentGroup[];
+function newAssignments(groups, assignments): Assignments {
+  return {
+    groups: groups,
+    assignments: assignments, // should only be visible to teacher
+  };
 }
 
-interface Assignment {
-  id: string;
-  course_id;
-  name: string;
-  languages: string[];
-  description: string;
-  available: boolean;
+function newAssignmentsgroup(id: string, name: string, assignments: Assignment[]): Assignmentsgroup {
+  return {
+    id: id,
+    name: name,
+    assignments: assignments,
+  };
 }
+
+function newAssignment(id: string, name: string, languages: any[], desc: string) {
+  return {
+    id: id,
+    name: name,
+    languages: languages,
+    description: desc,
+  };
+}
+

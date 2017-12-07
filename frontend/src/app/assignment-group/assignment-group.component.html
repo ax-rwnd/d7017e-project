@@ -1,15 +1,15 @@
 <div class="gamification-block panel panel-default">
   <div class="panel-heading assignment-header" (click)="groupCollapse()">
     {{assignmentGroup.name}}
-    <fa class="navbar-right right-margin" *ngIf="assignmentGroup.availability === 'locked'" name="lock"></fa>
-    <fa class="navbar-right right-margin" *ngIf="assignmentGroup.availability === 'unlocked'" name="unlock"></fa>
+   <!-- <fa class="navbar-right right-margin" *ngIf="assignmentGroup.availability === 'locked'" name="lock"></fa>
+    <fa class="navbar-right right-margin" *ngIf="assignmentGroup.availability === 'unlocked'" name="unlock"></fa> -->
   </div>
-  <div class="panel-body" [collapse]="assignmentGroup.collapse">
+  <div class="panel-body">
     <span *ngIf="assignmentGroup.assignments.length === 0" style="color: dimgrey;">
         No assignments available for the moment...
       </span>
-    <div [routerLink]="['/courses', courseCode, 'assignment', a.id]" *ngFor="let a of assignmentGroup.assignments" class="assignment well">
-      {{a['assignment'].name}}
+    <div [routerLink]="['/courses', courseCode, 'group', assignmentGroup['id'] ,'assignment', a.id]" *ngFor="let a of assignmentGroup.assignments" class="assignment well">
+     {{a.name}}
     </div>
   </div>
   <div *ngFor="let g of assignmentGroup.groups">

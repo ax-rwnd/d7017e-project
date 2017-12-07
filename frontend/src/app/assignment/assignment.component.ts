@@ -50,7 +50,7 @@ export class AssignmentComponent implements OnInit, OnDestroy {
         this.sidebarState = sidebarState;
     });
     this.route.params.subscribe( params => {
-      this.assignment = this.assignmentService.GetAssignment(params['course'], params['assignment']);
+      this.assignment = this.assignmentService.GetAssignment(params['course'], params['group'], params['assignment']);
       this.currentCourse = this.courseService.GetCourse(params['course']);
       this.backendService.getDraft(new ObjectID(params['course']), new ObjectID(params['assignment']))
         .then(data => {
@@ -96,7 +96,7 @@ export class AssignmentComponent implements OnInit, OnDestroy {
 
     const user_id = new ObjectID(this.userid);
     const assignment_id = new ObjectID(this.assignment['id']);
-    const course_id = new ObjectID(this.assignment['course_id']);
+    const course_id = new ObjectID(this.currentCourse.id);
     this.backendService.submitAssignment(user_id, course_id, assignment_id, this.language, this.content)
       .then(data => {
         this.HandleResponse(data);
@@ -109,7 +109,7 @@ export class AssignmentComponent implements OnInit, OnDestroy {
     // Posts the current code to backend
 
     const assignment_id = new ObjectID(this.assignment['id']);
-    const course_id = new ObjectID(this.assignment['course_id']);
+    const course_id = new ObjectID(this.currentCourse.id);
     this.backendService.postDraft(course_id, assignment_id, this.content, this.language)
       .catch(err => console.error('Post draft failed', err));
   }

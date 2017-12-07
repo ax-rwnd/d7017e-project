@@ -157,13 +157,15 @@ export class TeacherCoursesComponent implements OnInit {
     console.log('course', this.currentCourse);
   }
 
-  setAssignments() {if (this.assignmentService.courseAssignments[this.currentCourse.id] !== undefined) {
-        this.assignments = this.assignmentService.courseAssignments[this.currentCourse.id]['assignments'];
-        this.groups = this.assignmentService.courseAssignments[this.currentCourse.id]['groups'];
-
-        this.selectedAssignments = [{'assignment': this.flattenAssignments(), 'possible': this.flattenAssignments()}];
-        // this.assignmentGroups = this.assignmentService.courseAssignments['default'];console.log('assignments', this.assignmentGroups);
-      }
+  setAssignments() {
+    if (this.assignmentService.courseAssignments[this.currentCourse.id] !== undefined) {
+      this.assignments = this.assignmentService.courseAssignments[this.currentCourse.id]['assignments'];
+      this.groups = this.assignmentService.courseAssignments[this.currentCourse.id]['groups'];
+      console.log('Groups:', this.groups);
+      console.log('Assingments:', this.assignments);
+      // this.selectedAssignments = [{'assignment': this.flattenAssignments(), 'possible': this.flattenAssignments()}];
+      // this.assignmentGroups = this.assignmentService.courseAssignments['default'];console.log('assignments', this.assignmentGroups);
+    }
   }
 
   ngOnInit() {
@@ -318,15 +320,17 @@ export class TeacherCoursesComponent implements OnInit {
       const body = Object.assign({}, this.groups[group]);
       body['assignments'] = [];
       for (const i in this.groups[group]['assignments']) {
-        console.log('assignment', this.groups[group]['assignments']);
-        body['assignments'].push({assignment: this.groups[group]['assignments'][i]['assignment']._id});
+        console.log('assignments', this.groups[group]['assignments']);
+        console.log('assignment sign:', this.groups[group]['assignments'][i], 'i:', i);
+        body['assignments'].push({assignment: this.groups[group]['assignments'][i].id});
       }
       console.log('group', this.groups[group]);
-      this.backendService.putAssignmentGroup(this.currentCourse.id, this.groups[group]._id, body)
+      this.backendService.putAssignmentGroup(this.currentCourse.id, this.groups[group].id, body)
         .then(response => console.log('group put', response))
         .catch(err => console.log('error', err));
     }
   }
+
 
   getAllInviteLinks() {
     // fel id?

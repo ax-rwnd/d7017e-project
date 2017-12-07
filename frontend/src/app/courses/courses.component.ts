@@ -73,9 +73,14 @@ export class CoursesComponent implements OnInit {
     this.route.params.subscribe( (params: any) => {
       // Grab the current course
       this.currentCourse = this.courseService.GetCourse(params.course);
+
       this.currentCourseSaved = this.currentCourse;
       console.log('course', this.currentCourse);
       // Assign groups for assignments
+
+      this.assignmentGroups = this.assignmentService.courseAssignments[this.currentCourse.id]['groups'];
+      console.log('Assignmentsgroups:', this.assignmentGroups);
+      /*
       if (this.assignmentService.courseAssignments[this.currentCourse.id] !== undefined) {
         this.assignmentGroups = this.assignmentService.courseAssignments[this.currentCourse.id]['groups'];
         console.log('assignments', this.assignmentService.courseAssignments[this.currentCourse.id]);
@@ -83,6 +88,7 @@ export class CoursesComponent implements OnInit {
         this.assignmentGroups = this.assignmentService.courseAssignments['default'];
         console.log('assignments', this.assignmentGroups);
       }
+      */
     });
   }
 

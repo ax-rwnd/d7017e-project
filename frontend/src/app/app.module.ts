@@ -74,7 +74,7 @@ import { ChartsModule } from 'ng2-charts/ng2-charts';
 const appRoutes: Routes = [
   { path: '', component: LoginComponent },
   { path: 'auth', component: LoginHelperComponent },
-  { path: 'courses/:course/assignment/:assignment', component: AssignmentComponent, canActivate: [AuthGuard]},
+  { path: 'courses/:course/group/:group/assignment/:assignment', component: AssignmentComponent, canActivate: [AuthGuard]},
   { path: 'user', component: UserComponent, canActivate: [AuthGuard]},
   { path: 'courses/:course', component: CoursesComponent, canActivate: [AuthGuard]},
   { path: 'teaching/:course', component: TeacherCoursesComponent, canActivate: [AuthGuard]},
