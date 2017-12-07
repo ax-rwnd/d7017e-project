@@ -3,10 +3,12 @@ import { BackendService } from './backend.service';
 import { Assignmentsgroup } from '../../assignmentsgroup';
 import { Assignment } from '../../assignment';
 import { Assignments } from '../../assignments';
+import { Subject } from 'rxjs/Subject';
 
 @Injectable()
 export class AssignmentService {
   courseAssignments = {};
+  assignmentsSub = new Subject<any>();
 
   constructor(private backendService: BackendService) {
 
@@ -19,7 +21,7 @@ export class AssignmentService {
       this.backendService.getCourseAssignments(course_id)
         .then(assignmentsResponse => {
           console.log('AssignmentsResp:', assignmentsResponse);
-          //this.AddCourseAssignments(course_id, assignmentsResponse['assignments']);
+          // this.AddCourseAssignments(course_id, assignmentsResponse['assignments']);
           this.setAssignmentsForCourse(course_id, assignmentsResponse['assignments']);
           resolve();
         })
@@ -60,29 +62,10 @@ export class AssignmentService {
     }
   }
 
-  AddCourseAssignments(course_id: string, assignments: any[]) {
-    const a = [];
-    for (let i = 0; i < assignments.length; i++) {
-      a[i] = {'assignment': assignments[i]};
-    }
-    if (this.courseAssignments[course_id] === undefined) {
-      this.courseAssignments[course_id] = [];
-    }
-    if (this.courseAssignments[course_id]['assignments'] === undefined) {
-      this.courseAssignments[course_id]['assignments'] = [];
-    }
-    this.courseAssignments[course_id]['assignments'] = a;
-  }
-
-  AddCourseAssignmentGroup(course_id: string, group: any) {
-    if (this.courseAssignments[course_id] === undefined) {
-      this.courseAssignments[course_id] = [];
-    }
-    if (this.courseAssignments[course_id]['groups'] === undefined) {
-      this.courseAssignments[course_id]['groups'] = [];
-    }
-    this.courseAssignments[course_id]['groups'].push(group);
-    console.log('course groups', this.courseAssignments[course_id]['groups']);
+  addAssignment(assign: Object, course_id: string) {
+    const assignment = newAssignment(assign['_id'], assign['name'], assign['languages'], assign['description']);
+    this.courseAssignments[course_id]['assignments'].push(assignment);
+    return this.assignmentsSub.next(this.courseAssignments[course_id]['assignments']);
   }
 
   GetAssignment(course_id: string, group_id: string, assignment_id: string): Assignment { // when you click on an assignment

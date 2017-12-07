@@ -84,6 +84,10 @@ export class TeacherCoursesComponent implements OnInit {
       this.teachCourses = teachCourses;
     });
 
+    this.assignmentService.assignmentsSub.subscribe( assignments => {
+      this.assignments = assignments;
+    });
+
     this.setDragula();
 
     this.route.params.subscribe( (params: any) => {
@@ -161,8 +165,6 @@ export class TeacherCoursesComponent implements OnInit {
     if (this.assignmentService.courseAssignments[this.currentCourse.id] !== undefined) {
       this.assignments = this.assignmentService.courseAssignments[this.currentCourse.id]['assignments'];
       this.groups = this.assignmentService.courseAssignments[this.currentCourse.id]['groups'];
-      console.log('Groups:', this.groups);
-      console.log('Assingments:', this.assignments);
       // this.selectedAssignments = [{'assignment': this.flattenAssignments(), 'possible': this.flattenAssignments()}];
       // this.assignmentGroups = this.assignmentService.courseAssignments['default'];console.log('assignments', this.assignmentGroups);
     }
@@ -356,6 +358,7 @@ export class TeacherCoursesComponent implements OnInit {
   }
 }
 
+/*
 interface AssignmentGroup {
   name: string;
   collapse: boolean;
@@ -368,3 +371,5 @@ interface Assignment {
   name: string;
   available: boolean;
 }
+
+*/
