@@ -74,8 +74,8 @@
           <tr *ngFor="let i of invites">
             <td *ngIf="i.course['course_code']">{{i.course['course_code']}}</td>
             <td *ngIf="!i.course['course_code']">{{i.course['name']}}</td>
-            <td><button type="button" class="glyph-accept" (click)="acceptInvite(i.courseCode['_id'])"><span class="glyphicon glyphicon-ok"></span></button></td>
-            <td><button type="button" class="glyph-decline" (click)="declineInvite(i.courses['_id'])"><span class="glyphicon glyphicon-remove"></span></button></td>
+            <td><button type="button" class="glyph-accept" (click)="acceptInvite(i.course['_id'])"><span class="glyphicon glyphicon-ok"></span></button></td>
+            <td><button type="button" class="glyph-decline" (click)="declineInvite(i.course['_id'])"><span class="glyphicon glyphicon-remove"></span></button></td>
           </tr>
           </tbody>
         </table>
@@ -93,17 +93,22 @@
     </button>
   </div>
     <div class="modal-body">
-        <div class="well-sm course-list" *ngFor="let p of possibleCourses">
-          <div class="row">
-            <div class="col-md-7">
-                <h4>{{p.name}}</h4>
-            </div>
-            <div class="col-md-3">
-              <h4>{{p.owner}}</h4>
-            </div>
-            <div class="col-md-2"> <button class="btn" (click)="join(p.id)">Join</button> </div>
-          </div>
-        </div>
+        <table class="well-sm course-table table table-striped">
+          <thead>
+            <tr>
+              <th class="col-md-7">Name</th>
+              <th class="col-md-3">Owner</th>
+              <th class="col-md-2"></th>
+            </tr>
+          </thead>
+          <tbody *ngFor="let p of possibleCourses">
+            <tr>
+              <td><h4>{{p.name}}</h4></td>
+              <td><h4>{{p.owner}}</h4></td>
+              <td><button class="btn" (click)="join(p.id)">Join</button></td>
+            </tr>
+          </tbody>
+        </table>
     </div>
     <div class="modal-footer"></div>
 </ng-template>
