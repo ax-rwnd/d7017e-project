@@ -225,6 +225,7 @@ export class TeacherCoursesComponent implements OnInit {
         console.log('group', response);
         this.toastService.success('Group Created!');
         this.assignmentService.addAssignmentGroup(response, this.currentCourse.id);
+        this.modalRef.hide();
       });
   }
 
