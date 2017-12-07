@@ -213,11 +213,11 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
   }
 
   scaleToLocal(coord: any) {
-    return {x: coord.x * this.baseWidth / this.width, y: coord.y * this.baseHeight / this.height};
+    return {x: coord.x * (this.baseWidth / this.width), y: coord.y * (this.baseHeight / this.height)};
   }
 
   scaleToBase(coord: any) {
-    return {x: coord.x *  this.width / this.baseWidth, y: coord.y * this.height / this.baseHeight};
+    return {x: coord.x *  (this.width / this.baseWidth), y: coord.y * (this.height / this.baseHeight)};
   }
 
   drawPoint(ctx: CanvasRenderingContext2D, current: any, index: number) {
