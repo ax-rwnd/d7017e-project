@@ -74,8 +74,8 @@
           <tr *ngFor="let i of invites">
             <td *ngIf="i.course['course_code']">{{i.course['course_code']}}</td>
             <td *ngIf="!i.course['course_code']">{{i.course['name']}}</td>
-            <td><button type="button" class="glyph-accept" (click)="acceptInvite(i.courseCode['_id'])"><span class="glyphicon glyphicon-ok"></span></button></td>
-            <td><button type="button" class="glyph-decline" (click)="declineInvite(i.courses['_id'])"><span class="glyphicon glyphicon-remove"></span></button></td>
+            <td><button type="button" class="glyph-accept" (click)="acceptInvite(i.course['_id'])"><span class="glyphicon glyphicon-ok"></span></button></td>
+            <td><button type="button" class="glyph-decline" (click)="declineInvite(i.course['_id'])"><span class="glyphicon glyphicon-remove"></span></button></td>
           </tr>
           </tbody>
         </table>
