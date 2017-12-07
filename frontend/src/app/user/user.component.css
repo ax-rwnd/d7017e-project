@@ -53,9 +53,16 @@
   font-weight: bold;
 }
 
-.course-list {
+.course-table {
   margin-bottom: 10px;
   background-color: rgba(29,117,175,0.27);
+  table-layout:fixed;
+}
+
+.course-table td {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .custom-well {
