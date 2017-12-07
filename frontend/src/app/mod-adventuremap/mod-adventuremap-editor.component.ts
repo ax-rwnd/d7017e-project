@@ -37,7 +37,7 @@ export class ModAdventuremapEditorComponent extends ModAdventuremapComponent imp
     ctx.fill();
 
     // Stroke the border
-    if (this.selectedAssignment !== undefined &&
+    if (this.selectedAssignment !== undefined && this.selectedAssignment.assignment !== undefined &&
       this.selectedAssignment.assignment._id === current.assignment._id) {
       ctx.lineWidth = this.borderThickness;
       ctx.strokeStyle = '#5f5';
@@ -47,6 +47,19 @@ export class ModAdventuremapEditorComponent extends ModAdventuremapComponent imp
     }
 
     ctx.stroke();
+  }
+
+  updateGroup(groupIndex: number) {
+    // Send a request to update the state of the group with new coords, etc.
+    // TODO: bunch together multiple requests?
+    this.assignmentGroups[groupIndex].assignments = this.assignments;
+    const group = this.assignmentGroups[groupIndex];
+
+    if (group !== undefined) {
+      return this.backendService.putAssignmentGroup(this.courseCode, group._id, group);
+    } else {
+      console.error('failed to update positions, undefined group');
+    }
   }
 
   handleClick() {
@@ -65,11 +78,13 @@ export class ModAdventuremapEditorComponent extends ModAdventuremapComponent imp
       });
 
       // Determine what to do
+      console.warn('selection', toSelect, this.selectedAssignment);
       if (toSelect !== undefined) {
         this.selectedAssignment = toSelect;
       } else if (this.selectedAssignment !== undefined) {
         this.selectedAssignment.coords.x = x;
         this.selectedAssignment.coords.y = y;
+        this.updateGroup(this.groupIndex);
       } else {
         console.warn('Warning: undefined elements.');
       }

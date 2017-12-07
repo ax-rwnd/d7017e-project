@@ -5,14 +5,7 @@ import { BackendService } from './backend.service';
 export class AssignmentService {
   courseAssignments = {};
   constructor(private backendService: BackendService) {
-    const a = [{id: '1', name: 'Assignment 1', description: 'description', available: true},
-      {id: '2', name: 'Assignment 2', description: 'description', available: true},
-      {id: '3', name: 'Assignment 3', description: 'description', available: false},
-      {id: '4', name: 'Assignment 4', description: 'description', available: false},
-      {id: '5', name: 'Assignment 5', available: false}];
-    const assignmentGroups = [];
-    assignmentGroups[0] = {name: 'Assignments', collapse: true, availability: false, assignments: a, groups: []};
-    this.courseAssignments['default'] = assignmentGroups;
+
   }
 
   getAssignmentsForCourse(course_id): Promise<any> {

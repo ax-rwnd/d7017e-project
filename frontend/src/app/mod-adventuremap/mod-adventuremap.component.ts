@@ -90,10 +90,10 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
   setTextValues() {
     // Set the assignment text and url
 
-    this.assignmentText = (this.selectedAssignment === undefined) ?
-                          'Pick an assignment' : this.selectedAssignment.name;
-    this.assignmentId = (this.selectedAssignment === undefined) ?
-                        '' : this.selectedAssignment._id;
+    this.assignmentText = (this.selectedAssignment === undefined || this.selectedAssignment.assignment === undefined) ?
+                          'Pick an assignment' : this.selectedAssignment.assignment.name;
+    this.assignmentId = (this.selectedAssignment === undefined || this.selectedAssignment.assignment === undefined) ?
+                        '' : this.selectedAssignment.assignment._id;
   }
 
   update() {
@@ -115,7 +115,7 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
   loadAssignments() {
     // Load assingments- and assignment groups from map
 
-    return new Promise ((resolve: any, reject: any) => {
+  return new Promise ((resolve: any, reject: any) => {
       this.backendService.getAssignmentGroupsCourse(this.courseCode).then((data: any) => {
         // Grab the available groups
         this.assignmentGroups = data.assignmentgroups;
@@ -182,10 +182,9 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
 
     if (this.assignments !== undefined) {
 
-      for (let i = 0; i < this.assignments.length; i++) {
-        const current = this.assignments[i];
+      this.assignments.forEach((current, i) => {
         this.drawAssignment(ctx, current, i);
-      }
+      });
     } else {
       console.warn('assignments were undefined during drawMap()');
     }
@@ -213,8 +212,8 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
     ctx.strokeStyle = 'black';
 
     // Set fill stule
-    if (this.lastAssignment !== undefined &&
-        this.lastAssignment._id === current._id) {
+    if (this.lastAssignment !== undefined && this.lastAssignment.assignment !== undefined &&
+        this.lastAssignment.assignment._id === current.assignment._id) {
       ctx.fillStyle = 'blue';
     } else if (this.userProgress.completed_assignments >= index) {
       ctx.fillStyle = 'red';
@@ -224,8 +223,8 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
     ctx.fill();
 
     // Set stroke style
-    if (this.selectedAssignment !== undefined &&
-      this.selectedAssignment.assignment_id === current.assignment_id) {
+    if (this.selectedAssignment !== undefined && this.selectedAssignment.assignment !== undefined &&
+      this.selectedAssignment.assignment._id === current.assignment._id) {
       ctx.lineWidth = this.borderThickness;
       ctx.strokeStyle = '#5f5';
     } else {
