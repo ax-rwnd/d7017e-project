@@ -49,6 +49,7 @@ export class CreateassignmentComponent implements OnInit {
   };
   assignment: Assignment;
   oldUnitTests: any[];
+  testArray: any[];
 
   constructor(private backendService: BackendService, private headService: HeadService,
               private modalService: BsModalService, private fb: FormBuilder, private route: ActivatedRoute,
@@ -107,22 +108,16 @@ export class CreateassignmentComponent implements OnInit {
     this.unitTests.push(['io', this.form.value.ioInput, this.form.value.ioOutput]);
   }
 
-  editExistingTest(e) {
-    if (this.assignment) {
-      if (this.testType === 'io') {
-        const id = this.oldUnitTests[e][3];
-        this.oldUnitTests[e] = [this.testType, this.form.value.ioInput, this.form.value.ioOutput, id];
-        console.log(this.oldUnitTests);
+  editExistingTest(e, array) { // need to add id if assignment
+    if (this.testType === 'io') {
+      if (this.assignment) { // should have id
+        const id = array[e][3];
+        array[e] = [this.testType, this.form.value.ioInput, this.form.value.ioOutput, id];
       } else {
-        this.oldUnitTests[e] = [this.testType];
+        array[e] = [this.testType, this.form.value.ioInput, this.form.value.ioOutput];
       }
     } else {
-      if (this.testType === 'io') {
-        this.unitTests[e] = [this.testType, this.form.value.ioInput, this.form.value.ioOutput];
-        console.log(this.unitTests);
-      } else {
-        this.unitTests[e] = [this.testType];
-      }
+      array[e] = [this.testType];
     }
     this.testType = '';
   }
@@ -134,11 +129,13 @@ export class CreateassignmentComponent implements OnInit {
   }
 
   openModalEdit(modal, testArray, index) {
+    console.log('Array:', testArray[index]);
+    console.log('Index:', index);
     this.form = this.fb.group({
-      type: [testArray[index][0]],
-      testInfo: [[]],
-      ioInput: [testArray[index][1]],
-      ioOutput: [testArray[index][2]],
+      type: testArray[index][0],
+      testInfo: [],
+      ioInput: testArray[index][1],
+      ioOutput: testArray[index][2],
     });
     this.modalRef = this.modalService.show(modal);
   }
