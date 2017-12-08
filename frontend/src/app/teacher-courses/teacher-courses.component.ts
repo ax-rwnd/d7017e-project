@@ -195,17 +195,19 @@ export class TeacherCoursesComponent implements OnInit {
   }
 
   deleteCourse(course_id) {
-    this.backendService.deleteCourse(course_id)
-      .then(resp => {
-        console.log('Response delete:', resp);
-        this.router.navigate(['/user'])
-          .then( done => {
-            this.courseService.removeTeacherCourse(course_id);
-          });
-      })
-      .catch(err => {
-        console.log('Error deleting course:', err);
-      });
+    if (confirm('Are you sure to delete ' + this.currentCourse.name + '?')) {
+      this.backendService.deleteCourse(course_id)
+        .then(resp => {
+          console.log('Response delete:', resp);
+          this.router.navigate(['/user'])
+            .then(done => {
+              this.courseService.removeTeacherCourse(course_id);
+            });
+        })
+        .catch(err => {
+          console.log('Error deleting course:', err);
+        });
+    }
   }
 
   openModal(modal, type) {
@@ -363,7 +365,10 @@ export class TeacherCoursesComponent implements OnInit {
     if (confirm('Are you sure to delete ' + group['name'] + '?')) {
       console.log('delete ', group);
       this.backendService.deleteAssignmentGroup(this.currentCourse.id, group['id'])
-        .then(response => this.toastService.success(group['name'] + 'deleted!'));
+        .then(response => {
+          this.toastService.success(group['name'] + 'deleted!');
+          this.assignmentService.removeAssignmentGroup(group, this.currentCourse.id);
+        });
     }
   }
   deleteBadge(badge) {

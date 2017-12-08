@@ -75,6 +75,14 @@ export class AssignmentService {
     return this.groupSub.next(this.courseAssignments[course_id]['groups']);
   }
 
+  removeAssignmentGroup(gr: Object, course_id: string) {
+    const index = this.courseAssignments[course_id]['groups'].indexOf(gr);
+    if (index !== -1) {
+      this.courseAssignments[course_id]['groups'].splice(index, 1);
+      return this.groupSub.next(this.courseAssignments[course_id]['groups']);
+    }
+  }
+
   GetAssignment(course_id: string, group_id: string, assignment_id: string): Assignment { // when you click on an assignment
     const groups = this.courseAssignments[course_id].groups;
     const group = groups.find((current) => current.id === group_id);
