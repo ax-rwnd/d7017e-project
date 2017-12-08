@@ -10,6 +10,7 @@ import { Component, OnInit, OnChanges, SimpleChanges, AfterViewInit } from '@ang
 export class ModAdventuremapEditorComponent extends ModAdventuremapComponent implements OnInit, AfterViewInit {
   // private toEdit: any;
 
+  /*
   ngOnInit() {
     this.width = 2 * this.baseWidth;
     this.height = 2 * this.baseHeight;
@@ -24,6 +25,13 @@ export class ModAdventuremapEditorComponent extends ModAdventuremapComponent imp
     };
     this.img.src = '/assets/images/map.png';
 
+  }
+   */
+
+  setMapDimensions() {
+    this.width = 2 * this.baseWidth;
+    this.height = 2 * this.baseHeight;
+    this.sensitivity = this.radius = 8;
   }
 
   colorPoint(selectedAssignment, lastAssignment, userProgress, ctx, current) {

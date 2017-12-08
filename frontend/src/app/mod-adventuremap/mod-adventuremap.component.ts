@@ -25,7 +25,7 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
 
   protected readonly activeBorder = '#5e5';
   protected readonly lastEdge = 'yellow';
-  protected readonly normalEdge = 'black';
+  protected readonly normalEdge = 'red';
 
 
   protected width = this.baseWidth;
@@ -51,12 +51,17 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
   protected canvas: any;
   protected context: CanvasRenderingContext2D;
 
+  setMapDimensions() {
+    // Modify the canvas size related elements here
+  }
+
   ngOnInit() {
+    this.setMapDimensions();
+
     // Setup the viewport to reload once the image has loaded
     this.img.onload = () => {
       this.drawMap();
     };
-
     this.img.src = '/assets/images/map.png';
   }
 
@@ -139,7 +144,7 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
   loadAssignments() {
     // Load assingments- and assignment groups from map
 
-  return new Promise ((resolve: any, reject: any) => {
+    return new Promise ((resolve: any, reject: any) => {
       this.backendService.getAssignmentGroupsCourse(this.courseCode).then((data: any) => {
         // Grab the available groups
         this.assignmentGroups = data.assignmentgroups;
@@ -219,13 +224,14 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
 
     if (index < this.assignments.length - 1) {
       const next = this.assignments[index + 1];
+      console.warn('next assignment', next);
 
       const local = this.scaleToLocal(current.coords);
       const localNext = this.scaleToLocal(next.coords);
 
       ctx.beginPath();
       ctx.lineWidth = this.lineThickness;
-      ctx.strokeStyle = 'black';
+      ctx.strokeStyle = this.normalEdge;
       ctx.moveTo(local.x, local.y);
       ctx.lineTo(localNext.x, localNext.y);
       ctx.stroke();
