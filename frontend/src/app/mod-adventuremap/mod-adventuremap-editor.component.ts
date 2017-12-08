@@ -26,28 +26,18 @@ export class ModAdventuremapEditorComponent extends ModAdventuremapComponent imp
 
   }
 
-  drawPoint(ctx: CanvasRenderingContext2D, current: any, index: number) {
-    // Draw the points in a manner relevant to the subclass
+  colorPoint(selectedAssignment, lastAssignment, userProgress, ctx, current) {
+    // Draw a simpler point for editing
+    ctx.fillStyle = this.completedFill;
 
-    // Fill the point
-    ctx.beginPath();
-    const local = this.scaleToLocal(current.coords);
-    ctx.arc(local.x, local.y, this.radius, 0, 2 * Math.PI, false);
-    ctx.fillStyle = 'red';
-
-    ctx.fill();
-
-    // Stroke the border
+    // Select a border color according to the current active status
     if (this.selectedAssignment !== undefined && this.selectedAssignment.assignment !== undefined &&
       this.selectedAssignment.assignment._id === current.assignment._id) {
-      ctx.lineWidth = this.borderThickness;
-      ctx.strokeStyle = '#5f5';
-    } else {
-      ctx.lineWidth = this.borderThickness;
-      ctx.strokeStyle = 'black';
-    }
+      ctx.strokeStyle = this.activeBorder;
 
-    ctx.stroke();
+    } else {
+      ctx.strokeStyle = this.normalEdge;
+    }
   }
 
   updateGroup(groupIndex: number) {

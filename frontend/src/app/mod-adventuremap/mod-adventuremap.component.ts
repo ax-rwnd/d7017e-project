@@ -15,7 +15,18 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
   protected readonly baseWidth = 200;
   protected readonly baseHeight = 200;
   protected readonly borderThickness = 2;
-  protected readonly lineThickness = 1;
+  protected readonly lineThickness = 3;
+
+  // Color constants
+  protected readonly normalFill = 'black';
+  protected readonly lockedFill = 'gray';
+  protected readonly completedFill = 'yellow';
+  protected readonly currentFill = 'red';
+
+  protected readonly activeBorder = '#5e5';
+  protected readonly lastEdge = 'yellow';
+  protected readonly normalEdge = 'black';
+
 
   protected width = this.baseWidth;
   protected height = this.baseHeight;
@@ -99,10 +110,14 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
   setTextValues() {
     // Set the assignment text and url
 
-    this.assignmentText = (this.selectedAssignment === undefined || this.selectedAssignment.assignment === undefined) ?
-                          'Pick an assignment' : this.selectedAssignment.assignment.name;
-    this.assignmentId = (this.selectedAssignment === undefined || this.selectedAssignment.assignment === undefined) ?
-                        '' : this.selectedAssignment.assignment._id;
+    if (this.selectedAssignment === undefined) {
+      this.assignmentText = this.selectedAssignment.assignment.name;
+      this.assignmentId = this.selectedAssignment.assignment._id;
+    } else {
+      this.assignmentText = 'Pick an assignment';
+      this.assignmentId = '';
+    }
+
   }
 
   update() {
@@ -218,48 +233,60 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
   }
 
   scaleToLocal(coord: any) {
-    return {x: coord.x * (this.baseWidth / this.width), y: coord.y * (this.baseHeight / this.height)};
+    // Grab base cords from db etc. and scale to our local resolution
+
+    return {x: coord.x * (this.baseWidth / this.width),
+            y: coord.y * (this.baseHeight / this.height)};
   }
 
   scaleToBase(coord: any) {
-    return {x: coord.x *  (this.width / this.baseWidth), y: coord.y * (this.height / this.baseHeight)};
+    // Grab local cords from screen and scale them for the db
+
+    return {x: coord.x *  (this.width / this.baseWidth),
+            y: coord.y * (this.height / this.baseHeight)};
+  }
+
+  colorPoint(selectedAssignment, lastAssignment, userProgress, ctx, current) {
+    // Set styles for the current point
+    // TODO: replace index with the new, smarter way
+
+    // Set the filling style to its appropriate colior
+    if (lastAssignment !== undefined && lastAssignment.assignment !== undefined &&
+        lastAssignment.assignment._id === current.assignment._id) {
+      ctx.fillStyle = this.currentFill;
+
+    } else if (userProgress !== undefined &&
+      userProgress.completed_assignments >= 4) {
+      ctx.fillStyle = this.completedFill;
+
+    } else {
+      ctx.fillStyle = this.lockedFill;
+    }
+
+    // Set stroke style according to the selection status
+    ctx.strokeStyle = (selectedAssignment !== undefined &&
+                      selectedAssignment.assignment !== undefined &&
+                      selectedAssignment.assignment._id === current.assignment._id) ?
+                        ctx.strokeStyle = this.activeBorder :
+                        ctx.strokeStyle = this.normalEdge;
   }
 
   drawPoint(ctx: CanvasRenderingContext2D, current: any, index: number) {
-    // Draw dot
+    // Draw a dot representing an assignment
+
     ctx.beginPath();
-
+    this.colorPoint(this.selectedAssignment, this.lastAssignment,
+                    this.userProgress, ctx, current);
     const local = this.scaleToLocal(current.coords);
+    ctx.lineWidth = this.borderThickness;
     ctx.arc(local.x, local.y, this.radius, 0, 2 * Math.PI, false);
-    ctx.strokeStyle = 'black';
 
-    // Set fill stule
-    if (this.lastAssignment !== undefined && this.lastAssignment.assignment !== undefined &&
-        this.lastAssignment.assignment._id === current.assignment._id) {
-      ctx.fillStyle = 'blue';
-    } else if (this.userProgress.completed_assignments >= index) {
-      ctx.fillStyle = 'red';
-    } else {
-      ctx.fillStyle = 'gray';
-    }
     ctx.fill();
-
-    // Set stroke style
-    if (this.selectedAssignment !== undefined && this.selectedAssignment.assignment !== undefined &&
-      this.selectedAssignment.assignment._id === current.assignment._id) {
-      ctx.lineWidth = this.borderThickness;
-      ctx.strokeStyle = '#5f5';
-    } else {
-      ctx.lineWidth = this.borderThickness;
-      ctx.strokeStyle = 'black';
-    }
-
     ctx.stroke();
   }
 
   drawAssignment(ctx: CanvasRenderingContext2D, current: any, index: number) {
     // Draw information for one assignment
-
 
     this.strokePath(ctx, current, index);
     this.drawPoint(ctx, current, index);
