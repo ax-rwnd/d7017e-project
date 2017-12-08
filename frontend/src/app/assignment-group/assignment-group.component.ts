@@ -18,18 +18,8 @@ export class AssignmentGroupComponent implements OnInit {
   groupCollapse() {
     if (this.assignmentGroup.availability !== 'locked') {
       this.assignmentGroup.collapse = !this.assignmentGroup.collapse;
-      if (this.assignmentGroup.collapse) {
-        collapseChildren(this.assignmentGroup.groups);
-      }
     }
   }
-}
-
-function collapseChildren(children: AssignmentGroup[]) {
-  children.forEach(child => {
-    child.collapse = true;
-    collapseChildren(child.groups);
-  });
 }
 
 interface AssignmentGroup {
