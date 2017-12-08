@@ -4,7 +4,8 @@
   <button *ngIf="sidebarState === 'inactive'" style="float:left;" class="glyph-button" (click)="goBack()"><span class="glyphicon glyphicon-circle-arrow-left"></span></button>
 
   <div class="container">
-    <h2>Create Assignment <span class="required">{{errorMessage}}</span></h2>
+    <h2 *ngIf="!assignment">Create assignment <span class="required">{{errorMessage}}</span></h2>
+    <h2 *ngIf="assignment">Update assignment <span class="required">{{errorMessage}}</span></h2>
     <br>
     <div class="row">
       <div class="col-lg-6">
@@ -52,21 +53,37 @@
     </div>
 
     <!-- Test editing section -->
-    <div *ngFor='let fb of unitTests' id="test">
-      <div id="testInfo">
+    <div *ngFor='let fb of oldUnitTests' class="test">
+      <div class="testInfo">
         <h4>{{fb[0]}} Test</h4>
         <div *ngIf="fb[1]"> Input: {{fb[1]}} </div>
         <div *ngIf="fb[2]"> Output: {{fb[2]}} </div>
       </div>
-      <div id="testEdit">
+      <div class="testEdit">
         <div style="align:right">
-          <button class="btn btn-primary" (click)="openModalEdit(editTest); testType=fb[0]; editT=unitTests.indexOf(fb)">Edit test</button>
+          <button class="btn btn-primary" (click)="openModalEdit(editTest, oldUnitTests, oldUnitTests.indexOf(fb)); testType=fb[0]; editT=oldUnitTests.indexOf(fb);">Edit test</button>
+        </div>
+      </div>
+    </div>
+
+    <div *ngFor='let fb of unitTests' class="test">
+      <div class="testInfo">
+        <h4>{{fb[0]}} Test</h4>
+        <div *ngIf="fb[1]"> Input: {{fb[1]}} </div>
+        <div *ngIf="fb[2]"> Output: {{fb[2]}} </div>
+      </div>
+      <div class="testEdit">
+        <div style="align:right">
+          <button class="btn btn-primary" (click)="openModalEdit(editTest); testType=fb[0]; editT=unitTests.indexOf(fb); testArray=unitTests">Edit test</button>
         </div>
       </div>
     </div>
 
     <div id="footer">
-      <button class="btn btn-primary" (click)="submitAssignment()">Create Assignment</button>
+      <button class="btn btn-primary" (click)="submitAssignment()">
+        <span *ngIf="!assignment">Create assignment</span>
+        <span *ngIf="assignment">Update assignment</span>
+      </button>
     </div>
 
   </div>
@@ -115,12 +132,12 @@
     <div class="modal-body">
       <div class="form-group" *ngIf="testIo()">
         <h4>Input</h4>
-        <input type="text" class="form-control" id="ioInput2" formControlName="ioInput" ngModel required>
+        <input type="text" class="form-control" id="ioInput2" formControlName="ioInput">
       </div>
 
       <div class="form-group" *ngIf="testIo()">
         <h4>Output</h4>
-        <textarea type="text" class="form-control" id="ioOutput2" formControlName="ioOutput" ngModel required></textarea>
+        <textarea type="text" class="form-control" id="ioOutput2" formControlName="ioOutput"></textarea>
       </div>
       <hr>
 

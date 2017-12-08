@@ -78,6 +78,29 @@ export class AssignmentService {
     return this.assignmentsSub.next(this.courseAssignments[course_id]['assignments']);
   }
 
+  updateAssignment(course_id: string, assignment_id: string, name: string, content: string, languages: string[]) {
+    // Update an assignment
+    const assignment = this.getTeacherAssignment(course_id, assignment_id);
+    assignment.name = name;
+    assignment.languages = languages;
+    assignment.description = content;
+    this.updateAssignmentGroup(course_id, assignment_id, name, content, languages);
+    return this.assignmentsSub.next(this.courseAssignments[course_id]['assignments']);
+  }
+
+  updateAssignmentGroup(course_id: string, assignment_id: string, name: string, content: string, languages: string[]) {
+    const groups = this.courseAssignments[course_id]['groups'];
+    for (const group of groups) {
+      const assignment = group.assignments.find((current) => current.id === assignment_id);
+      if (assignment) { // If found it in group, should be defined, update it
+        assignment.name = name;
+        assignment.languages = languages;
+        assignment.description = content;
+      }
+    }
+    return this.groupSub.next(this.courseAssignments[course_id]['groups']);
+  }
+
   addAssignmentGroup(gr: Object, course_id: string) {
     // Works similar to addAssignment function with subscription etc
 
@@ -94,6 +117,13 @@ export class AssignmentService {
       this.courseAssignments[course_id]['groups'].splice(index, 1);
       return this.groupSub.next(this.courseAssignments[course_id]['groups']);
     }
+  }
+
+  getTeacherAssignment(course_id: string, assignment_id: string): Assignment {
+    // Used when teacher update an assignment, need information
+
+    const assignments = this.courseAssignments[course_id].assignments;
+    return assignments.find((current) => current.id === assignment_id);
   }
 
   GetAssignment(course_id: string, group_id: string, assignment_id: string): Assignment {
