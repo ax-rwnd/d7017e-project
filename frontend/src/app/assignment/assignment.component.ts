@@ -155,7 +155,7 @@ export class AssignmentComponent implements OnInit, OnDestroy {
       const test = results['io'][i];
       const testindex = i + 1;
       if (!test['ok']) {
-        const failure = (test['stderr'] === '') ? 'Wrong output' : test['stderr'];
+        const failure = (test['stderr'] === '') ? 'Wrong output: ' + test['stdout'] : test['stderr'];
         feedback.push('Test ' + testindex + ' failure: ' + failure);
         passTests = false;
       } else {
