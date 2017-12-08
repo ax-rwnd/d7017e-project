@@ -43,6 +43,7 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
   // Frontend state
   protected lastAssignment: any;
   protected selectedAssignment: any;
+  private groupId: any;
   private assignmentText: string;
   private assignmentId: string;
   protected initialized = false;
@@ -114,6 +115,7 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
       if (this.selectedAssignment !== undefined) {
         this.assignmentText = this.selectedAssignment.assignment.name;
         this.assignmentId = this.selectedAssignment.assignment._id;
+        this.groupId = this.assignmentGroups[this.groupIndex]._id;
       } else {
         this.assignmentText = 'Pick an assignment';
         this.assignmentId = '';
