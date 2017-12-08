@@ -50,7 +50,7 @@ Http requests:
       .toPromise()
       .then(response => response)
       .catch(err => {
-        this.ToastError(err.error);
+        this.ToastError(err.error.error);
         throw err;
       });
   }
@@ -62,7 +62,7 @@ Http requests:
       .toPromise()
       .then(response => response)
       .catch(err => {
-        this.ToastError(err.error);
+        this.ToastError(err.error.error);
         throw err;
       });
   }
@@ -74,7 +74,7 @@ Http requests:
       .toPromise()
       .then(response => response)
       .catch(err => {
-        this.ToastError(err.error);
+        this.ToastError(err.error.error);
         throw err;
       });
   }
@@ -91,7 +91,7 @@ Http requests:
       .toPromise()
       .then(response => response)
       .catch(err => {
-        this.ToastError(err.error);
+        this.ToastError(err.error.error);
         throw err;
       });
   }
