@@ -59,7 +59,6 @@ export class ModAdventuremapEditorComponent extends ModAdventuremapComponent imp
         // Something was already selected, move it
 
         const baseCoords = this.scaleToBase({x: x, y: y});
-        console.warn('selected', this.selectedAssignment.coords, baseCoords);
         this.selectedAssignment.coords.x = baseCoords.x;
         this.selectedAssignment.coords.y = baseCoords.y;
         this.updateGroup(this.groupIndex);

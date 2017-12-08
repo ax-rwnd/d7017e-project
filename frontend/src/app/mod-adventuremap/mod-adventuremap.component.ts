@@ -60,10 +60,6 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
 
     // Setup the viewport to reload once the image has loaded
     this.update();
-    /*
-    this.img.onload = () => {
-      this.drawMap();
-    };*/
     this.img.src = '/assets/images/map.png';
   }
 
@@ -72,7 +68,6 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
     this.context = this.canvas.getContext('2d');
 
     // Allow users to select assignments
-    console.error('ADDING');
     this.canvas.addEventListener('click',
         this.handleClick(), false);
 
@@ -133,19 +128,6 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
         this.assignmentGroups = data.assignmentgroups;
         this.drawMap();
       });
-
-      //this.loadAssignments();
-      /*
-        .then( () => {
-          this.selectedAssignment = this.assignments[this.userProgress.completed_assignments]; this.lastAssignment = this.assignments[this.userProgress.completed_assignments];
-          this.setTextValues();
-
-          this.drawMap();
-        })
-        .catch(err => {
-          console.error('adventuremap failed to update', err);
-        });
-       */
     }
 
     drawMap() {
@@ -182,7 +164,6 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
     }
 
     drawPoint(ctx: CanvasRenderingContext2D, current: any) {
-        console.warn('code', this.courseCode, 'drawing at', current.coords);
         const local = this.scaleToLocal(current.coords);
 
         ctx.beginPath();
@@ -211,7 +192,6 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
 
     scaleToLocal(coord: any) {
       // Grab base cords from db etc. and scale to our local resolution
-      console.error('scaling x:', this.width / this.baseWidth );
 
       return {x: coord.x * (this.width / this.baseWidth),
         y: coord.y * (this.height / this.baseHeight)};
