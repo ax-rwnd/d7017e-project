@@ -133,8 +133,13 @@ export class CreateassignmentComponent implements OnInit {
     this.modalRef = this.modalService.show(modal);
   }
 
-  openModalEdit(modal) {
-    this.form = this.fb.group(this.defaultForm);
+  openModalEdit(modal, testArray, index) {
+    this.form = this.fb.group({
+      type: [testArray[index][0]],
+      testInfo: [[]],
+      ioInput: [testArray[index][1]],
+      ioOutput: [testArray[index][2]],
+    });
     this.modalRef = this.modalService.show(modal);
   }
 
