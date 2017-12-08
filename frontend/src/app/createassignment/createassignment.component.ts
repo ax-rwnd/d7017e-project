@@ -174,16 +174,15 @@ export class CreateassignmentComponent implements OnInit {
   updateAssignment() {
     this.backendService.updateAssignment(this.courseId, this.assignment.id, this.assignmentName, this.content, this.languages)
       .then(resp => {
-        console.log('Updated assign:', resp);
-        // this.assignmentService.updateAssignment(this.assignment, this.courseId);
+        this.assignmentService.updateAssignment(this.courseId, this.assignment.id, this.assignmentName, this.content, this.languages);
         for (const test of this.oldUnitTests) {
-          console.log('Sending in test:', test);
           this.backendService.updateTest(this.courseId, test, this.assignment.id, this.lintTest);
         }
         for (const test of this.unitTests) {
           this.backendService.createTest(this.courseId, test, this.assignment.id, this.lintTest);
         }
         this.toastService.success('Assignment Updated!');
+        window.scrollTo({left: 0, top: 0, behavior: 'smooth'});
       })
       .catch(err => console.error('Update assignment failed', err));
   }
