@@ -8,52 +8,29 @@ import { Component, OnInit, OnChanges, SimpleChanges, AfterViewInit } from '@ang
 })
 
 export class ModAdventuremapEditorComponent extends ModAdventuremapComponent implements OnInit, AfterViewInit {
-  // private toEdit: any;
 
-  ngOnInit() {
+  setMapDimensions() {
     this.width = 2 * this.baseWidth;
     this.height = 2 * this.baseHeight;
     this.sensitivity = this.radius = 8;
-
-    // Make sure to get those assignments loaded right away
-    this.loadAssignments();
-
-    // Setup the viewport to reload once the image has loaded
-    this.img.onload = () => {
-      this.drawMap();
-    };
-    this.img.src = '/assets/images/map.png';
-
   }
 
-  drawPoint(ctx: CanvasRenderingContext2D, current: any, index: number) {
-    // Draw the points in a manner relevant to the subclass
+  colorPoint(selectedAssignment, lastAssignment, userProgress, ctx, current) {
+    // Draw a simpler point for editing
+    ctx.fillStyle = this.completedFill;
 
-    // Fill the point
-    ctx.beginPath();
-    const local = this.scaleToLocal(current.coords);
-    ctx.arc(local.x, local.y, this.radius, 0, 2 * Math.PI, false);
-    ctx.fillStyle = 'red';
-
-    ctx.fill();
-
-    // Stroke the border
-    if (this.selectedAssignment !== undefined && this.selectedAssignment.assignment !== undefined &&
-      this.selectedAssignment.assignment._id === current.assignment._id) {
-      ctx.lineWidth = this.borderThickness;
-      ctx.strokeStyle = '#5f5';
-    } else {
-      ctx.lineWidth = this.borderThickness;
-      ctx.strokeStyle = 'black';
-    }
-
-    ctx.stroke();
+    // Select a border color according to the current active status
+    ctx.strokeStyle = (selectedAssignment !== undefined &&
+                       selectedAssignment.assignment !== undefined &&
+                       selectedAssignment.assignment._id === current.assignment._id) ?
+                         this.activeBorder :
+                         this.normalEdge;
   }
 
   updateGroup(groupIndex: number) {
     // Send a request to update the state of the group with new coords, etc.
     // TODO: bunch together multiple requests?
-    this.assignmentGroups[groupIndex].assignments = this.assignments;
+    // this.assignmentGroups[groupIndex].assignments = this.assignments;
     const group = this.assignmentGroups[groupIndex];
 
     if (group !== undefined) {
@@ -72,17 +49,15 @@ export class ModAdventuremapEditorComponent extends ModAdventuremapComponent imp
       const x = ev.clientX - rect.left;
       const y = ev.clientY - rect.top;
 
-      const toSelect = this.assignments.find( (el) => {
-        const local = this.scaleToLocal(el.coords);
-        const dx = x - local.x;
-        const dy = y - local.y;
-        return (Math.sqrt(dx * dx + dy * dy) < this.sensitivity);
-      });
+      const toSelect = this.hitTest(x, y);
 
-      // Determine what to do
       if (toSelect !== undefined) {
+        // Hittest success, select assignment
+
         this.selectedAssignment = toSelect;
       } else if (this.selectedAssignment !== undefined) {
+        // Something was already selected, move it
+
         const baseCoords = this.scaleToBase({x: x, y: y});
         this.selectedAssignment.coords.x = baseCoords.x;
         this.selectedAssignment.coords.y = baseCoords.y;
