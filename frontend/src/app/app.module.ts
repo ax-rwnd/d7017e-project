@@ -80,6 +80,7 @@ const appRoutes: Routes = [
   { path: 'teaching/:course', component: TeacherCoursesComponent, canActivate: [AuthGuard]},
   { path: 'createAssignmentTest', component: CreateassignmentComponent, canActivate: [AuthGuard]},
   { path: 'courses/:course/createNewAssignment', component: CreateassignmentComponent, canActivate: [AuthGuard]},
+  { path: 'courses/:course/updateAssignment/:assignment', component: CreateassignmentComponent, canActivate: [AuthGuard]},
   { path: 'user/createCourse', component: CreatecourseComponent, canActivate: [AuthGuard]},
   { path: 'user/updateCourse/:course', component: CreatecourseComponent, canActivate: [AuthGuard]},
   { path: 'join/:courseID', component: JoinCourseComponent, canActivate: [AuthGuard]},

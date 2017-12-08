@@ -329,6 +329,12 @@ The structure below is the following:
     return this.apiPost('/api/courses/' + course_id + '/assignments/', body);
   }
 
+  updateAssignment(course_id: any, assignment_id: string, assignmentName: string, description: string, languages: string[]) {
+
+    const body = {'name': assignmentName, 'description': description, 'languages': ['python3'], 'hidden': 'false'}; // languages should change
+    return this.apiPut('/api/courses/' + course_id + '/assignments/' + assignment_id, body);
+  }
+
   submitAssignment(user_id: ObjectID, course_id: ObjectID, assignment_id: ObjectID, lang: string, code: string) {
     // Submits code for testing
 
@@ -353,7 +359,7 @@ The structure below is the following:
 
 // -- Assignment test(s) -- //
 
-  getCourseAssignmentTests(course_id: ObjectID, assignment_id: ObjectID) {
+  getCourseAssignmentTests(course_id: string, assignment_id: string) {
     // Get all tests of a specific assignment
 
     return this.apiGet('/api/courses/' + course_id + '/assignments/' + assignment_id + '/tests');
@@ -368,6 +374,14 @@ The structure below is the following:
     return this.apiPost('/api/courses/' + course_id + '/assignments/' + assignment_id + '/tests', body);
   }
 
+  updateTest(course_id: string, test: string[], assignment_id: any, lint: boolean) {
+
+    const stdin = test[1];
+    const stdout = test[2];
+    const test_id = test[3];
+    const body = {'stdout': stdout, 'stdin': stdin, 'args': [], 'lint': lint};
+    return this.apiPut('/api/courses/' + course_id + '/assignments/' + assignment_id + '/tests/' + test_id, body);
+  }
 // ----------- 6. INVITE/PENDING calls ----------- //
 
 // -- Invite(s) -- //

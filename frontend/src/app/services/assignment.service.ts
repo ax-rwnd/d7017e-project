@@ -96,6 +96,13 @@ export class AssignmentService {
     }
   }
 
+  getTeacherAssignment(course_id: string, assignment_id: string): Assignment {
+    // Used when teacher update an assignment, need information
+
+    const assignments = this.courseAssignments[course_id].assignments;
+    return assignments.find((current) => current.id === assignment_id);
+  }
+
   GetAssignment(course_id: string, group_id: string, assignment_id: string): Assignment {
     // Called whn a user (student) clicks on an assignment, search through groups and
     // assignments and then return assignment to be displayed
