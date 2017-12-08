@@ -61,7 +61,7 @@
       </div>
       <div class="testEdit">
         <div style="align:right">
-          <button class="btn btn-primary" (click)="openModalEdit(editTest, oldUnitTests, oldUnitTests.indexOf(fb)); testType=fb[0]; editT=oldUnitTests.indexOf(fb);">Edit test</button>
+          <button class="btn btn-primary" (click)="openModalEdit(editTest, oldUnitTests, oldUnitTests.indexOf(fb)); testType=fb[0]; editT=oldUnitTests.indexOf(fb); testArray=oldUnitTests">Edit test</button>
         </div>
       </div>
     </div>
@@ -74,7 +74,7 @@
       </div>
       <div class="testEdit">
         <div style="align:right">
-          <button class="btn btn-primary" (click)="openModalEdit(editTest); testType=fb[0]; editT=unitTests.indexOf(fb); testArray=unitTests">Edit test</button>
+          <button class="btn btn-primary" (click)="openModalEdit(editTest, unitTests, unitTests.indexOf(fb)); testType=fb[0]; editT=unitTests.indexOf(fb); testArray=unitTests">Edit test</button>
         </div>
       </div>
     </div>
@@ -128,7 +128,7 @@
       <span aria-hidden="true">&times;</span>
     </button>
   </div>
-  <form (ngSubmit)="editExistingTest(editT)" [formGroup]="form" novalidate>
+  <form (ngSubmit)="editExistingTest(editT, testArray)" [formGroup]="form" novalidate>
     <div class="modal-body">
       <div class="form-group" *ngIf="testIo()">
         <h4>Input</h4>
