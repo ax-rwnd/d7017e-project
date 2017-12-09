@@ -91,11 +91,13 @@ export class AssignmentService {
   updateAssignmentGroup(course_id: string, assignment_id: string, name: string, content: string, languages: string[]) {
     const groups = this.courseAssignments[course_id]['groups'];
     for (const group of groups) {
-      const assignment = group.assignments.find((current) => current.id === assignment_id);
-      if (assignment) { // If found it in group, should be defined, update it
-        assignment.name = name;
-        assignment.languages = languages;
-        assignment.description = content;
+      // An assignment may occur more than once in a group
+      for (const assignment of group.assignments) {
+        if (assignment.id === assignment_id) { // If found it in group, should be defined, update it
+          assignment.name = name;
+          assignment.languages = languages;
+          assignment.description = content;
+        }
       }
     }
     return this.groupSub.next(this.courseAssignments[course_id]['groups']);
