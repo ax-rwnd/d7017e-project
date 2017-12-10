@@ -18,6 +18,14 @@
   font-size: 0.55em;
 }
 
+.question {
+  margin-left: -0.5em;
+  border: none;
+  background-color: transparent;
+  color: #133756;
+  font-size: 0.8em;
+}
+
 .margin-top {
   margin-top: 4%;
 }
