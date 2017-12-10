@@ -5,10 +5,18 @@
   <!-- Title -->
   <div class="container">
     <h2 *ngIf="!course">Create course <span class="required">{{errorMessage}}</span></h2>
-    <h2 *ngIf="course">Update course <span class="required">{{errorMessage}}</span></h2>
+    <div class="row">
+      <h2 *ngIf="course">Update course <span class="required">{{errorMessage}}</span>
+        <button class="glyph-button pull-right" (click)="deleteCourse(course.id)">
+          <span class="option-text">DELETE COURSE
+            <span class="glyphicon glyphicon-trash"></span>
+          </span>
+        </button>
+      </h2>
+    </div>
     <span *ngIf="!course">
     <div class="color-gray">(All fields can later be changed)</div>
-    <br>
+      <br>
     </span>
     <form (ngSubmit)="submitCourse()" [formGroup]="form" novalidate>
       <div class="row">
