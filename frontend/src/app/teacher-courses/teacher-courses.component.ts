@@ -106,7 +106,7 @@ export class TeacherCoursesComponent implements OnInit {
       this.createdBadges = {'badges': []};
       this.backendService.getAllBadges(this.currentCourse.id)
         .then(response => {
-          this.createdBadges = response;
+          this.createdBadges = response['badges'];
           console.log('badges', this.createdBadges);
         });
     });
@@ -369,13 +369,6 @@ export class TeacherCoursesComponent implements OnInit {
           this.toastService.success(group['name'] + 'deleted!');
           this.assignmentService.removeAssignmentGroup(group, this.currentCourse.id);
         });
-    }
-  }
-  deleteBadge(badge) {
-    if (confirm('Are you sure to delete ' + badge['title'] + '?')) {
-      console.log('delete ', badge);
-      this.backendService.deleteBadge(this.currentCourse.id, badge['_id'])
-        .then(response => this.toastService.success(badge['title'] + 'deleted!'));
     }
   }
 

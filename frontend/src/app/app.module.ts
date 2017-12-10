@@ -70,6 +70,7 @@ import { JoinCourseComponent } from './join-course/join-course.component';
 
 // statistics
 import { ChartsModule } from 'ng2-charts/ng2-charts';
+import { ModBadgesTeacherComponent } from './mod-badges/mod-badges-teacher/mod-badges-teacher.component';
 
 const appRoutes: Routes = [
   { path: '', component: LoginComponent },
@@ -117,6 +118,7 @@ const appRoutes: Routes = [
     TeacherCoursesComponent,
     CourseStatisticsComponent,
     JoinCourseComponent,
+    ModBadgesTeacherComponent,
   ],
   imports: [
     ChartsModule,

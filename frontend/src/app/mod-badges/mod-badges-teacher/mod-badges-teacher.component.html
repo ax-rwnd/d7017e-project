@@ -4,8 +4,9 @@
   </div>
   <div class="panel-body">
     <div *ngFor="let badge of badges">
-      <div class="col-lg-3 fillBadge">
-        <img tooltip="{{badge['title']}}" src="/assets/images/{{badge['icon']}}.png">
+      <div tooltip="{{badge['title']}}" class="col-lg-3 fillBadge">
+        <img class="pull-left" src="../../assets/images/{{badge['icon']}}.png"/>
+        <label (click)="deleteBadge(badge)" class="glyphicon glyphicon-remove delete-element"></label>
       </div>
     </div>
   </div>

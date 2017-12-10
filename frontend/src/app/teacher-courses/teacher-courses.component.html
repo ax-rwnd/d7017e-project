@@ -64,19 +64,7 @@
         <span *ngIf="currentCourse.enabled_features.adventuremap">
         <app-mod-adventuremap-editor [courseCode]="currentCourse.id"></app-mod-adventuremap-editor>
       </span>
-        <div class="gamification-block panel panel-default">
-          <div class="panel-heading gamification-header">
-            Badges
-          </div>
-          <div class="panel-body">
-            <div *ngFor="let badge of createdBadges['badges']">
-              <div tooltip="{{badge['title']}}" class="col-lg-3 fillBadge">
-                <label (click)="deleteBadge(badge)" class="glyphicon glyphicon-remove delete-element"></label>
-                <img class="pull-left" src="../../assets/images/{{badge['icon']}}.png"/>
-              </div>
-            </div>
-          </div>
-        </div>
+        <app-mod-badges-teacher [courseId]="currentCourse.id"></app-mod-badges-teacher>
       </div>
       <div class="col-lg-4">
         <h4>Requests from students

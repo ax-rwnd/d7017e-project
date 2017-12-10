@@ -5,6 +5,7 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { BackendService } from '../services/backend.service';
 import { ActivatedRoute } from '@angular/router';
+import { ToastService} from '../services/toast.service';
 
 @Component({
   selector: 'app-gameelement',
@@ -12,7 +13,7 @@ import { ActivatedRoute } from '@angular/router';
 })
 
 export class GameelementComponent implements OnInit {
-  constructor(protected backendService: BackendService, protected route: ActivatedRoute) {
+  constructor(protected backendService: BackendService, protected route: ActivatedRoute, protected toastService: ToastService) {
     this.route.params.subscribe( (data: any) => {
       this.sidebarUpdate(data);
     });
