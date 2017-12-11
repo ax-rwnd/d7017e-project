@@ -353,6 +353,7 @@ describe('/api', () => {
                     .set('Authorization', 'Bearer ' + access_tokens.admin)
                     .expect(200)
                     .then(res => {
+                        // check if assignment was removed from group
                         return request(runner.server)
                             .get('/api/courses/' + course_id + '/assignmentgroups/' + assignmentgroup_id1)
                             .set('Authorization', 'Bearer ' + access_tokens.user)
@@ -360,8 +361,16 @@ describe('/api', () => {
                             .then(res => {
                                 assert(res.body.assignments.length === 0, 'not length 0');
                             });
+                    }).then(() => {
+                        // check if assignment was removed from course
+                        return request(runner.server)
+                            .get('/api/courses/' + course_id)
+                            .set('Authorization', 'Bearer ' + access_tokens.user)
+                            .expect(200)
+                            .then(res => {
+                                assert(res.body.assignments.length === 1, 'there should only be one assignment left');
+                            });
                     });
-                // TODO: add assertions to check if there is some data left
             });
         });
 

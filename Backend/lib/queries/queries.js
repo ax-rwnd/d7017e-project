@@ -554,10 +554,12 @@ function deleteAssignment(assignment_id, course_id) {
         let del_tests = Test.remove({_id: {$in: allTests}});
         // drafts
         let del_drafts = Draft.remove({assignment: ass._id});
-        // assignmentgroups
-        let del_fromAssignmentgroups = Course.findById(course_id, 'assignmentgroups')
+        // course assignments and assignmentgroups
+        let del_from_course = Course.findById(course_id, 'assignments assignmentgroups')
         .populate({path: 'assignmentgroups', model: 'Assignmentgroup'})
         .then(function(course) {
+            course.assignments = course.assignments.filter(ass => ass != assignment_id);
+            course.save();
             for(let assignmentgroup of course.assignmentgroups) {
                 assignmentgroup.assignments = assignmentgroup.assignments.filter(assignment => assignment.assignment != assignment_id);
                 assignmentgroup.save();
@@ -565,7 +567,7 @@ function deleteAssignment(assignment_id, course_id) {
             return;
         });
 
-        return Promise.all([del_tests, del_drafts, del_fromAssignmentgroups]);
+        return Promise.all([del_tests, del_drafts, del_from_course]);
     });
 }
 
