@@ -186,6 +186,11 @@ export class AssignmentComponent implements OnInit, OnDestroy {
     }
     this.setFeedback(feedback);
 
+    // Check for badges
+    for (let badge of value.features.badges) {
+      this.toastService.badge('', '');
+    }
+
     if (value['passed']) {
       this.toastService.success('Assignment passed!');
 
