@@ -7,7 +7,7 @@
 
       <div>
       <button *ngIf="selectedAssignment === undefined" disabled="true">Pick an assignment</button>
-      <button *ngIf="selectedAssignment !== undefined" type="button" class="btn" id="goToAssignment" [routerLink]="['/courses', courseCode, 'assignment', assignmentId]">{{assignmentText}}</button>
+      <button *ngIf="selectedAssignment !== undefined" type="button" class="btn" id="goToAssignment" [routerLink]="['/courses', courseCode, 'group', groupId, 'assignment', assignmentId]">{{assignmentText}}</button>
       </div>
     </div>
 

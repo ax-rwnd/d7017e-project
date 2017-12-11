@@ -15,7 +15,18 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
   protected readonly baseWidth = 200;
   protected readonly baseHeight = 200;
   protected readonly borderThickness = 2;
-  protected readonly lineThickness = 1;
+  protected readonly lineThickness = 3;
+
+  // Color constants
+  protected readonly normalFill = 'black';
+  protected readonly lockedFill = 'gray';
+  protected readonly completedFill = 'yellow';
+  protected readonly currentFill = 'red';
+
+  protected readonly activeBorder = '#5e5';
+  protected readonly lastEdge = 'yellow';
+  protected readonly normalEdge = 'red';
+
 
   protected width = this.baseWidth;
   protected height = this.baseHeight;
@@ -32,6 +43,7 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
   // Frontend state
   protected lastAssignment: any;
   protected selectedAssignment: any;
+  private groupId: any;
   private assignmentText: string;
   private assignmentId: string;
   protected initialized = false;
@@ -40,228 +52,189 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
   protected canvas: any;
   protected context: CanvasRenderingContext2D;
 
-  ngOnInit() {
-    // Setup the viewport to reload once the image has loaded
-    this.img.onload = () => {
-      this.drawMap();
-    };
+  setMapDimensions() {
+    // Modify the canvas size related elements here
+  }
 
+  ngOnInit() {
+    this.setMapDimensions();
+
+    // Setup the viewport to reload once the image has loaded
+    this.update();
     this.img.src = '/assets/images/map.png';
   }
 
   ngAfterViewInit() {
     this.canvas = this.mapCanvas.nativeElement;
     this.context = this.canvas.getContext('2d');
-    this.update();
 
     // Allow users to select assignments
     this.canvas.addEventListener('click',
-      this.handleClick(), false);
+        this.handleClick(), false);
 
-    // Don't do stuff that relies on state until the component is initialized
     this.initialized = true;
   }
 
-  sidebarUpdate(data: any) {
-    // If the sidebar is clicked, update the map
+    sidebarUpdate(data: any) {
+      // If the sidebar is clicked, update the map
 
-    if (this.initialized) {
-      this.update();
+      if (this.initialized) {
+        this.update();
+      }
     }
-  }
 
-  handleClick() {
-    if (!this.initialized) {
-      console.warn('component not initialized, hold on!');
-      return;
-    }
-    return (ev: any) => {
-      // Handle click for this kind of event
-
-      const rect: any = (this as any).canvas.getBoundingClientRect();
-      const x = ev.clientX - rect.left;
-      const y = ev.clientY - rect.top;
-
-      // Hittest the nodes
-      this.selectedAssignment = this.assignments.find( (el) => {
-        console.log('element', el);
-        const local = this.scaleToLocal(el.coords);
-        const dx = x - local.x;
-        const dy = y - local.y;
-        return (Math.sqrt(dx * dx + dy * dy) < this.sensitivity);
-      });
-
-      this.setTextValues();
-      this.drawMap();
-    };
-  }
-
-  setTextValues() {
-    // Set the assignment text and url
-
-    this.assignmentText = (this.selectedAssignment === undefined || this.selectedAssignment.assignment === undefined) ?
-                          'Pick an assignment' : this.selectedAssignment.assignment.name;
-    this.assignmentId = (this.selectedAssignment === undefined || this.selectedAssignment.assignment === undefined) ?
-                        '' : this.selectedAssignment.assignment._id;
-  }
-
-  update() {
-    // Update the model with all the latest and greatest state
-
-    this.loadAssignments()
-      .then( () => {
-        this.selectedAssignment = this.assignments[this.userProgress.completed_assignments];
-        this.lastAssignment = this.assignments[this.userProgress.completed_assignments];
-        this.setTextValues();
-
-        this.drawMap();
-      })
-      .catch(err => {
-        console.error('adventuremap failed to update', err);
-      });
-  }
-
-  loadAssignments() {
-    // Load assingments- and assignment groups from map
-
-  return new Promise ((resolve: any, reject: any) => {
-      this.backendService.getAssignmentGroupsCourse(this.courseCode).then((data: any) => {
-        // Grab the available groups
-        this.assignmentGroups = data.assignmentgroups;
-
-        if (this.assignmentGroups && this.assignmentGroups.length <= 0) {
-          console.warn('no groups...');
-          return;
-        } else {
-        }
-
-        // Grab details about the specific group
-        this.backendService.getAssignmentGroup(this.courseCode, this.assignmentGroups[this.groupIndex]._id).then((nestdata: any) => {
-          this.assignments = nestdata.assignments;
-
-          // Make sure that progress is loaded
-          this.loadProgress().then((progress: any) => {
-            console.warn('loaded progress', progress);
-            resolve(this.assignments);
-          })
-          .catch( (err) => {
-            console.error('could not load progress', err);
-          });
-
-        })
-        .catch((err) => console.error('could not load assignments from group', err));
-
-      })
-      .catch((err) => {
-        console.error('could not get groups in adventuremap', err);
-        reject(err);
-      });
-    });
-  }
-
-  loadProgress() {
-    // Load the user's course progress
-
-    return new Promise((resolve: any, reject: any) => {
-      this.backendService.getFeaturesCourseMe(this.courseCode).then( (data: any) => {
-        this.userProgress = data;
-        resolve(this.userProgress);
-      })
-        .catch(err => {
-          console.error('adventuremap failed to load progress', err);
+    hitTest(x: number, y: number) {
+        // Hittest the nodes
+        return this.assignmentGroups[this.groupIndex].assignments.find( (el) => {
+          const local = this.scaleToLocal(el.coords);
+          const dx = x - local.x;
+          const dy = y - local.y;
+          return (Math.sqrt(dx * dx + dy * dy) < this.sensitivity);
         });
-    });
-  }
-
-  drawMap() {
-    // Render one frame of the game map
-
-    if (this.context === undefined) {
-      console.warn('drawMap was called before initialization.');
-      return;
     }
-    const ctx = this.context;
 
-    // Clear previous
-    ctx.fillStyle = 'white';
-    ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    handleClick() {
 
-    // Draw background
-    ctx.drawImage(this.img, 0, 0, this.canvas.width, this.canvas.height);
+      return (ev: any) => {
+        // Handle click for this kind of event
 
-    if (this.assignments !== undefined) {
+        const rect: any = (this as any).canvas.getBoundingClientRect();
+        const x = ev.clientX - rect.left;
+        const y = ev.clientY - rect.top;
 
-      this.assignments.forEach((current, i) => {
-        this.drawAssignment(ctx, current, i);
+        this.selectedAssignment = this.hitTest(x, y);
+
+        this.setTextValues();
+        this.drawMap();
+      };
+    }
+
+    setTextValues() {
+      // Set the assignment text and url
+
+      if (this.selectedAssignment !== undefined) {
+        this.assignmentText = this.selectedAssignment.assignment.name;
+        this.assignmentId = this.selectedAssignment.assignment._id;
+        this.groupId = this.assignmentGroups[this.groupIndex]._id;
+      } else {
+        this.assignmentText = 'Pick an assignment';
+        this.assignmentId = '';
+      }
+
+    }
+
+    update() {
+      // Update the model with all the latest and greatest state
+
+      this.backendService.getAssignmentGroupsCourse(this.courseCode).then((data: any) => {
+        this.assignmentGroups = data.assignmentgroups;
+        this.drawMap();
       });
+    }
+
+    drawMap() {
+      // Render one frame of the game map
+
+      if (this.context === undefined) {
+        console.warn('drawMap was called before initialization.');
+        return;
+      }
+      const ctx = this.context;
+
+      // Clear previous
+      ctx.fillStyle = 'white';
+      ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+      // Draw background
+      ctx.drawImage(this.img, 0, 0, this.canvas.width, this.canvas.height);
+
+      // Iterate over the groups
+      if (this.assignmentGroups === undefined) {
+        console.warn('no groups yet!');
+        return;
+      }
+
+      pairwise(this.assignmentGroups[this.groupIndex].assignments, (current, next) => {
+        this.drawPoint(ctx, current);
+        this.strokePath(ctx, current, next);
+
+        if (next !== undefined) {
+          this.drawPoint(ctx, next);
+        }
+      },
+      1);
+    }
+
+    drawPoint(ctx: CanvasRenderingContext2D, current: any) {
+        const local = this.scaleToLocal(current.coords);
+
+        ctx.beginPath();
+        this.colorPoint(this.selectedAssignment, this.lastAssignment,
+                        this.userProgress, ctx, current);
+        ctx.lineWidth = this.borderThickness;
+        ctx.arc(local.x, local.y, this.radius, 0, 2 * Math.PI, false);
+
+        ctx.fill();
+        ctx.stroke();
+    }
+
+    strokePath(ctx: CanvasRenderingContext2D, current: any, next: any) {
+      // Stroke path between assignments
+
+        const local = this.scaleToLocal(current.coords);
+        const localNext = this.scaleToLocal(next.coords);
+
+        ctx.beginPath();
+        ctx.lineWidth = this.lineThickness;
+        ctx.strokeStyle = this.normalEdge;
+        ctx.moveTo(local.x, local.y);
+        ctx.lineTo(localNext.x, localNext.y);
+        ctx.stroke();
+    }
+
+    scaleToLocal(coord: any) {
+      // Grab base cords from db etc. and scale to our local resolution
+
+      return {x: coord.x * (this.width / this.baseWidth),
+        y: coord.y * (this.height / this.baseHeight)};
+    }
+
+    scaleToBase(coord: any) {
+      // Grab local cords from screen and scale them for the db
+
+      return {x: coord.x * (this.baseWidth / this.width),
+        y: coord.y * (this.baseHeight / this.height)};
+    }
+
+    colorPoint(selectedAssignment, lastAssignment, userProgress, ctx, current) {
+      // Set styles for the current point
+      // TODO: replace index with the new, smarter way
+
+      // Set the filling style to its appropriate colior
+      if (lastAssignment !== undefined && lastAssignment.assignment !== undefined &&
+        lastAssignment.assignment._id === current.assignment._id) {
+      ctx.fillStyle = this.currentFill;
+
+    } else if (userProgress !== undefined &&
+      userProgress.completed_assignments >= 4) {
+      ctx.fillStyle = this.completedFill;
+
     } else {
-      console.warn('assignments were undefined during drawMap()');
-    }
-  }
-
-  strokePath(ctx: CanvasRenderingContext2D, current: any, index: number) {
-    // Stroke path between assignments
-
-    if (index < this.assignments.length - 1) {
-      const next = this.assignments[index + 1];
-
-      const local = this.scaleToLocal(current.coords);
-      const localNext = this.scaleToLocal(next.coords);
-
-      ctx.beginPath();
-      ctx.lineWidth = this.lineThickness;
-      ctx.strokeStyle = 'black';
-      ctx.moveTo(local.x, local.y);
-      ctx.lineTo(localNext.x, localNext.y);
-      ctx.stroke();
-    }
-  }
-
-  scaleToLocal(coord: any) {
-    return {x: coord.x * (this.baseWidth / this.width), y: coord.y * (this.baseHeight / this.height)};
-  }
-
-  scaleToBase(coord: any) {
-    return {x: coord.x *  (this.width / this.baseWidth), y: coord.y * (this.height / this.baseHeight)};
-  }
-
-  drawPoint(ctx: CanvasRenderingContext2D, current: any, index: number) {
-    // Draw dot
-    ctx.beginPath();
-
-    const local = this.scaleToLocal(current.coords);
-    ctx.arc(local.x, local.y, this.radius, 0, 2 * Math.PI, false);
-    ctx.strokeStyle = 'black';
-
-    // Set fill stule
-    if (this.lastAssignment !== undefined && this.lastAssignment.assignment !== undefined &&
-        this.lastAssignment.assignment._id === current.assignment._id) {
-      ctx.fillStyle = 'blue';
-    } else if (this.userProgress.completed_assignments >= index) {
-      ctx.fillStyle = 'red';
-    } else {
-      ctx.fillStyle = 'gray';
-    }
-    ctx.fill();
-
-    // Set stroke style
-    if (this.selectedAssignment !== undefined && this.selectedAssignment.assignment !== undefined &&
-      this.selectedAssignment.assignment._id === current.assignment._id) {
-      ctx.lineWidth = this.borderThickness;
-      ctx.strokeStyle = '#5f5';
-    } else {
-      ctx.lineWidth = this.borderThickness;
-      ctx.strokeStyle = 'black';
+      ctx.fillStyle = this.lockedFill;
     }
 
-    ctx.stroke();
+    // Set stroke style according to the selection status
+    ctx.strokeStyle = (selectedAssignment !== undefined &&
+                      selectedAssignment.assignment !== undefined &&
+                      selectedAssignment.assignment._id === current.assignment._id) ?
+                        ctx.strokeStyle = this.activeBorder :
+                        ctx.strokeStyle = this.normalEdge;
   }
+}
 
-  drawAssignment(ctx: CanvasRenderingContext2D, current: any, index: number) {
-    // Draw information for one assignment
-
-
-    this.strokePath(ctx, current, index);
-    this.drawPoint(ctx, current, index);
-  }
+function pairwise(arr, func, skips) {
+    skips = skips || 1;
+    for (let i = 0; i < arr.length - skips; i++) {
+        func(arr[i], arr[i + skips]);
+    }
 }

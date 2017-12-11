@@ -17,7 +17,7 @@
   width: 100%;
 }
 
-#test {
+.test {
   margin: 1%;
   height: 100%;
   text-align: left;
@@ -30,11 +30,11 @@
   box-shadow: 1px 1px 3px rgba(180, 180, 180, 1);
 }
 
-#testInfo {
+.testInfo {
   float: left;
 }
 
-#testEdit {
+.testEdit {
   float: right;
 }
 
@@ -87,6 +87,10 @@
   height: 500px;
   max-height: 500px;
   overflow: scroll;
+}
+
+.option-text {
+  font-size: 0.3em;
 }
 
 .glyphicon {

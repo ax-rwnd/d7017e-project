@@ -1,9 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { BsModalRef } from 'ngx-bootstrap/modal/modal-options.class';
-
 import { CourseService } from '../services/course.service';
 import { trigger, state, style, animate, transition } from '@angular/animations';
 import { HeadService } from '../services/head.service';
@@ -70,6 +68,7 @@ export class TeacherCoursesComponent implements OnInit {
   inviteLinkExample: string;
   groups: any[];
   inviteList: any;
+  createdBadges: any;
 
   constructor(private courseService: CourseService, private route: ActivatedRoute, private headService: HeadService,
               private fb: FormBuilder, private assignmentService: AssignmentService, private modalService: BsModalService,
@@ -84,6 +83,14 @@ export class TeacherCoursesComponent implements OnInit {
       this.teachCourses = teachCourses;
     });
 
+    this.assignmentService.assignmentsSub.subscribe( assignments => {
+      this.assignments = assignments;
+    });
+
+    this.assignmentService.groupSub.subscribe( groups => {
+      this.groups = groups;
+    });
+
     this.setDragula();
 
     this.route.params.subscribe( (params: any) => {
@@ -95,6 +102,13 @@ export class TeacherCoursesComponent implements OnInit {
       this.setPendingReqs();
       // Get invite requests
       this.setInviteReqs();
+
+      this.createdBadges = {'badges': []};
+      this.backendService.getAllBadges(this.currentCourse.id)
+        .then(response => {
+          this.createdBadges = response['badges'];
+          // console.log('badges', this.createdBadges);
+        });
     });
   }
 
@@ -123,7 +137,6 @@ export class TeacherCoursesComponent implements OnInit {
   setPendingReqs() {
     this.backendService.getPendingUsers(this.currentCourse.id)
       .then(response => {
-        console.log('pending', response);
         this.pendingReqs = response['invites'];
       })
       .catch(err => console.error('Get pending users failed', err));
@@ -132,7 +145,6 @@ export class TeacherCoursesComponent implements OnInit {
   setInviteReqs() {
     this.backendService.getInvitedUsers(this.currentCourse.id)
       .then(response => {
-        console.log('invited', response);
         this.inviteReqs = response['invites'];
       })
       .catch(err => console.error('Get invited users failed', err));
@@ -150,19 +162,14 @@ export class TeacherCoursesComponent implements OnInit {
           this.teachers.push(member);
         }
       }
-      console.log('members', data.members);
     })
       .catch(err => console.error('failed to get members', err));
-
-    console.log('course', this.currentCourse);
   }
 
   setAssignments() {
     if (this.assignmentService.courseAssignments[this.currentCourse.id] !== undefined) {
       this.assignments = this.assignmentService.courseAssignments[this.currentCourse.id]['assignments'];
       this.groups = this.assignmentService.courseAssignments[this.currentCourse.id]['groups'];
-      console.log('Groups:', this.groups);
-      console.log('Assingments:', this.assignments);
       // this.selectedAssignments = [{'assignment': this.flattenAssignments(), 'possible': this.flattenAssignments()}];
       // this.assignmentGroups = this.assignmentService.courseAssignments['default'];console.log('assignments', this.assignmentGroups);
     }
@@ -182,31 +189,25 @@ export class TeacherCoursesComponent implements OnInit {
     this.inviteLinkExample = environment.frontend_ip + '/join/';
   }
 
-  deleteCourse(course_id) {
-    this.backendService.deleteCourse(course_id)
-      .then(resp => {
-        console.log('Response delete:', resp);
-        this.router.navigate(['/user'])
-          .then( done => {
-            this.courseService.removeTeacherCourse(course_id);
-          });
-      })
-      .catch(err => {
-        console.log('Error deleting course:', err);
-      });
-  }
-
   openModal(modal, type) {
     // Open a modal dialog box
     if (type === 'createBadge') {
-      for (const a of this.flattenAssignments()) {
-        this.backendService.getAssignment(a.course_id, a.id)
+      console.log('assignments', this.assignmentService.courseAssignments[this.currentCourse.id]);
+      for (const a of this.assignmentService.courseAssignments[this.currentCourse.id]['assignments']) {
+        console.log('ids ', this.currentCourse.id, a.id);
+        this.backendService.getCourseAssignmentTests(this.currentCourse.id, a.id)
           .then(response => {
-            const tests = response['tests']['io'].concat(response['optional_tests']['io']);
-            for (let i = 0; i < tests.length; i++) {
-              tests[i]['checked'] = false;
+            let t = [];
+            if (response['tests'] !== undefined) {
+              t = t.concat(response['tests']['io']);
             }
-            this.tests[a.id] = tests;
+            if (response['optional_tests'] !== undefined) {
+              t = t.concat(response['optional_tests']['io']);
+            }
+            for (let i = 0; i < t.length; i++) {
+              t[i]['checked'] = false;
+            }
+            this.tests[a.id] = t;
           });
       }
     } else if (type === 'createGroup') {
@@ -215,9 +216,13 @@ export class TeacherCoursesComponent implements OnInit {
     this.modalRef = this.modalService.show(modal);
   }
 
-  createAssignmentGroup() {
+   createAssignmentGroup() {
     this.backendService.postAssignmentGroup(this.currentCourse.id, this.groupName)
-      .then(response => console.log('group', response));
+      .then(response => {
+        this.toastService.success('Group Created!');
+        this.assignmentService.addAssignmentGroup(response, this.currentCourse.id);
+        this.modalRef.hide();
+      });
   }
 
   acceptAllReqs() { // iterate through pending list
@@ -300,7 +305,9 @@ export class TeacherCoursesComponent implements OnInit {
     const assignments = [];
 
     for (const a of this.selectedAssignments) {
+      console.log('a', a);
       const assignmentTests = [];
+      console.log(this.tests[a['assignment'].id]);
       for (const t in this.tests[a['assignment'].id]) {
         const test = this.tests[a['assignment'].id][t];
         if (test['checked'] === true) {
@@ -310,27 +317,38 @@ export class TeacherCoursesComponent implements OnInit {
       assignments.push({'assignment': a['assignment'].id, 'tests': assignmentTests, 'code_size': 100});
     }
     console.log('submit', assignments);
+    this.modalRef.hide();
     this.backendService.postNewBadge(this.selectedBadge, this.badgeName, this.badgeDescription, this.currentCourse.id,
       [], assignments)
-      .then(response => console.log('badge created: ', response));
+      .then(response => {
+        this.toastService.success('Badge created');
+        this.createdBadges['badges'].push(response);
+        console.log('badge', response);
+      });
   }
   submitGroups() {
     for (const group in this.groups) {
-      const a = [];
       const body = Object.assign({}, this.groups[group]);
       body['assignments'] = [];
       for (const i in this.groups[group]['assignments']) {
-        console.log('assignments', this.groups[group]['assignments']);
-        console.log('assignment sign:', this.groups[group]['assignments'][i], 'i:', i);
         body['assignments'].push({assignment: this.groups[group]['assignments'][i].id});
       }
-      console.log('group', this.groups[group]);
       this.backendService.putAssignmentGroup(this.currentCourse.id, this.groups[group].id, body)
         .then(response => console.log('group put', response))
         .catch(err => console.log('error', err));
     }
   }
 
+  deleteGroup(group) {
+    if (confirm('Are you sure to delete ' + group['name'] + '?')) {
+      console.log('delete ', group);
+      this.backendService.deleteAssignmentGroup(this.currentCourse.id, group['id'])
+        .then(response => {
+          this.toastService.success(group['name'] + 'deleted!');
+          this.assignmentService.removeAssignmentGroup(group, this.currentCourse.id);
+        });
+    }
+  }
 
   getAllInviteLinks() {
     // fel id?
@@ -356,6 +374,7 @@ export class TeacherCoursesComponent implements OnInit {
   }
 }
 
+/*
 interface AssignmentGroup {
   name: string;
   collapse: boolean;
@@ -368,3 +387,5 @@ interface Assignment {
   name: string;
   available: boolean;
 }
+
+*/

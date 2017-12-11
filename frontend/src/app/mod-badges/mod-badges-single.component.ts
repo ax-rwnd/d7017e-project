@@ -13,8 +13,9 @@ export class ModBadgesSingleComponent extends ModBadgesComponent implements OnIn
     super.getElements(this.courseCode);
     this.backendService.getFeaturesCourseMe(this.courseCode)
       .then( (data: any) => {
-        // this.badges = data.badges.slice(0, 1);
-        this.badges = [1, 2].slice(0, 1);
+        this.badges = data.badges.slice(0, 1);
+        //this.badges = [1, 2].slice(0, 1);
+        console.log('single badge', this.badges);
       })
       .catch(err => console.error('Update single badge component failed'));
   }

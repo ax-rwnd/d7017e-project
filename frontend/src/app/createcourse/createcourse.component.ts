@@ -65,15 +65,19 @@ export class CreatecourseComponent implements OnInit {
     this.content = c;
   }
 
-  checkCourseCode(code) { // might be used to check if course-code already exist
-    if (code.length > 5) { // start search first when entire code is written
-      this.backendService.getSearch(code)
-        .then(
-          result => {
-            console.log(result);
-            // displayResult(result['courses']); // array of possible results
-          })
-        .catch(err => console.error('Something went wrong with getSearch', err));
+  deleteCourse(course_id) {
+    if (confirm('Are you sure to delete ' + this.course.name + '?')) {
+      this.backendService.deleteCourse(course_id)
+        .then(resp => {
+          console.log('Response delete:', resp);
+          this.router.navigate(['/user'])
+            .then(done => {
+              this.courseService.removeTeacherCourse(course_id);
+            });
+        })
+        .catch(err => {
+          console.log('Error deleting course:', err);
+        });
     }
   }
 

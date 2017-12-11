@@ -40,7 +40,15 @@
         <br> <!-- add some space -->
         <!-- Title -->
         <h2>My Courses
-          <button class="glyph-button pull-right" routerLink="./createCourse">
+          <span *ngIf="user.access==='basic'">
+            {{teachCourses.length}}/3
+            <sup>
+              <button type="button" class="question" tooltip="A student can create 3 courses.">
+                <span class="glyphicon glyphicon-question-sign"></span>
+              </button>
+            </sup>
+          </span>
+          <button class="glyph-button pull-right" routerLink="./createCourse" [disabled]="isDisabled()" [ngStyle]="disabledButton()">
             <span class="option-text">CREATE COURSE</span>
           </button>
         </h2>

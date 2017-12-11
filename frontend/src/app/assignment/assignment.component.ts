@@ -75,9 +75,7 @@ export class AssignmentComponent implements OnInit, OnDestroy {
     }
 
     this.status = false;
-    if (this.hasPassed()) {
-      this.status = true;
-    }
+    this.updateStatus();
 
     // Periodically save a draft of the code
     this.draftSubscription = Observable.interval(30 * 1000).subscribe(x => {
@@ -130,18 +128,27 @@ export class AssignmentComponent implements OnInit, OnDestroy {
     this.feedback = fb;
   }
 
-  hasPassed() {
-    // returns true if we have passed the assignment already
-    this.courseService.GetTeacherStudentViewHelper(this.currentCourse).then(res => {
-      this.currentCourse = res;
-      for (let prog of this.currentCourse.rewards.progress) {
-        if (prog.assignment._id === this.assignment.id) {
-          return true;
-        }
+  updateStatus() {
+    // fetch the teacherview course and update status
+    this.courseService.GetTeacherStudentViewHelper(this.currentCourse)
+      .then(res => {
+        this.currentCourse = res;
+        this.updateStatusHelper();
+      })
+      .catch(err => {
+        console.error('GetTeacherStudentViewHelper failed: ', err);
+      });
+  }
+
+  updateStatusHelper() {
+    // sets the status to true if we have passed the assignment already
+    for (let prog of this.currentCourse.rewards.progress) {
+      if (prog.assignment._id === this.assignment.id) {
+        this.status = true;
+        return;
       }
-      return false;
-    });
-    console.log('this is current course', this.currentCourse);
+    }
+    this.status = false;
   }
 
   // Handle the response from a code submission. Update the feedback div and update the course progress
@@ -155,7 +162,7 @@ export class AssignmentComponent implements OnInit, OnDestroy {
       const test = results['io'][i];
       const testindex = i + 1;
       if (!test['ok']) {
-        const failure = (test['stderr'] === '') ? 'Wrong output' : test['stderr'];
+        const failure = (test['stderr'] === '') ? 'Wrong output: ' + test['stdout'] : test['stderr'];
         feedback.push('Test ' + testindex + ' failure: ' + failure);
         passTests = false;
       } else {
@@ -181,17 +188,15 @@ export class AssignmentComponent implements OnInit, OnDestroy {
 
     if (value['passed']) {
       this.toastService.success('Assignment passed!');
-      this.status = true;
 
       // Refresh the course
       this.courseService.UpdateCourse(this.currentCourse.id)
         .then(response => {
           // Once the course has been updated, get it
           this.currentCourse = this.courseService.GetCourse(this.currentCourse.id);
+          this.updateStatusHelper();
         })
         .catch(err => console.error('Update course failed', err));
-    } else {
-      this.status = false;
     }
   }
 

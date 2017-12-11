@@ -70,6 +70,7 @@ import { JoinCourseComponent } from './join-course/join-course.component';
 
 // statistics
 import { ChartsModule } from 'ng2-charts/ng2-charts';
+import { ModBadgesTeacherComponent } from './mod-badges/mod-badges-teacher/mod-badges-teacher.component';
 
 const appRoutes: Routes = [
   { path: '', component: LoginComponent },
@@ -80,6 +81,7 @@ const appRoutes: Routes = [
   { path: 'teaching/:course', component: TeacherCoursesComponent, canActivate: [AuthGuard]},
   { path: 'createAssignmentTest', component: CreateassignmentComponent, canActivate: [AuthGuard]},
   { path: 'courses/:course/createNewAssignment', component: CreateassignmentComponent, canActivate: [AuthGuard]},
+  { path: 'courses/:course/updateAssignment/:assignment', component: CreateassignmentComponent, canActivate: [AuthGuard]},
   { path: 'user/createCourse', component: CreatecourseComponent, canActivate: [AuthGuard]},
   { path: 'user/updateCourse/:course', component: CreatecourseComponent, canActivate: [AuthGuard]},
   { path: 'join/:courseID', component: JoinCourseComponent, canActivate: [AuthGuard]},
@@ -116,6 +118,7 @@ const appRoutes: Routes = [
     TeacherCoursesComponent,
     CourseStatisticsComponent,
     JoinCourseComponent,
+    ModBadgesTeacherComponent,
   ],
   imports: [
     ChartsModule,
