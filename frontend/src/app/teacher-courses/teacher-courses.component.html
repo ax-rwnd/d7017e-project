@@ -4,7 +4,6 @@
     <h1>
       <span *ngIf="currentCourse.code">{{currentCourse.code}} - </span> {{currentCourse.name}}
     </h1>
-    <button type="button" class="btn btn-primary" (click)="openModal(createBadge, 'createBadge')">Create badge</button>
     <button type="button" class="btn btn-primary" (click)="deleteCourse(currentCourse.id)">Delete course</button>
     <div class="row">
       <!-- Display the course description, markdown style -->
@@ -186,58 +185,6 @@
   </div>
 </ng-template>
 
-<ng-template #createBadge>
-  <div class="modal-header">
-    <h4 class="modal-title pull-left">Create badge</h4>
-    <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
-  <div class="modal-body">
-    <h3>Select badge</h3>
-    <div class="form-group">
-      <select class="form-control" [(ngModel)]="selectedBadge">
-        <option *ngFor="let badge of badges" [ngValue]="badge['key']">{{badge['name']}}</option>
-      </select>
-    </div>
-    <div>
-      <img src="../../assets/images/{{selectedBadge}}.png"/>
-    </div>
-    <label for="name">Name:</label>
-    <input id="name" type="text" class="form-control" [(ngModel)]="badgeName">
-    <label for="description">Description:</label>
-    <input id="description" type="text" class="form-control" [(ngModel)]="badgeDescription">
-    <h3>
-      Add goals
-    </h3>
-    <div class="form-group">
-      <div class="select-block" *ngFor="let selected of selectedAssignments; let i = index">
-        <button class="glyphicon glyphicon-minus btn btn-danger select-remove" (click)="removeGoal(i)"></button>
-        <select class="form-control select-list" [(ngModel)]="selectedAssignments[i]['assignment']">
-          <option *ngFor="let assignment of selected['possible']" [ngValue]="assignment">{{assignment.name}}</option>
-        </select>
-        <div class="tests row">
-          <div *ngIf="selected.assignment">
-            <div *ngFor="let test of tests[selected.assignment['id']]; let j = index" class="pull-left test-box">
-              <label class="label-norm form-check-label">
-                <input class="form-check-input" [(ngModel)]="test['checked']" type="checkbox"> Test {{j+1}}
-                <label type="button" class="question"
-                       tooltip="Stdin: {{test['stdin']}}, Stdout: {{test['stdout']}}, Args: {{test['args']}}">
-                  <span class="glyphicon glyphicon-question-sign"></span></label>
-              </label>
-            </div>
-          </div>
-        </div>
-        <div class="row"></div>
-      </div>
-      <button class="glyphicon glyphicon-plus btn btn-success" (click)="addGoal()"></button>
-    </div>
-  </div>
-  <div class="modal-footer">
-    <button class="btn btn-primary pull-right" (click)="submitBadge()">Submit</button>
-  </div>
-</ng-template>
-
 <!-- Modal for creation of assignment group -->
 <ng-template #createGroup>
   <div class="modal-header">
@@ -253,7 +200,7 @@
     </div>
   </div>
   <div class="modal-footer">
-    <button class="btn btn-primary" (click)="createAssignmentGroup()" type="submit">Submit</button>
+    <button class="btn btn-success" (click)="createAssignmentGroup()" type="submit">Submit</button>
   </div>
 </ng-template>
 

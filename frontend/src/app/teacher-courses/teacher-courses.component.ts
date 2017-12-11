@@ -43,27 +43,7 @@ export class TeacherCoursesComponent implements OnInit {
     search: ''
   };
   groupName: string;
-  selectedBadge: string;
-  badges: Array<Object> = [
-    {key: 'bronze_medal_badge', name: 'Bronze medal'},
-    {key: 'silver_medal_badge', name: 'Silver medal'},
-    {key: 'gold_medal_badge', name: 'Gold medal'},
-    {key: 'cake_badge', name: 'Cake'},
-    {key: 'computer_badge', name: 'Computer'},
-    {key: 'bronze_trophy_badge', name: 'Bronze trophy'},
-    {key: 'silver_trophy_badge', name: 'Silver trophy'},
-    {key: 'gold_trophy_badge', name: 'Gold trophy'},
-    {key: 'badge2', name: 'Silver trophy 2'},
-    {key: 'goldbadge', name: 'Gold trophy 2'},
-    {key: 'badge1', name: 'Smiley'},
-    {key: 'badge3', name: 'Lightning'},
-    {key: 'brainbadge', name: 'Brain'},
-    {key: 'starbadge', name: 'Star'},
-  ];
-  selectedAssignments: any[];
   tests: any;
-  badgeName: string;
-  badgeDescription: string;
   inviteLink: string;
   inviteLinkExample: string;
   groups: any[];
@@ -184,9 +164,7 @@ export class TeacherCoursesComponent implements OnInit {
     this.teachCourses = this.courseService.teaching;
     this.sidebarState = this.headService.getCurrentState();
     this.possibleStudents = [];
-    this.selectedBadge = 'bronze_medal_badge';
     this.form = this.fb.group(this.defaultForm);
-    this.selectedAssignments = [{'assignment': this.flattenAssignments(), 'possible': this.flattenAssignments()}];
     this.tests = {};
     console.log('teacher, groups', this.groups);
     console.log('teacher, assignments', this.assignments);
@@ -212,26 +190,7 @@ export class TeacherCoursesComponent implements OnInit {
 
   openModal(modal, type) {
     // Open a modal dialog box
-    if (type === 'createBadge') {
-      console.log('assignments', this.assignmentService.courseAssignments[this.currentCourse.id]);
-      for (const a of this.assignmentService.courseAssignments[this.currentCourse.id]['assignments']) {
-        console.log('ids ', this.currentCourse.id, a.id);
-        this.backendService.getCourseAssignmentTests(this.currentCourse.id, a.id)
-          .then(response => {
-            let t = [];
-            if (response['tests'] !== undefined) {
-              t = t.concat(response['tests']['io']);
-            }
-            if (response['optional_tests'] !== undefined) {
-              t = t.concat(response['optional_tests']['io']);
-            }
-            for (let i = 0; i < t.length; i++) {
-              t[i]['checked'] = false;
-            }
-            this.tests[a.id] = t;
-          });
-      }
-    } else if (type === 'createGroup') {
+    if (type === 'createGroup') {
       this.groupName = '';
     }
     this.modalRef = this.modalService.show(modal);
@@ -315,39 +274,6 @@ export class TeacherCoursesComponent implements OnInit {
     return links;
   }
 
-  removeGoal(index) {
-    this.selectedAssignments.splice(index, 1);
-  }
-
-  addGoal() {
-    this.selectedAssignments.push({'assignment': this.flattenAssignments(), 'possible': this.flattenAssignments()});
-  }
-
-  submitBadge() {
-    const assignments = [];
-
-    for (const a of this.selectedAssignments) {
-      console.log('a', a);
-      const assignmentTests = [];
-      console.log(this.tests[a['assignment'].id]);
-      for (const t in this.tests[a['assignment'].id]) {
-        const test = this.tests[a['assignment'].id][t];
-        if (test['checked'] === true) {
-          assignmentTests.push(test._id);
-        }
-      }
-      assignments.push({'assignment': a['assignment'].id, 'tests': assignmentTests, 'code_size': 100});
-    }
-    console.log('submit', assignments);
-    this.modalRef.hide();
-    this.backendService.postNewBadge(this.selectedBadge, this.badgeName, this.badgeDescription, this.currentCourse.id,
-      [], assignments)
-      .then(response => {
-        this.toastService.success('Badge created');
-        this.createdBadges['badges'].push(response);
-        console.log('badge', response);
-      });
-  }
   submitGroups() {
     for (const group in this.groups) {
       const body = Object.assign({}, this.groups[group]);

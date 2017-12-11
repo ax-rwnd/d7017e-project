@@ -273,7 +273,7 @@ The structure below is the following:
     return this.apiGet('/api/courses/' + course_id + '/features');
   }
 
-  postNewBadge(icon: string, title: string, description: string, course_id: ObjectID, badges: any[], assignments: any[]) {
+  postNewBadge(icon: string, title: string, description: string, course_id: string, badges: any[], assignments: any[]) {
     const goals = {'badges': badges, 'assignments': assignments};
     const body = {'icon': icon, 'title': title, 'description': description, 'course_id': course_id, 'goals': goals};
     console.log('post body', body);
