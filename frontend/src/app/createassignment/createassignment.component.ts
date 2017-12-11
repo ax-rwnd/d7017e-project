@@ -122,6 +122,31 @@ export class CreateassignmentComponent implements OnInit {
     this.testType = '';
   }
 
+  deleteTest(array, index) {
+    if (confirm('Are you sure to delete test?')) {
+      if (array === this.unitTests) {
+        if (array.length < 2) {
+          this.unitTests = [];
+        } else {
+          this.unitTests.splice(index, 1);
+        }
+      } else { // old value, call backend to remove
+        const test = this.oldUnitTests[index];
+        this.backendService.deleteTest(this.courseId, this.assignment.id, test[3])
+          .then(resp => {
+            if (array.length < 2) {
+              this.oldUnitTests = [];
+            } else {
+              this.oldUnitTests.splice(index, 1);
+            }
+          })
+          .catch(err => {
+            console.log('Could not delete test', err);
+          });
+      }
+    }
+  }
+
   openModal(modal) {
     this.testType = '';
     this.form = this.fb.group(this.defaultForm);

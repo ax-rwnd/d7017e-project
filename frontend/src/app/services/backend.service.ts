@@ -390,6 +390,13 @@ The structure below is the following:
     return this.apiPut('/api/courses/' + course_id + '/assignments/' + assignment_id + '/tests/' + test_id, body);
   }
 
+  deleteTest(course_id: string, assignment_id: string, test_id: string) {
+    // Delete a test
+
+    const body = {};
+    return this.apiDelete('/api/courses/' + course_id + '/assignments/' + assignment_id + '/tests/' + test_id, body);
+  }
+
 // ----------- 6. INVITE/PENDING calls ----------- //
 
 // -- Invite(s) -- //
