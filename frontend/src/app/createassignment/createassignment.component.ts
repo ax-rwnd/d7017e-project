@@ -202,6 +202,23 @@ export class CreateassignmentComponent implements OnInit {
       })
       .catch(err => console.error('Create assignment failed', err));
   }
+
+  deleteAssignment() {
+    if (confirm('Are you sure to delete ' + this.assignment.name + '?')) {
+      this.backendService.deleteAssignment(this.courseId, this.assignment.id)
+        .then(response => {
+          console.log('Delete response:', response, 'removing id:', this.assignment.id);
+          this.router.navigate(['/teaching/' + this.courseId])
+            .then(done => {
+              console.log('Routing, calling assignmentService');
+              this.assignmentService.removeAssignment(this.courseId, this.assignment.id);
+            });
+        })
+        .catch(err => {
+          console.log('Error deleting assignment:', err);
+        });
+    }
+  }
 }
 
 interface UnitTests {

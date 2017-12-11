@@ -87,7 +87,7 @@ export class TeacherCoursesComponent implements OnInit {
       this.assignments = assignments;
     });
 
-    this.assignmentService.assignmentsSub.subscribe( groups => {
+    this.assignmentService.groupSub.subscribe( groups => {
       this.groups = groups;
     });
 
@@ -107,7 +107,7 @@ export class TeacherCoursesComponent implements OnInit {
       this.backendService.getAllBadges(this.currentCourse.id)
         .then(response => {
           this.createdBadges = response['badges'];
-          console.log('badges', this.createdBadges);
+          // console.log('badges', this.createdBadges);
         });
     });
   }
@@ -137,7 +137,6 @@ export class TeacherCoursesComponent implements OnInit {
   setPendingReqs() {
     this.backendService.getPendingUsers(this.currentCourse.id)
       .then(response => {
-        console.log('pending', response);
         this.pendingReqs = response['invites'];
       })
       .catch(err => console.error('Get pending users failed', err));
@@ -146,7 +145,6 @@ export class TeacherCoursesComponent implements OnInit {
   setInviteReqs() {
     this.backendService.getInvitedUsers(this.currentCourse.id)
       .then(response => {
-        console.log('invited', response);
         this.inviteReqs = response['invites'];
       })
       .catch(err => console.error('Get invited users failed', err));
@@ -164,11 +162,8 @@ export class TeacherCoursesComponent implements OnInit {
           this.teachers.push(member);
         }
       }
-      console.log('members', data.members);
     })
       .catch(err => console.error('failed to get members', err));
-
-    console.log('course', this.currentCourse);
   }
 
   setAssignments() {
@@ -224,7 +219,6 @@ export class TeacherCoursesComponent implements OnInit {
    createAssignmentGroup() {
     this.backendService.postAssignmentGroup(this.currentCourse.id, this.groupName)
       .then(response => {
-        console.log('group', response);
         this.toastService.success('Group Created!');
         this.assignmentService.addAssignmentGroup(response, this.currentCourse.id);
         this.modalRef.hide();

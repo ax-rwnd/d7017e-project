@@ -89,6 +89,10 @@
   overflow: scroll;
 }
 
+.option-text {
+  font-size: 0.3em;
+}
+
 .glyphicon {
   font-size: 1.1em;
 }

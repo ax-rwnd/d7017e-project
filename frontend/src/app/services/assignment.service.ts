@@ -88,6 +88,26 @@ export class AssignmentService {
     return this.assignmentsSub.next(this.courseAssignments[course_id]['assignments']);
   }
 
+  removeAssignment(course_id: string, assignment_id: string) {
+    const assignment = this.getTeacherAssignment(course_id, assignment_id);
+    const index = this.courseAssignments[course_id]['assignments'].indexOf(assignment);
+    if (index !== -1) {
+      this.courseAssignments[course_id]['assignments'].splice(index, 1);
+    }
+    this.removeAssignmentFromGroup(course_id, assignment_id);
+    return this.assignmentsSub.next(this.courseAssignments[course_id]['assignments']);
+  }
+
+  removeAssignmentFromGroup(course_id: string, assignment_id: string) {
+    const groups = this.courseAssignments[course_id]['groups'];
+    for (const group of groups) {
+      group.assignments = group.assignments.filter(assign => assign.id !== assignment_id);
+      console.log('New group:', group.assignments);
+    }
+    console.log('Done with removal:', this.courseAssignments);
+    return this.groupSub.next(this.courseAssignments[course_id]['groups']);
+  }
+
   updateAssignmentGroup(course_id: string, assignment_id: string, name: string, content: string, languages: string[]) {
     const groups = this.courseAssignments[course_id]['groups'];
     for (const group of groups) {
