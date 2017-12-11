@@ -68,6 +68,18 @@ export class UserComponent implements OnInit {
     this.statistics = !this.statistics;
   }
 
+  isDisabled() {
+    return (this.teachCourses.length === 3) && (this.user.access === 'basic');
+  }
+
+  disabledButton() {
+    const style = {
+      'cursor': this.isDisabled() ? 'not-allowed' : 'pointer',
+      'color': this.isDisabled() ? 'gray' : '',
+    }
+    return style;
+  }
+
   cancelRequest(course_id) {
     console.log('request id', course_id);
     this.backendService.declineInvite(course_id, this.userService.userInfo.id)

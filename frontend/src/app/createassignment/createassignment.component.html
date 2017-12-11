@@ -5,7 +5,13 @@
 
   <div class="container">
     <h2 *ngIf="!assignment">Create assignment <span class="required">{{errorMessage}}</span></h2>
-    <h2 *ngIf="assignment">Update assignment <span class="required">{{errorMessage}}</span></h2>
+    <h2 *ngIf="assignment">Update assignment <span class="required">{{errorMessage}}</span>
+      <button class="glyph-button pull-right" (click)="deleteAssignment()">
+          <span class="option-text">DELETE ASSIGNMENT
+            <span class="glyphicon glyphicon-trash"></span>
+          </span>
+      </button>
+    </h2>
     <br>
     <div class="row">
       <div class="col-lg-6">
@@ -61,7 +67,13 @@
       </div>
       <div class="testEdit">
         <div style="align:right">
-          <button class="btn btn-primary" (click)="openModalEdit(editTest, oldUnitTests, oldUnitTests.indexOf(fb)); testType=fb[0]; editT=oldUnitTests.indexOf(fb); testArray=oldUnitTests">Edit test</button>
+          <button class="btn btn-primary" (click)="openModalEdit(editTest, oldUnitTests, oldUnitTests.indexOf(fb)); testType=fb[0]; editT=oldUnitTests.indexOf(fb); testArray=oldUnitTests">
+            Edit test
+          </button>
+          <button class="btn btn-primary" (click)="deleteTest(oldUnitTests, oldUnitTests.indexOf(fb));">
+            <!-- Need to call backend to remove the test -->
+            Delete test
+          </button>
         </div>
       </div>
     </div>
@@ -74,7 +86,13 @@
       </div>
       <div class="testEdit">
         <div style="align:right">
-          <button class="btn btn-primary" (click)="openModalEdit(editTest, unitTests, unitTests.indexOf(fb)); testType=fb[0]; editT=unitTests.indexOf(fb); testArray=unitTests">Edit test</button>
+          <button class="btn btn-primary" (click)="openModalEdit(editTest, unitTests, unitTests.indexOf(fb)); testType=fb[0]; editT=unitTests.indexOf(fb); testArray=unitTests">
+            Edit test
+          </button>
+          <button class="btn btn-primary" (click)="deleteTest(unitTests, unitTests.indexOf(fb));">
+            <!-- Test doesn't exist yet so only need remove it from array -->
+            Delete test
+          </button>
         </div>
       </div>
     </div>

@@ -6,8 +6,8 @@
 </div>
 
 <div style="width: 100%">
-  <div *ngFor='let assignment of numberOfAssignments[0].assignments; let i = index' style="width: 40%">
-    <h3>{{assignment.name}}</h3>
+  <div *ngFor='let assignment of listOfAssignments; let i = index' style="width: 40%">
+    <h3>{{assignment[0]}}</h3>
     <div style="display: block">
       <canvas baseChart
               [data]="[listOfAssignments[i][2], listOfAssignments[i][1]]"
