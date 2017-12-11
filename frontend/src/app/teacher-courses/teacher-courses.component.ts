@@ -130,7 +130,7 @@ export class TeacherCoursesComponent implements OnInit {
       .catch(err => console.error('Get invited users failed', err));
   }
 
-  setCurrentCourse(course) {
+  setCurrentCourse(course) { // TODO: Bug fix when toggle between teachcourses
     this.currentCourse = this.courseService.GetCourse(course);
 
     // Grab enrolled students

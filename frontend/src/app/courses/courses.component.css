@@ -15,3 +15,18 @@
   cursor: pointer;
   font-weight: bold;
 }
+
+.glyph-button {
+  color: #133756;
+  background: none;
+  border: none;
+}
+
+.header-text {
+  font-size: 1.3em;
+}
+
+.teacher-view {
+  margin-top: 5%;
+  margin-bottom: 5%;
+}

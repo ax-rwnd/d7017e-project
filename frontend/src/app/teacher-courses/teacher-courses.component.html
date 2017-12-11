@@ -1,12 +1,12 @@
 <app-head></app-head>
 <div id="cont" class="content" [@content]="sidebarState">
   <div class="container">
-    <h1>
-      <span *ngIf="currentCourse.code">{{currentCourse.code}} - </span> {{currentCourse.name}}
-    </h1>
     <div class="row">
       <!-- Display the course description, markdown style -->
       <div class="col-lg-8">
+        <h1>
+          <span *ngIf="currentCourse.code">{{currentCourse.code}} - </span> {{currentCourse.name}}
+        </h1>
         <h3>Course
           <button type="button" class="glyph-button" [routerLink]="['/user/updateCourse', currentCourse.id]">
             <span class="glyphicon glyphicon-edit"></span>
@@ -65,69 +65,74 @@
         <app-mod-badges-teacher [courseId]="currentCourse.id"></app-mod-badges-teacher>
       </div>
       <div class="col-lg-4">
-        <h4>Requests from students
-          <button class="glyph-button pull-right" (click)="acceptAllReqs()">
-            <span class="table-button-text">ACCEPT ALL</span>
+        <div class="student-view">
+          <button class="glyph-button" [routerLink]="['/courses/', currentCourse.id]">
+            <span class="header-text">STUDENT VIEW <span class="glyphicon glyphicon-education"></span></span>
           </button>
-        </h4>
-        <table class="table table-hover">
-          <tbody>
-          <tr *ngIf="pendingReqs && pendingReqs.length === 0">
-            <td>No pending requests...</td>
-          </tr>
-          <tr *ngFor="let req of pendingReqs">
-            <td>{{req.user['username']}}</td>
-            <td>
-              <button type="button" class="glyph-accept" (click)="acceptReq(req.user['_id'])"><span
-                class="glyphicon glyphicon-ok"></span></button>
-            </td>
-            <td>
-              <button type="button" class="glyph-decline" (click)="declineReq(req.user['_id'])"><span
-                class="glyphicon glyphicon-remove"></span></button>
-            </td>
-          </tr>
-          </tbody>
-        </table>
-        <br>
-        <h4>Invitations to students
-          <button class="glyph-button pull-right" (click)="declineAllReqs()">
-            <span class="table-button-text">REMOVE ALL</span>
-          </button>
-        </h4>
-        <table class="table table-hover">
-          <tbody>
-          <tr *ngIf="inviteReqs && inviteReqs.length === 0">
-            <td>No invitations...</td>
-          </tr>
-          <tr *ngFor="let req of inviteReqs">
-            <td>{{req.user['username']}}</td>
-            <td>
-              <button style="visibility: hidden;" type="button" class="glyph-accept" (click)="acceptReq(req.user['_id'])"><span
-                class="glyphicon glyphicon-ok"></span></button>
-            </td>
-            <td>
-              <button type="button" class="glyph-decline" (click)="declineReq(req.user['_id'])"><span
-                class="glyphicon glyphicon-remove"></span></button>
-            </td>
-          </tr>
-          </tbody>
-        </table>
-        <br>
-        <h4>Enrolled students
-          <button class="glyph-button pull-right" (click)="openModal(inviteStudentModal)">
-            <span class="table-button-text">ADD STUDENT</span>
-          </button>
-        </h4>
-        <table class="table table-hover">
-          <tbody>
-          <tr *ngIf="students.length === 0">
-            <td>No students are enrolled to this course...</td>
-          </tr>
-          <tr *ngFor="let student of students">
-            <td>{{student.user.username}}</td>
-          </tr>
-          </tbody>
-        </table>
+        </div>
+          <h4>Requests from students
+            <button class="glyph-button pull-right" (click)="acceptAllReqs()">
+              <span class="table-button-text">ACCEPT ALL</span>
+            </button>
+          </h4>
+          <table class="table table-hover">
+            <tbody>
+            <tr *ngIf="pendingReqs && pendingReqs.length === 0">
+              <td>No pending requests...</td>
+            </tr>
+            <tr *ngFor="let req of pendingReqs">
+              <td>{{req.user['username']}}</td>
+              <td>
+                <button type="button" class="glyph-accept" (click)="acceptReq(req.user['_id'])"><span
+                  class="glyphicon glyphicon-ok"></span></button>
+              </td>
+              <td>
+                <button type="button" class="glyph-decline" (click)="declineReq(req.user['_id'])"><span
+                  class="glyphicon glyphicon-remove"></span></button>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+          <br>
+          <h4>Invitations to students
+            <button class="glyph-button pull-right" (click)="declineAllReqs()">
+              <span class="table-button-text">REMOVE ALL</span>
+            </button>
+          </h4>
+          <table class="table table-hover">
+            <tbody>
+            <tr *ngIf="inviteReqs && inviteReqs.length === 0">
+              <td>No invitations...</td>
+            </tr>
+            <tr *ngFor="let req of inviteReqs">
+              <td>{{req.user['username']}}</td>
+              <td>
+                <button style="visibility: hidden;" type="button" class="glyph-accept" (click)="acceptReq(req.user['_id'])"><span
+                  class="glyphicon glyphicon-ok"></span></button>
+              </td>
+              <td>
+                <button type="button" class="glyph-decline" (click)="declineReq(req.user['_id'])"><span
+                  class="glyphicon glyphicon-remove"></span></button>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+          <br>
+          <h4>Enrolled students
+            <button class="glyph-button pull-right" (click)="openModal(inviteStudentModal)">
+              <span class="table-button-text">ADD STUDENT</span>
+            </button>
+          </h4>
+          <table class="table table-hover">
+            <tbody>
+            <tr *ngIf="students.length === 0">
+              <td>No students are enrolled to this course...</td>
+            </tr>
+            <tr *ngFor="let student of students">
+              <td>{{student.user.username}}</td>
+            </tr>
+            </tbody>
+          </table>
       </div>
     </div> <!-- for end row -->
   </div>

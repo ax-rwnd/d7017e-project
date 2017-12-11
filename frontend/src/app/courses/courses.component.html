@@ -5,7 +5,6 @@
     <!-- <button *ngIf="toggleHelper()" type="button" class="btn btn-primary" (click)="toggleView()">Toggle</button> -->
 
     <!-- START of the student view -->
-    <span *ngIf="teachCourses.indexOf(currentCourse) === -1; else testTemplate"> <!-- Could switch this do for ex a bool or something -->
       <!-- This view below is for students, the view for the teacher is in teacherView down below -->
       <div class="col-lg-6">
         <!-- Title of the student page-->
@@ -34,23 +33,20 @@
       </div>
       <!-- Next column, for assignments group -->
       <div class="col-lg-6">
+        <span *ngIf="teachCourses.indexOf(currentCourse) !== -1">
+          <div class="row teacher-view">
+            <button class="glyph-button pull-right" [routerLink]="['/teaching/', currentCourse.id]">
+              <span class="header-text">TEACHER VIEW <span class="glyphicon glyphicon-pencil"></span></span>
+            </button>
+          </div>
+        </span>
         <div *ngFor="let g of assignmentGroups">
           <app-assignment-group [assignmentGroup]="g" [courseCode]="currentCourse.id"></app-assignment-group>
         </div>
       </div>
       <!-- End of assignments group -->
-    </span>
   </div>
 
-  <ng-template #testTemplate>
-    <div class="col-lg-6">
-      <h1>
-        <span *ngIf="currentCourse.code">{{currentCourse.code}} - </span> {{currentCourse.name}}
-      </h1>
-      <!-- Display the course description, markdown style
-      <markdown [data]="currentCourse.course_info"></markdown> -->
-    </div>
-  </ng-template>
 </div>
 
 
