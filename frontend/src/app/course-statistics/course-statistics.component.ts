@@ -58,12 +58,13 @@ export class CourseStatisticsComponent implements OnInit {
       this.courseUsers = response.members.length;
     });
 
-
-    for (const i in this.numberOfAssignments[0].assignments) {
-      // console.log(this.numberOfAssignments[0].assignments);
-      this.listOfAssignments.push([this.numberOfAssignments[0].assignments[i].name, 0, 1]);
+    console.log('what is this?', this.numberOfAssignments.groups[0].assignments);
+    for (const j in this.numberOfAssignments.groups) {
+      for (const i in this.numberOfAssignments.groups[j].assignments) {
+        // console.log(this.numberOfAssignments[0].assignments);
+        this.listOfAssignments.push([this.numberOfAssignments.groups[j].assignments[i].name, 0, 1]);
+      }
     }
-
 
 
     console.log('number of students', this.courseUsers);
@@ -83,6 +84,7 @@ export class CourseStatisticsComponent implements OnInit {
         } else {
           for (const j in response.features[i].progress) {
             // console.log(response.features[i].progress[j].assignment.name);
+            console.log('addUserToCompletedAssignment', response.features[i].progress[j].assignment.name);
             this.addUserToCompletedAssignment(response.features[i].progress[j].assignment.name);
           }
           // console.log(response.features[i].progress);
