@@ -560,8 +560,9 @@ function deleteAssignment(assignment_id, course_id) {
         .then(function(course) {
             for(let assignmentgroup of course.assignmentgroups) {
                 assignmentgroup.assignments = assignmentgroup.assignments.filter(assignment => assignment.assignment != assignment_id);
-                return assignmentgroup.save();
+                assignmentgroup.save();
             }
+            return;
         });
 
         return Promise.all([del_tests, del_drafts, del_fromAssignmentgroups]);
@@ -1188,7 +1189,7 @@ function generateInviteCode(course_id, expiresIn) {
         var newLink = new InviteCode({code: code, course: course_id, expiresAt: exp});
         return newLink.save().then(function (obj) {
             return obj.toObject();
-        });    
+        });
     });
 }
 
