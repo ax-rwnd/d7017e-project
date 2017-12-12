@@ -826,7 +826,6 @@ describe('/api', () => {
                             .set('Authorization', 'Bearer ' + access_tokens.admin)
                             .expect(200)
                             .then(res => {
-                                console.log(res.body.goals.assignments);
                                 assert(res.body.goals.assignments[0].tests.length === 1, 'Too many tests in badge');
                                 assert(res.body._id == badge_id, 'Badge IDs did not match');
                             });
