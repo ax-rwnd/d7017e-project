@@ -70,9 +70,10 @@
     https://github.com/btford/angular-markdown-directive
     -->
 
-    <div Markdown href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/themes/prism.min.css">
-      {{assignment.description}}
+    <div Markdown [data]="assignment.description">
+
       <!--# Markdown test
+      {{assignment.description}}
       # Headers
 
       # H1
