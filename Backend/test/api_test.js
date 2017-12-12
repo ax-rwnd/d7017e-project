@@ -848,6 +848,7 @@ describe('/api', () => {
                     })
                     .expect(200)
                     .then(res => {
+                        assert(res.body.passed == true);
                         assert(assignment_id1 == res.body.assignment_id, 'response is not contain the correct assignment_id');
                     });
             }).timeout(15000);
