@@ -120,3 +120,16 @@ body {
   color: white;
   background-color: #D5D5D5;
 }
+
+.toast-custom {
+  background-color: #51A351;
+}
+
+#toast-container > div.toast-custom {
+  padding: 15px;
+  color: white;
+}
+
+#toast-container > div.toast-custom .toast-close-button {
+  color: white !important;
+}

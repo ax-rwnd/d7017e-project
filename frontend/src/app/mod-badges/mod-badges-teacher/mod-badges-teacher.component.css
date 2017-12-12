@@ -6,3 +6,29 @@
 .delete-element {
   cursor: pointer;
 }
+
+.select-remove {
+  float: left;
+}
+
+.select-block {
+  margin-bottom: 5px;
+}
+
+.select-list {
+  width: 85%;
+  margin-left: 15%;
+}
+
+.tests {
+  margin-left: 10%;
+  margin-right: 5px;
+}
+
+.test-box {
+  margin-left: 10px;
+}
+
+.code-size {
+  float: right;
+}
