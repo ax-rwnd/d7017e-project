@@ -110,10 +110,17 @@
             </tr>
           </thead>
           <tbody *ngFor="let p of possibleCourses">
-            <tr>
+            <tr *ngIf="!isOwner(p.id)">
               <td><h4>{{p.name}}</h4></td>
               <td><h4>{{p.owner}}</h4></td>
-              <td><button class="btn" (click)="join(p.id)">Join</button></td>
+              <td>
+                <span *ngIf="isStudent(p.id);else join">
+                  <button class="btn" disabled>Join</button>
+                </span>
+                <ng-template #join>
+                  <button class="btn btn-success" (click)="join(p.id)">Join</button>
+                </ng-template>
+              </td>
             </tr>
           </tbody>
         </table>

@@ -138,6 +138,16 @@ export class UserComponent implements OnInit {
       .catch(err => console.error('getSearch failed', err));
   }
 
+  isOwner(course_id: string): boolean  {
+    const course = this.courseService.GetCourse(course_id);
+    return this.teachCourses.indexOf(course) !== -1;
+  }
+
+  isStudent(course_id: string): boolean {
+    const course = this.courseService.GetCourse(course_id);
+    return this.courses.indexOf(course) !== -1;
+  }
+
   join(course_id) {
     // Join a course
     this.backendService.postInvitationToCourse(course_id, this.userService.userInfo.id)
