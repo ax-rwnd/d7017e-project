@@ -96,6 +96,7 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
         this.handleClick(), false);
 
     this.initialized = true;
+    this.update();
   }
 
     sidebarUpdate(data: any) {
