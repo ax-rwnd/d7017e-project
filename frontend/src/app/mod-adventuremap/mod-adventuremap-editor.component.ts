@@ -15,18 +15,6 @@ export class ModAdventuremapEditorComponent extends ModAdventuremapComponent imp
     this.sensitivity = this.radius = 8;
   }
 
-  colorPoint(ctx, selectedAssignment, current, next) {
-    // Draw a simpler point for editing
-    ctx.fillStyle = this.completedFill;
-
-    // Select a border color according to the current active status
-    ctx.strokeStyle = (selectedAssignment !== undefined &&
-                       selectedAssignment.assignment !== undefined &&
-                       selectedAssignment.assignment._id === current.assignment._id) ?
-                         this.activeBorder :
-                         this.normalEdge;
-  }
-
   updateGroup(groupIndex: number) {
     // Send a request to update the state of the group with new coords, etc.
     // TODO: bunch together multiple requests?

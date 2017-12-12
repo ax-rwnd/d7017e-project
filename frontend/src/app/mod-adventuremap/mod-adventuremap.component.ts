@@ -217,16 +217,7 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
 
       ctx.beginPath();
       ctx.lineWidth = this.lineThickness;
-      console.warn('stuff!', this.currentCourse.rewards, this.currentCourse.rewards);
-      const progress = this.currentCourse.rewards.progress.find((el: any) => (current.assignment !== undefined) && (el.assignment._id === current.assignment._id));
-      const nextProgress = this.currentCourse.rewards.progress.find((el: any) => (next.assignment !== undefined) && (el.assignment._id === next.assignment._id));
-      if (progress === undefined && nextProgress === undefined) {
-        ctx.strokeStyle = this.lockedEdge;
-      } else if (progress !== undefined && nextProgress === undefined) {
-        ctx.strokeStyle = this.lastEdge;
-      } else {
-        ctx.strokeStyle = this.normalEdge;
-      }
+      this.colorPath(ctx, current, next);
       ctx.moveTo(local.x, local.y);
       ctx.lineTo(localNext.x, localNext.y);
       ctx.stroke();
@@ -246,21 +237,46 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
         y: coord.y * (this.baseHeight / this.height)};
     }
 
-    colorPoint(ctx, selectedAssignment, current, next) {
+    colorPath(ctx: CanvasRenderingContext2D, current: any, next: any) {
+      // Set the style for the current path
+
+      try {
+        const progress = this.currentCourse.rewards.progress.find(
+          (el: any) => (current.assignment !== undefined) && (el.assignment._id === current.assignment._id));
+        const nextProgress = this.currentCourse.rewards.progress.find(
+          (el: any) => (next.assignment !== undefined) && (el.assignment._id === next.assignment._id));
+
+        if (progress === undefined && nextProgress === undefined) {
+          ctx.strokeStyle = this.lockedEdge;
+        } else if (progress !== undefined && nextProgress === undefined) {
+          ctx.strokeStyle = this.lastEdge;
+        } else {
+          ctx.strokeStyle = this.normalEdge;
+        }
+      } catch (e) {
+        ctx.strokeStyle = this.normalEdge;
+      }
+    }
+
+  colorPoint(ctx: CanvasRenderingContext2D, selectedAssignment: any,
+    current: any, next: any) {
       // Set styles for the current point
 
-      console.warn('coloring:', current, this.currentCourse.rewards.progress);
-      const progress = this.currentCourse.rewards.progress.find((el: any) =>
-        (current.assignment !== undefined) && (el.assignment._id === current.assignment._id));
-      const nextProgress = this.currentCourse.rewards.progress.find((el: any) =>
-        (next.assignment !== undefined) && (el.assignment._id === next.assignment._id));
-      console.warn('nodes:', current, next, 'progress', progress, nextProgress);
-      if (progress !== undefined && nextProgress !== undefined) {
+      try {
+        const progress = this.currentCourse.rewards.progress.find((el: any) =>
+          (current.assignment !== undefined) && (el.assignment._id === current.assignment._id));
+        const nextProgress = this.currentCourse.rewards.progress.find((el: any) =>
+          (next.assignment !== undefined) && (el.assignment._id === next.assignment._id));
+
+        if (progress !== undefined && nextProgress !== undefined) {
+          ctx.fillStyle = this.completedFill;
+        } else if (progress !== undefined && nextProgress === undefined) {
+          ctx.fillStyle = this.currentFill;
+        } else {
+          ctx.fillStyle = this.lockedFill;
+        }
+      } catch (e) {
         ctx.fillStyle = this.completedFill;
-      } else if (progress !== undefined && nextProgress === undefined) {
-        ctx.fillStyle = this.currentFill;
-      } else {
-        ctx.fillStyle = this.lockedFill;
       }
 
     // Set stroke style according to the selection status
