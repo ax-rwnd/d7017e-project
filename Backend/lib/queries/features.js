@@ -43,7 +43,8 @@ function deleteBadge(badge_id) {
 }
 
 function getBadgeByCourseID(course_id) {
-    return Badge.find({'course_id': course_id}).then(function(badge) {
+    return Badge.find({'course_id': course_id})
+    .then(function(badge) {
         if(badge === null)
             throw errors.BADGE_DO_NOT_EXIST;
         return badge;
@@ -51,7 +52,8 @@ function getBadgeByCourseID(course_id) {
 }
 
 function getCourseByID(course_id) {
-    return Course.findById(course_id).then(function(course) {
+    return Course.findById(course_id)
+    .then(function(course) {
         if(course === null) {
             throw errors.COURSE_DO_NOT_EXIST;
         }
@@ -60,7 +62,8 @@ function getCourseByID(course_id) {
 }
 
 function getCourseByAssignmentID(assignment_id) {
-    return Course.findOne({'assignments': assignment_id}).then(function(course) {
+    return Course.findOne({'assignments': assignment_id})
+    .then(function(course) {
         if(course === null)
             throw errors.COURSE_DO_NOT_EXIST;
         return course;
@@ -68,7 +71,8 @@ function getCourseByAssignmentID(assignment_id) {
 }
 
 function getNumberOfAssignments(course_id) {
-    return getCourseByID(course_id).then(function(course) {
+    return getCourseByID(course_id)
+    .then(function(course) {
         if(course === null){
             throw errors.COURSE_DO_NOT_EXIST;
         }
@@ -78,7 +82,8 @@ function getNumberOfAssignments(course_id) {
 
 function createFeature(user_id, course_id) {
     let feature = new Features({user: user_id, progress: [], badges: []});
-    return feature.save().then(function(data) {
+    return feature.save()
+    .then(function(data) {
         return data;
     }).catch(function(err) {
         throw err;
@@ -163,7 +168,7 @@ function getFeaturesOfCourse(course_id) {
          .then(function(features) {
              for(let feature of features) {
                  feature = feature.features;
-                 
+
                  delete feature.user.tokens;
 
                  feature.completed_assignments = feature.progress.length;

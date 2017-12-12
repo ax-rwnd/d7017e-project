@@ -27,7 +27,7 @@ function postCourseValidation(req) {
     var description, course_code, hidden, autojoin;
 
     // Required Fields
-    req.checkBody("name", "Must contain only letters and numbers").isAscii();
+    req.checkBody("name", "'name' field is required").exists();
     name = req.body.name;
 
     // Optional fields
@@ -40,14 +40,14 @@ function postCourseValidation(req) {
     }
 
     if (req.body.description) {
-        req.checkBody("description", "Must contain only ascii characters").isAscii();
+        //req.checkBody("description", "Must contain only ascii characters").isAscii();
         description = req.body.description;
     } else {
         description = "";
     }
 
     if (req.body.course_code) {
-        req.checkBody("course_code", "Must contain only ascii characters").isAlphanumeric();
+        //req.checkBody("course_code", "Must contain only ascii characters").isAlphanumeric();
         course_code = req.body.course_code;
     } else {
         course_code = "";
@@ -317,7 +317,7 @@ function assignmentgroupValidation(req) {
     let input = {};
 
     //req
-    req.checkBody("name", "Must contain only ascii characters").isAscii();
+    req.checkBody("name", "'name' field is required").exists();
     input.name = req.body.name;
 
     //optional
@@ -348,11 +348,11 @@ function postBadgeValidation(req) {
     //req
     req.checkParams("course_id", "Not a valid course id").isMongoId();
     input.course_id = req.params.course_id;
-    req.checkBody("icon", "Must contain only ascii characters").isAscii();
+    req.checkBody("icon", "'icon' field is required").exists();
     input.icon = req.body.icon;
-    req.checkBody("title", "Must contain only ascii characters").isAscii();
+    req.checkBody("title", "'title' field is required").exists();
     input.title = req.body.title;
-    req.checkBody("description", "Must contain only ascii characters").isAscii();
+    req.checkBody("description", "'description' field is required").exists();
     input.description = req.body.description;
 
     //optional
@@ -382,15 +382,15 @@ function putBadgeValidation(req) {
 
     // optional
     if (req.body.icon) {
-        req.checkBody("icon", "Must contain only ascii characters").isAscii();
+        //req.checkBody("icon", "Must contain only ascii characters").isAscii();
         input.icon = req.body.icon;
     }
     if (req.body.title) {
-        req.checkBody("title", "Must contain only ascii characters").isAscii();
+        //req.checkBody("title", "Must contain only ascii characters").isAscii();
         input.title = req.body.title;
     }
     if (req.body.description) {
-        req.checkBody("description", "Must contain only ascii characters").isAscii();
+        //req.checkBody("description", "Must contain only ascii characters").isAscii();
         input.description = req.body.description;
     }
     if(req.body.goals) {
@@ -425,15 +425,15 @@ function putCourseBodyValidation(req) {
 
     // Optional fields
     if ('name' in req.body) {
-        req.checkBody("name", "Must contain only letters and numbers").isAscii();
+        //req.checkBody("name", "Must contain only letters and numbers").isAscii();
         input.name = req.body.name;
     }
     if ('description' in req.body) {
-        req.checkBody("description", "Must contain only ascii characters").isAscii();
+        //req.checkBody("description", "Must contain only ascii characters").isAscii();
         input.description = req.body.description;
     }
     if ('course_code' in req.body) {
-        req.checkBody("course_code", "Must contain only ascii characters").isAlphanumeric();
+        //req.checkBody("course_code", "Must contain only ascii characters").isAlphanumeric();
         input.course_code = req.body.course_code;
     }
     if ('hidden' in req.body) {
@@ -462,11 +462,11 @@ function putAssignmentBodyValidation(req) {
 
     // Optional fields
     if ('name' in req.body) {
-        req.checkBody("name", "Must contain only letters and numbers").isAscii();
+        //req.checkBody("name", "Must contain only letters and numbers").isAscii();
         input.name = req.body.name;
     }
     if ('description' in req.body) {
-        req.checkBody("description", "Must contain only ascii characters").isAscii();
+        //req.checkBody("description", "Must contain only ascii characters").isAscii();
         input.description = req.body.description;
     }
     if ('hidden' in req.body) {
@@ -488,7 +488,7 @@ function putAssignmentBodyValidation(req) {
         }
     }
     if ('languages' in req.body) {
-        req.checkBody("languages", "Must contain only ascii characters").isAscii();
+        //req.checkBody("languages", "Must contain only ascii characters").isAscii();
         input.languages = req.body.languages;
     }
 
@@ -504,13 +504,13 @@ function postAssignmentBodyValidation(req) {
     var input = {};
 
     // Required fields
-    req.checkBody("name", "Must contain only letters and numbers").isAscii();
+    req.checkBody("name", "'name' field is required").exists();
     input.name = req.body.name;
 
     req.checkBody("hidden", "Must contain true or false").isBoolean();
     input.hidden = req.body.hidden;
 
-    req.checkBody("languages", "Must contain only ascii characters").isAscii();
+    req.checkBody("languages", "'languages' field is required").exists();
     input.languages = req.body.languages;
 
     input.tests = {};
@@ -520,7 +520,7 @@ function postAssignmentBodyValidation(req) {
 
     // Optional fields
     if ('description' in req.body) {
-        req.checkBody("description", "Must contain only ascii characters").isAscii();
+        //req.checkBody("description", "Must contain only ascii characters").isAscii();
         input.description = req.body.description;
     } else {
         input.description = "";
