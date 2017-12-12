@@ -83,7 +83,7 @@ app.use(function (err, req, res, next) {
     }
 
     logger.log("error", err.message);
-    res.status(err.httpCode).json({message: err.message});
+    res.status(err.httpCode).json({error: {message: err.message}});
 });
 
 app.use(function (err, req, res, next) {
@@ -92,7 +92,7 @@ app.use(function (err, req, res, next) {
     }
 
     logger.log("error", err.message);
-    res.status(err.httpCode).json({message: err.message, badinput: err.inputErrors});
+    res.status(err.httpCode).json({error: {message: err.message, badinput: err.inputErrors}});
 });
 
 app.use(function (err, req, res, next) {
@@ -101,13 +101,13 @@ app.use(function (err, req, res, next) {
     }
 
     logger.log("error", err);
-    res.status(err.httpCode).json({message: err.message});
+    res.status(err.httpCode).json({error: {message: err.message}});
 });
 
 app.use(function (err, req, res, next) {
     if (err.name === "CastError") {
         logger.log("error", err);
-        return res.status(400).json({message: "Bad Input"});
+        return res.status(400).json({error: {message: "Bad Input"}});
     }
 
 /*

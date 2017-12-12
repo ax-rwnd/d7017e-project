@@ -554,17 +554,20 @@ function deleteAssignment(assignment_id, course_id) {
         let del_tests = Test.remove({_id: {$in: allTests}});
         // drafts
         let del_drafts = Draft.remove({assignment: ass._id});
-        // assignmentgroups
-        let del_fromAssignmentgroups = Course.findById(course_id, 'assignmentgroups')
+        // course assignments and assignmentgroups
+        let del_from_course = Course.findById(course_id, 'assignments assignmentgroups')
         .populate({path: 'assignmentgroups', model: 'Assignmentgroup'})
         .then(function(course) {
+            course.assignments = course.assignments.filter(ass => ass != assignment_id);
+            course.save();
             for(let assignmentgroup of course.assignmentgroups) {
                 assignmentgroup.assignments = assignmentgroup.assignments.filter(assignment => assignment.assignment != assignment_id);
-                return assignmentgroup.save();
+                assignmentgroup.save();
             }
+            return;
         });
 
-        return Promise.all([del_tests, del_drafts, del_fromAssignmentgroups]);
+        return Promise.all([del_tests, del_drafts, del_from_course]);
     });
 }
 
@@ -667,6 +670,18 @@ function getAssignment(assignment_id, roll, fields) {
         .then(function(populatedAssignment) {
             return populatedAssignment[0];
         });
+    });
+}
+
+// Alernative to getAssignment that doesn't mess around with permissions
+function getAssignment1(id, fields) {
+    var wantedFields = fields || "name description hidden tests optional_tests languages";
+
+    return Assignment.findById(id, wantedFields).then(function (assignment) {
+        if (!assignment) {
+            throw errors.ASSIGNMENT_DOES_NOT_EXIST;
+        }
+        return assignment;
     });
 }
 
@@ -1163,15 +1178,20 @@ function addInviteToCourse(user_id, course_id) {
 function generateInviteCode(course_id, expiresIn) {
     var code = randomstring.generate(config.get('Courses.invite_link_length'));
     var exp = (expiresIn === "never") // Won't set expiresAt if link never expires
-        ? undefined 
+        ? undefined
         : Date.now() + (expiresIn || config.get("Courses.invite_link_ttl"));
 
     if (!mongoose.Types.ObjectId.isValid(course_id)) {
             throw errors.INVALID_ID;
     }
-    var newLink = new InviteCode({code: code, course: course_id, expiresAt: exp});
-    return newLink.save().then(function (obj) {
-        return obj.toObject();
+    return Course.findById(course_id).then(function (course) {
+        if (!course) {
+            throw errors.COURSE_DOES_NOT_EXIST;
+        }
+        var newLink = new InviteCode({code: code, course: course_id, expiresAt: exp});
+        return newLink.save().then(function (obj) {
+            return obj.toObject();
+        });
     });
 }
 
@@ -1229,12 +1249,16 @@ function getInviteCode(code, userObject) {
 }
 
 function getAllInviteCodes(course, userObject) {
-    return permission.checkIfTeacherOrAdmin(userObject.id, course, userObject.access).then(function () {
-        return InviteCode.find({course: course}, "code course uses createdAt expiresAt").then(function (codes) {
-            return codes;
+    return Course.findById(course).then(function (obj) {
+        if (!obj) {
+            throw errors.COURSE_DOES_NOT_EXIST;
+        }
+        return permission.checkIfTeacherOrAdmin(userObject.id, course, userObject.access).then(function () {
+            return InviteCode.find({course: course}, "code course uses createdAt expiresAt").then(function (codes) {
+                return codes;
+            });
         });
-    });
-    
+    })
 }
 
 function getAssignmentgroupsByCourseID(course_id) {
@@ -1249,13 +1273,14 @@ function getAssignmentgroupsByCourseID(course_id) {
     .then(course => {
         let assignmentgroups = course.assignmentgroups;
 
-        for(let assignmentgroup of assignmentgroups) {
-            for(let assignment of assignmentgroup.assignments) {
-                if(assignment.assignment.hidden) {
-                    assignmentgroup.assignments.pop(assignment);
-                }
-            }
-        }
+        // TODO: handle roles so that basic access dont get assignment with hidden true
+        //for(let assignmentgroup of assignmentgroups) {
+        //    for(let assignment of assignmentgroup.assignments) {
+        //        if(assignment.assignment.hidden) {
+        //            assignmentgroup.assignments.pop(assignment);
+        //        }
+        //    }
+        //}
 
         return assignmentgroups;
     });
@@ -1388,3 +1413,4 @@ exports.getAssignmentgroupByID = getAssignmentgroupByID;
 exports.updateAssignmentgroup = updateAssignmentgroup;
 exports.deleteAssignmentgroup = deleteAssignmentgroup;
 exports.updateAssignment = updateAssignment;
+exports.getAssignment1 = getAssignment1;
