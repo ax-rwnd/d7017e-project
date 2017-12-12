@@ -40,7 +40,15 @@
         <br> <!-- add some space -->
         <!-- Title -->
         <h2>My Courses
-          <button class="glyph-button pull-right" routerLink="./createCourse">
+          <span *ngIf="user.access==='basic'">
+            {{teachCourses.length}}/3
+            <sup>
+              <button type="button" class="question" tooltip="A student can create 3 courses.">
+                <span class="glyphicon glyphicon-question-sign"></span>
+              </button>
+            </sup>
+          </span>
+          <button class="glyph-button pull-right" routerLink="./createCourse" [disabled]="isDisabled()" [ngStyle]="disabledButton()">
             <span class="option-text">CREATE COURSE</span>
           </button>
         </h2>
@@ -102,10 +110,18 @@
             </tr>
           </thead>
           <tbody *ngFor="let p of possibleCourses">
-            <tr>
+            <tr *ngIf="!isOwner(p.id)">
               <td><h4>{{p.name}}</h4></td>
               <td><h4>{{p.owner}}</h4></td>
-              <td><button class="btn" (click)="join(p.id)">Join</button></td>
+              <td>
+                <span *ngIf="isStudent(p.id);else notStudent">
+                  <button class="btn btn-block" disabled>Join</button>
+                  <!-- Here can have leave button instead but delete member doesn't exist yet -->
+                </span>
+                <ng-template #notStudent>
+                  <button class="btn btn-success btn-block" (click)="join(p.id)">Join</button>
+                </ng-template>
+              </td>
             </tr>
           </tbody>
         </table>

@@ -133,9 +133,9 @@ function getTeachCourses(response: Object, backendService, courseService, assign
       .then(info => {
         const code = course.hasOwnProperty('course_code') ? info['course_code'] : '';
         const rewards = newRewards('', '', '', '');
-        const nCourse = newCourse(info['_id'], info['name'], code, info['description'], rewards, '', info['hidden'],
-          info['enabled_features'], info['stundents'], info['teachers'], info['autojoin']);
-        courseService.teaching.push(nCourse);
+        const teachCourse = newCourse(info['_id'], info['name'], code, info['description'], rewards, '', info['hidden'],
+          info['enabled_features'], info['students'], info['teachers'], info['autojoin']);
+        courseService.teaching.push(teachCourse);
       })
       .catch());
     promiseArray.push(assignmentService.getAssignmentsForCourse(course._id)); // Set assignments for assignments
@@ -143,7 +143,6 @@ function getTeachCourses(response: Object, backendService, courseService, assign
   }
   return Promise.all(promiseArray);
 }
-
 
 function updateCourses(response, backendService, courseService, assignmentService) {
   // Updates the courses with input from backend, some course service a´nd an assignment service
@@ -158,9 +157,13 @@ function updateCourses(response, backendService, courseService, assignmentServic
       .then(featureResponse => {
         const rewards = handleFeatureResponse(featureResponse);
         const progress = newProgress(featureResponse.total_assignments, featureResponse.completed_assignments);
-        const nCourse = newCourse(course._id, course.name, course.course_code, course.description, rewards, progress,
-          '', '', '', '', ''); // Since not a teacher course
-        courseService.courses.push(nCourse);
+        const check = courseService.GetCourse(course._id);
+        if (!check) {
+          // This is a fix for the join functionality, should probably use a service instead
+          const nCourse = newCourse(course._id, course.name, course.course_code, course.description, rewards, progress,
+            '', '', '', '', ''); // Since not a teacher course
+          courseService.courses.push(nCourse);
+        }
       })
       .catch( err => { console.log('Error fetching features:', err);
       }));
@@ -193,17 +196,20 @@ function updateCourseFeatures(courseId, backendService, courseService) {
   // Updates the features of the given course
   // Returns a promise
 
-  const currentCourse = courseService.GetCourse(courseId);
-  const index = getCourseIndex(courseId, courseService);
- // TODO: courses.indexOf(currentCourse) === -1, course don't exist
-
   return backendService.getFeaturesCourseMe(courseId)
     .then(featureResponse => {
       const rewards = handleFeatureResponse(featureResponse);
       const progress = newProgress(featureResponse.total_assignments, featureResponse.completed_assignments);
+      const course = courseService.GetCourse(courseId);
+      if (course) {
+        course.rewards = rewards;
+        course.progress = progress;
+      }
+      /*
       const course = newCourse(currentCourse.id, currentCourse.name, currentCourse.code,
         currentCourse.course_info, rewards, progress, '', '', '', '', '');
       courseService.courses[index] = course;
+      */
     })
     .catch( err => { console.log('Error getting features:', err);
     });

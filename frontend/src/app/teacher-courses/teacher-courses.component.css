@@ -29,6 +29,10 @@
   font-size: 0.7em;
 }
 
+.header-text {
+  font-size: 1.3em;
+}
+
 .blue-text {
   color: #133756;
 }
@@ -39,6 +43,11 @@
 
 .bottom-margin {
   margin-bottom: 5%;
+}
+
+.student-view {
+  margin-top: 7%;
+  margin-bottom: 20%;
 }
 
 .assignment {

@@ -273,7 +273,7 @@ The structure below is the following:
     return this.apiGet('/api/courses/' + course_id + '/features');
   }
 
-  postNewBadge(icon: string, title: string, description: string, course_id: ObjectID, badges: any[], assignments: any[]) {
+  postNewBadge(icon: string, title: string, description: string, course_id: string, badges: any[], assignments: any[]) {
     const goals = {'badges': badges, 'assignments': assignments};
     const body = {'icon': icon, 'title': title, 'description': description, 'course_id': course_id, 'goals': goals};
     console.log('post body', body);
@@ -325,13 +325,21 @@ The structure below is the following:
     // Get an assignment with name desc., langs.
     // course_id
     // lang
-    const body = {'name': assignmentName, 'description': description, 'languages': ['python3'], 'hidden': 'false'};
+    const body = {'name': assignmentName, 'description': description, 'languages': languages, 'hidden': 'false'};
+    console.log('createAssignment', body);
     return this.apiPost('/api/courses/' + course_id + '/assignments/', body);
+  }
+
+  deleteAssignment(course_id: string, assignment_id: string) {
+    // Delete assignment
+
+    const body = {};
+    return this.apiDelete('/api/courses/' + course_id + '/assignments/' + assignment_id, body);
   }
 
   updateAssignment(course_id: any, assignment_id: string, assignmentName: string, description: string, languages: string[]) {
 
-    const body = {'name': assignmentName, 'description': description, 'languages': ['python3'], 'hidden': 'false'}; // languages should change
+    const body = {'name': assignmentName, 'description': description, 'languages': languages, 'hidden': 'false'}; // languages should change
     return this.apiPut('/api/courses/' + course_id + '/assignments/' + assignment_id, body);
   }
 
@@ -382,6 +390,14 @@ The structure below is the following:
     const body = {'stdout': stdout, 'stdin': stdin, 'args': [], 'lint': lint};
     return this.apiPut('/api/courses/' + course_id + '/assignments/' + assignment_id + '/tests/' + test_id, body);
   }
+
+  deleteTest(course_id: string, assignment_id: string, test_id: string) {
+    // Delete a test
+
+    const body = {};
+    return this.apiDelete('/api/courses/' + course_id + '/assignments/' + assignment_id + '/tests/' + test_id, body);
+  }
+
 // ----------- 6. INVITE/PENDING calls ----------- //
 
 // -- Invite(s) -- //

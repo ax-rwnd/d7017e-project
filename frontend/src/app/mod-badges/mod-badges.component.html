@@ -5,7 +5,7 @@
   <div class="panel-body">
     <div *ngFor="let badge of badges">
       <div class="col-lg-3 fillBadge">
-        <img src="/assets/images/bronze_medal_badge.png">
+        <img tooltip="{{badge['title']}}" src="/assets/images/{{badge['icon']}}.png">
       </div>
     </div>
   </div>

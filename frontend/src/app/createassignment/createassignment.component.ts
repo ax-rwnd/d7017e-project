@@ -5,7 +5,7 @@ import { trigger, state, style, animate, transition } from '@angular/animations'
 import { HeadService } from '../services/head.service';
 import {until} from 'selenium-webdriver';
 import titleContains = until.titleContains;
-import {FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
+import {FormBuilder, FormControl, FormGroup, NgForm, Validators} from '@angular/forms';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { BsModalRef } from 'ngx-bootstrap/modal/modal-options.class';
 import {ActivatedRoute, Router} from '@angular/router';
@@ -46,10 +46,18 @@ export class CreateassignmentComponent implements OnInit {
     testInfo: [],
     ioInput: String,
     ioOutput: String,
+    python27: new FormControl(false),
+    python3: new FormControl(false),
+    java: new FormControl(false),
+    c: new FormControl(false)
   };
   assignment: Assignment;
   oldUnitTests: any[];
   testArray: any[];
+  python27: boolean;
+  python3: boolean;
+  java: boolean;
+  c: boolean;
 
   constructor(private backendService: BackendService, private headService: HeadService,
               private modalService: BsModalService, private fb: FormBuilder, private route: ActivatedRoute,
@@ -77,6 +85,14 @@ export class CreateassignmentComponent implements OnInit {
     this.form = this.fb.group(this.defaultForm);
     this.unitTests = [];
     this.errorMessage = '';
+    this.python27 = this.assignment ? this.hasLanguage('python27') : false;
+    this.python3 = this.assignment ? this.hasLanguage('python3') : false;
+    this.java = this.assignment ? this.hasLanguage('java') : false;
+    this.c = this.assignment ? this.hasLanguage('c') : false;
+  }
+
+  hasLanguage(lang: string): boolean {
+    return this.assignment.languages.indexOf(lang) !== -1;
   }
 
   goBack() {
@@ -122,6 +138,31 @@ export class CreateassignmentComponent implements OnInit {
     this.testType = '';
   }
 
+  deleteTest(array, index) {
+    if (confirm('Are you sure to delete test?')) {
+      if (array === this.unitTests) {
+        if (array.length < 2) {
+          this.unitTests = [];
+        } else {
+          this.unitTests.splice(index, 1);
+        }
+      } else { // old value, call backend to remove
+        const test = this.oldUnitTests[index];
+        this.backendService.deleteTest(this.courseId, this.assignment.id, test[3])
+          .then(resp => {
+            if (array.length < 2) {
+              this.oldUnitTests = [];
+            } else {
+              this.oldUnitTests.splice(index, 1);
+            }
+          })
+          .catch(err => {
+            console.log('Could not delete test', err);
+          });
+      }
+    }
+  }
+
   openModal(modal) {
     this.testType = '';
     this.form = this.fb.group(this.defaultForm);
@@ -138,6 +179,21 @@ export class CreateassignmentComponent implements OnInit {
       ioOutput: testArray[index][2],
     });
     this.modalRef = this.modalService.show(modal);
+  }
+
+  setLanguages() {
+    if (this.python27) {
+      this.languages.push('python27');
+    }
+    if (this.python3) {
+      this.languages.push('python3');
+    }
+    if (this.java) {
+      this.languages.push('java');
+    }
+    if (this.c) {
+      this.languages.push('c');
+    }
   }
 
   testIo() {
@@ -165,6 +221,7 @@ export class CreateassignmentComponent implements OnInit {
       window.scrollTo({left: 0, top: 0, behavior: 'smooth'});
     } else {
       this.errorMessage = '';
+      this.setLanguages();
       if (this.assignment) {
         this.updateAssignment();
       } else {
@@ -174,6 +231,7 @@ export class CreateassignmentComponent implements OnInit {
   }
 
   updateAssignment() {
+    console.log('Languages:', this.languages);
     this.backendService.updateAssignment(this.courseId, this.assignment.id, this.assignmentName, this.content, this.languages)
       .then(resp => {
         this.assignmentService.updateAssignment(this.courseId, this.assignment.id, this.assignmentName, this.content, this.languages);
@@ -202,6 +260,32 @@ export class CreateassignmentComponent implements OnInit {
       })
       .catch(err => console.error('Create assignment failed', err));
   }
+
+  deleteAssignment() {
+    if (confirm('Are you sure to delete ' + this.assignment.name + '?')) {
+      this.backendService.deleteAssignment(this.courseId, this.assignment.id)
+        .then(response => {
+          console.log('Delete response:', response, 'removing id:', this.assignment.id);
+          this.router.navigate(['/teaching/' + this.courseId])
+            .then(done => {
+              console.log('Routing, calling assignmentService');
+              this.assignmentService.removeAssignment(this.courseId, this.assignment.id);
+            });
+        })
+        .catch(err => {
+          console.log('Error deleting assignment:', err);
+        });
+    }
+  }
+}
+
+function languageForm() {
+  return new FormGroup({
+    python27: new FormControl(false),
+    python3: new FormControl(false),
+    java: new FormControl(false),
+    c: new FormControl(false)
+  });
 }
 
 interface UnitTests {

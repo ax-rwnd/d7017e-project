@@ -68,6 +68,18 @@ export class UserComponent implements OnInit {
     this.statistics = !this.statistics;
   }
 
+  isDisabled() {
+    return (this.teachCourses.length === 3) && (this.user.access === 'basic');
+  }
+
+  disabledButton() {
+    const style = {
+      'cursor': this.isDisabled() ? 'not-allowed' : 'pointer',
+      'color': this.isDisabled() ? 'gray' : '',
+    }
+    return style;
+  }
+
   cancelRequest(course_id) {
     console.log('request id', course_id);
     this.backendService.declineInvite(course_id, this.userService.userInfo.id)
@@ -126,12 +138,27 @@ export class UserComponent implements OnInit {
       .catch(err => console.error('getSearch failed', err));
   }
 
+  isOwner(course_id: string): boolean  {
+    const course = this.courseService.GetCourse(course_id);
+    return this.teachCourses.indexOf(course) !== -1;
+  }
+
+  isStudent(course_id: string): boolean {
+    const course = this.courseService.GetCourse(course_id);
+    return this.courses.indexOf(course) !== -1;
+  }
+
   join(course_id) {
     // Join a course
     this.backendService.postInvitationToCourse(course_id, this.userService.userInfo.id)
       .then(response => {
         console.log(response);
         this.getPending();
+        this.courseService.GetAllCoursesForUser()
+          .then(done => {
+            this.getPending();
+            this.modalRef.hide();
+          });
       })
       .catch(err => console.error('Join course request failed', err));
   }

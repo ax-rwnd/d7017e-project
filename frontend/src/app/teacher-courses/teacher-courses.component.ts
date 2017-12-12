@@ -43,27 +43,7 @@ export class TeacherCoursesComponent implements OnInit {
     search: ''
   };
   groupName: string;
-  selectedBadge: string;
-  badges: Array<Object> = [
-    {key: 'bronze_medal_badge', name: 'Bronze medal'},
-    {key: 'silver_medal_badge', name: 'Silver medal'},
-    {key: 'gold_medal_badge', name: 'Gold medal'},
-    {key: 'cake_badge', name: 'Cake'},
-    {key: 'computer_badge', name: 'Computer'},
-    {key: 'bronze_trophy_badge', name: 'Bronze trophy'},
-    {key: 'silver_trophy_badge', name: 'Silver trophy'},
-    {key: 'gold_trophy_badge', name: 'Gold trophy'},
-    {key: 'badge2', name: 'Silver trophy 2'},
-    {key: 'goldbadge', name: 'Gold trophy 2'},
-    {key: 'badge1', name: 'Smiley'},
-    {key: 'badge3', name: 'Lightning'},
-    {key: 'brainbadge', name: 'Brain'},
-    {key: 'starbadge', name: 'Star'},
-  ];
-  selectedAssignments: any[];
   tests: any;
-  badgeName: string;
-  badgeDescription: string;
   inviteLink: string;
   inviteLinkExample: string;
   groups: any[];
@@ -87,7 +67,7 @@ export class TeacherCoursesComponent implements OnInit {
       this.assignments = assignments;
     });
 
-    this.assignmentService.assignmentsSub.subscribe( groups => {
+    this.assignmentService.groupSub.subscribe( groups => {
       this.groups = groups;
     });
 
@@ -106,8 +86,8 @@ export class TeacherCoursesComponent implements OnInit {
       this.createdBadges = {'badges': []};
       this.backendService.getAllBadges(this.currentCourse.id)
         .then(response => {
-          this.createdBadges = response;
-          console.log('badges', this.createdBadges);
+          this.createdBadges = response['badges'];
+          // console.log('badges', this.createdBadges);
         });
     });
   }
@@ -137,7 +117,6 @@ export class TeacherCoursesComponent implements OnInit {
   setPendingReqs() {
     this.backendService.getPendingUsers(this.currentCourse.id)
       .then(response => {
-        console.log('pending', response);
         this.pendingReqs = response['invites'];
       })
       .catch(err => console.error('Get pending users failed', err));
@@ -146,7 +125,6 @@ export class TeacherCoursesComponent implements OnInit {
   setInviteReqs() {
     this.backendService.getInvitedUsers(this.currentCourse.id)
       .then(response => {
-        console.log('invited', response);
         this.inviteReqs = response['invites'];
       })
       .catch(err => console.error('Get invited users failed', err));
@@ -154,6 +132,7 @@ export class TeacherCoursesComponent implements OnInit {
 
   setCurrentCourse(course) {
     this.currentCourse = this.courseService.GetCourse(course);
+    this.students = [];
 
     // Grab enrolled students
     this.backendService.getCourseStudents(course).then((data: any) => {
@@ -164,11 +143,8 @@ export class TeacherCoursesComponent implements OnInit {
           this.teachers.push(member);
         }
       }
-      console.log('members', data.members);
     })
       .catch(err => console.error('failed to get members', err));
-
-    console.log('course', this.currentCourse);
   }
 
   setAssignments() {
@@ -184,9 +160,7 @@ export class TeacherCoursesComponent implements OnInit {
     this.teachCourses = this.courseService.teaching;
     this.sidebarState = this.headService.getCurrentState();
     this.possibleStudents = [];
-    this.selectedBadge = 'bronze_medal_badge';
     this.form = this.fb.group(this.defaultForm);
-    this.selectedAssignments = [{'assignment': this.flattenAssignments(), 'possible': this.flattenAssignments()}];
     this.tests = {};
     console.log('teacher, groups', this.groups);
     console.log('teacher, assignments', this.assignments);
@@ -194,44 +168,9 @@ export class TeacherCoursesComponent implements OnInit {
     this.inviteLinkExample = environment.frontend_ip + '/join/';
   }
 
-  deleteCourse(course_id) {
-    if (confirm('Are you sure to delete ' + this.currentCourse.name + '?')) {
-      this.backendService.deleteCourse(course_id)
-        .then(resp => {
-          console.log('Response delete:', resp);
-          this.router.navigate(['/user'])
-            .then(done => {
-              this.courseService.removeTeacherCourse(course_id);
-            });
-        })
-        .catch(err => {
-          console.log('Error deleting course:', err);
-        });
-    }
-  }
-
   openModal(modal, type) {
     // Open a modal dialog box
-    if (type === 'createBadge') {
-      console.log('assignments', this.assignmentService.courseAssignments[this.currentCourse.id]);
-      for (const a of this.assignmentService.courseAssignments[this.currentCourse.id]['assignments']) {
-        console.log('ids ', this.currentCourse.id, a.id);
-        this.backendService.getCourseAssignmentTests(this.currentCourse.id, a.id)
-          .then(response => {
-            let t = [];
-            if (response['tests'] !== undefined) {
-              t = t.concat(response['tests']['io']);
-            }
-            if (response['optional_tests'] !== undefined) {
-              t = t.concat(response['optional_tests']['io']);
-            }
-            for (let i = 0; i < t.length; i++) {
-              t[i]['checked'] = false;
-            }
-            this.tests[a.id] = t;
-          });
-      }
-    } else if (type === 'createGroup') {
+    if (type === 'createGroup') {
       this.groupName = '';
     }
     this.modalRef = this.modalService.show(modal);
@@ -240,7 +179,6 @@ export class TeacherCoursesComponent implements OnInit {
    createAssignmentGroup() {
     this.backendService.postAssignmentGroup(this.currentCourse.id, this.groupName)
       .then(response => {
-        console.log('group', response);
         this.toastService.success('Group Created!');
         this.assignmentService.addAssignmentGroup(response, this.currentCourse.id);
         this.modalRef.hide();
@@ -315,39 +253,6 @@ export class TeacherCoursesComponent implements OnInit {
     return links;
   }
 
-  removeGoal(index) {
-    this.selectedAssignments.splice(index, 1);
-  }
-
-  addGoal() {
-    this.selectedAssignments.push({'assignment': this.flattenAssignments(), 'possible': this.flattenAssignments()});
-  }
-
-  submitBadge() {
-    const assignments = [];
-
-    for (const a of this.selectedAssignments) {
-      console.log('a', a);
-      const assignmentTests = [];
-      console.log(this.tests[a['assignment'].id]);
-      for (const t in this.tests[a['assignment'].id]) {
-        const test = this.tests[a['assignment'].id][t];
-        if (test['checked'] === true) {
-          assignmentTests.push(test._id);
-        }
-      }
-      assignments.push({'assignment': a['assignment'].id, 'tests': assignmentTests, 'code_size': 100});
-    }
-    console.log('submit', assignments);
-    this.modalRef.hide();
-    this.backendService.postNewBadge(this.selectedBadge, this.badgeName, this.badgeDescription, this.currentCourse.id,
-      [], assignments)
-      .then(response => {
-        this.toastService.success('Badge created');
-        this.createdBadges['badges'].push(response);
-        console.log('badge', response);
-      });
-  }
   submitGroups() {
     for (const group in this.groups) {
       const body = Object.assign({}, this.groups[group]);
@@ -369,13 +274,6 @@ export class TeacherCoursesComponent implements OnInit {
           this.toastService.success(group['name'] + 'deleted!');
           this.assignmentService.removeAssignmentGroup(group, this.currentCourse.id);
         });
-    }
-  }
-  deleteBadge(badge) {
-    if (confirm('Are you sure to delete ' + badge['title'] + '?')) {
-      console.log('delete ', badge);
-      this.backendService.deleteBadge(this.currentCourse.id, badge['_id'])
-        .then(response => this.toastService.success(badge['title'] + 'deleted!'));
     }
   }
 

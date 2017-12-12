@@ -56,6 +56,10 @@
   color: #133756;
 }
 
+.option-text {
+  font-size: 0.3em;
+}
+
 .set-checkbox-margin {
   margin-top: 5%;
   margin-left: -2em;

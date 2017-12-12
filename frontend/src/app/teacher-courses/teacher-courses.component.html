@@ -1,14 +1,12 @@
 <app-head></app-head>
 <div id="cont" class="content" [@content]="sidebarState">
   <div class="container">
-    <h1>
-      <span *ngIf="currentCourse.code">{{currentCourse.code}} - </span> {{currentCourse.name}}
-    </h1>
-    <button type="button" class="btn btn-primary" (click)="openModal(createBadge, 'createBadge')">Create badge</button>
-    <button type="button" class="btn btn-primary" (click)="deleteCourse(currentCourse.id)">Delete course</button>
     <div class="row">
       <!-- Display the course description, markdown style -->
       <div class="col-lg-8">
+        <h1>
+          <span *ngIf="currentCourse.code">{{currentCourse.code}} - </span> {{currentCourse.name}}
+        </h1>
         <h3>Course
           <button type="button" class="glyph-button" [routerLink]="['/user/updateCourse', currentCourse.id]">
             <span class="glyphicon glyphicon-edit"></span>
@@ -64,84 +62,77 @@
         <span *ngIf="currentCourse.enabled_features.adventuremap">
         <app-mod-adventuremap-editor [courseCode]="currentCourse.id" [courseService]="courseService"></app-mod-adventuremap-editor>
       </span>
-        <div class="gamification-block panel panel-default">
-          <div class="panel-heading gamification-header">
-            Badges
-          </div>
-          <div class="panel-body">
-            <div *ngFor="let badge of createdBadges['badges']">
-              <div tooltip="{{badge['title']}}" class="col-lg-3 fillBadge">
-                <label (click)="deleteBadge(badge)" class="glyphicon glyphicon-remove delete-element"></label>
-                <img class="pull-left" src="../../assets/images/{{badge['icon']}}.png"/>
-              </div>
-            </div>
-          </div>
-        </div>
+        <app-mod-badges-teacher [courseId]="currentCourse.id"></app-mod-badges-teacher>
       </div>
       <div class="col-lg-4">
-        <h4>Requests from students
-          <button class="glyph-button pull-right" (click)="acceptAllReqs()">
-            <span class="table-button-text">ACCEPT ALL</span>
+        <div class="student-view">
+          <button class="glyph-button" [routerLink]="['/courses/', currentCourse.id]">
+            <span class="header-text">STUDENT VIEW <span class="glyphicon glyphicon-education"></span></span>
           </button>
-        </h4>
-        <table class="table table-hover">
-          <tbody>
-          <tr *ngIf="pendingReqs && pendingReqs.length === 0">
-            <td>No pending requests...</td>
-          </tr>
-          <tr *ngFor="let req of pendingReqs">
-            <td>{{req.user['username']}}</td>
-            <td>
-              <button type="button" class="glyph-accept" (click)="acceptReq(req.user['_id'])"><span
-                class="glyphicon glyphicon-ok"></span></button>
-            </td>
-            <td>
-              <button type="button" class="glyph-decline" (click)="declineReq(req.user['_id'])"><span
-                class="glyphicon glyphicon-remove"></span></button>
-            </td>
-          </tr>
-          </tbody>
-        </table>
-        <br>
-        <h4>Invitations to students
-          <button class="glyph-button pull-right" (click)="declineAllReqs()">
-            <span class="table-button-text">REMOVE ALL</span>
-          </button>
-        </h4>
-        <table class="table table-hover">
-          <tbody>
-          <tr *ngIf="inviteReqs && inviteReqs.length === 0">
-            <td>No invitations...</td>
-          </tr>
-          <tr *ngFor="let req of inviteReqs">
-            <td>{{req.user['username']}}</td>
-            <td>
-              <button style="visibility: hidden;" type="button" class="glyph-accept" (click)="acceptReq(req.user['_id'])"><span
-                class="glyphicon glyphicon-ok"></span></button>
-            </td>
-            <td>
-              <button type="button" class="glyph-decline" (click)="declineReq(req.user['_id'])"><span
-                class="glyphicon glyphicon-remove"></span></button>
-            </td>
-          </tr>
-          </tbody>
-        </table>
-        <br>
-        <h4>Enrolled students
-          <button class="glyph-button pull-right" (click)="openModal(inviteStudentModal)">
-            <span class="table-button-text">ADD STUDENT</span>
-          </button>
-        </h4>
-        <table class="table table-hover">
-          <tbody>
-          <tr *ngIf="students.length === 0">
-            <td>No students are enrolled to this course...</td>
-          </tr>
-          <tr *ngFor="let student of students">
-            <td>{{student.user.username}}</td>
-          </tr>
-          </tbody>
-        </table>
+        </div>
+          <h4>Requests from students
+            <button class="glyph-button pull-right" (click)="acceptAllReqs()">
+              <span class="table-button-text">ACCEPT ALL</span>
+            </button>
+          </h4>
+          <table class="table table-hover">
+            <tbody>
+            <tr *ngIf="pendingReqs && pendingReqs.length === 0">
+              <td>No pending requests...</td>
+            </tr>
+            <tr *ngFor="let req of pendingReqs">
+              <td>{{req.user['username']}}</td>
+              <td>
+                <button type="button" class="glyph-accept" (click)="acceptReq(req.user['_id'])"><span
+                  class="glyphicon glyphicon-ok"></span></button>
+              </td>
+              <td>
+                <button type="button" class="glyph-decline" (click)="declineReq(req.user['_id'])"><span
+                  class="glyphicon glyphicon-remove"></span></button>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+          <br>
+          <h4>Invitations to students
+            <button class="glyph-button pull-right" (click)="declineAllReqs()">
+              <span class="table-button-text">REMOVE ALL</span>
+            </button>
+          </h4>
+          <table class="table table-hover">
+            <tbody>
+            <tr *ngIf="inviteReqs && inviteReqs.length === 0">
+              <td>No invitations...</td>
+            </tr>
+            <tr *ngFor="let req of inviteReqs">
+              <td>{{req.user['username']}}</td>
+              <td>
+                <button style="visibility: hidden;" type="button" class="glyph-accept" (click)="acceptReq(req.user['_id'])"><span
+                  class="glyphicon glyphicon-ok"></span></button>
+              </td>
+              <td>
+                <button type="button" class="glyph-decline" (click)="declineReq(req.user['_id'])"><span
+                  class="glyphicon glyphicon-remove"></span></button>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+          <br>
+          <h4>Enrolled students
+            <button class="glyph-button pull-right" (click)="openModal(inviteStudentModal)">
+              <span class="table-button-text">ADD STUDENT</span>
+            </button>
+          </h4>
+          <table class="table table-hover">
+            <tbody>
+            <tr *ngIf="students.length === 0">
+              <td>No students are enrolled to this course...</td>
+            </tr>
+            <tr *ngFor="let student of students">
+              <td>{{student.user.username}}</td>
+            </tr>
+            </tbody>
+          </table>
       </div>
     </div> <!-- for end row -->
   </div>
@@ -198,58 +189,6 @@
   </div>
 </ng-template>
 
-<ng-template #createBadge>
-  <div class="modal-header">
-    <h4 class="modal-title pull-left">Create badge</h4>
-    <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
-  <div class="modal-body">
-    <h3>Select badge</h3>
-    <div class="form-group">
-      <select class="form-control" [(ngModel)]="selectedBadge">
-        <option *ngFor="let badge of badges" [ngValue]="badge['key']">{{badge['name']}}</option>
-      </select>
-    </div>
-    <div>
-      <img src="../../assets/images/{{selectedBadge}}.png"/>
-    </div>
-    <label for="name">Name:</label>
-    <input id="name" type="text" class="form-control" [(ngModel)]="badgeName">
-    <label for="description">Description:</label>
-    <input id="description" type="text" class="form-control" [(ngModel)]="badgeDescription">
-    <h3>
-      Add goals
-    </h3>
-    <div class="form-group">
-      <div class="select-block" *ngFor="let selected of selectedAssignments; let i = index">
-        <button class="glyphicon glyphicon-minus btn btn-danger select-remove" (click)="removeGoal(i)"></button>
-        <select class="form-control select-list" [(ngModel)]="selectedAssignments[i]['assignment']">
-          <option *ngFor="let assignment of selected['possible']" [ngValue]="assignment">{{assignment.name}}</option>
-        </select>
-        <div class="tests row">
-          <div *ngIf="selected.assignment">
-            <div *ngFor="let test of tests[selected.assignment['id']]; let j = index" class="pull-left test-box">
-              <label class="label-norm form-check-label">
-                <input class="form-check-input" [(ngModel)]="test['checked']" type="checkbox"> Test {{j+1}}
-                <label type="button" class="question"
-                       tooltip="Stdin: {{test['stdin']}}, Stdout: {{test['stdout']}}, Args: {{test['args']}}">
-                  <span class="glyphicon glyphicon-question-sign"></span></label>
-              </label>
-            </div>
-          </div>
-        </div>
-        <div class="row"></div>
-      </div>
-      <button class="glyphicon glyphicon-plus btn btn-success" (click)="addGoal()"></button>
-    </div>
-  </div>
-  <div class="modal-footer">
-    <button class="btn btn-primary pull-right" (click)="submitBadge()">Submit</button>
-  </div>
-</ng-template>
-
 <!-- Modal for creation of assignment group -->
 <ng-template #createGroup>
   <div class="modal-header">
@@ -265,7 +204,7 @@
     </div>
   </div>
   <div class="modal-footer">
-    <button class="btn btn-primary" (click)="createAssignmentGroup()" type="submit">Submit</button>
+    <button class="btn btn-success" (click)="createAssignmentGroup()" type="submit">Submit</button>
   </div>
 </ng-template>
 

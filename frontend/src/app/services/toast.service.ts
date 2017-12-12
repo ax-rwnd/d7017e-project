@@ -21,4 +21,9 @@ export class ToastService {
   error(message: string, title: string) {
     this.toastr.error(message, title);
   }
+
+  badge(message: string, img_url: string) {
+    // TODO hardcoded image
+    this.toastr.custom('<img src="/assets/images/bronze_medal_badge.png" width="25%" height="25%">', 'New Badge!', {enableHTML: true});
+  }
 }
