@@ -23,6 +23,7 @@ var config = require('config');
 var constants = require('../constants.js');
 var randomstring = require('randomstring');
 var features = require('./features.js');
+var featuresHelper = require('../../features/features_helper.js');
 
 /* MOVED TO LIB/CONSTANTS.JS
 const FIELDS = {
@@ -413,7 +414,7 @@ function removeStudentFromCourse(user_id, course_id) {
     });
 }
 
-function deleteTest(test_id, assignment_id) {
+function deleteTest(test_id, assignment_id, course_id) {
     return Assignment.update(
         {_id: assignment_id},
         {$pull: {'tests.io': test_id}},
@@ -422,6 +423,16 @@ function deleteTest(test_id, assignment_id) {
         if (updated.nModified === 0) {
             throw errors.TEST_NOT_IN_ASSIGNMENT;
         }
+        return features.getBadgeByCourseID(course_id)
+        .then(badges => {
+            for(let badge of badges) {
+                for(let assignment of badge.goals.assignments) {
+                    assignment.tests.pop(test_id);
+                }
+                badge.save();
+            }
+        });
+    }).then(function (updated) {
         return Test.findOneAndRemove({_id: test_id})
         .then(function(test) {
             if (!test) {
@@ -1256,7 +1267,7 @@ function getAllInviteCodes(course, userObject) {
                 return codes;
             });
         });
-    })
+    });
 }
 
 function getAssignmentgroupsByCourseID(course_id) {
