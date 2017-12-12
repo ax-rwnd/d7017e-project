@@ -28,8 +28,8 @@ var assignmentgroupSchema = new Schema({
     name: {type: String, required: true},
     assignments: [{
         coords: {
-            x: {type: Number, default: 0},
-            y: {type: Number, default: 0}
+            x: {type: Number, default: 100},
+            y: {type: Number, default: 100}
         },
         story: {type: String, default: ""},
         assignment: { type: Schema.Types.ObjectId, ref: 'Assignment', required: true}
