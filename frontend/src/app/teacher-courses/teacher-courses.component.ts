@@ -261,8 +261,8 @@ export class TeacherCoursesComponent implements OnInit {
         body['assignments'].push({assignment: this.groups[group]['assignments'][i].id});
       }
       this.backendService.putAssignmentGroup(this.currentCourse.id, this.groups[group].id, body)
-        .then(response => console.log('group put', response))
-        .catch(err => console.log('error', err));
+        .then(response => this.toastService.success('Updated assignment group'))
+        .catch(err => this.toastService.error(err.message, 'Updated assignment group'));
     }
   }
 

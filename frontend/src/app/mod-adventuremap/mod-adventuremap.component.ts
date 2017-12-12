@@ -30,7 +30,6 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
   protected readonly normalEdge = 'red';
   protected readonly lockedEdge = 'grey';
 
-
   protected width = this.baseWidth;
   protected height = this.baseHeight;
   protected radius = 4;
@@ -59,6 +58,7 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
     // Decrement the group index and redraw
 
     if (this.groupIndex > 0) {
+      this.selectedAssignment = undefined;
       this.groupIndex--;
       this.drawMap();
     }
@@ -68,6 +68,7 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
     // Increment the group index and redraw
 
     if (this.groupIndex < this.assignmentGroups.length - 1) {
+      this.selectedAssignment = undefined;
       this.groupIndex++;
       this.drawMap();
     }
