@@ -1,11 +1,13 @@
 <div class="gamification-block panel panel-default" *ngIf="isEnabled !== false">
-  <div class="panel-heading gamification-header">Adventure Map</div>
+  <div class="panel-heading gamification-header">Adventure Map [{{groupIndex + 1}}]</div>
   <div>
 
     <div class="panel-body text-center">
       <canvas #mapCanvas width="{{width}}" height="{{height}}" onblur="lostFocus()" onfocusout="alert(1)"></canvas>
 
       <div>
+        <button *ngIf="assignmentGroups !== undefined" type="button" (click)="goToPreviousGroup()">Previous</button>
+        <button *ngIf="assignmentGroups !== undefined" type="button" (click)="goToNextGroup()">Next</button>
         <p *ngIf="selectedAssignment !== undefined">{{selectedAssignment.name}}</p>
         <p *ngIf="selectedAssignment === undefined">Select- and move your assignments by clicking on them on the map.</p>
       </div>

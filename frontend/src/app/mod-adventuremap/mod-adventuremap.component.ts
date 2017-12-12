@@ -55,6 +55,24 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
   protected canvas: any;
   protected context: CanvasRenderingContext2D;
 
+  goToPreviousGroup() {
+    // Decrement the group index and redraw
+
+    if (this.groupIndex > 0) {
+      this.groupIndex--;
+      this.drawMap();
+    }
+  }
+
+  goToNextGroup() {
+    // Increment the group index and redraw
+
+    if (this.groupIndex < this.assignmentGroups.length - 1) {
+      this.groupIndex++;
+      this.drawMap();
+    }
+  }
+
   setMapDimensions() {
     // Modify the canvas size related elements here
   }
