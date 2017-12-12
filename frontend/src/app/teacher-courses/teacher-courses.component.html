@@ -62,7 +62,7 @@
           </div>
         </div>
         <span *ngIf="currentCourse.enabled_features.adventuremap">
-        <app-mod-adventuremap-editor [courseCode]="currentCourse.id"></app-mod-adventuremap-editor>
+        <app-mod-adventuremap-editor [courseCode]="currentCourse.id" [courseService]="courseService"></app-mod-adventuremap-editor>
       </span>
         <div class="gamification-block panel panel-default">
           <div class="panel-heading gamification-header">

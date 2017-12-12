@@ -15,7 +15,7 @@ export class ModAdventuremapEditorComponent extends ModAdventuremapComponent imp
     this.sensitivity = this.radius = 8;
   }
 
-  colorPoint(selectedAssignment, lastAssignment, userProgress, ctx, current) {
+  colorPoint(ctx, selectedAssignment, current, next) {
     // Draw a simpler point for editing
     ctx.fillStyle = this.completedFill;
 
@@ -38,6 +38,22 @@ export class ModAdventuremapEditorComponent extends ModAdventuremapComponent imp
     } else {
       console.error('failed to update positions, undefined group');
     }
+  }
+
+  strokePath(ctx: CanvasRenderingContext2D, current: any, next: any) {
+    // Stroke path between assignments
+    // TODO: this is overriden because courseService returns bogus
+    // data in the teacher view, this should be rewritten to fix said issue!
+
+    const local = this.scaleToLocal(current.coords);
+    const localNext = this.scaleToLocal(next.coords);
+
+    ctx.beginPath();
+    ctx.lineWidth = this.lineThickness;
+    ctx.strokeStyle = this.normalEdge;
+    ctx.moveTo(local.x, local.y);
+    ctx.lineTo(localNext.x, localNext.y);
+    ctx.stroke();
   }
 
   handleClick() {

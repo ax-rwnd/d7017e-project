@@ -10,6 +10,8 @@ import { Component, OnInit, ViewChild, AfterViewInit, Input } from '@angular/cor
 export class ModAdventuremapComponent extends GameelementComponent implements OnInit, AfterViewInit {
   @ViewChild('mapCanvas') mapCanvas;
   @Input() courseCode: string;
+  @Input() courseService: any;
+  protected currentCourse: any;
 
   // Style constants
   protected readonly baseWidth = 200;
@@ -26,6 +28,7 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
   protected readonly activeBorder = '#5e5';
   protected readonly lastEdge = 'yellow';
   protected readonly normalEdge = 'red';
+  protected readonly lockedEdge = 'grey';
 
 
   protected width = this.baseWidth;
@@ -62,6 +65,7 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
     // Setup the viewport to reload once the image has loaded
     this.update();
     this.img.src = '/assets/images/map.png';
+    console.warn('new service!', this.courseService);
   }
 
   ngAfterViewInit() {
@@ -154,23 +158,32 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
         return;
       }
 
-      pairwise(this.assignmentGroups[this.groupIndex].assignments, (current, next) => {
-        this.drawPoint(ctx, current);
-        this.strokePath(ctx, current, next);
+      // TODO: dirty copy-pasting
+      this.currentCourse = this.courseService.GetCourse(this.courseCode);
 
-        if (next !== undefined) {
-          this.drawPoint(ctx, next);
-        }
-      },
+      if (this.assignmentGroups[this.groupIndex] === undefined) {
+        console.warn('no groups to draw');
+      } else if (this.assignmentGroups[this.groupIndex].assignments.length === 1) {
+        const current = this.assignmentGroups[this.groupIndex].assignments[0];
+        this.drawPoint(ctx, current, {});
+      } else {
+        pairwise(this.assignmentGroups[this.groupIndex].assignments, (current, next) => {
+          this.drawPoint(ctx, current, next);
+          this.strokePath(ctx, current, next);
+
+          if (next !== undefined) {
+            this.drawPoint(ctx, next, {});
+          }
+        },
       1);
+      }
     }
 
-    drawPoint(ctx: CanvasRenderingContext2D, current: any) {
+    drawPoint(ctx: CanvasRenderingContext2D, current: any, next: any) {
         const local = this.scaleToLocal(current.coords);
 
         ctx.beginPath();
-        this.colorPoint(this.selectedAssignment, this.lastAssignment,
-                        this.userProgress, ctx, current);
+        this.colorPoint(ctx, this.selectedAssignment, current, next);
         ctx.lineWidth = this.borderThickness;
         ctx.arc(local.x, local.y, this.radius, 0, 2 * Math.PI, false);
 
@@ -181,15 +194,24 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
     strokePath(ctx: CanvasRenderingContext2D, current: any, next: any) {
       // Stroke path between assignments
 
-        const local = this.scaleToLocal(current.coords);
-        const localNext = this.scaleToLocal(next.coords);
+      const local = this.scaleToLocal(current.coords);
+      const localNext = this.scaleToLocal(next.coords);
 
-        ctx.beginPath();
-        ctx.lineWidth = this.lineThickness;
+      ctx.beginPath();
+      ctx.lineWidth = this.lineThickness;
+      console.warn('stuff!', this.currentCourse.rewards, this.currentCourse.rewards);
+      const progress = this.currentCourse.rewards.progress.find((el: any) => (current.assignment !== undefined) && (el.assignment._id === current.assignment._id));
+      const nextProgress = this.currentCourse.rewards.progress.find((el: any) => (next.assignment !== undefined) && (el.assignment._id === next.assignment._id));
+      if (progress === undefined && nextProgress === undefined) {
+        ctx.strokeStyle = this.lockedEdge;
+      } else if (progress !== undefined && nextProgress === undefined) {
+        ctx.strokeStyle = this.lastEdge;
+      } else {
         ctx.strokeStyle = this.normalEdge;
-        ctx.moveTo(local.x, local.y);
-        ctx.lineTo(localNext.x, localNext.y);
-        ctx.stroke();
+      }
+      ctx.moveTo(local.x, local.y);
+      ctx.lineTo(localNext.x, localNext.y);
+      ctx.stroke();
     }
 
     scaleToLocal(coord: any) {
@@ -206,22 +228,22 @@ export class ModAdventuremapComponent extends GameelementComponent implements On
         y: coord.y * (this.baseHeight / this.height)};
     }
 
-    colorPoint(selectedAssignment, lastAssignment, userProgress, ctx, current) {
+    colorPoint(ctx, selectedAssignment, current, next) {
       // Set styles for the current point
-      // TODO: replace index with the new, smarter way
 
-      // Set the filling style to its appropriate colior
-      if (lastAssignment !== undefined && lastAssignment.assignment !== undefined &&
-        lastAssignment.assignment._id === current.assignment._id) {
-      ctx.fillStyle = this.currentFill;
-
-    } else if (userProgress !== undefined &&
-      userProgress.completed_assignments >= 4) {
-      ctx.fillStyle = this.completedFill;
-
-    } else {
-      ctx.fillStyle = this.lockedFill;
-    }
+      console.warn('coloring:', current, this.currentCourse.rewards.progress);
+      const progress = this.currentCourse.rewards.progress.find((el: any) =>
+        (current.assignment !== undefined) && (el.assignment._id === current.assignment._id));
+      const nextProgress = this.currentCourse.rewards.progress.find((el: any) =>
+        (next.assignment !== undefined) && (el.assignment._id === next.assignment._id));
+      console.warn('nodes:', current, next, 'progress', progress, nextProgress);
+      if (progress !== undefined && nextProgress !== undefined) {
+        ctx.fillStyle = this.completedFill;
+      } else if (progress !== undefined && nextProgress === undefined) {
+        ctx.fillStyle = this.currentFill;
+      } else {
+        ctx.fillStyle = this.lockedFill;
+      }
 
     // Set stroke style according to the selection status
     ctx.strokeStyle = (selectedAssignment !== undefined &&
