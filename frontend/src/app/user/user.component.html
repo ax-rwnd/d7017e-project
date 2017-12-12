@@ -115,11 +115,13 @@
               <td><h4>{{p.owner}}</h4></td>
               <td>
                 <span *ngIf="isStudent(p.id);else notStudent">
-                  <button class="btn btn-block" disabled>Join</button>
+                  <button class="btn glyph-button glyph-accept btn-block no-click">
+                    <span class="glyphicon glyphicon-ok"></span>
+                  </button>
                   <!-- Here can have leave button instead but delete member doesn't exist yet -->
                 </span>
                 <ng-template #notStudent>
-                  <button class="btn btn-success btn-block" (click)="join(p.id)">Join</button>
+                  <button class="btn btn-block" (click)="join(p.id)">Join</button>
                 </ng-template>
               </td>
             </tr>

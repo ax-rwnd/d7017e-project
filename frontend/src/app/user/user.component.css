@@ -36,6 +36,11 @@
   border: none;
 }
 
+.no-click {
+  pointer-events: none;
+  cursor: default;
+}
+
 .glyph-decline {
   color: darkred;
   background: none;
