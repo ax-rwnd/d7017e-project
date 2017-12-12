@@ -5,7 +5,7 @@ import { trigger, state, style, animate, transition } from '@angular/animations'
 import { HeadService } from '../services/head.service';
 import {until} from 'selenium-webdriver';
 import titleContains = until.titleContains;
-import {FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
+import {FormBuilder, FormControl, FormGroup, NgForm, Validators} from '@angular/forms';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { BsModalRef } from 'ngx-bootstrap/modal/modal-options.class';
 import {ActivatedRoute, Router} from '@angular/router';
@@ -46,10 +46,18 @@ export class CreateassignmentComponent implements OnInit {
     testInfo: [],
     ioInput: String,
     ioOutput: String,
+    python27: new FormControl(false),
+    python3: new FormControl(false),
+    java: new FormControl(false),
+    c: new FormControl(false)
   };
   assignment: Assignment;
   oldUnitTests: any[];
   testArray: any[];
+  python27: boolean;
+  python3: boolean;
+  java: boolean;
+  c: boolean;
 
   constructor(private backendService: BackendService, private headService: HeadService,
               private modalService: BsModalService, private fb: FormBuilder, private route: ActivatedRoute,
@@ -77,6 +85,10 @@ export class CreateassignmentComponent implements OnInit {
     this.form = this.fb.group(this.defaultForm);
     this.unitTests = [];
     this.errorMessage = '';
+    this.python27 = false;
+    this.python3 = false;
+    this.java = false;
+    this.c = false;
   }
 
   goBack() {
@@ -165,6 +177,43 @@ export class CreateassignmentComponent implements OnInit {
     this.modalRef = this.modalService.show(modal);
   }
 
+  /*
+  how I felt writing this:
+  https://i.redd.it/3c86gua5n9201.jpg
+  not a super nice, solution, but hey! it works
+   */
+  toggleLang ( lang ) {
+    switch ( lang ) {
+      case 'python27':
+        this.python27 = !this.python27;
+        break;
+      case 'python3':
+        this.python3 = !this.python3;
+        break;
+      case 'java':
+        this.java = !this.java;
+        break;
+      case 'c':
+        this.c = !this.c;
+        break;
+    }
+  }
+
+  setLanguages() {
+    if (this.python27) {
+      this.languages.push('python27');
+    }
+    if (this.python3) {
+      this.languages.push('python3');
+    }
+    if (this.java) {
+      this.languages.push('java');
+    }
+    if (this.c) {
+      this.languages.push('c');
+    }
+  }
+
   testIo() {
     if (this.testType === 'io') { // asså, jag vet :p
       return true;
@@ -190,6 +239,7 @@ export class CreateassignmentComponent implements OnInit {
       window.scrollTo({left: 0, top: 0, behavior: 'smooth'});
     } else {
       this.errorMessage = '';
+      this.setLanguages();
       if (this.assignment) {
         this.updateAssignment();
       } else {
@@ -244,6 +294,15 @@ export class CreateassignmentComponent implements OnInit {
         });
     }
   }
+}
+
+function languageForm() {
+  return new FormGroup({
+    python27: new FormControl(false),
+    python3: new FormControl(false),
+    java: new FormControl(false),
+    c: new FormControl(false)
+  });
 }
 
 interface UnitTests {

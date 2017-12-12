@@ -325,7 +325,8 @@ The structure below is the following:
     // Get an assignment with name desc., langs.
     // course_id
     // lang
-    const body = {'name': assignmentName, 'description': description, 'languages': ['python3'], 'hidden': 'false'};
+    const body = {'name': assignmentName, 'description': description, 'languages': languages, 'hidden': 'false'};
+    console.log('createAssignment', body);
     return this.apiPost('/api/courses/' + course_id + '/assignments/', body);
   }
 
@@ -338,7 +339,7 @@ The structure below is the following:
 
   updateAssignment(course_id: any, assignment_id: string, assignmentName: string, description: string, languages: string[]) {
 
-    const body = {'name': assignmentName, 'description': description, 'languages': ['python3'], 'hidden': 'false'}; // languages should change
+    const body = {'name': assignmentName, 'description': description, 'languages': languages, 'hidden': 'false'}; // languages should change
     return this.apiPut('/api/courses/' + course_id + '/assignments/' + assignment_id, body);
   }
 
