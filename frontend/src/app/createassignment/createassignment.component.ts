@@ -85,10 +85,14 @@ export class CreateassignmentComponent implements OnInit {
     this.form = this.fb.group(this.defaultForm);
     this.unitTests = [];
     this.errorMessage = '';
-    this.python27 = false;
-    this.python3 = false;
-    this.java = false;
-    this.c = false;
+    this.python27 = this.assignment ? this.hasLanguage('python27') : false;
+    this.python3 = this.assignment ? this.hasLanguage('python3') : false;
+    this.java = this.assignment ? this.hasLanguage('java') : false;
+    this.c = this.assignment ? this.hasLanguage('c') : false;
+  }
+
+  hasLanguage(lang: string): boolean {
+    return this.assignment.languages.indexOf(lang) !== -1;
   }
 
   goBack() {
@@ -177,28 +181,6 @@ export class CreateassignmentComponent implements OnInit {
     this.modalRef = this.modalService.show(modal);
   }
 
-  /*
-  how I felt writing this:
-  https://i.redd.it/3c86gua5n9201.jpg
-  not a super nice, solution, but hey! it works
-   */
-  toggleLang ( lang ) {
-    switch ( lang ) {
-      case 'python27':
-        this.python27 = !this.python27;
-        break;
-      case 'python3':
-        this.python3 = !this.python3;
-        break;
-      case 'java':
-        this.java = !this.java;
-        break;
-      case 'c':
-        this.c = !this.c;
-        break;
-    }
-  }
-
   setLanguages() {
     if (this.python27) {
       this.languages.push('python27');
@@ -249,6 +231,7 @@ export class CreateassignmentComponent implements OnInit {
   }
 
   updateAssignment() {
+    console.log('Languages:', this.languages);
     this.backendService.updateAssignment(this.courseId, this.assignment.id, this.assignmentName, this.content, this.languages)
       .then(resp => {
         this.assignmentService.updateAssignment(this.courseId, this.assignment.id, this.assignmentName, this.content, this.languages);

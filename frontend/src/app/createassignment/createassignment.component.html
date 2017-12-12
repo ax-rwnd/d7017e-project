@@ -58,20 +58,20 @@
       <label class="label-bold" for="features">Languages</label>
       <div id="features" class="form-check">
         <label class="label-norm form-check-label">
-          <input class="form-check-input" (click)="toggleLang('python27')" type="checkbox"> Python27
+          <input class="form-check-input" [checked]="python27" (change)="python27 = !python27" type="checkbox"> Python27
           <button type="button" class="question" tooltip="Enable this assignment to be written in Python 2.7"><span class="glyphicon glyphicon-question-sign"></span></button>
         </label>
         <label class="label-norm form-check-label">
-          <span style="display:inline-block; width: 0.5em;"></span> <input class="form-checabelbelbelbel-input" (click)="toggleLang('python3')" type="checkbox"> Python3
+          <span style="display:inline-block; width: 0.5em;"></span> <input class="form-check-input" [checked]="python3" (change)="python3 = !python3" type="checkbox"> Python3
           <button type="button" class="question" tooltip="Enable this assignment to be written in Python 3">
             <span class="glyphicon glyphicon-question-sign"></span></button>
         </label>
         <label class="label-norm form-check-label">
-          <span style="display:inline-block; width: 0.5em;"></span> <input class="form-check-input" (click)="toggleLang('java')" type="checkbox"> Java
+          <span style="display:inline-block; width: 0.5em;"></span> <input class="form-check-input" [checked]="java" (change)="java = !java" type="checkbox"> Java
           <button type="button" class="question" tooltip="Enable this assignment to be written in  Java"><span class="glyphicon glyphicon-question-sign"></span></button>
         </label>
         <label class="label-norm form-check-label">
-          <span style="display:inline-block; width: 0.5em;"></span> <input class="form-check-input" (click)="toggleLang('c')" type="checkbox"> C
+          <span style="display:inline-block; width: 0.5em;"></span> <input class="form-check-input" [checked]="c" (change)="c = !c" type="checkbox"> C
           <button type="button" class="question" tooltip="Enable this assignment to be written in C"><span class="glyphicon glyphicon-question-sign"></span></button>
         </label>
       </div>
