@@ -353,6 +353,7 @@ describe('/api', () => {
                     .set('Authorization', 'Bearer ' + access_tokens.admin)
                     .expect(200)
                     .then(res => {
+                        // check if assignment was removed from group
                         return request(runner.server)
                             .get('/api/courses/' + course_id + '/assignmentgroups/' + assignmentgroup_id1)
                             .set('Authorization', 'Bearer ' + access_tokens.user)
@@ -360,8 +361,16 @@ describe('/api', () => {
                             .then(res => {
                                 assert(res.body.assignments.length === 0, 'not length 0');
                             });
+                    }).then(() => {
+                        // check if assignment was removed from course
+                        return request(runner.server)
+                            .get('/api/courses/' + course_id)
+                            .set('Authorization', 'Bearer ' + access_tokens.user)
+                            .expect(200)
+                            .then(res => {
+                                assert(res.body.assignments.length === 1, 'there should only be one assignment left');
+                            });
                     });
-                // TODO: add assertions to check if there is some data left
             });
         });
 
@@ -805,6 +814,26 @@ describe('/api', () => {
             });
         });
 
+        describe.skip('DELETE /api/courses/:course_id/assignments/:assignment_id/tests/:test_id', () => {
+            it('delete test and now badge should be updated aswell', () => {
+                return request(runner.server)
+                    .delete('/api/courses/' + course_id + '/assignments/' + assignment_id1 + '/tests/' + test_id2)
+                    .set('Authorization', 'Bearer ' + access_tokens.admin)
+                    .expect(200)
+                    .then(res => {
+                        return request(runner.server)
+                            .get('/api/courses/' + course_id + '/badges/' + badge_id)
+                            .set('Authorization', 'Bearer ' + access_tokens.admin)
+                            .expect(200)
+                            .then(res => {
+                                assert(res.body.goals.assignments[0].tests.length === 1, 'Too many tests in badge');
+                                assert(res.body._id == badge_id, 'Badge IDs did not match');
+                            });
+
+                    });
+            });
+        });
+        
         describe('DELETE /api/courses/:course_id/badges/:badge_id', () => {
             it('Return all badge of a course', () => {
                 return request(runner.server)
@@ -1045,6 +1074,23 @@ describe('/api', () => {
     });
 
     describe('tester', () => {
+        describe('POST /api/courses/:course_id/assignments/:assignment_id/submit', () => {
+            it('run assignments tests', () => {
+                return request(runner.server)
+                    .post('/api/courses/' + course_id + '/assignments/' + assignment_id1 + '/submit')
+                    .set('Authorization', 'Bearer ' + access_tokens.user)
+                    .send({
+                        'lang': 'python3',
+                        'code': 'print(\"hello world2\")\n'
+                    })
+                    .expect(200)
+                    .then(res => {
+                        assert(res.body.passed == true);
+                        assert(assignment_id1 == res.body.assignment_id, 'response is not contain the correct assignment_id');
+                    });
+            }).timeout(15000);
+        });
+
         describe('GET /api/tester/languages', () => {
             it('Get supported languages from tester', () => {
                 return request(runner.server)

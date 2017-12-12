@@ -642,6 +642,7 @@ module.exports = function(router) {
             return next(error);
         }
 
+        
         permission.checkIfAssignmentInCourse(course_id, assignment_id)
         .then(function () {
             return testerCom.validateCode(req.user.id, lang, code, assignment_id)
