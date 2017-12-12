@@ -144,6 +144,11 @@ export class UserComponent implements OnInit {
       .then(response => {
         console.log(response);
         this.getPending();
+        this.courseService.GetAllCoursesForUser()
+          .then(done => {
+            this.getPending();
+            this.modalRef.hide();
+          });
       })
       .catch(err => console.error('Join course request failed', err));
   }

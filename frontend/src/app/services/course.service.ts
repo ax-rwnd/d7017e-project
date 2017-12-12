@@ -157,9 +157,13 @@ function updateCourses(response, backendService, courseService, assignmentServic
       .then(featureResponse => {
         const rewards = handleFeatureResponse(featureResponse);
         const progress = newProgress(featureResponse.total_assignments, featureResponse.completed_assignments);
-        const nCourse = newCourse(course._id, course.name, course.course_code, course.description, rewards, progress,
-          '', '', '', '', ''); // Since not a teacher course
-        courseService.courses.push(nCourse);
+        const check = courseService.GetCourse(course._id);
+        if (!check) {
+          // This is a fix for the join functionality, should probably use a service instead
+          const nCourse = newCourse(course._id, course.name, course.course_code, course.description, rewards, progress,
+            '', '', '', '', ''); // Since not a teacher course
+          courseService.courses.push(nCourse);
+        }
       })
       .catch( err => { console.log('Error fetching features:', err);
       }));
