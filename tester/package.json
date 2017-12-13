@@ -1,0 +1,22 @@
+{
+  "name": "docker_web_app",
+  "version": "1.0.0",
+  "description": "Node.js on Docker",
+  "author": "First Last <first.last@example.com>",
+  "main": "server.js",
+  "scripts": {
+    "test": "mocha",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "config": "^1.27.0",
+    "dockerode": "^2.5.2",
+    "express": "^4.16.1",
+    "mocha": "^4.0.1",
+    "request": "^2.83.0",
+    "supertest": "^3.0.0",
+    "tcp-port-used": "^0.1.2",
+    "uuid": "^3.1.0",
+    "winston": "^2.4.0"
+  }
+}
