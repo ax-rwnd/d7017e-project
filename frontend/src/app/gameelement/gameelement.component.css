@@ -1,0 +1,10 @@
+.gamification-header {
+  background-color: #133756;
+  color: white;
+  font-weight: bold;
+}
+
+.gamification-block {
+  background-color: rgba(29, 117, 175, 0.27);
+  width: 95%;
+}

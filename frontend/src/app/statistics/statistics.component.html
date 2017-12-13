@@ -1,0 +1,25 @@
+<div class="container">
+  <div class="row">
+    <div class="[ col-xs-12 col-sm-offset-2 col-sm-8 ]">
+      <ul class="event-list">
+        <li *ngFor="let course of courses">
+          <div [routerLink]="['/courses', course.code]" class="latestBadge">
+            <span class="badgeTitle">Latest badge</span>
+            <div *ngIf="course.rewards.badges != false" class="">
+              <img src="../../assets/images/{{course.rewards.badges[course.rewards.badges.length - 1]}}.png">
+            </div>
+          </div>
+          <div [routerLink]="['/courses', course.code]" class="info">
+            <h2 class="title">{{ course.code }}</h2>
+            <p class="desc">{{ course.name }}</p>
+            <div *ngIf="course.rewards.progress !== false" class="progress progress-margin">
+              <div class="progress-bar" role="progressbar" [attr.aria-valuenow]="course.rewards.progress" aria-valuemin="0" aria-valuemax ="100"
+                   [style.width]="course.rewards.progress + '%'">
+              </div>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>

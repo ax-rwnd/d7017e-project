@@ -1,0 +1,31 @@
+<router-outlet>
+  <!-- This is the sidebar -->
+  <div id="menu" class="sidebar" [@sidebar]="sidebarState"><!-- sidebar collapse width [ngStyle]="setSidebar"() -->
+    <h4 class="course-title">Courses</h4>
+    <ul class="nav nav-pills nav-stacked"> <!-- iterates over a list of courses -->
+      <span class="no-courses-text" *ngIf="courses.length===0">No courses...</span>
+      <li [routerLinkActive]="['active']" *ngFor="let course of courses">
+        <a routerLink="/courses/{{course.id}}">
+          <span *ngIf="course.code; else courseName">{{course.code}} <!-- control if course.id exist --></span>
+          <ng-template #courseName>
+            {{displayCourseName(course.name)}}
+          </ng-template>
+        </a>
+      </li>
+    </ul>
+    <br>
+    <h4 class="course-title">My courses</h4>
+    <ul class="nav nav-pills nav-stacked"> <!-- iterates over a list of courses -->
+      <span class="no-courses-text" *ngIf="teachCourses.length===0">No courses...</span>
+      <li [routerLinkActive]="['active']" *ngFor="let course of teachCourses">
+        <a routerLink="/teaching/{{course.id}}">
+          <span *ngIf="course.code; else courseName">{{course.code}} <!-- control if course.id exist --></span>
+          <ng-template #courseName>
+            {{displayCourseName(course.name)}} <!-- if true dots, else nothing -->
+          </ng-template>
+        </a>
+      </li>
+    </ul>
+    <div style="margin-bottom: 2em;"></div>
+  </div>
+</router-outlet>

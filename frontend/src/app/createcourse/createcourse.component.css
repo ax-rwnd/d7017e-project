@@ -1,0 +1,81 @@
+.assignmentDescription {
+  margin: 1%;
+  padding: 0;
+  height: 500px;
+  max-height: 500px;
+  background-color: lightgray;
+  float: left;
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.8);
+  box-shadow: 1px 1px 3px rgba(180, 180, 180, 1);
+  overflow: scroll;
+}
+
+.label-norm {
+  font-weight: normal;
+  font-size: medium;
+}
+
+.label-bold {
+  font-size: medium;
+  font-weight: bold;
+}
+
+.preview {
+  margin: 1%;
+  padding: 0;
+  height: 500px;
+  text-align: left;
+  background-color: lightgray;
+  float: left;
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.8);
+  box-shadow: 1px 1px 3px rgba(180, 180, 180, 1);
+  overflow: scroll;
+}
+
+.color-gray {
+  color: gray;
+}
+
+.glyphicon {
+  font-size: 1.1em;
+}
+
+.glyph-button {
+  color: #133756;
+  background: none;
+  border: none;
+  font-size: 1.8em;
+}
+
+.question {
+  margin-left: -0.5em;
+  border: none;
+  background-color: transparent;
+  color: #133756;
+}
+
+.option-text {
+  font-size: 0.3em;
+}
+
+.set-checkbox-margin {
+  margin-top: 5%;
+  margin-left: -2em;
+}
+
+.set-margin {
+  margin-top: 2em;
+  margin-bottom: 5%;
+}
+
+.required {
+  color: red;
+  font-size: medium;
+}
+
+.user-list {
+  margin-bottom: 10px;
+  background-color: rgba(29,117,175,0.27);
+}

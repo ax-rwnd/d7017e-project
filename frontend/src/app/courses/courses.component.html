@@ -1,0 +1,52 @@
+<app-head></app-head>
+<div id="cont" class="content" [@content]="sidebarState">
+  <div class="container">
+    <!-- toggle only visible to owner -->
+    <!-- <button *ngIf="toggleHelper()" type="button" class="btn btn-primary" (click)="toggleView()">Toggle</button> -->
+
+    <!-- START of the student view -->
+      <!-- This view below is for students, the view for the teacher is in teacherView down below -->
+      <div class="col-lg-6">
+        <!-- Title of the student page-->
+        <h1>
+          <span *ngIf="currentCourse.code">{{currentCourse.code}} - </span> {{currentCourse.name}}
+        </h1>
+          <!-- Display the course description, markdown style -->
+          <markdown [data]="currentCourse.course_info"></markdown>
+
+          <!-- Feature progress bar -->
+          <app-mod-progressbar [courseCode]="currentCourse.id"></app-mod-progressbar>
+
+          <!-- Score board -->
+          <div class="gamification-block panel panel-default" *ngIf="currentCourse.rewards.score !== false">
+            <div class="panel-heading gamification-header">
+              Score
+            </div>
+            <div class="panel-body">
+              {{currentCourse.rewards.score}}
+            </div>
+          </div>
+          <!-- Features, display if defined for course -->
+          <app-mod-badges [courseCode]="currentCourse.id"></app-mod-badges>
+          <app-mod-leaderboard [courseCode]="currentCourse.id"></app-mod-leaderboard>
+          <app-mod-adventuremap-large [courseCode]="currentCourse.id" [courseService]="courseService"></app-mod-adventuremap-large>
+      </div>
+      <!-- Next column, for assignments group -->
+      <div class="col-lg-6">
+        <span *ngIf="teachCourses.indexOf(currentCourse) !== -1">
+          <div class="row teacher-view">
+            <button class="glyph-button pull-right" [routerLink]="['/teaching/', currentCourse.id]">
+              <span class="header-text">TEACHER VIEW <span class="glyphicon glyphicon-pencil"></span></span>
+            </button>
+          </div>
+        </span>
+        <div *ngFor="let g of assignmentGroups">
+          <app-assignment-group [assignmentGroup]="g" [courseCode]="currentCourse.id"></app-assignment-group>
+        </div>
+      </div>
+      <!-- End of assignments group -->
+  </div>
+
+</div>
+
+

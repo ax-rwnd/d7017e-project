@@ -1,0 +1,244 @@
+<app-head></app-head>
+<div id="cont" class="content" [@content]="sidebarState">
+  <div class="container">
+    <div class="row">
+      <!-- Display the course description, markdown style -->
+      <div class="col-lg-8">
+        <h1>
+          <span *ngIf="currentCourse.code">{{currentCourse.code}} - </span> {{currentCourse.name}}
+        </h1>
+        <h3>Course
+          <button type="button" class="glyph-button" [routerLink]="['/user/updateCourse', currentCourse.id]">
+            <span class="glyphicon glyphicon-edit"></span>
+          </button>
+        </h3>
+        <markdown [data]="currentCourse.course_info"></markdown>
+        <br>
+        <h3>Assignments</h3>
+        <div class="row">
+          <div class="col-lg-6 bottom-margin">
+            <h4>Groups
+              <button (click)="openModal(createGroup, 'createGroup')" class="glyph-button pull-right">
+                <span class="option-text">CREATE GROUP</span>
+              </button>
+            </h4>
+            <span *ngIf="groups.length === 0">
+              No groups created yet...
+            </span>
+          <div *ngFor="let group of groups" class="well">
+            <label (click)="deleteGroup(group)" class="glyphicon glyphicon-remove pull-right delete-element"></label>
+            <div dragula="bag-one" id="left{{group.name}}" [dragulaModel]='group.assignments'>
+              {{group.name}}
+              <div *ngFor='let assignment of group.assignments' class="assignment">
+                {{assignment.name}}
+              </div>
+            </div>
+          </div>
+            <h4>
+              <button (click)="submitGroups()" class="btn btn-success pull-right">
+                <span class="option-text">SAVE CHANGES</span>
+              </button>
+            </h4>
+        </div>
+        <div class="col-lg-6 container">
+          <h4>Assignments
+            <button class="glyph-button pull-right" [routerLink]="['/courses', currentCourse.id, 'createNewAssignment']">
+              <span class="option-text">CREATE ASSIGNMENT</span>
+            </button>
+          </h4>
+          <span *ngIf="assignments.length === 0">
+              No assignments created yet...
+            </span>
+            <div dragula="bag-one" id="right" [dragulaModel]='assignments'>
+              <div *ngFor="let assignment of assignments" class="assignment">
+                {{assignment.name}}
+                <button type="button" class="glyph-button white-text pull-right" [routerLink]="['/courses', currentCourse.id, 'updateAssignment', assignment.id]">
+                  <span class="glyphicon glyphicon-edit" style="font-size: 1.2em;"></span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <span *ngIf="currentCourse.enabled_features.adventuremap">
+        <app-mod-adventuremap-editor [courseCode]="currentCourse.id" [courseService]="courseService"></app-mod-adventuremap-editor>
+      </span>
+        <app-mod-badges-teacher [courseId]="currentCourse.id"></app-mod-badges-teacher>
+      </div>
+      <div class="col-lg-4">
+        <div class="student-view">
+          <button class="glyph-button" [routerLink]="['/courses/', currentCourse.id]">
+            <span class="header-text">STUDENT VIEW <span class="glyphicon glyphicon-education"></span></span>
+          </button>
+        </div>
+          <h4>Requests from students
+            <button class="glyph-button pull-right" (click)="acceptAllReqs()">
+              <span class="table-button-text">ACCEPT ALL</span>
+            </button>
+          </h4>
+          <table class="table table-hover">
+            <tbody>
+            <tr *ngIf="pendingReqs && pendingReqs.length === 0">
+              <td>No pending requests...</td>
+            </tr>
+            <tr *ngFor="let req of pendingReqs">
+              <td>{{req.user['username']}}</td>
+              <td>
+                <button type="button" class="glyph-accept" (click)="acceptReq(req.user['_id'])"><span
+                  class="glyphicon glyphicon-ok"></span></button>
+              </td>
+              <td>
+                <button type="button" class="glyph-decline" (click)="declineReq(req.user['_id'])"><span
+                  class="glyphicon glyphicon-remove"></span></button>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+          <br>
+          <h4>Invitations to students
+            <button class="glyph-button pull-right" (click)="declineAllReqs()">
+              <span class="table-button-text">REMOVE ALL</span>
+            </button>
+          </h4>
+          <table class="table table-hover">
+            <tbody>
+            <tr *ngIf="inviteReqs && inviteReqs.length === 0">
+              <td>No invitations...</td>
+            </tr>
+            <tr *ngFor="let req of inviteReqs">
+              <td>{{req.user['username']}}</td>
+              <td>
+                <button style="visibility: hidden;" type="button" class="glyph-accept" (click)="acceptReq(req.user['_id'])"><span
+                  class="glyphicon glyphicon-ok"></span></button>
+              </td>
+              <td>
+                <button type="button" class="glyph-decline" (click)="declineReq(req.user['_id'])"><span
+                  class="glyphicon glyphicon-remove"></span></button>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+          <br>
+          <h4>Enrolled students
+            <button class="glyph-button pull-right" (click)="openModal(inviteStudentModal)">
+              <span class="table-button-text">ADD STUDENT</span>
+            </button>
+          </h4>
+          <table class="table table-hover">
+            <tbody>
+            <tr *ngIf="students.length === 0">
+              <td>No students are enrolled to this course...</td>
+            </tr>
+            <tr *ngFor="let student of students">
+              <td>{{student.user.username}}</td>
+            </tr>
+            </tbody>
+          </table>
+      </div>
+    </div> <!-- for end row -->
+  </div>
+</div>
+
+<!-- MODALS -->
+<!-- Modal for invitation of student to course -->
+<ng-template #inviteStudentModal>
+  <div class="modal-header">
+    <h4 class="modal-title pull-left">Invite students</h4>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div>
+      <form (ngSubmit)="search()" [formGroup]="form" novalidate>
+        <div class="form-group">
+          <label for="search">Search term</label>
+          <input type="text" class="form-control" id="search" formControlName="search" ngModel required>
+        </div>
+        <button class="btn" type="submit">Search</button>
+      </form>
+    </div>
+    <br>
+    <div>
+      <label> generate invite link </label>
+      <div>
+        <button class="btn" (click)="generateInviteLink()">Create invite link</button>
+        <button class="btn" (click)="openModal(viewInvites)">View invite links</button>
+      </div>
+      <br>
+      <div>
+        <form>
+          <input type="text" class="form-control" id="inviteLink" value="{{inviteLink}}" readonly>
+        </form>
+      </div>
+
+    </div>
+  </div>
+  <div class="modal-body">
+    <div class="well-sm user-list" *ngFor="let p of possibleStudents">
+      <div class="row">
+        <div class="col-md-10">
+          <h4>{{p.name}}</h4>
+        </div>
+        <div class="col-md-2">
+          <button class="btn" (click)="invite(p.id)">Invite</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+  </div>
+</ng-template>
+
+<!-- Modal for creation of assignment group -->
+<ng-template #createGroup>
+  <div class="modal-header">
+    <h4 class="modal-title pull-left">Create assignment group</h4>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="form-group">
+      <label for="groupName">Group name</label>
+      <input type="text" class="form-control" id="groupName" [(ngModel)]="groupName">
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-success" (click)="createAssignmentGroup()" type="submit">Submit</button>
+  </div>
+</ng-template>
+
+<ng-template #viewInvites>
+  <div class="modal-body">
+    <table class="table table-hover">
+      <thead>
+      <tr>
+        <th class="text-center">Invite code</th>
+        <th class="text-center">Usages</th>
+        <th class="text-center">Expires</th>
+        <th class="text-center">Cancel</th>
+        <button type="button" class="close text-center" aria-label="Close" (click)="modalRef.hide()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let obj of inviteList;">
+        <td class="text-center">{{obj.code}}</td>
+        <td class="text-center">{{obj.uses}}</td>
+        <td class="text-center">{{obj.expiresAt}}</td>
+        <td>
+          <button type="button button-hover" class="close" aria-label="Close" (click)="deleteInviteLink(obj.code)">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="modal-footer">
+    <div class="text-center">
+       example: {{inviteLinkExample}}<span style="color: red">xB4bttgh</span>
+    </div>
+  </div>
+</ng-template>

@@ -1,0 +1,209 @@
+<app-head></app-head>
+
+<div id="cont" class="content" [@content]="sidebarState">
+  <button *ngIf="sidebarState === 'inactive'" style="float:left;" class="glyph-button" (click)="goBack()"><span class="glyphicon glyphicon-circle-arrow-left"></span></button>
+
+  <div class="container">
+    <h2 *ngIf="!assignment">Create assignment <span class="required">{{errorMessage}}</span></h2>
+    <h2 *ngIf="assignment">Update assignment <span class="required">{{errorMessage}}</span>
+      <button class="glyph-button pull-right" (click)="deleteAssignment()">
+          <span class="option-text">DELETE ASSIGNMENT
+            <span class="glyphicon glyphicon-trash"></span>
+          </span>
+      </button>
+    </h2>
+    <br>
+    <div class="row">
+      <div class="col-lg-6">
+        <div class="form-group">
+          <label class="label-norm">Assignment name</label> <span class="required">*</span>
+          <input (text)="assignmentName" class="form-control" placeholder="Assignment name" [(ngModel)]="assignmentName">
+        </div>
+      </div>
+    </div>
+    <form class="form-group">
+      <div class="form-check">
+        <label class="label-norm form-check-label check-box-margin">
+          <input type="checkbox" name="linttest" (click)="testLint()" class="question"> Test code syntax using lint
+          <button type="button" class="question" tooltip="Test code syntax using lint"> <span class="glyphicon glyphicon-question-sign"></span></button>
+        </label>
+      </div>
+    </form>
+    <div class="form-group">
+      <!-- Start of course description -->
+      <label class="label-norm" for="desc">Assignment description</label> <span class="required">*</span>
+      <div id="desc">
+        <tabset>
+          <tab heading="Write" id="write">
+            <div class="assignmentDescription" appScroller>
+              <div ace-editor [(text)]="content" [mode]="'markdown'" [theme]="'eclipse'" [options]="{maxLines: 1000, printMargin: false}" [readOnly]="false" [autoUpdateContent]="true" [durationBeforeCallback]="1000" (textChanged)="onChange(content)"  style="min-height: 100%; width:100%; overflow: auto;"></div>
+            </div>
+          </tab>
+          <tab heading="Preview" id="preview">
+            <div class="preview" appScroller>
+              <div Markdown [data]="content" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/themes/prism.min.css"></div>
+            </div>
+          </tab>
+        </tabset>
+      </div>
+      <!-- End of course description -->
+    </div>
+
+    <div>
+      <a href="https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet">Markdown guide</a>
+    </div>
+
+    <div class="form-group">
+      <!-- Start of features part -->
+      <label class="label-bold" for="features">Languages</label>
+      <div id="features" class="form-check">
+        <label class="label-norm form-check-label">
+          <input class="form-check-input" [checked]="python27" (change)="python27 = !python27" type="checkbox"> Python27
+          <button type="button" class="question" tooltip="Enable this assignment to be written in Python 2.7"><span class="glyphicon glyphicon-question-sign"></span></button>
+        </label>
+        <label class="label-norm form-check-label">
+          <span style="display:inline-block; width: 0.5em;"></span> <input class="form-check-input" [checked]="python3" (change)="python3 = !python3" type="checkbox"> Python3
+          <button type="button" class="question" tooltip="Enable this assignment to be written in Python 3">
+            <span class="glyphicon glyphicon-question-sign"></span></button>
+        </label>
+        <label class="label-norm form-check-label">
+          <span style="display:inline-block; width: 0.5em;"></span> <input class="form-check-input" [checked]="java" (change)="java = !java" type="checkbox"> Java
+          <button type="button" class="question" tooltip="Enable this assignment to be written in  Java"><span class="glyphicon glyphicon-question-sign"></span></button>
+        </label>
+        <label class="label-norm form-check-label">
+          <span style="display:inline-block; width: 0.5em;"></span> <input class="form-check-input" [checked]="c" (change)="c = !c" type="checkbox"> C
+          <button type="button" class="question" tooltip="Enable this assignment to be written in C"><span class="glyphicon glyphicon-question-sign"></span></button>
+        </label>
+      </div>
+    </div>
+
+
+
+    <div id="addTests">
+      <h4>Code tests</h4>
+      <button class="btn btn-primary" (click)="openModal(testModal)">Add Test</button>
+    </div>
+
+    <!-- Test editing section -->
+    <div *ngFor='let fb of oldUnitTests' class="test">
+      <div class="testInfo">
+        <h4>{{fb[0]}} Test</h4>
+        <div *ngIf="fb[1]"> Input: {{fb[1]}} </div>
+        <div *ngIf="fb[2]"> Output: {{fb[2]}} </div>
+      </div>
+      <div class="testEdit">
+        <div style="align:right">
+          <button class="btn btn-primary" (click)="openModalEdit(editTest, oldUnitTests, oldUnitTests.indexOf(fb)); testType=fb[0]; editT=oldUnitTests.indexOf(fb); testArray=oldUnitTests">
+            Edit test
+          </button>
+          <button class="btn btn-primary" (click)="deleteTest(oldUnitTests, oldUnitTests.indexOf(fb));">
+            <!-- Need to call backend to remove the test -->
+            Delete test
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div *ngFor='let fb of unitTests' class="test">
+      <div class="testInfo">
+        <h4>{{fb[0]}} Test</h4>
+        <div *ngIf="fb[1]"> Input: {{fb[1]}} </div>
+        <div *ngIf="fb[2]"> Output: {{fb[2]}} </div>
+      </div>
+      <div class="testEdit">
+        <div style="align:right">
+          <button class="btn btn-primary" (click)="openModalEdit(editTest, unitTests, unitTests.indexOf(fb)); testType=fb[0]; editT=unitTests.indexOf(fb); testArray=unitTests">
+            Edit test
+          </button>
+          <button class="btn btn-primary" (click)="deleteTest(unitTests, unitTests.indexOf(fb));">
+            <!-- Test doesn't exist yet so only need remove it from array -->
+            Delete test
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div id="footer">
+      <button class="btn btn-primary" (click)="submitAssignment()">
+        <span *ngIf="!assignment">Create assignment</span>
+        <span *ngIf="assignment">Update assignment</span>
+      </button>
+    </div>
+
+  </div>
+</div>
+
+
+<ng-template #testModal>
+  <!-- A modal dialog for creating and modifying tests -->
+
+  <div class="modal-header">
+    <h4 class="modal-title pull-left">Add I/O Test to assignment</h4>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <form (ngSubmit)="createTest()" [formGroup]="form" novalidate>
+    <div class="modal-body">
+      <div class="form-group">
+        <h4>Input</h4>
+        <textarea type="text" class="form-control" id="ioInput" formControlName="ioInput" ngModel required></textarea>
+      </div>
+
+      <div class="form-group">
+        <h4>Output</h4>
+        <textarea type="text" class="form-control" id="ioOutput" formControlName="ioOutput" ngModel required></textarea>
+      </div>
+      <hr>
+
+
+    </div>
+    <div class="modal-footer">
+      <button type="submit" class="btn" (click)="modalRef.hide()">Submit</button>
+    </div>
+
+  </form>
+</ng-template>
+
+<ng-template #editTest>
+  <div class="modal-header">
+    <h4 class="modal-title pull-left">Edit Test</h4>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <form (ngSubmit)="editExistingTest(editT, testArray)" [formGroup]="form" novalidate>
+    <div class="modal-body">
+      <div class="form-group" *ngIf="testIo()">
+        <h4>Input</h4>
+        <input type="text" class="form-control" id="ioInput2" formControlName="ioInput">
+      </div>
+
+      <div class="form-group" *ngIf="testIo()">
+        <h4>Output</h4>
+        <textarea type="text" class="form-control" id="ioOutput2" formControlName="ioOutput"></textarea>
+      </div>
+      <hr>
+
+
+    </div>
+    <div class="modal-footer">
+      <button type="submit" class="btn" (click)="modalRef.hide()">Submit</button>
+    </div>
+
+  </form>
+</ng-template>
+
+<ng-template #markdownTutorial>
+  <div class="modal-header">
+    <h4 class="modal-title pull-left">Markdown guide</h4>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+
+  <div id="markdownGuide">
+    <markdown [data]="markdownExampleCode"></markdown>
+  </div>
+</ng-template>
+

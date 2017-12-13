@@ -1,0 +1,32 @@
+
+.gamification-header {
+  background-color: #133756;
+  color: white;
+  font-weight: bold;
+}
+
+
+.gamification-block {
+  background-color: rgba(29, 117, 175, 0.27);
+  width: 95%;
+}
+
+.assignment {
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.glyph-button {
+  color: #133756;
+  background: none;
+  border: none;
+}
+
+.header-text {
+  font-size: 1.3em;
+}
+
+.teacher-view {
+  margin-top: 5%;
+  margin-bottom: 5%;
+}

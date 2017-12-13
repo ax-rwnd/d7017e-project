@@ -1,0 +1,86 @@
+.pointer {
+  cursor: pointer;
+}
+
+.img-center {
+  display: block;
+  margin: auto;
+}
+
+.glyph-button {
+  color: #133756;
+  background: none;
+  border: none;
+  margin-right: 5%;
+}
+
+.option-text {
+  font-size: 0.55em;
+}
+
+.question {
+  margin-left: -0.5em;
+  border: none;
+  background-color: transparent;
+  color: #133756;
+  font-size: 0.8em;
+}
+
+.margin-top {
+  margin-top: 4%;
+}
+
+.glyph-accept {
+  color: darkgreen;
+  background: none;
+  border: none;
+}
+
+.no-click {
+  pointer-events: none;
+  cursor: default;
+}
+
+.glyph-decline {
+  color: darkred;
+  background: none;
+  border: none;
+}
+
+.gamification-block {
+  background-color: rgba(29, 117, 175, 0.27);
+  width: 95%;
+}
+
+.gamification-header {
+   background-color: #133756;
+   color: white;
+   font-weight: bold;
+}
+
+.assignment {
+  background-color: #f5f5f5;
+  border-radius: 0.5em;
+  padding: 5%;
+  margin-left: 0.5em;
+  font-weight: bold;
+}
+
+.course-table {
+  margin-bottom: 10px;
+  background-color: rgba(29,117,175,0.27);
+  table-layout:fixed;
+}
+
+.course-table td {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.custom-well {
+}
+
+.right-buttons {
+  float: right;
+}

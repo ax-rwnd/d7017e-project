@@ -1,0 +1,32 @@
+.courseTitle {
+  color: white;
+  font-size: large;
+  margin-bottom: 5%;
+}
+
+/* Sidebar */
+.sidebar {
+  width: var(--wSidebar);
+  height: 100%;
+  background: #133756;
+  position: fixed;
+  padding-top: 5%;
+  left: 0;
+  padding-left: 1%;
+  font-size: 1.1em;
+}
+
+.size {
+  font-size: 1.2em;
+}
+
+.userID-display {
+  pointer-events: none;
+  cursor: default;
+}
+
+.brandclass {
+  letter-spacing: 6pt;
+  font-family: serif;
+  margin-left: 0pt;
+  }

@@ -1,0 +1,31 @@
+<nav class="navbar navbar-default navbar-fixed-top">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand">
+        <!-- When click the menu button, toggle the sidebar -->
+        <button type="button" class="menubtn" (click)="toggleState()">
+          <span class="glyphicon glyphicon-menu-hamburger" ></span></button>
+      </a>
+      <!-- Title of header -->
+      <span class="navbar-brand brandclass" routerLink="/user">GPP</span>
+    </div>
+
+    <ul class="nav navbar-nav navbar-right">
+      <li><a class="userID-display">
+        <span class="glyphicon glyphicon-user size"></span>
+        <span style="display:inline-block; width: 0.1em;"></span>
+        <span *ngIf="user.userName;else noID">{{user.userName}}</span>
+        <ng-template #noID>Unknown</ng-template>
+      </a></li>
+      <li (click)="logout()"><a>
+        <span class="glyphicon glyphicon-log-out size"></span>
+        <span style="display:inline-block; width: 0.1em;"></span>
+        Log out
+      </a></li>
+    </ul>
+  </div>
+</nav>
+
+
+
+

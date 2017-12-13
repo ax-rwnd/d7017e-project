@@ -1,0 +1,132 @@
+<app-head></app-head>
+
+<div id="cont" class="content" [@content]="sidebarState">
+  <div class="container">
+    <div class="row">
+      <div class="container col-lg-9">
+        <!-- Title -->
+        <h2>Courses
+          <button class="glyph-button pull-right" (click)="openModal(searchCourseModal)">
+            <span class="option-text">JOIN COURSE</span>
+          </button>
+        </h2>
+        <!-- iterate of the list of courses -->
+        <span *ngFor="let course of courses">
+          <!-- The panel content, input to panel is course  -->
+          <app-user-panels [course]="course" [teaching]="false">
+            <div class="col-md-5">
+              <app-mod-badges-single [courseCode]="course.id"></app-mod-badges-single>
+              <app-mod-progressbar [courseCode]="course.id"></app-mod-progressbar>
+              <app-mod-adventuremap [courseCode]="course.id" [courseService]="courseService"></app-mod-adventuremap>
+              <!-- Assignment panel start -->
+              <!--
+              <div class="gamification-block panel panel-default">
+                <div class="panel-heading gamification-header">
+                  Current Assignment
+                </div>
+                <div class="panel-body">
+                  <div class="assignment">Assignment 1</div>
+                </div>
+              </div>
+              -->
+              <!-- Assignment panel end -->
+            </div>
+            <!-- column for progress and assignment end -->
+            <div class="col-md-4">
+              <app-mod-leaderboard [courseCode]="course.id"></app-mod-leaderboard>
+            </div>
+          </app-user-panels>
+        </span>
+        <br> <!-- add some space -->
+        <!-- Title -->
+        <h2>My Courses
+          <span *ngIf="user.access==='basic'">
+            {{teachCourses.length}}/3
+            <sup>
+              <button type="button" class="question" tooltip="A student can create 3 courses.">
+                <span class="glyphicon glyphicon-question-sign"></span>
+              </button>
+            </sup>
+          </span>
+          <button class="glyph-button pull-right" routerLink="./createCourse" [disabled]="isDisabled()" [ngStyle]="disabledButton()">
+            <span class="option-text">CREATE COURSE</span>
+          </button>
+        </h2>
+        <span *ngFor="let course of teachCourses">
+          <app-user-panels [course]="course" [teaching]="true"></app-user-panels>
+        </span>
+
+      </div>
+      <div class="col-lg-3 margin-top">
+        <h4>Pending requests</h4>
+        <table class="table table-hover">
+          <tbody>
+          <tr *ngIf="pending && pending.length === 0">
+            <td>No pending requests...</td>
+          </tr>
+          <tr *ngFor="let p of pending">
+            <td *ngIf="p.course['course_code']">{{p.course['course_code']}}</td>
+            <td *ngIf="!p.course['course_code']">{{p.course['name']}}</td>
+            <td><button type="button" class="glyph-decline" (click)="cancelRequest(p.course['_id'])"><span class="glyphicon glyphicon-remove"></span></button></td>
+          </tr>
+          </tbody>
+        </table>
+
+        <h4>Invites
+        </h4>
+        <table class="table table-hover">
+          <tbody>
+          <tr *ngIf="invites && invites.length === 0">
+            <td>No pending invites...</td>
+          </tr>
+          <tr *ngFor="let i of invites">
+            <td *ngIf="i.course['course_code']">{{i.course['course_code']}}</td>
+            <td *ngIf="!i.course['course_code']">{{i.course['name']}}</td>
+            <td><button type="button" class="glyph-accept" (click)="acceptInvite(i.course['_id'])"><span class="glyphicon glyphicon-ok"></span></button></td>
+            <td><button type="button" class="glyph-decline" (click)="declineInvite(i.course['_id'])"><span class="glyphicon glyphicon-remove"></span></button></td>
+          </tr>
+          </tbody>
+        </table>
+    </div>
+  </div>
+
+  </div>
+</div>
+
+<ng-template #searchCourseModal>
+  <div class="modal-header">
+    <h4 class="modal-title pull-left">Join course</h4>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+    <div class="modal-body">
+        <table class="well-sm course-table table table-striped">
+          <thead>
+            <tr>
+              <th class="col-md-7">Name</th>
+              <th class="col-md-3">Owner</th>
+              <th class="col-md-2"></th>
+            </tr>
+          </thead>
+          <tbody *ngFor="let p of possibleCourses">
+            <tr *ngIf="!isOwner(p.id)">
+              <td><h4>{{p.name}}</h4></td>
+              <td><h4>{{p.owner}}</h4></td>
+              <td>
+                <span *ngIf="isStudent(p.id);else notStudent">
+                  <button class="btn glyph-button glyph-accept btn-block no-click">
+                    <span class="glyphicon glyphicon-ok"></span>
+                  </button>
+                  <!-- Here can have leave button instead but delete member doesn't exist yet -->
+                </span>
+                <ng-template #notStudent>
+                  <button class="btn btn-block" (click)="join(p.id)">Join</button>
+                </ng-template>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+    </div>
+    <div class="modal-footer"></div>
+</ng-template>

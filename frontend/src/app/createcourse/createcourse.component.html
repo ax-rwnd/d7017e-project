@@ -1,0 +1,150 @@
+<app-head></app-head>
+<div id="cont" class="content" [@content]="sidebarState">
+  <button *ngIf="sidebarState === 'inactive'" style="float:left;" class="glyph-button" (click)="goBack()"><span class="glyphicon glyphicon-circle-arrow-left"></span></button>
+  <!-- start of the form -->
+  <!-- Title -->
+  <div class="container">
+    <h2 *ngIf="!course">Create course <span class="required">{{errorMessage}}</span></h2>
+    <div class="row">
+      <h2 *ngIf="course">Update course <span class="required">{{errorMessage}}</span>
+        <button class="glyph-button pull-right" (click)="deleteCourse(course.id)">
+          <span class="option-text">DELETE COURSE
+            <span class="glyphicon glyphicon-trash"></span>
+          </span>
+        </button>
+      </h2>
+    </div>
+    <span *ngIf="!course">
+    <div class="color-gray">(All fields can later be changed)</div>
+      <br>
+    </span>
+    <form (ngSubmit)="submitCourse()" [formGroup]="form" novalidate>
+      <div class="row">
+        <div class="col-md-6">
+          <!-- First input, for course code -->
+          <div class="form-group">
+            <label class="label-norm" for="code">Course code</label>
+            <input type="text"  class="form-control" id="code" formControlName="code" placeholder="Ex D0009E" [(ngModel)]="form.value.code">
+          </div>
+        </div>
+        <div class="col-md-6">
+          <!-- Second input, for course name, should be required input -->
+          <div class="form-group">
+            <label class="label-norm" for="name">Course name</label> <span class="required">*</span>
+            <input type="text" class="form-control" id="name" formControlName="name" placeholder="Ex Introduction to programming" [(ngModel)]="form.value.name">
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <!-- Start of features part -->
+        <label class="label-bold" for="features">Features</label>
+        <div id="features" class="form-check">
+          <label class="label-norm form-check-label">
+            <input class="form-check-input" formControlName="badges" type="checkbox"> Badges
+            <button type="button" class="question" tooltip="{{badgesDesc}}"><span class="glyphicon glyphicon-question-sign"></span></button>
+          </label>
+          <label class="label-norm form-check-label">
+            <span style="display:inline-block; width: 0.5em;"></span> <input class="form-checabelbelbelbel-input" formControlName="progress" type="checkbox"> Progressbar
+            <button type="button" class="question" tooltip="{{progDesc}}">
+              <span class="glyphicon glyphicon-question-sign"></span></button>
+          </label>
+          <label class="label-norm form-check-label">
+            <span style="display:inline-block; width: 0.5em;"></span> <input class="form-check-input" formControlName="map" type="checkbox"> Adventure map
+            <button type="button" class="question" tooltip="{{advmapDesc}}"><span class="glyphicon glyphicon-question-sign"></span></button>
+          </label>
+          <label class="label-norm form-check-label">
+            <span style="display:inline-block; width: 0.5em;"></span> <input class="form-check-input" formControlName="leaderboard" type="checkbox"> Leaderboard
+            <button type="button" class="question" tooltip="{{leadbDesc}}"><span class="glyphicon glyphicon-question-sign"></span></button>
+          </label>
+        </div>
+        <!-- End of features part -->
+      </div>
+      <div class="form-group">
+         <!-- Start of settings -->
+        <label class="label-bold" for="settings">Settings</label>
+        <div id="settings" class="form-check">
+          <label class="label-norm form-check-label">
+            <input class="form-check-input" formControlName="nothidden" type="checkbox"> Public
+            <button type="button" class="question" tooltip="{{publicDesc}}"><span class="glyphicon glyphicon-question-sign"></span></button>
+          </label>
+          <label class="label-norm form-check-label">
+            <span style="display:inline-block; width: 0.5em;"></span> <input class="form-check-input" formControlName="autojoin" type="checkbox"> Auto join
+            <button type="button" class="question" tooltip="{{autojoinDesc}}"><span class="glyphicon glyphicon-question-sign"></span></button>
+          </label>
+          <!-- End of setting here -->
+        </div>
+      </div>
+      <div class="form-group">
+        <!-- Start of course description -->
+        <label class="label-norm" for="desc">Course description</label> <span class="required">*</span>
+        <div id="desc">
+          <tabset>
+            <tab heading="Write" id="tab1">
+              <div class="assignmentDescription" appScroller>
+                <div ace-editor [(text)]="content" [mode]="'markdown'" [theme]="'eclipse'" [options]="{maxLines: 1000, printMargin: false}" [readOnly]="false" [autoUpdateContent]="true" [durationBeforeCallback]="1000" (textChanged)="onChange(content)"  style="min-height: 100%; width:100%; overflow: auto;"></div>
+              </div>
+            </tab>
+            <tab heading="Preview">
+              <div class="preview" appScroller>
+                <div Markdown [data]="content" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/themes/prism.min.css"></div>
+              </div>
+            </tab>
+          </tabset>
+        </div>
+        <!-- End of course description -->
+      </div>
+      <div class="form-group">
+          <button type="submit" class="btn btn-primary">
+            <span *ngIf="!course">Create course</span>
+            <span *ngIf="course">Update course</span>
+          </button>
+      </div>
+    </form>
+</div>
+</div>
+
+<!-- Start of different Modals here -->
+<ng-template #courseCreated>
+  <div class="modal-header">
+    <h4 class="modal-title pull-left">Course created</h4>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <p>You can see your course on the user page or in the menu to the left.</p>
+  </div>
+  <div class="modal-footer">
+  </div>
+</ng-template>
+
+<ng-template #inviteStudentModal>
+  <div class="modal-header">
+    <h4 class="modal-title pull-left">Invite students</h4>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <form (ngSubmit)="findStudent()" [formGroup]="form" novalidate>
+      <div class="form-group">
+        <label for="search">Search term</label>
+        <input type="text" class="form-control" id="search" formControlName="search" ngModel required>
+      </div>
+      <button class="btn" type="submit">Search</button>
+    </form>
+  </div>
+  <div class="modal-body">
+    <div class="well-sm user-list" *ngFor="let student of students">
+      <div class="row">
+        <div class="col-md-10">
+          <h4>{{student.username}}</h4>
+        </div>
+        <div class="col-md-2"> <button class="btn btn-primary" (click)="invite(student._id)">Invite</button> </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+  </div>
+</ng-template>
+
