@@ -279,7 +279,7 @@ export class TeacherCoursesComponent implements OnInit {
 
   getAllInviteLinks() {
     // fel id?
-    console.log('is this the correct course id: ', this.currentCourse.id);
+    // console.log('is this the correct course id: ', this.currentCourse.id);
     this.backendService.getAllInviteLinks(this.currentCourse.id).then((resp: any) => {
       this.inviteList = resp;
       this.inviteList = this.flattenInviteLinks();
