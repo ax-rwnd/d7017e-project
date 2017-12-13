@@ -73,7 +73,10 @@ export class CourseService {
     // Add assignments to the course that have been created
     this.assignmentService.getAssignmentsForCourse(course['_id'])
       .then( done => {
-        return this.teachCourses.next(this.teaching);
+        this.assignmentService.getAssignmentGroups(course['_id'], this.backendService)
+          .then(response => {
+            return this.teachCourses.next(this.teaching);
+          });
       })
       .catch(err => { console.log('err in', this.addTeacherCourse.name, err);
       });
