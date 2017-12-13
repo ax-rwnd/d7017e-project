@@ -1,5 +1,5 @@
-# Learning As A Service
-Learning as a service is a project that intends to help university students learn programming. The idea is to provide a platform for introducing gamified elements into their education, so that tools for external motivation can be added, used and evaluated against learning results.
+# Gamified Programming Platform (GPP)
+The gamified programming platform is a project that intends to help university students learn programming. The idea is to provide a platform for introducing gamified elements into their education, so that tools for external motivation can be added, used and evaluated against learning results.
 
 # Installing
 Learning as a service was built and tested on debian linux 9 (stretch) with node 8.6.0 and npm 5.3.0.
