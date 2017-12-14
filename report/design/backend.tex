@@ -9,5 +9,19 @@ Because of the increasing demands on having stable backend dev builds, a new req
 \\
 Connected to the reasoning of building the backend in different environments/modes such as production or development, it was important to load different configurations depending on what environment the backend was supposed to run. For example, the production environment should not use the same database as the development environment. Because of this, it was important to be able to run the backend in different modes and dynamically load the correct configurations based on the mode that the backend was running in, hence a system that did this was implemented.\\
 \\
+A large part of developers and support teams work is monitoring, debugging and troubleshooting. Because of this it is important to have good logging as a way to make these processes easier, faster and smoother. Having good logging gives them a good insight into what the application is doing and how it works. Because of this, it was important to have proper, useful and extensible logging available in the backend. A custom logging system promtly named logger was developed that ran with Winston and Morgan at its core. Winston is a simple and universal logging library and Morgan is a HTTP request logger middleware. Logger combined winston and morgan with the selectiveness of running the backend in different modes/environments. Depending on the mode, logger had different parts that it logged into log files.\\
+Logger was setup to log all errors, server errors and a general logs in separate log files. When running in dev mode it was also important to log to the console, but not otherwise, hence console logging was only enabled when the backend ran in dev mode. \\
+\\
+Winston and Logger use levels to identify what type of information a log contains, the logging levels in logger conform closely to the severity ordering specified by RFC6424.
+The severity of all levels are numerically ascending from most important to least important.
+\begin{enumerate}
+  \item Server Error
+  \item Error
+  \item Warning
+  \item Info
+  \item Verbose
+  \item Debug
+  \item Silly
+\end{enumerate}
 
 %Needs to be more filled out with technical details by other members of the Backend Group
