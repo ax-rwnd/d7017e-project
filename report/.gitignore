@@ -1,3 +1,5 @@
+*.pdf
+
 # vim stuff
 # Swap
 [._]*.s[a-v][a-z]
