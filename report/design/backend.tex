@@ -53,4 +53,4 @@ The severity of all levels are numerically ascending from most important to leas
 \end{enumerate}
 
 % automated testing
-% TODO
+The API is a large part of the backend codebase. Automated tests of the endpoints were developed, mainly to guard against regressions. The tests mostly assert that the server doesn't return an error when given good input. In order to save time in test development, the tests are run in order, where older tests create the resources that are needed for later tests. This is not good practice in automated tests, but it would have been far more costly to make the tests independent of each other by doing setup and teardown for each endpoint test.
