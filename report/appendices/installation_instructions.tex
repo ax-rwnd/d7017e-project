@@ -3,7 +3,7 @@ The Gamified Programming Platform was a service was built and tested on debian l
 \section{Tester}
 Tester consists of two components; Manager and Runner. Managaer replies to requests from the backend and manages docker containers that run arbitrary code. Containers are used to ensure that some test A does not interfere with some later test B by modifying the executing environment.\\
 \begin{enumerate}
-    \item Clone the repo: \texttt{git clone https://github.com/ax-rwnd/d7017e-project}
+    \item Clone the repo: \texttt{git clone \url{https://github.com/ax-rwnd/d7017e-project}}
     \item Change directory to the Manager folder: \texttt{cd d7017e-project/tester}
     \item Install the dependencies for the Manager: \texttt{npm i}
     \item (Optional) Select languages by adding/removing dependencies in \texttt{Makefile}. For instance the line \texttt{all: python27 python3 java c \# haskell} selects the languages Python 2.7, Python 3, Java, C, but not Haskell (since it's commented out).
@@ -17,7 +17,7 @@ Tester consists of two components; Manager and Runner. Managaer replies to reque
 Backend is the state-managing component. It uses MongoDB to store information that it receives while processesing frontend requests and tester results.
 \begin{enumerate}
 \item Install och configure MongoDB.
-\item Clone the repo: \texttt{git clone https://github.com/ax-rwnd/d7017e-project}
+\item Clone the repo: \texttt{git clone \url{https://github.com/ax-rwnd/d7017e-project}}
 \item Change directory to backend: \texttt{cd d7017e-project/Backend}
 \item Install dependencies: \texttt{npm i}
 \item Configure database address/port in \texttt{Backend/config/default} and \\
@@ -30,10 +30,10 @@ Backend is the state-managing component. It uses MongoDB to store information th
 Frontend is the part that the users see. It builds on Angular for UI and contacts backend for functionality.
 
 \begin{enumerate}
-    \item Clone the repo: \texttt{git clone https://github.com/ax-rwnd/d7017e-project}
+    \item Clone the repo: \texttt{git clone \url{https://github.com/ax-rwnd/d7017e-project}}
     \item Change directory to frontend: \texttt{cd d7017e-project/frontend}
-    \item Redirect frontend to backend: \texttt{sed -i "s/ \textbackslash (backend\_ip: \textbackslash )'.*'/ \\ \textbackslash 1'https://{your\_backend}'/" src/environments/environment.prod.ts}
-    \item Tell were the global ip for frontend is: \texttt{ed -i "s/\textbackslash (frontend\_ip: \\ \textbackslash)'.*'/\textbackslash 1'https://{your\_frontend}'/" src/environments/environment.prod.ts}
+    \item Redirect frontend to backend: \texttt{sed -i "s/ \textbackslash (backend\_ip: \textbackslash )'.*'/ \\ \textbackslash 1'\url{https://{your\_backend}}'/" src/environments/environment.prod.ts}
+    \item Tell were the global ip for frontend is: \texttt{ed -i "s/\textbackslash (frontend\_ip: \\ \textbackslash)'.*'/\textbackslash 1'\url{https://{your\_frontend}}'/" src/environments/environment.prod.ts}
     \item (Optional) Repeat step 2 and 3 for \texttt{src/environments/environment.ts}
     \item Move or link your ssl-certificates \texttt{ln -s encryption/private.key.default \\
     encryption/private.key \&\& \\
