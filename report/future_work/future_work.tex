@@ -1,1 +1,7 @@
 \chapter{Future Work}
+\subsection{Statistics}
+As of right now, there is a simple statistics page that is implemented on the frontend for showing statistics for a specific course. A teacher can see pie-charts for each assignment in the course and how many students that has completed that assignment of the ones who are registered to the course.
+
+The current implementation is using the API call to get all features for that specific course. This API call returns a lot of data that is unnecessary, and in some cases might not be correct to send to frontend. The data used for statistics has to be individually picked out from the massive response that the API call returns. In the future, it might be good to create a route from backend that returns the amount of students that has passed a specific assignment.
+
+In the future, it might be nice to add a graph for each assignment plotting when students pass a specific assignment. This feature would require additional information to be stored in the database of when a student first pass a specific assignment.
