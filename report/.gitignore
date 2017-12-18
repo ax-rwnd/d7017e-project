@@ -42,3 +42,6 @@ tags
 *.synctex.gz
 *.fls
 *.fdb*
+
+# OSX
+*/.DS_Store
