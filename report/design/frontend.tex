@@ -7,3 +7,10 @@ This provides you with a ticket as an URL parameter and redirects you to path: $
 
 \subsubsection{Auth interceptor}
 The main purpose of this interceptor is to modify all requests by setting the authentication field in the header of the request for authenticated users. More than this it collects failed requests in the case of token expiration and tries to refresh the token to retry all failed requests automatically and stay logged in without the user being aware of affected.
+
+\subsection{User page}
+Since the user page acts as the front page of the site it should display a good overview to the user. Therefore all courses that a user either has joined or created will be displayed here. To not take up too much space each course is a collapsed panel that can be opened to show any gamification elements available in the course. By clicking on the name of the course the user will be redirected to the the page for that course.
+
+It is also possible to join a course by selecting a course from a list. This list is displayed in a modal opened by the button above the courses you have joined.  The list does not only show the course code or the name of the course but also the creator of the course. This is because there can be many courses with the same name and/or code.
+
+On the right half of the page you can see which courses you have requested to join and can the requests be canceled. The courses that have allowed students to join the course directly without any confirmation from the teacher will of course not be displayed here. Below the requests there's a list showing any invites sent by teachers to the user. The invites can be accepted or declined.
