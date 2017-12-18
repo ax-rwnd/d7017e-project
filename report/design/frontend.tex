@@ -37,3 +37,16 @@ The assignment description implements markdown, which is a format language for p
 The create assignment page also contains a field for creating and editing input-output tests. A teacher can add multiple tests for verifying the code against multiple inputs.
 
 Once an assignment is ready to be submitted, an API call to backend to create new assignment will be made and if that call is successful, additional calls for adding input-output tests can be made. 
+
+\subsection{Services}
+In AngularJS, a service is a function or object that is accessible from anywhere in the application. On the frontend, services are used regularly as a means to reuse code, such as API calls to backend, as well as to maintain data across several pages. In the following sections some of the more important and well-used services are detailed.
+
+\subsubsection{BackendService}
+The BackendService is the center of all our communication with the backend. Every component or service that needs to either get or post information to or from the backend does so through this service. By requiring all calls to go through this service, we can perform all error handling in one place as well as ensuring that all calls are sent in a similar fashion. All calls expects a response with a JSON body. If there is no relevent information to send in the body an empty JSON body should be sent.
+
+All of BackendService's functions return a Promise that will eventually resolve to the response from the backend. In the event that a request fails, a Toast containing the error message is displayed to the user. 
+
+\subsubsection{AssignmentService and CourseService}
+The AssignmentService is used to keep track of assignments belonging to a specific course. Information about assignments are stored in the service to remove the need of fetching assignments all the time when navigating the course page (e.g., going from the course page to the assignment page and back). The service is also used to keep the information up-to-date with changes that comes as a result of user action. For example, if a teacher creates a new assignment, we only fetch the new assignment from backend and adds it to the already saved list of assignments.
+
+The CourseService fulfil the same purposes as the AssignmentService, but for courses instead of assignments as the name suggests.
