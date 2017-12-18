@@ -14,3 +14,16 @@ Since the user page acts as the front page of the site it should display a good 
 It is also possible to join a course by selecting a course from a list. This list is displayed in a modal opened by the button above the courses you have joined.  The list does not only show the course code or the name of the course but also the creator of the course. This is because there can be many courses with the same name and/or code.
 
 On the right half of the page you can see which courses you have requested to join and can the requests be canceled. The courses that have allowed students to join the course directly without any confirmation from the teacher will of course not be displayed here. Below the requests there's a list showing any invites sent by teachers to the user. The invites can be accepted or declined.
+
+\subsection{Services}
+In AngularJS, a service is a function or object that is accessible from anywhere in the application. On the frontend, services are used regularly as a means to reuse code, such as API calls to backend, as well as to maintain data across several pages. In the following sections some of the more important and well-used services are detailed.
+
+\subsubsection{BackendService}
+The BackendService is the center of all our communication with the backend. Every component or service that needs to either get or post information to or from the backend does so through this service. By requiring all calls to go through this service, we can perform all error handling in one place as well as ensuring that all calls are sent in a similar fashion. All calls expects a response with a JSON body. If there is no relevent information to send in the body an empty JSON body should be sent.
+
+All of BackendService's functions return a Promise that will eventually resolve to the response from the backend. In the event that a request fails, a Toast containing the error message is displayed to the user. 
+
+\subsubsection{AssignmentService and CourseService}
+The AssignmentService is used to keep track of assignments belonging to a specific course. Information about assignments are stored in the service to remove the need of fetching assignments all the time when navigating the course page (e.g., going from the course page to the assignment page and back). The service is also used to keep the information up-to-date with changes that comes as a result of user action. For example, if a teacher creates a new assignment, we only fetch the new assignment from backend and adds it to the already saved list of assignments.
+
+The CourseService fulfil the same purposes as the AssignmentService, but for courses instead of assignments as the name suggests.
