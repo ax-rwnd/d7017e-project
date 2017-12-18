@@ -14,3 +14,20 @@ Since the user page acts as the front page of the site it should display a good 
 It is also possible to join a course by selecting a course from a list. This list is displayed in a modal opened by the button above the courses you have joined.  The list does not only show the course code or the name of the course but also the creator of the course. This is because there can be many courses with the same name and/or code.
 
 On the right half of the page you can see which courses you have requested to join and can the requests be canceled. The courses that have allowed students to join the course directly without any confirmation from the teacher will of course not be displayed here. Below the requests there's a list showing any invites sent by teachers to the user. The invites can be accepted or declined.
+
+\subsection{Assignment}
+\subsubsection{Assignment Page}
+The assignment component is used for displaying and for submitting a solution to an assignment. The component consists of three key fields. A feedback field for displaying server response from testr. A description field for showing the assignment description and finally an in-browser editor. 
+
+The decision to implement an in-browser editor for writing the code was made early on as it was seen as more intuitive than having to write your code using your own editor and then uploading files to the site.
+
+First iteration of the assignment component implemented an editor called CodeMirror, however this editor was dropped and replaced by an implementation of ace editor, which had far many more options in terms of customization such as size of editor and theme. Ace editor also had better support for switching between syntax highlighting of different languages, while CodeMirror required us to reload editor upon switching language. 
+
+\subsubsection{Create Assignment}
+The create assignment page is used for both creating and editing assignments. An assignment consists of a name, description, available languages and flag whether or not the syntax of the code should be tested using lint. 
+
+The assignment description implements markdown, which is a format language for parsing text to correct HTML. This allows a teacher to add different sized headers, lists, embedded pictures, links, code blocks with syntax highlighting. Early version of the create assignment page implemented a live-preview for writing the description, however got removed to maintain consistent design with the create course page. 
+
+The create assignment page also contains a field for creating and editing input-output tests. A teacher can add multiple tests for verifying the code against multiple inputs.
+
+Once an assignment is ready to be submitted, an API call to backend to create new assignment will be made and if that call is successful, additional calls for adding input-output tests can be made. 
