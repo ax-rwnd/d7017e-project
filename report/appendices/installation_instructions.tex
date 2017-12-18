@@ -1,0 +1,38 @@
+Learning as a service was built and tested on debian linux 9 (stretch) with node 8.6.0 and npm 5.3.0.
+\section{Tester}
+Tester consists of two components; Manager and Runner. Managaer replies to requests from the backend and manages docker containers that run arbitrary code. Containers are used to ensure that some test A does not interfere with some later test B by modifying the executing environment.\\
+\begin{enumerate}
+    \item Clone the repo: \textbf{git clone https://github.com/ax-rwnd/d7017e-project}
+    \item Change directory to the Manager folder: \textbf{cd d7017e-project/tester}
+    \item Install the dependencies for the Manager: \textbf{npm i}
+    \item (Optional) Select languages by adding/removing dependencies in \textbf{Makefile}. For instance the line\textbf{ all: python27 python3 java c \# haskell} selects the languages Python 2.7, Python 3, Java, C, but not Haskell (since it's commented out).
+    \item Run the Makefile: \textbf{make}
+    \item (Optional) Set preferences for Runner in \textbf{config/default.js}. There, things like queue lengths and ports may be configured.
+    \item Move back up to manager: \textbf{cd ..}
+    \item Start Manager: \textbf{node server.js \{PORT\}}
+\end{enumerate}
+
+\section{Backend}
+Backend is the state-managing component. It uses MongoDB to store information that it receives while processesing frontend requests and tester results.
+\begin{enumerate}
+\item Install och configure MongoDB.
+\item Clone the repo: \textbf{git clone https://github.com/ax-rwnd/d7017e-project}
+\item Change directory to backend: \textbf{cd d7017e-project/Backend}
+\item Install dependencies: \textbf{npm i}
+\item onfigure database address/port in \textbf{Backend/config/default} and \textbf{Backend/config/production}. IP/Port may differ between the files, should you want to use different databases for testing and production. To select one of these files, set the \textbf{NODE\_ENV} environment variable to \textbf{production} or \textbf{development}.
+\item Start the backend daemon: \textbf{npm start}.
+\item (Optional) Start start backend in the foreground: \textbf{node ./bin/www}
+\end{enumerate}
+
+\section{Frontend}
+Frontend is the part that the users see. It builds on Angular for UI and contacts backend for functionality.
+
+\begin{enumerate}
+    \item Clone the repo: \textbf{git clone https://github.com/ax-rwnd/d7017e-project}
+    \item Change directory to frontend: \textbf{cd d7017e-project/frontend}
+    \item Redirect frontend to backend: \textbf{sed -i "s/ \textbackslash (backend\_ip: \textbackslash )'.*'/ \\ \textbackslash 1'https://{your\_backend}'/" src/environments/environment.prod.ts}
+    \item Tell were the global ip for frontend is: \textbf{ed -i "s/\textbackslash (frontend\_ip: \\ \textbackslash)'.*'/\textbackslash 1'https://{your\_frontend}'/" src/environments/environment.prod.ts}
+    \item (Optional) Repeat step 2 and 3 for \textbf{src/environments/environment.ts}
+    \item Move or link your ssl-certificates \textbf{ln -s encryption/private.key.default encryption/private.key \&\& ln -s encryption/server.crt.default encryption/server.crt}
+    \item Start server: \textbf{--ssl 1 --ssl-cert ./encryption/server.crt --ssl-key ./encryption/private.key --live-reload false}
+\end{enumerate}

@@ -1,0 +1,53 @@
+\documentclass[a4paper,12pt]{report}
+
+% input/text packages
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{amssymb}
+\usepackage{calc}
+
+% graphical/layout packages
+\usepackage[top=1in, bottom=1.5in, left=1in, right=1in]{geometry}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{float}
+
+%Set graphics path
+\graphicspath{ {img/} }
+
+% Horizontal rule with negative spacing
+\newcommand{\spacerule}[1]{\vspace{-.66\baselineskip}\rule{#1}{.4pt}\par}
+
+% Group members together to keep title code clean
+\newcommand{\membergroup}[4]{%
+    \begin{member}{\raggedright}#1\par\spacerule{\widthof{#1}} #2\end{member}\hfill%
+        \begin{member}{\raggedleft}#3\par\spacerule{\widthof{#3}} #4\end{member}%
+            \par\vspace{\baselineskip}}
+
+% Simple minipage for listing project members
+\newenvironment{member}[1]{\begin{minipage}[t]
+    {.3\textwidth}#1}{\end{minipage}}
+
+\input{abbreviations.tex}
+
+\begin{document}
+
+\begin{titlepage}
+    \input{title.tex}
+\end{titlepage}
+
+ \begin{abstract}
+ This report presents how gamification could be applied when learning programming. The key aspects of gamification were investigated by conducting interviews with teachers at Luleå university of technology and a theoretical study. The produced platform shows how some parts of gamification can be used when learning programming. The platforms primary target is university students taking computer science courses at Luleå university of technology. The product is a platform for increasing learning by gamification. In the platform it is possible for teachers to create courses with gamification elements such as an adventure map, a leader board, a progress bar and badges. The teacher can also create assignments and choose how the assignment should be tested, input/output test and/or Lint-test the code. 
+The student can join courses, solve assignments, get feedback if the programming assignment have been correctly solved and earn rewards for increased motivation.
+ \end{abstract}
+
+\tableofcontents{}
+
+ \input{intro/intro.tex}
+ \input{working_methods/working_methods.tex}
+ \input{design/design.tex}
+ \input{discussion/discussion.tex}
+ \input{future_work/future_work.tex}
+ \input{appendices/appendices.tex}
+
+\end{document}
