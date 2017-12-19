@@ -24,8 +24,8 @@ Data can be sent to the backend via both body and URL. Sending data via body is 
 % login/tokens
 % input validation
 % access control
-% SSL (HTTPS), just mention it
-
+\subsection{HTTPS} \label{https}
+Self-signed certificates have been used for the testing environment in order to establish a secure environment with HTTPS. Once a proper production environment is used, it is preferable to not use SSL and instead use a trusted certificate authority.
 \subsection{Quality control}
 % jenkins
 As a way to keep the project effective it was determined that it was important to implement continuous integration as a part of the project to have a modern workflow where you could push changes to git and have them automatically built on a live test server. Using continuous integration was also a good way to separate production and development builds and a way to ensure that production builds always kept a certain standard and robustness. The framework that was used for continuous integration was Jenkins which is one of the most popular frameworks.
