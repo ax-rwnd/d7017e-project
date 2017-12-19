@@ -1,9 +1,21 @@
 % intro, what is Tester trying to do?
+% we want broad language support
 
 \subsection{Sandboxing}
-\subsection{Extensibility}
 \subsection{Manager}
 % TODO: add discussion of different ways of managing load and what we chose
 % (Start containers on demand? Keep a pool of containers ready? Predict load or just react? Allocate different amounts of resources for different languages?)
-\subsection{Language availability fallback}
+\subsection{Test types}
+% unit tests are hard to write
+% I/O tests are language-independent which is good if we want broad language support
 
+\subsection{Extensibility}
+In order to achieve broad language support, it needs to be easy to add new languages. Two steps are necessary to add support for a new language:
+
+\begin{itemize}
+\item The manager has a makefile that produces docker images for each supported language. The makefile needs to be extended with a new target that installs language-specific dependencies.
+
+\item The Node instance running in the container needs to have a module for each supported language. Each language module exports two functions: \texttt{prepare}, which produces a file that can be run with the \texttt{run} function. The \texttt{prepare} step is used for compiled languages, where a binary must be produced before running the program. Some languages, such as python, are run directly in the interpreter. By making preparation a separate step, the program does not need to be recompiled for each test.
+\end{itemize}
+
+\subsection{Language availability fallback}
