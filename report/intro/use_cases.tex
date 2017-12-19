@@ -1,5 +1,11 @@
-In the system there should be two different roles, teacher and student.
-The teacher is able to create courses, assignments and invite students to the courses.
-The teacher will create a course by fill out the description and the name of the course. Then it's possible to choose which gamification parts that should be included in the course. The visibility of the course is chosen by two options public and auto join. When public, the students can see that the course exist and if auto join is chosen the students can freely join the course otherwise they have to request access. When a teacher creates a assignment the teacher fills out the name of the assignment and chooses between LINT-test and input/output test that should be applied on the assignment. The teacher can then write the assignment in with markdown for better structure and easier reading. It is now possible to create badges where the teacher chooses which badges should be applied to an assignment.\\
+The system should have two different types of roles, teacher and student.
 
-A student can be invited to a course or join courses. The student that want to solve an assignment can choose the assignment from a list of assignments on the course page or choose the assignment in the adventuremap if it has been selected by the teacher. The student can see the progress of solved assignment and rewards in form of badges, leader board and progressbar. When solving an assignment the student writes the solution and then submits it. The student will get direct feedback with a reward if the solution is correct otherwise the feedback will be a text showing which tests has failed.
+\subsection*{Teacher}
+A teacher logs into the website and creates a new course. In the create course form, the teacher has to define the name of the course, write a detailed description of the course and choose from a list of gamification elements to use in the course. 
+
+With the new course created, the teacher wants to create new assignments for the course. On the create assignment page, the teacher designs the assignment by writing a detailed description of the task. The teacher then adds tests for the assignment from which the student's solution should be tested against. To get students to join the course, the teacher can send out invites.
+
+\subsection*{Student}
+A student logs into the website and joins a course. On the course page, the student can see all available assignments as well as the enabled gamification elements. The student picks an assignment and start working on a solution. Once the solution is done, the user submits the code for testing.
+
+Within a few seconds, the website responds whether or not the students solution has passed all the tests. If the solution is correct, the students progress in the course is updated. If the solution is incorrect on the other hand, the page will display what went wrong.
