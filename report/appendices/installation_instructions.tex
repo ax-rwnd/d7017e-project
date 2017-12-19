@@ -1,12 +1,12 @@
-The Gamified Programming Platform was a service was built and tested on debian linux 9 (stretch) with node 8.6.0 and npm 5.3.0.
+The Gamified Programming Platform was built and tested on Debian GNU/Linux 9 (stretch) with \nodejs{} 8.6.0 and npm 5.3.0.
 
 \section{Tester}
-Tester consists of two components; Manager and Runner. Managaer replies to requests from the backend and manages docker containers that run arbitrary code. Containers are used to ensure that some test A does not interfere with some later test B by modifying the executing environment.\\
+Tester consists of two components; Manager and Runner. Managaer replies to requests from the backend and manages docker containers that run arbitrary code. Containers are used to ensure that some test $A$ does not interfere with some later test $B$ by modifying the execution environment.\\
 \begin{enumerate}
     \item Clone the repo: \texttt{git clone \url{https://github.com/ax-rwnd/d7017e-project}}
     \item Change directory to the Manager folder: \texttt{cd d7017e-project/tester}
     \item Install the dependencies for the Manager: \texttt{npm i}
-    \item (Optional) Select languages by adding/removing dependencies in \texttt{Makefile}. For instance the line \texttt{all: python27 python3 java c \# haskell} selects the languages Python 2.7, Python 3, Java, C, but not Haskell (since it's commented out).
+    \item (Optional) Select languages by adding/removing dependencies in \texttt{Makefile}. For instance the line \texttt{all: python27 python3 java c \# haskell} selects the languages Python 2.7, Python 3, Java and C, but not Haskell (since it's commented out).
     \item Run the Makefile: \texttt{make}
     \item (Optional) Set preferences for Runner in \texttt{config/default.js}. There, things like queue lengths and ports may be configured.
     \item Move back up to manager: \texttt{cd ..}
@@ -23,7 +23,7 @@ Backend is the state-managing component. It uses MongoDB to store information th
 \item Configure database address/port in \texttt{Backend/config/default} and \\
 \texttt{Backend/config/production}. IP/Port may differ between the files, should you want to use different databases for testing and production. To select one of these files, set the \texttt{NODE\_ENV} environment variable to \texttt{production} or \texttt{development}.
 \item Start the backend daemon: \texttt{npm start}.
-\item (Optional) Start start backend in the foreground: \texttt{node ./bin/www}
+\item (Optional) Start backend in the foreground: \texttt{node ./bin/www}
 \end{enumerate}
 
 \section{Frontend}
@@ -37,7 +37,7 @@ Frontend is the part that the users see. It builds on Angular for UI and contact
     \item (Optional) Repeat step 2 and 3 for \texttt{src/environments/environment.ts}
     \item Move or link your ssl-certificates \texttt{ln -s encryption/private.key.default \\
     encryption/private.key \&\& \\
-   kln -s encryption/server.crt.default encryption/server.crt}
-    \item Start server: \texttt{--ssl 1 --ssl-cert ./encryption/server.crt \\
+    ln -s encryption/server.crt.default encryption/server.crt}
+    \item Start server: \texttt{ng serve --ssl 1 --ssl-cert ./encryption/server.crt \\
     --ssl-key ./encryption/private.key --live-reload false}
 \end{enumerate}
