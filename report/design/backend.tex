@@ -18,6 +18,14 @@ A decision was made early in the project to adhere to a RESTful API design. Acce
 Data can be sent to the backend via both body and URL. Sending data via body is relevant for PUT and POST requests. The information for such requests should be sent as JSON and it should match the format specified in the API documentation\ref{apidocs}. JSON is also the data-type used by the backend to return data, even when the result returned is a status code.
 
 % errors
+\subsubsection{Error handling}
+To enhance a user's experience when working with the API, it was decided that a good way to handle both user errors and server errors should be implemented.
+
+A server error is defined as an unexpected error that could cause the server to crash and therefore become unresponsive. A server error should never prevent the server from continuing serving data from working routes. Therefore every server error is handled and returned to the user as a HTTP error, 500 Internal server error. As explained in logger section(REFFA LOGGER SECTION) a server error is logged to help maintainers localize where things went wrong. This also prevents the server from crashing but the route which threw the error will still throw the error until it's patched. 
+
+A user error is defined as any error caused by a user of the API. Trying to call a non existent route, not including input or including the wrong input are examples of user errors. If such an error is encountered it's important that the user receives feedback on what they are doing wrong. Both a fitting HTTP error code and error message should be returned. If a user has missed one required input field they should be told exactly which field is missing. All user errors is returned with a HTTP error code of 4xx.
+
+Another type of user error occurs when the user makes a valid request which can not be handled because of restrictions implemented in the API. For example, if a user tries to modify data which they don't have access to. These errors is still considered user errors and will follow the error form of such an error.
 % extensibility in features/progress/gamification
 
 \subsection{Security}
