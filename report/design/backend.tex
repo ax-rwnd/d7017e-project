@@ -114,40 +114,40 @@ a tool that support development of future gamification modules. This tool is cal
 Feature and is built in such a way that it is possible to easily extend it with more
 functionallity. Feature works by running all of the gamification modules and
 storing the results of these modules in a Feature collection associated with
-a student and a course.\\
-\\
+a student and a course.
+
 In order to achieve this flexability that future developers should be able to expand
 with their gamification elements without having to learn the whole code base.
 It is important to create a system that can dynamically load files and run
 code on the results from Tester. This was possible by requiring all
 files in a directory, \textit{modules} inside the features directory. These module-files need to follow
 a given interface. They have to contain an initiation function and a function
-that is called once Tester has delivered back results to Backend. \\
-\\
+that is called once Tester has delivered back results to Backend. 
+
 The initiation function connects to an eventlistener that triggers once Backend
 gets a result back from Tester. When this event is triggered it will call the
 function that does module specfic code. It should be noted that if any of the
 mandatory tests fail then Feature wont run any gamification modules. Once a module
-is done calculating it can return results that will be sent back to Frontend.\\
-\\
+is done calculating it can return results that will be sent back to Frontend.
+
 Even if extensibility was of high priority when developing this tool, it was not
 possible to create it truly decoupled from the rest of the code base. For example
 in front of MongoDB, Mongoose is running in order to structure what is stored in
 the database. This means that if a module need to store anything in the database
 the database schema has to be modified in order to support the desired structure
-for that module.\\
-\\
+for that module.
+
 Such an example is the gamification element is called Progress, after
 receiving the results from Tester the result is stored in the Feature collection
 of that student. Resulting in data that describe the progression of that students
-advancements throughout the course.\\
-\\
+advancements throughout the course.
+
 Another example is Badge, each badge has contain information that describes the
 story behind it but also what goals that has to be achieved in order to earn a
 certain badge. This information is stored in a seperate model in the database
 schema but that is not enough. In order to be able to track badges that a student
-of a course has recieved the Feature model has to be updated aswell.\\
-\\
+of a course has recieved the Feature model has to be updated aswell.
+
 This result in that Feature is somewhat decoupled from the rest of the system and
 therefore one of the easiest parts to understand and extend. To create a new module
 is very simple but as most of the modules need to store something that is associated

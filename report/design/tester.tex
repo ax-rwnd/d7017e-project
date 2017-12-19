@@ -16,14 +16,14 @@ When a request for a container with a language that has no free containers that
 request is put in queue and handled when a container is ready. Once a request has
 been served a container another container of the same type is started to decrease
 the response time to Backend. Because on average the containers
-take around one second to start.\\
-\\
+take around one second to start.
+
 A problem with starting containers whenever a request has been made
 is that each Tester instance has limited hardware capacity. Starting too many
 containers will effect the over all performance of the system and therefore
 performance per container. And as timing is one of the properties that Tester
-examines this will affect the result.\\
-\\
+examines this will affect the result.
+
 In order to address this issue the Manager has to keep track of which containers
 that are started and which containers that are currently doing work. Depending on
 hardware it is possible to configure so that a maximum number of containers that
@@ -31,19 +31,19 @@ can be started and to specify the maximum number of containers
 per supported language aswell. It is also possible to configure a number of containers
 that should be started even if no request for that langauge has been made to keep
 idling containers ready serve new requests. This is done in order to decrease
-response time to Backend.\\
-\\
+response time to Backend.
+
 Another way of handling the amount of containers running at a given time could
 be to analyze how high the demand for a specfic language has been previously and
 then deciding on that result how many containers that needs to run in order to
 suffice the number of request on that langauge. This is not something that has
-been impleneted but could be done in the future.\\
-\\
+been impleneted but could be done in the future.
+
 Each container is limited to one thread of the processor running at 50\% core speed and
 100MB memory. Because of this each time a student run the same code a similar
 result can be observed. Timing is always a hard property to measure but with
-these settings Tester can deliver similar timings multiple times.\\
-\\
+these settings Tester can deliver similar timings multiple times.
+
 If a container is highjacked by malicous code the Manager has a timeout that will
 force the container to exit after a given time and return request timeout status code.
 
