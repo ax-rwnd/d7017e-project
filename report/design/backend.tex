@@ -3,7 +3,7 @@
 
 The backend of GPP was developed using javascript running with NodeJs as server framework and Express as a webframework to handle routing. NodeJs was chosen because it was the most established framework with wide support and multiple extensions, such as Express.
 
-\subsection{Database}
+\subsection{Database} \label{database}
 % choice of DB
 % mongoose
 % explain, motivate and evaluate schema design
@@ -12,8 +12,11 @@ The backend of GPP was developed using javascript running with NodeJs as server 
 The document database MongoDB was chosen for the project instead of using a relational database, the reasoning for this decision was to have a database that was built with scalability in mind and dynamic schemas but also because of the simple reason that it is easy for the programmers to read and understand the data inside the database thanks to MongoDBs JSON-like document structure.
 
 \subsection{API}
-% endpoint names
-% protocol, some input data in route, some in url, most of it in req body
+\subsubsection{API protocol}
+A decision was made early in the project to adhere to a RESTful API design. Access paths to resources are built from the database schema\ref{database}. For example: in the current database design, each assignment belongs to a course. It is therefore necessary to reference a specific course to access an assignment. \emph{Example: GET https://.../api/courses/123123123/assignments/456456456/} returns assignment \emph{456456456} which belongs to course \emph{123123123}. Each resource name such as \emph{courses} is in plural. A POST to \emph{https://.../api/courses} creates a course while a GET request to the same resource returns all courses.
+
+Data can be sent to the backend via both body and URL. Sending data via body is relevant for PUT and POST requests. The information for such requests should be sent as JSON and it should match the format specified in the API documentation\ref{apidocs}. JSON is also the data-type used by the backend to return data, even when the result returned is a status code.
+
 % errors
 % extensibility in features/progress/gamification
 
