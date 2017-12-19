@@ -17,9 +17,9 @@ While developing it also proved valuable to have a graphical representation of t
 
 
 \subsection{API protocol}
-A decision was made early in the project to adhere to a RESTful API design. Access paths to resources are built from the database schema~\ref{fig:schema}. For example: in the current database design, each assignment belongs to a course. It is therefore necessary to reference a specific course to access an assignment. Example: \texttt{GET https://.../api/courses/\allowbreak123123123/assignments/456456456/} returns assignment \texttt{456456456} which belongs to course \texttt{123123123}. Each resource name such as \texttt{courses} is in plural. A POST to \texttt{https://.../api/courses} creates a course while a GET request to the same resource returns all courses.
+A decision was made early in the project to adhere to a RESTful API design. Access paths to resources are built from the database schema\ref{https}. For example: in the current database design, each assignment belongs to a course. It is therefore necessary to reference a specific course to access an assignment. \texttt{Example: GET https://.../api/courses/123123123/assignments/456456456/} returns assignment \texttt{456456456} which belongs to course \texttt{123123123}. Each resource name such as \texttt{courses} is in plural. A POST to \texttt{https://.../api/courses} creates a course while a GET request to the same resource returns all courses.
 
-Data can be sent to the backend via both body and URL. Sending data via body is relevant for PUT and POST requests. The information for such requests should be sent as JSON and it should match the format specified in the API documentation~\ref{apidocs}. JSON is also the data-type used by the backend to return data, even when the result returned is a status code.
+Data can be sent to the backend via both body and URL. Sending data via body is relevant for PUT and POST requests. The information for such requests should be sent as JSON and it should match the format specified in the API documentation\ref{}. JSON is also the data-type used by the backend to return data, even when the result returned is a status code.
 
 % errors
 \subsubsection{Error handling}
@@ -40,7 +40,7 @@ Another type of user error occurs when the user makes a valid request which can 
 \subsubsection{Authentication}
 The API endpoint \url{/auth/login/ltu} validates a service ticket issued by CAS at \url{https://weblogon.ltu.se/cas/login} and, if successful, will issue an access token for use at the other access restricted endpoints of the API (see \ref{fig:auth}). The access token is a JSON Web Token with a short life span that is tamper proof and contains information about the user's id and access level. This approach allows the backend to remain sessionless, as the backend will validate the token at every API request. Since the access token expires quickly a refresh token is issued alongside it. The refresh token has a much longer life span and its only use is to generate new access tokens at the \url{/auth/login/accesstoken} endpoint. The refresh tokens are stored in the database, while the access tokens are not. Revoking a refresh token is done by deleting it from the database. Theft of an access token or refresh token would give the thief access until the token expires or, in the case of refresh tokens, it is revoked but this is made harder with SSL encryption.
 
-\subsection{HTTPS} \label{https}
+\subsubsection{HTTPS} \label{https}
 Self-signed certificates have been used for the testing environment in order to establish a secure environment with HTTPS. Once a proper production environment is used, it is preferable to use a trusted certificate authority instead of self-signed certificates.
 
 % SSL (HTTPS), just mention it
