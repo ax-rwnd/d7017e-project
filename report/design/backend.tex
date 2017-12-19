@@ -4,18 +4,22 @@
 The backend of GPP was developed using javascript running with NodeJs as server framework and Express as a webframework to handle routing. NodeJs was chosen because it was the most established framework with wide support and multiple extensions, such as Express.
 
 \subsection{Database} \label{database}
-% choice of DB
-% mongoose
-% explain, motivate and evaluate schema design
 
-% fixme
-The document database MongoDB was chosen for the project instead of using a relational database, the reasoning for this decision was to have a database that was built with scalability in mind and dynamic schemas but also because of the simple reason that it is easy for the programmers to read and understand the data inside the database thanks to MongoDBs JSON-like document structure.
+%OLD TEXT COMMENTED
+%The document database MongoDB was chosen for the project instead of using a relational database, %the reasoning for this decision was to have a database that was built with scalability in mind %and dynamic schemas but also because of the simple reason that it is easy for the programmers to %read and understand the data inside the database thanks to MongoDBs JSON-like document %structure.
+%OLD TEXT COMMENTED
 
-\subsection{API}
-\subsubsection{API protocol}
-A decision was made early in the project to adhere to a RESTful API design. Access paths to resources are built from the database schema\ref{database}. For example: in the current database design, each assignment belongs to a course. It is therefore necessary to reference a specific course to access an assignment. \emph{Example: GET https://.../api/courses/123123123/assignments/456456456/} returns assignment \emph{456456456} which belongs to course \emph{123123123}. Each resource name such as \emph{courses} is in plural. A POST to \emph{https://.../api/courses} creates a course while a GET request to the same resource returns all courses.
+MongoDB was chosen mainly because the project members aimed to use software that are included in the MEAN software stack (MongoDB, Express, Angular, NodeJS). The majority of the group members working with backend did not have prior experience working with NoSQL databases which means it also presented a good opportunity to learn. MongoDB was a popular choice among NoSQL databases and the group deemed it able to simplify the process of interacting with the data. Mongo uses a JSON-like document structure and JSON is the data format used when different parts of the project services communicates. 
 
-Data can be sent to the backend via both body and URL. Sending data via body is relevant for PUT and POST requests. The information for such requests should be sent as JSON and it should match the format specified in the API documentation\ref{apidocs}. JSON is also the data-type used by the backend to return data, even when the result returned is a status code.
+It was discovered that a plug-in for MongoDB: Mongoose, would aid in the process of creating a database structure. With Mongoose it's possible to create schemas that describes the format of the data that is to be stored in the database. Using Mongoose did present a problem to the project members by not having consistency. If the schemas were updated there would be a mix of data, some of it stored in the previous format and some in the new. This resulted in a need to reset the database after schema updates.
+
+While developing it also proved valuable to have a graphical representation of the data. The data is displayed using \href{https://github.com/mrvautin/adminMongo}{AdminMongo} which also enables the user to create new entries, edit existing data and delete data. Being able to insert and edit data presented some issues throughout the project since the user has full freedom when inserting data. No input validation or checks to the current database schemas are made. 
+
+
+\subsection{API protocol}
+A decision was made early in the project to adhere to a RESTful API design. Access paths to resources are built from the database schema\ref{https}. For example: in the current database design, each assignment belongs to a course. It is therefore necessary to reference a specific course to access an assignment. \texttt{Example: GET https://.../api/courses/123123123/assignments/456456456/} returns assignment \texttt{456456456} which belongs to course \texttt{123123123}. Each resource name such as \texttt{courses} is in plural. A POST to \texttt{https://.../api/courses} creates a course while a GET request to the same resource returns all courses.
+
+Data can be sent to the backend via both body and URL. Sending data via body is relevant for PUT and POST requests. The information for such requests should be sent as JSON and it should match the format specified in the API documentation\ref{}. JSON is also the data-type used by the backend to return data, even when the result returned is a status code.
 
 % errors
 % extensibility in features/progress/gamification
@@ -26,7 +30,7 @@ Data can be sent to the backend via both body and URL. Sending data via body is 
 % access control
 
 \subsection{HTTPS} \label{https}
-Self-signed certificates have been used for the testing environment in order to establish a secure environment with HTTPS. Once a proper production environment is used, it is preferable to not use SSL and instead use a trusted certificate authority.
+Self-signed certificates have been used for the testing environment in order to establish a secure environment with HTTPS. Once a proper production environment is used, it is preferable to use a trusted certificate authority instead of self-signed certificates.
 
 % SSL (HTTPS), just mention it
 \subsubsection{Access control}
