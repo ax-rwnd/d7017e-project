@@ -1,13 +1,29 @@
 % intro, what is Tester trying to do?
 % we want broad language support
+Tester is a tool for testing code in a variety of programming languages in a safe and isolated environment. To fulfill the needs of the GPP, Tester needs to support a  broad varierty of languages, so that the range of courses that can benefit from the platform is not limited. Tester also strives for the functionality to test code based on different merits to support the creation of varied, fun and interesting assignments.
 
 \subsection{Sandboxing}
+%TODO ref to docker
+An important feature of the Tester is that the code is tested in an isolated enviroment. The main reason behind doing this is that we are executing potentially malicious code. Allowing such code to be executed without isolation is bound to cause service disruptions or information leaks. 
+
+To achieve isolation all code testing takes place in so called Docker containers equipped with the tools necessary to compile and run the code. A container is a virtualization (simulation) of an operating-system with a separate user-space. What this means is that programs running inside the container can only access the contents and devices that are assigned to the container. By running the tests in Docker containers, any malicious code cannot gain access to information it shouldn't have access to or cause any disruptions to the service, since such code will at most crash the container which has no long-lasting effects on the service offered by Tester.
 \subsection{Manager}
 % TODO: add discussion of different ways of managing load and what we chose
 % (Start containers on demand? Keep a pool of containers ready? Predict load or just react? Allocate different amounts of resources for different languages?)
 \subsection{Test types}
 % unit tests are hard to write
 % I/O tests are language-independent which is good if we want broad language support
+When deciding which test types had the highest implementation priority, an important factor was the time expenditure required by the creator of the tests. If writing tests for a single assignment takes a considerable amount of time the platform will become too impractical to use. For this reason tests such as Unit Tests are not supported. It would be time-consuming for lab supervisors to write tests. %idk what i wrote here
+
+Another deciding factor is the language-dependency of the unit tests. If a test requires language-specific implementation the extensibility of the language support suffers. This is one of the reasons why the I/O and Code size tests mentioned below are excellent choices, they are both language-independent and require no additional implementation for every language supported. Although Lint tests also mentioned below does not have the independency property, it has been implemented for a smaller number of languages as a proof of concept.
+%Should we explain what each test type is? or are they obvious enough?
+Currently, Tester supports three types of tests:
+\begin{itemize}
+\item Input/Output (I/O)
+\item Code size
+\item Lint
+\end{itemize}
+
 
 \subsection{Extensibility}
 In order to achieve broad language support, it needs to be easy to add new languages. Two steps are necessary to add support for a new language:

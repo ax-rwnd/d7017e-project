@@ -12,6 +12,7 @@
 \usepackage{subcaption}
 \usepackage{float}
 \usepackage{enumitem}
+\usepackage{multicol}
 \setlist[itemize]{noitemsep, topsep=0pt}
 
 %Set graphics path
@@ -45,11 +46,16 @@ The student can join courses, solve assignments, get feedback if the programming
 
 \tableofcontents{}
 
+% NOTE: \addtocontents need to keep this format for the toc to be properly columnized
+\addtocontents{toc}{\protect\begin{multicols}{2}}
+
  \input{intro/intro.tex}
  \input{working_methods/working_methods.tex}
  \input{design/design.tex}
  \input{discussion/discussion.tex}
  \input{future_work/future_work.tex}
  \input{appendices/appendices.tex}
+
+\addtocontents{toc}{\protect\end{multicols}}
 
 \end{document}
