@@ -3,9 +3,6 @@
 
 The backend of GPP was developed using javascript running with \nodejs{} as server framework and Express as a webframework to handle routing. \nodejs{} was chosen because it was the most established framework with wide support and multiple extensions, such as Express.
 
-\subsection{Authentication}
-The API endpoint \url{/auth/login/ltu} validates a service ticket issued by CAS at \url{https://weblogon.ltu.se/cas/login} and, if successful, will issue an access token for use at the other access restricted endpoints of the API (see \ref{fig:auth}). The access token is a JSON Web Token with a short life span that is tamper proof and contains information about the user's id and access level. This approach allows the backend to remain sessionless, as the backend will validate the token at every API request. Since the access token expires quickly a refresh token is issued alongside it. The refresh token has a much longer life span and its only use is to generate new access tokens at the \url{/auth/login/accesstoken} endpoint.
-
 \subsection{Database} \label{database}
 
 %OLD TEXT COMMENTED
@@ -37,16 +34,16 @@ Another type of user error occurs when the user makes a valid request which can 
 
 \subsection{Security}
 % login/tokens
-
 % input validation
-\subsubsection{Input validation}
-A common security problem in databases is injection attacks. To prevent this the API has to make sure the input has the expected form. A boolean input field must be of boolean type to be accepted. To achieve this, the module express-validator(REF https://github.com/ctavan/express-validator) was used. With this module it's possible to check URL, query and body input. For every invalid input field a specific error message is added to an array. When all fields have been checked, this array will be returned together with an HTTP error code 400 as feedback. This way the user can receive direct feedback without the need to consult the documentation. 
+% access control
 
-% SSL (HTTPS), just mention it
-\subsubsection{HTTPS} \label{https}
+\subsubsection{Authentication}
+The API endpoint \url{/auth/login/ltu} validates a service ticket issued by CAS at \url{https://weblogon.ltu.se/cas/login} and, if successful, will issue an access token for use at the other access restricted endpoints of the API (see \ref{fig:auth}). The access token is a JSON Web Token with a short life span that is tamper proof and contains information about the user's id and access level. This approach allows the backend to remain sessionless, as the backend will validate the token at every API request. Since the access token expires quickly a refresh token is issued alongside it. The refresh token has a much longer life span and its only use is to generate new access tokens at the \url{/auth/login/accesstoken} endpoint. The refresh tokens are stored in the database, while the access tokens are not. Revoking a refresh token is done by deleting it from the database. Theft of an access token or refresh token would give the thief access until the token expires or, in the case of refresh tokens, it is revoked but this is made harder with SSL encryption.
+
+\subsection{HTTPS} \label{https}
 Self-signed certificates have been used for the testing environment in order to establish a secure environment with HTTPS. Once a proper production environment is used, it is preferable to use a trusted certificate authority instead of self-signed certificates.
 
-% access control
+% SSL (HTTPS), just mention it
 \subsubsection{Access control}
 The API has three different base roles, 
 \begin{itemize}
