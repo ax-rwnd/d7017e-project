@@ -22,6 +22,14 @@ A decision was made early in the project to adhere to a RESTful API design. Acce
 Data can be sent to the backend via both body and URL. Sending data via body is relevant for PUT and POST requests. The information for such requests should be sent as JSON and it should match the format specified in the API documentation\ref{}. JSON is also the data-type used by the backend to return data, even when the result returned is a status code.
 
 % errors
+\subsubsection{Error handling}
+To enhance a user's experience when working with the API, it was decided that a good way to handle both user errors and server errors should be implemented.
+
+A server error is defined as an unexpected error that could cause the server to crash and therefore become unresponsive. A server error should never prevent the server from continuing serving data from working routes. Therefore every server error is handled and returned to the user as a HTTP error, 500 Internal server error. As explained in logger section(REFFA LOGGER SECTION) a server error is logged to help maintainers localize where things went wrong. This also prevents the server from crashing but the route which threw the error will still throw the error until it's patched. 
+
+A user error is defined as any error caused by a user of the API. Trying to call a non existent route, not including input or including the wrong input are examples of user errors. If such an error is encountered it's important that the user receives feedback on what they are doing wrong. Both a fitting HTTP error code and error message should be returned. If a user has missed one required input field they should be told exactly which field is missing. All user errors is returned with a HTTP error code of 4xx.
+
+Another type of user error occurs when the user makes a valid request which can not be handled because of restrictions implemented in the API. For example, if a user tries to modify data which they don't have access to. These errors is still considered user errors and will follow the error form of such an error.
 % extensibility in features/progress/gamification
 
 \subsection{Security}
@@ -53,6 +61,7 @@ A student is only allowed to do things regarding himself, such as submitting ass
 
 \subsection{Quality control}
 % jenkins
+\subsubsection{Jenkins}
 As a way to keep the project effective it was determined that it was important to implement continuous integration as a part of the project to have a modern workflow where you could push changes to git and have them automatically built on a live test server. Using continuous integration was also a good way to separate production and development builds and a way to ensure that production builds always kept a certain standard and robustness. The framework that was used for continuous integration was Jenkins which is one of the most popular frameworks.
 
 While the idea of how continuous integration was supposed to be used in the project was quite clear, the concept wasn't put to as good use as it could have. In the first half of the project, the builds generated from Jenkins wasn't really put to use. This was mainly due to communication errors and the fact that the builds weren't needed as much. For the second part of the project the builds were used more. The way that the deployment with Jenkins was setup was to build from two branches from GIT, one from the master which was supposed to build for production and another from the backend branch which was supposed to build for development. The idea was that the development build would always contain the latest changes in backend. As the project reached its deadline it became increasingly important to also keep the backend dev builds stable because of the fact that the frontend team were depending on the backend dev build when developing.
@@ -60,9 +69,11 @@ While the idea of how continuous integration was supposed to be used in the proj
 Because of the increasing demands on having stable backend dev builds, a new requirement was setup for the continuous integration where a new development dev build was only built if it passed a set of unit-tests for the application.
 
 % different environments
+\subsubsection{Different environments}
 Connected to the reasoning of building the backend in different environments/modes such as production or development, it was important to load different configurations depending on what environment the backend was supposed to run. For example, the production environment should not use the same database as the development environment. Because of this, it was important to be able to run the backend in different modes and dynamically load the correct configurations based on the mode that the backend was running in, hence a system that did this was implemented.
 
 % logging
+\subsubsection{Logging}
 A large part of developers and support teams work is monitoring, debugging and troubleshooting. Because of this it is important to have good logging as a way to make these processes easier, faster and smoother. Having good logging gives them a good insight into what the application is doing and how it works. Because of this, it was important to have proper, useful and extensible logging available in the backend. A custom logging system promtly named logger was developed that ran with Winston and Morgan at its core. Winston is a simple and universal logging library and Morgan is a HTTP request logger middleware. Logger combined winston and morgan with the selectiveness of running the backend in different modes/environments. Depending on the mode, logger had different parts that it logged into log files.
 
 Logger was setup to log all errors, server errors and a general logs in separate log files. When running in dev mode it was also important to log to the console, but not otherwise, hence console logging was only enabled when the backend ran in dev mode. 
@@ -81,4 +92,5 @@ The severity of all levels are numerically ascending from most important to leas
 \end{enumerate}
 
 % automated testing
+\subsubsection{Automated testing}
 The API is a large part of the backend codebase. Automated tests of the endpoints were developed, mainly to guard against regressions. The tests mostly assert that the server doesn't return an error when given good input. In order to save time in test development, the tests are run in order, where older tests create the resources that are needed for later tests. This is not good practice in automated tests, but it would have been far more costly to make the tests independent of each other by doing setup and teardown for each endpoint test.
