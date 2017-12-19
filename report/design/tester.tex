@@ -13,6 +13,17 @@ To achieve isolation all code testing takes place in so called Docker containers
 \subsection{Test types}
 % unit tests are hard to write
 % I/O tests are language-independent which is good if we want broad language support
+When deciding which test types had the highest implementation priority, an important factor was the time expenditure required by the creator of the tests. If writing tests for a single assignment takes a considerable amount of time the platform will become too impractical to use. For this reason tests such as Unit Tests are not supported. It would be time-consuming for lab supervisors to write tests. %idk what i wrote here
+
+Another deciding factor is the language-dependency of the unit tests. If a test requires language-specific implementation the extensibility of the language support suffers. This is one of the reasons why the I/O and Code size tests mentioned below are excellent choices, they are both language-independent and require no additional implementation for every language supported. Although Lint tests also mentioned below does not have the independency property, it has been implemented for a smaller number of languages as a proof of concept.
+%Should we explain what each test type is? or are they obvious enough?
+Currently, Tester supports three types of tests:
+\begin{itemize}
+\item Input/Output (I/O)
+\item Code size
+\item Lint
+\end{itemize}
+
 
 \subsection{Extensibility}
 In order to achieve broad language support, it needs to be easy to add new languages. Two steps are necessary to add support for a new language:
