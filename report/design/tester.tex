@@ -43,9 +43,6 @@ these settings Tester can deliver similar timings multiple times.\\
 If a container is highjacked by malicous code the Manager has a timeout that will
 force the container to exit after a given time and return request timeout status code.
 
-
-
-
 \subsection{Test types}
 % unit tests are hard to write
 % I/O tests are language-independent which is good if we want broad language support
@@ -72,34 +69,3 @@ In order to achieve broad language support, it needs to be easy to add new langu
 
 \subsection{Service Availability Fallback}
 A little known feature of tester is that it plays nice with load-balancers by reporting whether or not the testing service itself is available. That is, if the language that is to be tested isn't available, or the testing-queue is full, it defers the job to another tester. It does that by responding with the \texttt{503: Service Unavailable} status, after which the load-balancer sitting in front of it will understand that it needs to route traffic elsewhere.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
----
->>>>>>> Stashed changes
