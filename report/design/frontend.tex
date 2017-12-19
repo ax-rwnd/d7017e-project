@@ -6,11 +6,13 @@ The CSS library Bootstrap was used to get a clean and consistent design. To achi
 
 \subsection{Authentication}
 \subsubsection{Login}
-To authenticate yourself on login you are by default prompted to sign in with LTU's weblogon CAS (central authentication service). 
+To authenticate yourself on login you are by default prompted to sign in with LTU's weblogon CAS (Central Authentication Service). 
 This provides you with a ticket as an URL parameter and redirects you to path: \url{https://frontend\_ip/Auth} which in turn contacts backend with said ticket to check its validity. If validated the backend responds with a status code of 200 OK and a JSON object containing authentication tokens for the user which are saved in local storage. In any other case the user receives status code 401 unauthorized and is prompted to login again.
 \begin{figure}[hb]
     \centering
     \includegraphics[width=\textwidth]{login.png}
+    \caption{Authentication schema}
+    \label{fig:auth}
 \end{figure}
 
 \subsubsection{Auth interceptor}

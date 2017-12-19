@@ -1,7 +1,10 @@
 % TODO move to a higher level (working methods?)
 % A coding-standard was quickly decided on to make sure the code style was somewhat coherent effectively making it easier for different members to take over other members code if needed.
 
-The backend of GPP was developed using javascript running with NodeJs as server framework and Express as a webframework to handle routing. NodeJs was chosen because it was the most established framework with wide support and multiple extensions, such as Express.
+The backend of GPP was developed using javascript running with \nodejs{} as server framework and Express as a webframework to handle routing. \nodejs{} was chosen because it was the most established framework with wide support and multiple extensions, such as Express.
+
+\subsection{Authentication}
+The API endpoint \url{/auth/login/ltu} validates a service ticket issued by CAS at \url{https://weblogon.ltu.se/cas/login} and, if successful, will issue an access token for use at the other access restricted endpoints of the API (see \ref{fig:auth}). The access token is a JSON Web Token with a short life span that is tamper proof and contains information about the user's id and access level. This approach allows the backend to remain sessionless, as the backend will validate the token at every API request. Since the access token expires quickly a refresh token is issued alongside it. The refresh token has a much longer life span and its only use is to generate new access tokens at the \url{/auth/login/accesstoken} endpoint.
 
 \subsection{Database} \label{database}
 
@@ -9,7 +12,7 @@ The backend of GPP was developed using javascript running with NodeJs as server 
 %The document database MongoDB was chosen for the project instead of using a relational database, %the reasoning for this decision was to have a database that was built with scalability in mind %and dynamic schemas but also because of the simple reason that it is easy for the programmers to %read and understand the data inside the database thanks to MongoDBs JSON-like document %structure.
 %OLD TEXT COMMENTED
 
-MongoDB was chosen mainly to complete the MEAN software stack (MongoDB, Express, Angular, NodeJS). The majority of the group members working on backend did not have prior experience working with NoSQL databases which presented a good opportunity to learn. MongoDB is a popular choice among NoSQL databases and the group deemed it able to simplify when interacting with the data: Mongo uses a JSON-like document structure and JSON is the data format used when different parts of the project services communicates. 
+MongoDB was chosen mainly to complete the MEAN software stack (MongoDB, Express, Angular, \nodejs{}). The majority of the group members working on backend did not have prior experience working with NoSQL databases which presented a good opportunity to learn. MongoDB is a popular choice among NoSQL databases and the group deemed it able to simplify when interacting with the data: Mongo uses a JSON-like document structure and JSON is the data format used when different parts of the project services communicates. 
 
 Mongoose is a package that extends MongoDB by enforcing a database structure. With Mongoose it's possible to create schemas that describe the format of the data that is to be stored in the database. Mongoose presented a problem to the project members by not having consistency. If the schemas were updated there would be a mix of data, some of it stored in the previous format and some in the new. This resulted in a need to either migrate or remove the data in the database after schema updates.
 
