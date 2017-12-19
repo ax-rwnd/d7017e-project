@@ -34,13 +34,16 @@ Another type of user error occurs when the user makes a valid request which can 
 
 \subsection{Security}
 % login/tokens
-% input validation
-% access control
 
-\subsection{HTTPS} \label{https}
-Self-signed certificates have been used for the testing environment in order to establish a secure environment with HTTPS. Once a proper production environment is used, it is preferable to use a trusted certificate authority instead of self-signed certificates.
+% input validation
+\subsubsection{Input validation}
+A common security problem in databases is injection attacks. To prevent this the API has to make sure the input has the expected form. A boolean input field must be of boolean type to be accepted. To achieve this, the module express-validator(REF https://github.com/ctavan/express-validator) was used. With this module it's possible to check URL, query and body input. For every invalid input field a specific error message is added to an array. When all fields have been checked, this array will be returned together with an HTTP error code 400 as feedback. This way the user can receive direct feedback without the need to consult the documentation. 
 
 % SSL (HTTPS), just mention it
+\subsubsection{HTTPS} \label{https}
+Self-signed certificates have been used for the testing environment in order to establish a secure environment with HTTPS. Once a proper production environment is used, it is preferable to use a trusted certificate authority instead of self-signed certificates.
+
+% access control
 \subsubsection{Access control}
 The API has three different base roles, 
 \begin{itemize}
