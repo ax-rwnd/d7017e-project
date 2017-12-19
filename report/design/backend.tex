@@ -25,6 +25,23 @@ Data can be sent to the backend via both body and URL. Sending data via body is 
 % input validation
 % access control
 % SSL (HTTPS), just mention it
+\subsubsection{Access control}
+The API has three different base roles, 
+\begin{itemize}
+\item Basic
+\item Advanced
+\item Admin
+\end{itemize}
+
+These are assigned according to the user's role in their school, which is found when logging in through CAS. If the user is a student he will be assigned the basic role and if he is a teacher the advanced role is assigned. Admin is never assigned automatically and have to be set manually if needed. Depending on the role, different limitations are enforced. A basic user is only allowed to create 3 courses. Admins and advanced users are allowed to create an unlimited number of courses. This is the only difference between a basic and an advanced user. The reason a basic user is limited in their number of courses is simply to prevent malicious behaviour. Admins have full access to every route and are not limited in any way. This is mostly affecting course routes. 
+
+Regardless of a user's base role he has a different role in every course. Every course in turn has three user roles,
+\begin{itemize}
+\item Student
+\item Teacher
+\item Owner
+\end{itemize}
+A student is only allowed to do things regarding himself, such as submitting assignments or leaving the course. The teacher role is to maintain the course but also to control who is allowed to join it. The highest course role is the owner which is the user that created the course. The owner can do everything a teacher is able to do, the only difference being that teachers can't remove the owner from the course. A user with the admin base role is basically able to do everything in any course.
 
 \subsection{Quality control}
 % jenkins
