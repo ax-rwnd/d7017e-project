@@ -58,11 +58,11 @@ Currently logging in with CAS via \LTU\ is the only way to access the backend. T
 Self-signed certificates have been used for the testing environment in order to establish a secure environment with HTTPS. Once a proper production environment is used, it is necessary to use a trusted certificate authority instead of self-signed certificates.
 
 \subsubsection{Input validation}
-Injection attacks are a common security problem in applications that use databases. To prevent this the API has to make sure the input has the expected form. A boolean input field must be of boolean type to be accepted. To achieve this, the module \href{https://github.com/ctavan/express-validator}{express-validator} was used. With this module it's possible to check URL, query and body input. For every invalid input field a specific error message is added to an array. When all fields have been checked, this array will be returned together with an HTTP error code 400 as feedback. This way the user can receive direct feedback without the need to consult the documentation.
+Injection attacks are a common security problem in applications that use databases. To prevent this the API has to make sure the input has the expected form. A boolean input field must be of boolean type to be accepted. To achieve this, the module \href{https://github.com/ctavan/express-validator}{express-validator} was used. With this module it's possible to check URL, query and body input. For every invalid input field a specific error message is added to an array. When all fields have been checked, this array will be returned together with an HTTP error code \texttt{400:\@ Bad Request} as feedback. This way the user can receive direct feedback without the need to consult the documentation.
 
 % SSL (HTTPS), just mention it
-\subsubsection{Access control}
-The API has three different base roles, 
+\subsubsection{Access Control}
+The API has three different base roles:
 \begin{itemize}
 \item Basic
 \item Advanced
@@ -70,15 +70,15 @@ The API has three different base roles,
 \end{itemize}
 These are assigned according to the user's role in their school, which is found when logging in through CAS. If the user is a student, a basic role will be assigned, and if the user is a teacher, an advanced role will be assigned. Admin is never assigned automatically and has to be set manually if needed. Depending on the role, different limitations are enforced. A basic user is only allowed to create 3 courses. Admins and advanced users are allowed to create an unlimited number of courses. This is currently the only difference between a basic and an advanced user. The reason a basic user is limited in their number of courses is simply to prevent malicious behaviour. Admins have full access to every route and are not limited in any way. This is mostly affecting course routes. 
 
-Regardless of a user's base role he has a different role in every course. Every course in turn has three user roles,
+Regardless of a user's base role he has a different role in every course. Every course in turn has three user roles:
 \begin{itemize}
 \item Student
 \item Teacher
 \item Owner
 \end{itemize}
-A student is only allowed to do things regarding himself, such as submitting assignments or leaving the course. The teacher role maintains the course, but also controls who is allowed to join. The highest course role is the owner, which is the user that created the course. The owner can do everything a teacher is able to do, the only difference being that teachers can't remove the owner from the course. A user with the admin base role is basically able to do everything in any course.
+Students are only allowed to use a subset of the routes, such as submitting assignments or leaving courses. The teacher role maintains the course, but also controls who is allowed to join. The highest course role is the owner, which is the user that created the course. The owner can do everything a teacher is able to do, the only difference being that teachers can't remove the owner from the course. A user with the admin base role is basically able to do everything in any course.
 
-\subsection{Quality control}
+\subsection{Quality Control}
 % jenkins
 \subsubsection{Continuous Integration}
 As a way to keep the project effective it was determined that it was important to implement continuous integration as a part of the project. This helps to achieve a modern workflow, where changes pushed to the repository are automatically tested and built on a live test server. Using continuous integration was also a good way to separate production and development builds, and a way to ensure that production builds always kept a certain standard and robustness. The solution used was \href{https://jenkins-ci.org/}{Jenkins}, which is well established.
@@ -88,7 +88,7 @@ While the idea of how continuous integration was supposed to be used in the proj
 Because of the increasing demands of having stable backend development builds, a new requirement was set up for the continuous integration where a new development build was only built if it passed a set of unit tests.
 
 % different environments
-\subsubsection{Different environments}
+\subsubsection{Different Environments}
 Connected to the reasoning of building the backend in different environments/modes, such as production or development, it was important to load different configurations depending on what environment the backend was supposed to run. For example, the production environment should not use the same database as the development environment. Because of this, it was important to be able to run the backend in different modes and dynamically load the correct configurations based on the mode that the backend was running in, hence a system that did this was implemented.
 
 % logging

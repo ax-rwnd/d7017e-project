@@ -1,6 +1,6 @@
 % intro, what is Tester trying to do?
 % we want broad language support
-Tester is a tool for testing code in a variety of programming languages in a safe and isolated environment. To fulfill the needs of the GPP, Tester needs to support a  broad varierty of languages, so that the range of courses that can benefit from the platform is not limited. Tester also strives for the functionality to test code based on different merits to support the creation of varied, fun and interesting assignments.
+Tester is a tool for testing code in a variety of programming languages in a safe and isolated environment. To fulfill the needs of the GPP, Tester needs to support a  broad variety of languages, so that the range of courses that can benefit from the platform is not limited. Tester also strives for the functionality to test code based on different merits to support the creation of varied, fun and interesting assignments.
 
 \subsection{Sandboxing}
 %TODO ref to docker
@@ -13,7 +13,7 @@ To achieve isolation all code testing takes place in so called Docker containers
 
 As Backend sends requests to Tester these requests are handled by assigning a free container to serve that request.
 If all containers for a language are busy, requests for that language are enqueued. 
-The containers take around one second to start. In order to decrease the response time to backend,
+The containers take around one second to start (NB:\@ on the authors' servers). In order to decrease the response time to backend,
 containers are started preemptively. Once a request has been served another container of the same type is started.
 
 If Tester receives a lot of requests, it will in turn start large number of containers.
@@ -21,7 +21,7 @@ Starting too many containers will affect the overall performance of the system a
 This will increase the uncertainty of the timing tests which is undesirable.
 
 In order to address this issue the Manager has to keep track of which containers
-are started and which ones which are currently processing a request. 
+are started and which ones are currently processing a request. 
 It is possible to configure the maximum number of containers that
 can be started and to specify the maximum number of containers
 per supported language. It is also possible to configure the number of containers
@@ -46,7 +46,6 @@ Currently, Tester supports three types of tests:
 \item Code size. These tests enforce a maximum limit on the number of characters there can be in the submitted code.
 \item Lint. A lint test makes sure that the submitted code adheres to some coding standard for the language. Indentation, trailing whitespaces and blank lines are some examples of what might be checked.
 \end{itemize}
-
 When deciding which test types had the highest implementation priority, an important factor was the time expenditure required by the creator of the tests. If writing tests for a single assignment takes a considerable amount of time the platform will become impractical to use. For this reason tests such as Unit Tests are not supported. It would be time-consuming for lab supervisors to write tests.
 
 Another deciding factor is the language-dependency of the unit tests. If a test requires language-specific implementation the extensibility of the language support suffers. This is one of the reasons why the I/O and Code size tests mentioned allow are excellent choices, they are both language-independent and require no additional implementation for every language supported. Although Lint tests are not language-independent, they have been implemented for a few languages as a proof of concept.
