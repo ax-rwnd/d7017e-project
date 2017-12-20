@@ -11,41 +11,35 @@ To achieve isolation all code testing takes place in so called Docker containers
 % add discussion of different ways of managing load and what we chose
 % (Start containers on demand? Keep a pool of containers ready? Predict load or just react? Allocate different amounts of resources for different languages?)
 
-As Backend sends requests to Tester these requests are handled by assigning a free container serving that request.
-When a request for a container with a language that has no free containers that
-request is put in queue and handled when a container is ready. Once a request has
-been served a container another container of the same type is started to decrease
-the response time to Backend. Because on average the containers
-take around one second to start.
+As Backend sends requests to Tester these requests are handled by assigning a free container to serve that request.
+If all containers for a language are busy, requests for that language are enqueued. 
+The containers take around one second to start. In order to decrease the response time to backend,
+containers are started preemptively. Once a request has been served another container of the same type is started.
 
-A problem with starting containers whenever a request has been made
-is that each Tester instance has limited hardware capacity. Starting too many
-containers will effect the over all performance of the system and therefore
-performance per container. And as timing is one of the properties that Tester
-examines this will affect the result.
+If Tester receives a lot of requests, it will in turn start large number of containers.
+Starting too many containers will affect the overall performance of the system and therefore performance per container.
+This will increase the uncertainty of the timing tests which is undesirable.
 
 In order to address this issue the Manager has to keep track of which containers
-that are started and which containers that are currently doing work. Depending on
-hardware it is possible to configure so that a maximum number of containers that
+are started and which ones which are currently processing a request. 
+It is possible to configure the maximum number of containers that
 can be started and to specify the maximum number of containers
-per supported language as well. It is also possible to configure a number of containers
+per supported language. It is also possible to configure the number of containers
 that should be started even if no request for that language has been made to keep
 idling containers ready serve new requests. This is done in order to decrease
 response time to Backend.
 
-Another way of handling the amount of containers running at a given time could
-be to analyze how high the demand for a specific language has been previously and
-then deciding on that result how many containers that needs to run in order to
-suffice the number of request on that language. This is not something that has
-been implemented but could be done in the future.
+Another way of handling the number of containers running at a given time could
+be to predict demand for different languages and start more containers for popular languages.
+This has not been implemented but could be done in the future.
 
 Each container is limited to one thread of the processor running at 50\% core speed and
-100MB memory. Because of this each time a student run the same code a similar
-result can be observed. Timing is always a hard property to measure but with
+100MB memory. Because of this each time a student runs the same code a similar
+result can be observed. Timing is always a difficult property to measure but with
 these settings Tester can deliver similar timings multiple times.
 
 If a container is hijacked by malicious code the Manager has a timeout that will
-force the container to exit after a given time and return request timeout status code.
+force the container to exit and respond with an error.
 
 \subsection{Test types}
 % unit tests are hard to write
@@ -57,9 +51,9 @@ Currently, Tester supports three types of tests:
 \item Lint. A lint test makes sure that the submitted code adheres to some coding standard for the language. Indentation, trailing whitespaces and blank lines are some examples of what might be checked.
 \end{itemize}
 
-When deciding which test types had the highest implementation priority, an important factor was the time expenditure required by the creator of the tests. If writing tests for a single assignment takes a considerable amount of time the platform will become too impractical to use. For this reason tests such as Unit Tests are not supported. It would be time-consuming for lab supervisors to write tests. %idk what i wrote here
+When deciding which test types had the highest implementation priority, an important factor was the time expenditure required by the creator of the tests. If writing tests for a single assignment takes a considerable amount of time the platform will become impractical to use. For this reason tests such as Unit Tests are not supported. It would be time-consuming for lab supervisors to write tests.
 
-Another deciding factor is the language-dependency of the unit tests. If a test requires language-specific implementation the extensibility of the language support suffers. This is one of the reasons why the I/O and Code size tests mentioned below are excellent choices, they are both language-independent and require no additional implementation for every language supported. Although Lint tests also mentioned below does not have the independence property, it has been implemented for a smaller number of languages as a proof of concept.
+Another deciding factor is the language-dependency of the unit tests. If a test requires language-specific implementation the extensibility of the language support suffers. This is one of the reasons why the I/O and Code size tests mentioned allow are excellent choices, they are both language-independent and require no additional implementation for every language supported. Although Lint tests are not language-independent, they have been implemented for a few languages as a proof of concept.
 
 \subsection{Extensibility}
 In order to achieve broad language support, it needs to be easy to add new languages. Two steps are necessary to add support for a new language:
@@ -71,4 +65,4 @@ In order to achieve broad language support, it needs to be easy to add new langu
 \end{itemize}
 
 \subsection{Service Availability Fallback}
-A little known feature of tester is that it plays nice with load-balancers by reporting whether or not the testing service itself is available. That is, if the language that is to be tested isn't available, or the testing-queue is full, it defers the job to another tester. It does that by responding with the \texttt{503: Service Unavailable} status, after which the load-balancer sitting in front of it will understand that it needs to route traffic elsewhere.
+A little known feature of Tester is that it plays nice with load-balancers by reporting whether or not the testing service itself is available. That is, if the language that is to be tested isn't available, or the testing-queue is full, it defers the job to another Tester. It does that by responding with the \texttt{503: Service Unavailable} status, after which the load-balancer sitting in front of it will understand that it needs to route traffic elsewhere.
