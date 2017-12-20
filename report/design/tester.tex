@@ -8,38 +8,42 @@ An important feature of the Tester is that the code is tested in an isolated env
 
 To achieve isolation all code testing takes place in so called Docker containers equipped with the tools necessary to compile and run the code. A container is a virtualization (simulation) of an operating-system with a separate user-space. What this means is that programs running inside the container can only access the contents and devices that are assigned to the container. By running the tests in Docker containers, any malicious code cannot gain access to information it shouldn't have access to or cause any disruptions to the service, since such code will at most crash the container which has no long-lasting effects on the service offered by Tester.
 \subsection{Manager}
-% TODO: add discussion of different ways of managing load and what we chose
+% add discussion of different ways of managing load and what we chose
 % (Start containers on demand? Keep a pool of containers ready? Predict load or just react? Allocate different amounts of resources for different languages?)
 
+As Backend sends requests to Tester these requests are handled by assigning a free container serving that request.
+When a request for a container with a language that has no free containers that
+request is put in queue and handled when a container is ready. Once a request has
+been served a container another container of the same type is started to decrease
+the response time to Backend. Because on average the containers
+take around one second to start.
 
-%Vad, varför, hur blev det?
-
-As Tester handles and run code that the user submit it is important that this is
-done in a safe environment. The solution that was developed in order to achieve
-this was to user Docker and having the potential harmful code run inside a container
-and therefore a controlled environment that if compromised can be shut down by the
-Manager. In order to decrease footprint of these containers, the images that the
-containers are started by are language specific.\\
-\\
-A problem with starting containers whenever a request has been made to Tester
+A problem with starting containers whenever a request has been made
 is that each Tester instance has limited hardware capacity. Starting too many
 containers will effect the over all performance of the system and therefore
 performance per container. And as timing is one of the properties that Tester
-examines this will affect the result.\\
-\\
+examines this will affect the result.
+
 In order to address this issue the Manager has to keep track of which containers
 that are started and which containers that are currently doing work. Depending on
 hardware it is possible to configure so that a maximum number of containers that
 can be started and to specify the maximum number of containers
 per supported language aswell. It is also possible to configure a number of containers
-that should be started even if no request for that langauge has been made. This
-is done in order to decrease response time to Backend.\\
-\\
-Each container is limited to one core of the processor running at 50\% speed and
+that should be started even if no request for that langauge has been made to keep
+idling containers ready serve new requests. This is done in order to decrease
+response time to Backend.
+
+Another way of handling the amount of containers running at a given time could
+be to analyze how high the demand for a specfic language has been previously and
+then deciding on that result how many containers that needs to run in order to
+suffice the number of request on that langauge. This is not something that has
+been impleneted but could be done in the future.
+
+Each container is limited to one thread of the processor running at 50\% core speed and
 100MB memory. Because of this each time a student run the same code a similar
 result can be observed. Timing is always a hard property to measure but with
-these settings Tester can deliver similar timings multiple times.\\
-\\
+these settings Tester can deliver similar timings multiple times.
+
 If a container is highjacked by malicous code the Manager has a timeout that will
 force the container to exit after a given time and return request timeout status code.
 

@@ -9,6 +9,13 @@ The backend of GPP was developed using javascript running with \nodejs{} as serv
 %The document database MongoDB was chosen for the project instead of using a relational database, %the reasoning for this decision was to have a database that was built with scalability in mind %and dynamic schemas but also because of the simple reason that it is easy for the programmers to %read and understand the data inside the database thanks to MongoDBs JSON-like document %structure.
 %OLD TEXT COMMENTED
 
+\begin{sidewaysfigure}
+    \centering
+    \includegraphics[width=\textwidth]{img/gpp_database-schema.pdf}
+    \caption{Overview of the database schema.}
+    \label{fig:schema}
+\end{sidewaysfigure}
+
 MongoDB was chosen mainly to complete the MEAN software stack (MongoDB, Express, Angular, \nodejs{}). The majority of the group members working on backend did not have prior experience working with NoSQL databases which presented a good opportunity to learn. MongoDB is a popular choice among NoSQL databases and the group deemed it able to simplify when interacting with the data: Mongo uses a JSON-like document structure and JSON is the data format used when different parts of the project services communicates.
 
 Mongoose is a package that extends MongoDB by enforcing a database structure. With Mongoose it's possible to create schemas that describe the format of the data that is to be stored in the database. Mongoose presented a problem to the project members by not having consistency. If the schemas were updated there would be a mix of data, some of it stored in the previous format and some in the new. This resulted in a need to either migrate or remove the data in the database after schema updates.
@@ -101,54 +108,46 @@ The API is a large part of the backend codebase. Automated tests of the endpoint
 
 \subsection{Feature}
 
-%Feature delen till stor del borde handla om vad vi gjort för att ha bra extensibility.
-%Badges är väl egentligen ett exempel som ska visa att det funkar.
-
-%Vad, varför, hur blev det?
-
 As this project had focus on adding gamification elements for programming exercises
 and making programming more fun in general it was important to include
 a tool that support development of future gamification modules. This tool is called
 Feature and is built in such a way that it is possible to easily extend it with more
 functionallity. Feature works by running all of the gamification modules and
 storing the results of these modules in a Feature collection associated with
-a student and a course.\\
-\\
+a student and a course.
+
 In order to achieve this flexability that future developers should be able to expand
 with their gamification elements without having to learn the whole code base.
 It is important to create a system that can dynamically load files and run
 code on the results from Tester. This was possible by requiring all
 files in a directory, \textit{modules} inside the features directory. These module-files need to follow
 a given interface. They have to contain an initiation function and a function
-that is called once Tester has delivered back results to Backend. \\
-\\
+that is called once Tester has delivered back results to Backend. 
+
 The initiation function connects to an eventlistener that triggers once Backend
 gets a result back from Tester. When this event is triggered it will call the
 function that does module specfic code. It should be noted that if any of the
 mandatory tests fail then Feature wont run any gamification modules. Once a module
-is done calculating it can return results that will be sent back to Frontend.\\
-\\
+is done calculating it can return results that will be sent back to Frontend.
+
 Even if extensibility was of high priority when developing this tool, it was not
 possible to create it truly decoupled from the rest of the code base. For example
 in front of MongoDB, Mongoose is running in order to structure what is stored in
 the database. This means that if a module need to store anything in the database
 the database schema has to be modified in order to support the desired structure
-for that module.\\
-\\
+for that module.
+
 Such an example is the gamification element is called Progress, after
 receiving the results from Tester the result is stored in the Feature collection
 of that student. Resulting in data that describe the progression of that students
-advancements throughout the course. %The data stored is which assignment is
-%completed and the results of the tests for that assignment aswell a summary of
-%the timing of the mandatory tests and code size.
-\\
-\\
+advancements throughout the course.
+
 Another example is Badge, each badge has contain information that describes the
 story behind it but also what goals that has to be achieved in order to earn a
 certain badge. This information is stored in a seperate model in the database
 schema but that is not enough. In order to be able to track badges that a student
-of a course has recieved the Feature model has to be updated aswell.\\
-\\
+of a course has recieved the Feature model has to be updated aswell.
+
 This result in that Feature is somewhat decoupled from the rest of the system and
 therefore one of the easiest parts to understand and extend. To create a new module
 is very simple but as most of the modules need to store something that is associated
