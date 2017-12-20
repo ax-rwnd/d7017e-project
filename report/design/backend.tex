@@ -32,6 +32,10 @@ A decision was made early in the project to adhere to a RESTful API design. Acce
 
 Data can be sent to the backend via both body and URL. Sending data via body is relevant for PUT and POST requests. The information for such requests should be sent as JSON and it should match the format specified in the API documentation~\ref{apidocs}. JSON is also the data-type used by the backend to return data, even when the result returned is a status code.
 
+\subsubsection{API documentation} \label{apidocs}
+Documentation for the API can at the time of writing be found at: \\ \texttt{130.240.5.119:18000/docs}. \\
+In general it is found where the Backend server is deployed at: \\ \texttt{BACKEND\_IP:PORT/docs}.
+
 % errors
 \subsubsection{Error handling}
 To enhance a user's experience when working with the API, it was decided that a good way to handle both user errors and server errors should be implemented.
