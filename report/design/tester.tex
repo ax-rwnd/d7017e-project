@@ -4,7 +4,7 @@ Tester is a tool for testing code in a variety of programming languages in a saf
 
 \subsection{Sandboxing}
 %TODO ref to docker
-An important feature of the Tester is that the code is tested in an isolated enviroment. The main reason behind doing this is that we are executing potentially malicious code. Allowing such code to be executed without isolation is bound to cause service disruptions or information leaks.
+An important feature of the Tester is that the code is tested in an isolated environment. The main reason behind doing this is that we are executing potentially malicious code. Allowing such code to be executed without isolation is bound to cause service disruptions or information leaks.
 
 To achieve isolation all code testing takes place in so called Docker containers equipped with the tools necessary to compile and run the code. A container is a virtualization (simulation) of an operating-system with a separate user-space. What this means is that programs running inside the container can only access the contents and devices that are assigned to the container. By running the tests in Docker containers, any malicious code cannot gain access to information it shouldn't have access to or cause any disruptions to the service, since such code will at most crash the container which has no long-lasting effects on the service offered by Tester.
 \subsection{Manager}
@@ -28,23 +28,23 @@ In order to address this issue the Manager has to keep track of which containers
 that are started and which containers that are currently doing work. Depending on
 hardware it is possible to configure so that a maximum number of containers that
 can be started and to specify the maximum number of containers
-per supported language aswell. It is also possible to configure a number of containers
-that should be started even if no request for that langauge has been made to keep
+per supported language as well. It is also possible to configure a number of containers
+that should be started even if no request for that language has been made to keep
 idling containers ready serve new requests. This is done in order to decrease
 response time to Backend.
 
 Another way of handling the amount of containers running at a given time could
-be to analyze how high the demand for a specfic language has been previously and
+be to analyze how high the demand for a specific language has been previously and
 then deciding on that result how many containers that needs to run in order to
-suffice the number of request on that langauge. This is not something that has
-been impleneted but could be done in the future.
+suffice the number of request on that language. This is not something that has
+been implemented but could be done in the future.
 
 Each container is limited to one thread of the processor running at 50\% core speed and
 100MB memory. Because of this each time a student run the same code a similar
 result can be observed. Timing is always a hard property to measure but with
 these settings Tester can deliver similar timings multiple times.
 
-If a container is highjacked by malicous code the Manager has a timeout that will
+If a container is hijacked by malicious code the Manager has a timeout that will
 force the container to exit after a given time and return request timeout status code.
 
 \subsection{Test types}
@@ -52,7 +52,7 @@ force the container to exit after a given time and return request timeout status
 % I/O tests are language-independent which is good if we want broad language support
 When deciding which test types had the highest implementation priority, an important factor was the time expenditure required by the creator of the tests. If writing tests for a single assignment takes a considerable amount of time the platform will become too impractical to use. For this reason tests such as Unit Tests are not supported. It would be time-consuming for lab supervisors to write tests. %idk what i wrote here
 
-Another deciding factor is the language-dependency of the unit tests. If a test requires language-specific implementation the extensibility of the language support suffers. This is one of the reasons why the I/O and Code size tests mentioned below are excellent choices, they are both language-independent and require no additional implementation for every language supported. Although Lint tests also mentioned below does not have the independency property, it has been implemented for a smaller number of languages as a proof of concept.
+Another deciding factor is the language-dependency of the unit tests. If a test requires language-specific implementation the extensibility of the language support suffers. This is one of the reasons why the I/O and Code size tests mentioned below are excellent choices, they are both language-independent and require no additional implementation for every language supported. Although Lint tests also mentioned below does not have the independence property, it has been implemented for a smaller number of languages as a proof of concept.
 %Should we explain what each test type is? or are they obvious enough?
 Currently, Tester supports three types of tests:
 \begin{itemize}

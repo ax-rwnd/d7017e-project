@@ -112,11 +112,11 @@ As this project had focus on adding gamification elements for programming exerci
 and making programming more fun in general it was important to include
 a tool that support development of future gamification modules. This tool is called
 Feature and is built in such a way that it is possible to easily extend it with more
-functionallity. Feature works by running all of the gamification modules and
+functionality. Feature works by running all of the gamification modules and
 storing the results of these modules in a Feature collection associated with
 a student and a course.
 
-In order to achieve this flexability that future developers should be able to expand
+In order to achieve this flexibility that future developers should be able to expand
 with their gamification elements without having to learn the whole code base.
 It is important to create a system that can dynamically load files and run
 code on the results from Tester. This was possible by requiring all
@@ -124,9 +124,9 @@ files in a directory, \textit{modules} inside the features directory. These modu
 a given interface. They have to contain an initiation function and a function
 that is called once Tester has delivered back results to Backend. 
 
-The initiation function connects to an eventlistener that triggers once Backend
+The initiation function connects to an event listener that triggers once Backend
 gets a result back from Tester. When this event is triggered it will call the
-function that does module specfic code. It should be noted that if any of the
+function that does module specific code. It should be noted that if any of the
 mandatory tests fail then Feature wont run any gamification modules. Once a module
 is done calculating it can return results that will be sent back to Frontend.
 
@@ -144,11 +144,11 @@ advancements throughout the course.
 
 Another example is Badge, each badge has contain information that describes the
 story behind it but also what goals that has to be achieved in order to earn a
-certain badge. This information is stored in a seperate model in the database
+certain badge. This information is stored in a separate model in the database
 schema but that is not enough. In order to be able to track badges that a student
-of a course has recieved the Feature model has to be updated aswell.
+of a course has received the Feature model has to be updated as well.
 
 This result in that Feature is somewhat decoupled from the rest of the system and
 therefore one of the easiest parts to understand and extend. To create a new module
 is very simple but as most of the modules need to store something that is associated
-with a student in a course the database schema most likely needs to be modified aswell.
+with a student in a course the database schema most likely needs to be modified as well.
