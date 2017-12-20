@@ -29,10 +29,6 @@ that should be started even if no request for that language has been made to kee
 idling containers ready serve new requests. This is done in order to decrease
 response time to Backend.
 
-Another way of handling the number of containers running at a given time could
-be to predict demand for different languages and start more containers for popular languages.
-This has not been implemented but could be done in the future.
-
 Each container is limited to one thread of the processor running at 50\% core speed and
 100MB memory. Because of this each time a student runs the same code a similar
 result can be observed. Timing is always a difficult property to measure but with
