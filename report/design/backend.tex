@@ -122,7 +122,7 @@ Future developers should be able to expand the system with their own gamificatio
 
 The initiation function connects to an event listener that triggers once Backend
 gets a result back from Tester. When this event is triggered it will call the
-function that executes plug-in specfic code. It should be noted that if any of the mandatory tests fail then Feature wont run any gamification plug-ins. Once a plug-in is done calculating it can return results that will be sent back to Frontend.
+function that executes plug-in specific code. It should be noted that if any of the mandatory tests fail then Feature wont run any gamification plug-ins. Once a plug-in is done calculating it can return results that will be sent back to Frontend.
 
 Even if extensibility was of high priority when developing this tool, it was not
 possible to fully decouple it from the rest of the codebase. For example, in front of MongoDB, Mongoose is running in order to structure what is stored in the database. This means that if a plug-in needs to store anything in the database, the database schema has to be modified in order to support the desired structure for that plug-in.
