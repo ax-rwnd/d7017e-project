@@ -80,24 +80,24 @@ A student is only allowed to do things regarding himself, such as submitting ass
 
 \subsection{Quality control}
 % jenkins
-\subsubsection{Jenkins}
-As a way to keep the project effective it was determined that it was important to implement continuous integration as a part of the project to have a modern workflow where you could push changes to git and have them automatically built on a live test server. Using continuous integration was also a good way to separate production and development builds and a way to ensure that production builds always kept a certain standard and robustness. The framework that was used for continuous integration was Jenkins which is one of the most popular frameworks.
+\subsubsection{Continuous Integration}
+As a way to keep the project effective it was determined that it was important to implement continuous integration as a part of the project. This helps to achieve a modern workflow, where changes pushed to the repository are automatically tested and built on a live test server. Using continuous integration was also a good way to separate production and development builds, and a way to ensure that production builds always kept a certain standard and robustness. The solution used was \href{https://jenkins-ci.org/}{Jenkins}, which is well established.
 
-While the idea of how continuous integration was supposed to be used in the project was quite clear, the concept wasn't put to as good use as it could have. In the first half of the project, the builds generated from Jenkins wasn't really put to use. This was mainly due to communication errors and the fact that the builds weren't needed as much. For the second part of the project the builds were used more. The way that the deployment with Jenkins was setup was to build from two branches from GIT, one from the master which was supposed to build for production and another from the backend branch which was supposed to build for development. The idea was that the development build would always contain the latest changes in backend. As the project reached its deadline it became increasingly important to also keep the backend dev builds stable because of the fact that the frontend team were depending on the backend dev build when developing.
+While the idea of how continuous integration was supposed to be used in the project was quite clear, the concept wasn't put to as good use as it could have. In the first half of the project, the builds generated from Jenkins weren't really put to use. This was mainly due to communication errors and the fact that the builds weren't needed as much as expected. For the second part of the project, the builds were used more. The way that the deployment with Jenkins was setup was to build from two branches from Git, one from \texttt{master}, which was supposed to build for production, and another from \texttt{backend}, which was supposed to build for development. The idea was that the development build would always contain the latest changes in \texttt{backend}. As the project reached its deadline it became increasingly important to keep the backend development builds stable because of the fact that the frontend team was depending on the backend development build.
 
-Because of the increasing demands on having stable backend dev builds, a new requirement was setup for the continuous integration where a new development dev build was only built if it passed a set of unit-tests for the application.
+Because of the increasing demands of having stable backend development builds, a new requirement was set up for the continuous integration where a new development build was only built if it passed a set of unit tests.
 
 % different environments
 \subsubsection{Different environments}
-Connected to the reasoning of building the backend in different environments/modes such as production or development, it was important to load different configurations depending on what environment the backend was supposed to run. For example, the production environment should not use the same database as the development environment. Because of this, it was important to be able to run the backend in different modes and dynamically load the correct configurations based on the mode that the backend was running in, hence a system that did this was implemented.
+Connected to the reasoning of building the backend in different environments/modes, such as production or development, it was important to load different configurations depending on what environment the backend was supposed to run. For example, the production environment should not use the same database as the development environment. Because of this, it was important to be able to run the backend in different modes and dynamically load the correct configurations based on the mode that the backend was running in, hence a system that did this was implemented.
 
 % logging
 \subsubsection{Logging} \label{logging}
-A large part of developers and support teams work is monitoring, debugging and troubleshooting. Because of this it is important to have good logging as a way to make these processes easier, faster and smoother. Having good logging gives them a good insight into what the application is doing and how it works. Because of this, it was important to have proper, useful and extensible logging available in the backend. A custom logging system promtly named logger was developed that ran with Winston and Morgan at its core. Winston is a simple and universal logging library and Morgan is a HTTP request logger middleware. Logger combined winston and morgan with the selectiveness of running the backend in different modes/environments. Depending on the mode, logger had different parts that it logged into log files.
+A large part of the work of development and support teams work is monitoring, debugging and troubleshooting. Because of this it is important to have good logging as a way to make these processes easier, faster and smoother. Having good logging gives a good insight into what the application is doing and how it works. Because of this, it was essential to have proper, useful and extensible logging available in the backend. A custom logging system, named \emph{Logger}, was developed that ran with \href{https://github.com/winstonjs/winston}{Winston} and \href{https://github.com/expressjs/morgan}{Morgan} at its core. Winston is a simple and universal logging library and Morgan is an HTTP request logger middleware. Logger combined Winston and Morgan with the selectiveness of running the backend in different modes/environments. Depending on the mode, Logger had different parts that it logged into log files.
 
-Logger was setup to log all errors, server errors and a general logs in separate log files. When running in dev mode it was also important to log to the console, but not otherwise, hence console logging was only enabled when the backend ran in dev mode. 
+Logger was set up to log all errors, server errors and a general logs in separate log files. When running in development mode it was also important to log to the console, but not otherwise, hence console logging was only enabled when the backend ran in development mode.
 
-Winston and Logger use levels to identify what type of information a log contains, the logging levels in logger conform closely to the severity ordering specified by RFC6424.
+Winston and Logger use levels to identify what type of information a log contains. The logging levels in Logger conform closely to the severity ordering specified by RFC6424.
 The severity of all levels are numerically ascending from most important to least important.
 
 \begin{enumerate}
@@ -116,47 +116,21 @@ The API is a large part of the backend codebase. Automated tests of the endpoint
 
 \subsection{Feature}
 
-As this project had focus on adding gamification elements for programming exercises
-and making programming more fun in general it was important to include
-a tool that support development of future gamification modules. This tool is called
-Feature and is built in such a way that it is possible to easily extend it with more
-functionallity. Feature works by running all of the gamification modules and
-storing the results of these modules in a Feature collection associated with
-a student and a course.
+As this project focused on adding gamification elements for programming exercises and making programming more fun in general, it was important to include a tool that supports development of future gamification modules. This tool is called \emph{Feature} and is built in such a way that it is possible to easily extend it with more functionality. Feature works by running all of the gamification modules and storing the results of these modules in a Feature collection associated with a student and a course.
 
-In order to achieve this flexibility that future developers should be able to expand
-with their gamification elements without having to learn the whole code base.
-It is important to create a system that can dynamically load files and run
-code on the results from Tester. This was possible by requiring all
-files in a directory, \textit{modules} inside the features directory. These module-files need to follow
-a given interface. They have to contain an initiation function and a function
-that is called once Tester has delivered back results to Backend. 
+Future developers should be able to expand the system with their own gamification elements without having to learn the whole codebase. This flexibility is achieved with a plug-in system that dynamically loads files and runs code on the results from Tester. This was possible by importing all modules inside the features directory. The plug-in modules need to follow a given interface. They have to contain an initiation function and a function that is called once Tester has delivered back results to Backend. 
 
-The initiation function connects to an eventlistener that triggers once Backend
+The initiation function connects to an event listener that triggers once Backend
 gets a result back from Tester. When this event is triggered it will call the
-function that does module specfic code. It should be noted that if any of the
-mandatory tests fail then Feature wont run any gamification modules. Once a module
-is done calculating it can return results that will be sent back to Frontend.
+function that executes plug-in specfic code. It should be noted that if any of the mandatory tests fail then Feature wont run any gamification plug-ins. Once a plug-in is done calculating it can return results that will be sent back to Frontend.
 
 Even if extensibility was of high priority when developing this tool, it was not
-possible to create it truly decoupled from the rest of the code base. For example
-in front of MongoDB, Mongoose is running in order to structure what is stored in
-the database. This means that if a module need to store anything in the database
-the database schema has to be modified in order to support the desired structure
-for that module.
+possible to fully decouple it from the rest of the codebase. For example, in front of MongoDB, Mongoose is running in order to structure what is stored in the database. This means that if a plug-in needs to store anything in the database, the database schema has to be modified in order to support the desired structure for that plug-in.
 
-Such an example is the gamification element is called Progress, after
+Such an example is the gamification element called \emph{Progress}. After
 receiving the results from Tester the result is stored in the Feature collection
-of that student. Resulting in data that describe the progression of that students
-advancements throughout the course.
+of that student, resulting in data that describes the progression of that student's advancements throughout the course.
 
-Another example is Badge, each badge has contain information that describes the
-story behind it but also what goals that has to be achieved in order to earn a
-certain badge. This information is stored in a seperate model in the database
-schema but that is not enough. In order to be able to track badges that a student
-of a course has recieved the Feature model has to be updated aswell.
+Another example is \emph{Badge}. Each badge contains information that describes the story behind it and also the goals that have to be achieved in order to earn it. This information is defined in a separate model in the database schema. However, in order to be able to track badges that a student of a course has received the Feature model has to be updated as well.
 
-This result in that Feature is somewhat decoupled from the rest of the system and
-therefore one of the easiest parts to understand and extend. To create a new module
-is very simple but as most of the modules need to store something that is associated
-with a student in a course the database schema most likely needs to be modified aswell.
+Feature is somewhat decoupled from the rest of the system and therefore one of the easiest parts to understand and extend. To create a new plug-in is very simple, but because most plug-ins need to store something that is associated with a student, the database schema most likely needs to be modified as well.
