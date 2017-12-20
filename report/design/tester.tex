@@ -4,7 +4,7 @@ Tester is a tool for testing code in a variety of programming languages in a saf
 
 \subsection{Sandboxing}
 %TODO ref to docker
-An important feature of the Tester is that the code is tested in an isolated environment. The main reason behind doing this is that we are executing potentially malicious code. Allowing such code to be executed without isolation is bound to cause service disruptions or information leaks.
+An important feature of Tester is that the code is tested in an isolated environment. The main reason behind doing this is that we are executing potentially malicious code. Allowing such code to be executed without isolation is bound to cause service disruptions or information leaks.
 
 To achieve isolation all code testing takes place in so called Docker containers equipped with the tools necessary to compile and run the code. A container is a virtualization (simulation) of an operating-system with a separate user-space. What this means is that programs running inside the container can only access the contents and devices that are assigned to the container. By running the tests in Docker containers, any malicious code cannot gain access to information it shouldn't have access to or cause any disruptions to the service, since such code will at most crash the container which has no long-lasting effects on the service offered by Tester.
 \subsection{Manager}
