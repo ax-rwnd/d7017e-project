@@ -27,6 +27,26 @@ An overview of the database schema can be seen in figure \ref{fig:schema}. There
 
 The database design started with the core collections and evolved during development to support new features that were added. Decisions needed to be made quickly to maintain the workflow, which might have resulted in some suboptimal solutions. The resulting schema was very relational, which imposed a problem as MongoDB only supports atomicity on a document level. An example of this is if a document is removed from the database, separate queries need to be made to remove any references held by other documents, which may result in inconsistencies if other queries are made at the same time. The solution to this would be to design a schema with less relations, or to use a relational database.
 
+\subsection{Feature}
+As this project focused on adding gamification elements for programming exercises and making programming more fun in general, it was important to include a tool that supports development of future gamification modules. This tool is called \emph{Feature} and is built in such a way that it is possible to easily extend it with more functionality. Feature works by running all of the gamification modules and storing the results of these modules in a Feature collection associated with a student and a course.
+
+Future developers should be able to expand the system with their own gamification elements without having to learn the whole codebase. This flexibility is achieved with a plug-in system that dynamically loads files and runs code on the results from Tester. This was possible by importing all modules inside the features directory. The plug-in modules need to follow a given interface. They have to contain an initiation function and a function that is called once Tester has delivered back results to Backend. 
+
+The initiation function connects to an event listener that triggers once Backend
+gets a result back from Tester. When this event is triggered it will call the
+function that executes plug-in specific code. It should be noted that if any of the mandatory tests fail then Feature wont run any gamification plug-ins. Once a plug-in is done calculating it can return results that will be sent back to Frontend.
+
+Even if extensibility was of high priority when developing this tool, it was not
+possible to fully decouple it from the rest of the codebase. For example, in front of MongoDB, Mongoose is running in order to structure what is stored in the database. This means that if a plug-in needs to store anything in the database, the database schema has to be modified in order to support the desired structure for that plug-in.
+
+Such an example is the gamification element called \emph{Progress}. After
+receiving the results from Tester the result is stored in the Feature collection
+of that student, resulting in data that describes the progression of that student's advancements throughout the course.
+
+Another example is \emph{Badge}. Each badge contains information that describes the story behind it and also the goals that have to be achieved in order to earn it. This information is defined in a separate model in the database schema. However, in order to be able to track badges that a student of a course has received the Feature model has to be updated as well.
+
+Feature is somewhat decoupled from the rest of the system and therefore one of the easiest parts to understand and extend. To create a new plug-in is very simple, but because most plug-ins need to store something that is associated with a student, the database schema most likely needs to be modified as well.
+
 \subsection{API Protocol}
 A decision was made early in the project to adhere to a RESTful API design. Access paths to resources are built from the database schema, see figure~\ref{fig:schema}. For example: in the current database design, each assignment belongs to a course. It is therefore necessary to reference a specific course to access an assignment. Example: \texttt{GET https://.../api/courses/\allowbreak123123123/assignments/456456456/} returns assignment \texttt{456456456} which belongs to course \texttt{123123123}. Each resource name such as \texttt{courses} is in plural. A POST to \texttt{https://.../api/courses} creates a course while a GET request to the same resource returns all courses.
 
@@ -113,24 +133,3 @@ The severity of all levels are numerically ascending from most important to leas
 % automated testing
 \subsubsection{Automated Testing}
 The API is a large part of the backend codebase. Automated tests of the endpoints were developed, mainly to guard against regressions. The tests mostly assert that the server doesn't return an error when given good input. In order to save time in test development, the tests are run in order, where older tests create the resources that are needed for later tests. This is not good practice in automated tests, but it would have been far more costly to make the tests independent of each other by doing setup and teardown for each endpoint test.
-
-\subsection{Feature}
-
-As this project focused on adding gamification elements for programming exercises and making programming more fun in general, it was important to include a tool that supports development of future gamification modules. This tool is called \emph{Feature} and is built in such a way that it is possible to easily extend it with more functionality. Feature works by running all of the gamification modules and storing the results of these modules in a Feature collection associated with a student and a course.
-
-Future developers should be able to expand the system with their own gamification elements without having to learn the whole codebase. This flexibility is achieved with a plug-in system that dynamically loads files and runs code on the results from Tester. This was possible by importing all modules inside the features directory. The plug-in modules need to follow a given interface. They have to contain an initiation function and a function that is called once Tester has delivered back results to Backend. 
-
-The initiation function connects to an event listener that triggers once Backend
-gets a result back from Tester. When this event is triggered it will call the
-function that executes plug-in specific code. It should be noted that if any of the mandatory tests fail then Feature wont run any gamification plug-ins. Once a plug-in is done calculating it can return results that will be sent back to Frontend.
-
-Even if extensibility was of high priority when developing this tool, it was not
-possible to fully decouple it from the rest of the codebase. For example, in front of MongoDB, Mongoose is running in order to structure what is stored in the database. This means that if a plug-in needs to store anything in the database, the database schema has to be modified in order to support the desired structure for that plug-in.
-
-Such an example is the gamification element called \emph{Progress}. After
-receiving the results from Tester the result is stored in the Feature collection
-of that student, resulting in data that describes the progression of that student's advancements throughout the course.
-
-Another example is \emph{Badge}. Each badge contains information that describes the story behind it and also the goals that have to be achieved in order to earn it. This information is defined in a separate model in the database schema. However, in order to be able to track badges that a student of a course has received the Feature model has to be updated as well.
-
-Feature is somewhat decoupled from the rest of the system and therefore one of the easiest parts to understand and extend. To create a new plug-in is very simple, but because most plug-ins need to store something that is associated with a student, the database schema most likely needs to be modified as well.
