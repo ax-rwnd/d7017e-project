@@ -27,12 +27,12 @@ An overview of the database schema can be seen in figure \ref{fig:schema}. There
 
 The database design started with the core collections and evolved during development to support new features that were added. Decisions needed to be made quickly to maintain the workflow, which might have resulted in some suboptimal solutions. The resulting schema was very relational, which imposed a problem as MongoDB only supports atomicity on a document level. An example of this is if a document is removed from the database, separate queries need to be made to remove any references held by other documents, which may result in inconsistencies if other queries are made at the same time. The solution to this would be to design a schema with less relations, or to use a relational database.
 
-\subsection{API protocol}
+\subsection{API Protocol}
 A decision was made early in the project to adhere to a RESTful API design. Access paths to resources are built from the database schema, see figure~\ref{fig:schema}. For example: in the current database design, each assignment belongs to a course. It is therefore necessary to reference a specific course to access an assignment. Example: \texttt{GET https://.../api/courses/\allowbreak123123123/assignments/456456456/} returns assignment \texttt{456456456} which belongs to course \texttt{123123123}. Each resource name such as \texttt{courses} is in plural. A POST to \texttt{https://.../api/courses} creates a course while a GET request to the same resource returns all courses.
 
 Data can be sent to the backend via both body and URL. Sending data via body is relevant for PUT and POST requests. The information for such requests should be sent as JSON and it should match the format specified in the API documentation. JSON is also the data-type used by the backend to return data, even when the result returned is a status code.
 
-\subsubsection{API documentation} \label{apidocs}
+\subsubsection{API Documentation} \label{apidocs}
 Documentation for the API can at the time of writing be found at: \\ \texttt{130.240.5.119:18000/docs}. \\
 In general it is found where the Backend server is deployed at: \\ \texttt{BACKEND\_IP:PORT/docs}.
 
@@ -57,7 +57,7 @@ Currently logging in with CAS via \LTU\ is the only way to access the backend. T
 \subsubsection{HTTPS} \label{https}
 Self-signed certificates have been used for the testing environment in order to establish a secure environment with HTTPS. Once a proper production environment is used, it is necessary to use a trusted certificate authority instead of self-signed certificates.
 
-\subsubsection{Input validation}
+\subsubsection{Input Validation}
 Injection attacks are a common security problem in applications that use databases. To prevent this the API has to make sure the input has the expected form. A boolean input field must be of boolean type to be accepted. To achieve this, the module \href{https://github.com/ctavan/express-validator}{express-validator} was used. With this module it's possible to check URL, query and body input. For every invalid input field a specific error message is added to an array. When all fields have been checked, this array will be returned together with an HTTP error code \texttt{400:\@ Bad Request} as feedback. This way the user can receive direct feedback without the need to consult the documentation.
 
 % SSL (HTTPS), just mention it
@@ -111,7 +111,7 @@ The severity of all levels are numerically ascending from most important to leas
 \end{enumerate}
 
 % automated testing
-\subsubsection{Automated testing}
+\subsubsection{Automated Testing}
 The API is a large part of the backend codebase. Automated tests of the endpoints were developed, mainly to guard against regressions. The tests mostly assert that the server doesn't return an error when given good input. In order to save time in test development, the tests are run in order, where older tests create the resources that are needed for later tests. This is not good practice in automated tests, but it would have been far more costly to make the tests independent of each other by doing setup and teardown for each endpoint test.
 
 \subsection{Feature}
