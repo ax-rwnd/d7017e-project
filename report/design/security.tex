@@ -40,9 +40,32 @@ Regardless of a user's base role he has a different role in every course. Every 
 Students are only allowed to use a subset of the routes, such as submitting assignments or leaving courses. The teacher role maintains the course, but also controls who is allowed to join. The highest course role is the owner, which is the user that created the course. The owner can do everything a teacher is able to do, the only difference being that teachers can't remove the owner from the course. A user with the admin base role is basically able to do everything in any course.
 
 \subsection{Tester Sandbox}
-% TODO
+Arbitrary code execution is as dangerous as it sounds and needs to be handled accordingly. The approach taken here is to sandbox the environment using containers and to simply trust the container software maintainers to fix whatever vulnerabilities arise.
+
+After each series of tests, the container is considered ``spent''. That is, no series of tests may influence any other of series of test, and should the code, for instance, rewrite the programming environment, it will not influence the later tests.
+
+\subsection{Remote Attacks Using Tester}
+While sandboxing resolves issues regarding result correctness, it does not remove the responsibility to deny attempts at remote attacks from ephemeral tester shells. One could picture a scenario (see figure \ref{fig:tester-ddos}) where tester-clusters are used to amplify attacks made from zombie shells by supplying as many parallel malicious scripts as the tester environment will allow.
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=\textwidth]{img/tester_amplification.png}
+    \caption{A DDOS scenario involving unsecured tester environments.}\label{fig:tester-ddos}
+\end{figure}
+If the tester shells are allowed to access the network, an adversary could send test-requests to backends (or public testers) that would in turn make requests to remote hosts. This could partly act as a proxy for some attacker that would like to remain anonymous, but also allow one remotely controlled host to attack many other hosts.
 
 \subsection{Dumping Assignments}
-During development, it was found that on some setups, assignments could be dumped with relative ease from memory using standard GNU utilities and code input from the frontend interface. An interesting aspect to note is that since containers share kernel, the protection that usually wards unauthorized users from reading other users' memory varied between installations.
+During development, it was found that on some setups, assignments could be dumped with relative ease from memory using standard GNU utilities and code input from the frontend interface. An interesting aspect to note is that since containers share kernel, the protection that usually wards unauthorized users from reading other users' memory varied between kernel versions.
 
-For instance, some payload \texttt{dump.py} could happily extract the memory of the part of tester that ran on docker and executed the python files when run on a Debian GNU/Linux host, whereas the same script on an Arch Linux host would deny access and halt. This lead to the decision of running all user-supplied code as a non-root user, which seems to have taken care of the bulk of such memory-access vulnerabilities.
+For instance, some payload \texttt{dump.py} would happily extract the memory of the part of tester that ran on docker and executed the python files. This memory in turn contained the answers to the tests that a student would need to complete, effectively allowing a constant-time lookup table to be constructed.
+
+When run on a Debian GNU/Linux host, the exploit worked flawlessly, whereas the same script on an Arch Linux host would deny access and halt. This lead to the decision of running all user-supplied code as a non-root user, which seems to have taken care of the bulk of such memory-access vulnerabilities.
+
+\subsection{Hijacking TCP Sessions}
+Another vulnerability that was identified was the ability to hijack the TCP sessions used to transport test results. The authors acknowledge that an attack like this probably still affects the system, but decided that it is too far out of scope for them to fix.
+
+In fact, should an enterprising student attempt to trick the system by performing such an attack, they should be rewarded for their investigative work, rather than punished for gaming the system. By triggering such a response, the student has clearly shown that they aspire for more than a simple grade and probably do not require gamification to go further.
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{tcp_interception.png}
+    \caption{A TCP hijack may send data pretending to be the tester.}
+\end{figure}
