@@ -1,5 +1,7 @@
+A wide variety of attacks can be posed against a system like this; there are web components, arbitrary code executions and legitimate cross-domain requests that may be abused. Therefore, it is crucial to discuss the topics at length and disclose what strengths and weaknesess are present from the get-go.
+
 \subsection{Authentication}
-%TODO: move this to security
+Authentication for the frontend is managed using an authentication interceptor. The main purpose of this device is to modify all requests by setting the authentication field in the header of the request for authenticated users. It also collects failed requests in the case of token expiration and tries to refresh the token to retry all failed requests automatically and stay logged in without the user being aware of affected.
 \begin{figure}[hb]
     \centering
     \includegraphics[width=\textwidth]{auth_schema.png}
@@ -7,16 +9,13 @@
     \label{fig:auth}
 \end{figure}
 
-\subsection{Auth Interceptor}
-The main purpose of this interceptor is to modify all requests by setting the authentication field in the header of the request for authenticated users. More than this it collects failed requests in the case of token expiration and tries to refresh the token to retry all failed requests automatically and stay logged in without the user being aware of affected.
-
 %\subsubsection{Authentication}
 The API endpoint \url{/auth/login/ltu} validates a service ticket issued by CAS at \url{https://weblogon.ltu.se/cas/login} and, if successful, will issue an access token for use at the other access restricted endpoints of the API (see figure \ref{fig:auth}). The access token is a JSON Web Token with a short life span, that is tamper-proof and contains information about the user's id and access level. This approach allows the backend to remain sessionless, as the backend will validate the token at every API request. Since the access token expires quickly a refresh token is issued alongside it. The refresh token has a much longer life span and its only use is to generate new access tokens at the \url{/auth/login/accesstoken} endpoint. The refresh tokens are stored in the database, while the access tokens are not. Revoking a refresh token is done by deleting it from the database. Theft of an access token or refresh token would give the thief access until the token expires or, in the case of refresh tokens, until it is revoked. Stealing tokens is made harder with SSL encryption.
 
 Currently logging in with CAS via \LTU\ is the only way to access the backend. This could however be extended to allow more ways of logging in by adding other authentication endpoints to the backend.
 
 \subsection{HTTPS} \label{https}
-Self-signed certificates have been used for the testing environment in order to establish a secure environment with HTTPS. Once a proper production environment is used, it is necessary to use a trusted certificate authority instead of self-signed certificates.
+Self-signed certificates were used for the testing environment in order to establish a secure environment with HTTPS. Once a proper production environment is used, it is necessary to use a trusted certificate authority instead of self-signed certificates.
 
 \subsection{Input Validation}
 Injection attacks are a common security problem in applications that use databases. To prevent this the API has to make sure the input has the expected form. A boolean input field must be of boolean type to be accepted. To achieve this, the module \href{https://github.com/ctavan/express-validator}{express-validator} was used. With this module it's possible to check URL, query and body input. For every invalid input field a specific error message is added to an array. When all fields have been checked, this array will be returned together with an HTTP error code \texttt{400:\@ Bad Request} as feedback. This way the user can receive direct feedback without the need to consult the documentation.
