@@ -67,37 +67,6 @@ A user error is defined as any error caused by a user of the API. Trying to call
 Another type of user error occurs when the user makes a valid request which can not be handled because of restrictions implemented in the API. For example, if a user tries to modify data which they don't have access to. These errors are still considered user errors and will follow the error form of such an error.
 % extensibility in features/progress/gamification
 
-\subsection{Security}
-
-\subsubsection{Authentication}
-The API endpoint \url{/auth/login/ltu} validates a service ticket issued by CAS at \url{https://weblogon.ltu.se/cas/login} and, if successful, will issue an access token for use at the other access restricted endpoints of the API (see figure \ref{fig:auth}). The access token is a JSON Web Token with a short life span, that is tamper-proof and contains information about the user's id and access level. This approach allows the backend to remain sessionless, as the backend will validate the token at every API request. Since the access token expires quickly a refresh token is issued alongside it. The refresh token has a much longer life span and its only use is to generate new access tokens at the \url{/auth/login/accesstoken} endpoint. The refresh tokens are stored in the database, while the access tokens are not. Revoking a refresh token is done by deleting it from the database. Theft of an access token or refresh token would give the thief access until the token expires or, in the case of refresh tokens, until it is revoked. Stealing tokens is made harder with SSL encryption.
-
-Currently logging in with CAS via \LTU\ is the only way to access the backend. This could however be extended to allow more ways of logging in by adding other authentication endpoints to the backend.
-
-\subsubsection{HTTPS} \label{https}
-Self-signed certificates have been used for the testing environment in order to establish a secure environment with HTTPS. Once a proper production environment is used, it is necessary to use a trusted certificate authority instead of self-signed certificates.
-
-\subsubsection{Input Validation}
-Injection attacks are a common security problem in applications that use databases. To prevent this the API has to make sure the input has the expected form. A boolean input field must be of boolean type to be accepted. To achieve this, the module \href{https://github.com/ctavan/express-validator}{express-validator} was used. With this module it's possible to check URL, query and body input. For every invalid input field a specific error message is added to an array. When all fields have been checked, this array will be returned together with an HTTP error code \texttt{400:\@ Bad Request} as feedback. This way the user can receive direct feedback without the need to consult the documentation.
-
-% SSL (HTTPS), just mention it
-\subsubsection{Access Control}
-The API has three different base roles:
-\begin{itemize}
-\item Basic
-\item Advanced
-\item Admin
-\end{itemize}
-These are assigned according to the user's role in their school, which is found when logging in through CAS. If the user is a student, a basic role will be assigned, and if the user is a teacher, an advanced role will be assigned. Admin is never assigned automatically and has to be set manually if needed. Depending on the role, different limitations are enforced. A basic user is only allowed to create 3 courses. Admins and advanced users are allowed to create an unlimited number of courses. This is currently the only difference between a basic and an advanced user. The reason a basic user is limited in their number of courses is simply to prevent malicious behaviour. Admins have full access to every route and are not limited in any way. This is mostly affecting course routes. 
-
-Regardless of a user's base role he has a different role in every course. Every course in turn has three user roles:
-\begin{itemize}
-\item Student
-\item Teacher
-\item Owner
-\end{itemize}
-Students are only allowed to use a subset of the routes, such as submitting assignments or leaving courses. The teacher role maintains the course, but also controls who is allowed to join. The highest course role is the owner, which is the user that created the course. The owner can do everything a teacher is able to do, the only difference being that teachers can't remove the owner from the course. A user with the admin base role is basically able to do everything in any course.
-
 \subsection{Quality Control}
 % jenkins
 \subsubsection{Continuous Integration}

@@ -4,16 +4,7 @@ The site consist of a number of components. These include the different pages in
 
 The CSS library Bootstrap was used to get a clean and consistent design. To achieve a distinct and personal look a color scheme was decided upon. For this the dark blue color of LTU was used as a base.
 
-\subsection{Authentication}
-%TODO: move this to security
-\begin{figure}[hb]
-    \centering
-    \includegraphics[width=\textwidth]{auth_schema.png}
-    \caption{Authentication schema}
-    \label{fig:auth}
-\end{figure}
-
-\subsubsection{Login}
+\subsection{Login}
 To authenticate yourself on login you are by default prompted to sign in with LTU's weblogon CAS (Central Authentication Service). 
 This provides you with a ticket as an URL parameter and redirects you to path: \url{https://frontend\_ip/Auth} which in turn contacts backend with said ticket to check its validity. If validated the backend responds with a status code of \texttt{200:\@ OK} and a JSON object containing authentication tokens for the user which are saved in local storage. In any other case the user receives status code \texttt{401:\@ Unauthorized} and is prompted to login again.
 \begin{figure}[H]
@@ -22,9 +13,6 @@ This provides you with a ticket as an URL parameter and redirects you to path: \
     \caption{A screenshot depicting the landing page for a user.}
     \label{fig:student}
 \end{figure}
-
-\subsubsection{Auth Interceptor}
-The main purpose of this interceptor is to modify all requests by setting the authentication field in the header of the request for authenticated users. More than this it collects failed requests in the case of token expiration and tries to refresh the token to retry all failed requests automatically and stay logged in without the user being aware of affected.
 
 \subsection{User Page}
 Since the user page acts as the front page of the site it should display a good overview to the user. Therefore all courses that a user either has joined or created will be displayed here. To not take up too much space each course is a collapsed panel that can be opened to show any gamification elements available in the course. By clicking on the name of the course the user will be redirected to the page for that course.
