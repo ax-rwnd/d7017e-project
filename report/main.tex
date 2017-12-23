@@ -35,19 +35,6 @@
 %Set graphics path
 \graphicspath{ {img/} }
 
-% Horizontal rule with negative spacing
-\newcommand{\spacerule}[1]{\vspace{-.66\baselineskip}\rule{#1}{.4pt}\par}
-
-% Group members together to keep title code clean
-\newcommand{\membergroup}[4]{%
-    \begin{member}{\raggedright}#1\par\spacerule{\widthof{#1}} #2\end{member}\hfill%
-        \begin{member}{\raggedleft}#3\par\spacerule{\widthof{#3}} #4\end{member}%
-            \par\vspace{\baselineskip}}
-
-% Simple minipage for listing project members
-\newenvironment{member}[1]{\begin{minipage}[t]
-    {.3\textwidth}#1}{\end{minipage}}
-
 \input{abbreviations.tex}
 
 \begin{document}
