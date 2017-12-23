@@ -16,7 +16,11 @@ Session.vim
 # Auto-generated tag files
 tags
 
-% laTeX stuff
+# biblatex
+*.bcf
+*.xml
+
+# LaTeX stuff
 *.aux
 *.glo
 *.idx

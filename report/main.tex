@@ -17,6 +17,21 @@
 \setlist[itemize]{noitemsep, topsep=0pt}
 \setlist[enumerate]{itemsep=0pt, topsep=0pt}
 
+% setup biblatex/bibliography
+\usepackage[
+    backend=biber,
+    style=ieee,
+    sortlocale=en_UK,
+    natbib=true,
+    url=true,
+    doi=true,
+    eprint=true,
+    autocite=superscript
+]{biblatex}
+\addbibresource{references.bib}
+\makeatletter
+\let\cite\supercite
+
 %Set graphics path
 \graphicspath{ {img/} }
 
@@ -62,6 +77,7 @@
  \input{working_methods/working_methods.tex}
  \input{discussion/discussion.tex}
  \input{future_work/future_work.tex}
+ \printbibliography{}
  \input{appendices/appendices.tex}
 
 \addtocontents{toc}{\protect\end{multicols}}
