@@ -1,43 +1,53 @@
-The Gamified Programming Platform was built and tested on Debian GNU/Linux 9 (stretch) with \nodejs{} 8.6.0 and npm 5.3.0.
+The Gamified Programming Platform was built and tested on Debian GNU/Linux 9 (stretch) with \nodejs{} 8.6.0 and npm 5.3.0. Furthermore, some components are essential only to some part of the system, these components are listed in their repsective sections. Note that to use the instructions below, these requirements must be fulfilled. Other setups may work, but your mileage may vary.
+
+\section{Certificates}
+For each part, a self-signed default certificate has been provided so that it may be used to quickly evaluate the technologies. However, these certificates should be avoided when configuring the website for a live production environment.
+
+Depending on which certificate authority is to be used, some different options may be provided to deploy new certificates (for example, Let'sEncrypt uses CertBot). The core idea is to place the private key in \texttt{encryption/private.key} and the certificate in \texttt{encryption/server.crt}, this way, the certificates will be served when users try to access the site.
 
 \section{Tester}
-Tester consists of two components; Manager and Runner. Manager replies to requests from the backend and manages docker containers that run arbitrary code. Containers are used to ensure that some test $A$ does not interfere with some later test $B$ by modifying the execution environment.\\
+
+Tester consists of two components; Manager and Runner. Manager replies to requests from the backend and manages \docker{} containers that run arbitrary code. Containers are used to ensure that some test $A$ does not interfere with some later test $B$ by modifying the execution environment. For this to work, \docker{} 17.09-ce needs to be installed and available or else, no containers may start. To install tester, follow these instructions:
 \begin{enumerate}
     \item Clone the repo: \texttt{git clone \url{https://github.com/ax-rwnd/d7017e-project}}
     \item Change directory to the Manager folder: \texttt{cd d7017e-project/tester}
     \item Install the dependencies for the Manager: \texttt{npm i}
-    \item (Optional) Select languages by adding/removing dependencies in \texttt{Makefile}. For instance the line \texttt{all: python27 python3 java c \# haskell} selects the languages Python 2.7, Python 3, Java and C, but not Haskell (since it's commented out).
+    \item (Optional) Select languages by adding/removing dependencies in \texttt{Makefile}. For instance, the line \texttt{all: python27 python3 java c \# haskell} selects the languages Python 2.7, Python 3, Java and C, but not Haskell (since it's commented out).
     \item Run the Makefile: \texttt{make}
     \item (Optional) Set preferences for Runner in \texttt{config/default.js}. There, things like queue lengths and ports may be configured.
-    \item Move back up to manager: \texttt{cd ..}
-    \item Start Manager: \texttt{node server.js \{PORT\}}
+    \item Move or link the ssl-certificates \texttt{ln -s encryption/private.key.default \\
+    encryption/private.key \&\& \\
+    ln -s encryption/server.crt.default encryption/server.crt}
+    \item Start Manager: \texttt{npm start \{PORT\}}
 \end{enumerate}
 
 \section{Backend}
-Backend is the state-managing component. It uses MongoDB to store information that it receives while processesing frontend requests and tester results.
+Backend is the state-managing component of the system. To run, it requires an instance of MongoDB (version 3.2.11 was tested) to which it can send queries. Once this dependency is met, it can be installed using the following instructions:
 \begin{enumerate}
-\item Install och configure MongoDB.
+%\item Install and configure MongoDB.
 \item Clone the repo: \texttt{git clone \url{https://github.com/ax-rwnd/d7017e-project}}
 \item Change directory to backend: \texttt{cd d7017e-project/Backend}
 \item Install dependencies: \texttt{npm i}
 \item Configure database address/port in \texttt{Backend/config/default} and \\
-\texttt{Backend/config/production}. IP/Port may differ between the files, should you want to use different databases for testing and production. To select one of these files, set the \texttt{NODE\_ENV} environment variable to \texttt{production} or \texttt{development}.
+\texttt{Backend/config/production}. IP/Port may differ between the files, should one want to use different databases for testing and production. To select one of these files, set the \texttt{NODE\_ENV} environment variable to \texttt{production} or \texttt{development}.
 \item Start the backend daemon: \texttt{npm start}.
 \item (Optional) Start backend in the foreground: \texttt{node ./bin/www}
 \end{enumerate}
 
 \section{Frontend}
-Frontend is the part that the users see. It builds on Angular for UI and contacts backend for functionality.
-
+Frontend is the website that users visit with their browsers. It uses Angular 4 as a framework on top of node to render the website, meaning that an installation of Angular version 4.2.4 needs to be present on the host computer. Then, once the dependencies are met, frontend may the installed by using the following instructions:
 \begin{enumerate}
+    \item Install Angular CLI: \texttt{npm install -g @angular/cli}
     \item Clone the repo: \texttt{git clone \url{https://github.com/ax-rwnd/d7017e-project}}
     \item Change directory to frontend: \texttt{cd d7017e-project/frontend}
-    \item Redirect frontend to backend: \texttt{sed -i "s/ \textbackslash (backend\_ip: \textbackslash )'.*'/ \\ \textbackslash 1'\url{https://{your\_backend}}'/" src/environments/environment.prod.ts}
-    \item Tell were the global ip for frontend is: \texttt{ed -i "s/\textbackslash (frontend\_ip: \\ \textbackslash)'.*'/\textbackslash 1'\url{https://{your\_frontend}}'/" src/environments/environment.prod.ts}
-    \item (Optional) Repeat step 2 and 3 for \texttt{src/environments/environment.ts}
+    %\item Redirect frontend to backend: \texttt{sed -i "s/ \textbackslash (backend\_ip: \textbackslash )'.*'/ \\ \textbackslash 1'\texttt{https://{your\_backend}}'/" src/environments/environment.prod.ts}
+    \item Assign an address that will point to the backend server when doing API calls by editing \texttt{src/environments/envivornment.prod.ts} and changing the variable \texttt{backend\_ip} with the IP address or domain name of your backend.
+    %\item Tell were the global ip for frontend is: \texttt{sed -i "s/\textbackslash (frontend\_ip: \\ \textbackslash)'.*'/\textbackslash 1'\texttt{https://{your\_frontend}}'/" src/environments/environment.prod.ts}
+    \item Assign an address that will point to the frontend server globally, i.e., a valid address that the end-user may use to reach the system from. To do this, edit \texttt{src/environments/envivornment.prod.ts} by changing the \texttt{frontend\_ip} variable to said address. This is the value that will be used by CAS to handle post-login handover.\label{item:global_ip}
+    %\item (Optional) Repeat step 2 and 3 for \texttt{src/environments/environment.ts}
     \item Move or link your ssl-certificates \texttt{ln -s encryption/private.key.default \\
     encryption/private.key \&\& \\
     ln -s encryption/server.crt.default encryption/server.crt}
-    \item Start server: \texttt{ng serve --ssl 1 --ssl-cert ./encryption/server.crt \\
-    --ssl-key ./encryption/private.key --live-reload false}
+    \item Start server: \texttt{npm start}
 \end{enumerate}
+After setting the system up and starting it, the website should be available by browsing to the address that was set in step~\ref{item:global_ip}
