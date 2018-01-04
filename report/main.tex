@@ -16,6 +16,7 @@
 \usepackage{enumitem}
 \usepackage{multicol}
 \usepackage{rotating}
+\usepackage{fancyhdr}
 \setlist[itemize]{noitemsep, topsep=4pt}
 \setlist[enumerate]{itemsep=0pt, topsep=4pt}
 
@@ -39,7 +40,11 @@
 
 \input{abbreviations.tex}
 
+\pagestyle{fancy}
+
 \begin{document}
+
+\pagenumbering{gobble}
 
 \begin{titlepage}
     \input{title.tex}
@@ -56,7 +61,11 @@
  
  \end{abstract}
 
+\input{authors.tex}
+
 \tableofcontents{}
+
+\pagenumbering{arabic}
 
 % NOTE: \addtocontents need to keep this format for the toc to be properly columnized
 \addtocontents{toc}{\protect\begin{multicols}{2}}
