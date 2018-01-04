@@ -52,7 +52,7 @@ While sandboxing resolves issues regarding result correctness, it does not remov
 \end{figure}
 If the tester shells are allowed to access the network, an adversary could send test-requests to backends (or public testers) that would in turn make requests to remote hosts. This could partly act as a proxy for some attacker that would like to remain anonymous, but also allow one remotely controlled host to attack many other hosts.
 
-\subsection{Dumping Assignments}
+\subsection{Dumping Assignments}\label{sec:dumping}
 During development, it was found that on some setups, assignments could be dumped with relative ease from memory using standard GNU utilities and code input from the frontend interface. An interesting aspect to note is that since containers share kernel, the protection that usually wards unauthorized users from reading other users' memory varied between kernel versions.
 
 For instance, some payload \texttt{dump.py} would happily extract the memory of the part of tester that ran on docker and executed the python files. This memory in turn contained the answers to the tests that a student would need to complete, effectively allowing a constant-time lookup table to be constructed.
