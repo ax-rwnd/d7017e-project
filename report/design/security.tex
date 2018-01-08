@@ -5,7 +5,7 @@ Authentication for the frontend is managed using an authentication interceptor. 
 \begin{figure}[hb]
     \centering
     \includegraphics[width=\textwidth]{auth_schema.png}
-    \caption{Authentication schema}
+    \caption{Authentication schema: showing 3 different hosts, their active components and arrows with network communication in between.}
     \label{fig:auth}
 \end{figure}
 
@@ -28,7 +28,7 @@ The API has three different base roles:
 \item Advanced
 \item Admin
 \end{itemize}
-These are assigned according to the user's role in their school, which is found when logging in through CAS. If the user is a student, a basic role will be assigned, and if the user is a teacher, an advanced role will be assigned. Admin is never assigned automatically and has to be set manually if needed. Depending on the role, different limitations are enforced. A basic user is only allowed to create 3 courses. Admins and advanced users are allowed to create an unlimited number of courses. This is currently the only difference between a basic and an advanced user. The reason a basic user is limited in their number of courses is simply to prevent malicious behaviour. Admins have full access to every route and are not limited in any way. This is mostly affecting course routes. 
+These are assigned according to the user's role in their school, which is found when logging in through CAS. If the user is a student, a basic role will be assigned, and if the user is a teacher, an advanced role will be assigned. Admin is never assigned automatically and has to be set manually if needed. Depending on the role, different limitations are enforced. A basic user is only allowed to create 3 courses. Admins and advanced users are allowed to create an unlimited number of courses. This is currently the only difference between a basic and an advanced user. The reason a basic user is limited in their number of courses is simply to prevent malicious behaviour. Admins have full access to every route and are not limited in any way. This is mostly affecting course routes.
 
 Regardless of a user's base role he has a different role in every course. Every course in turn has three user roles:
 \begin{itemize}
