@@ -1,7 +1,7 @@
 % TODO move to a higher level (working methods?)
 % A coding-standard was quickly decided on to make sure the code style was somewhat coherent effectively making it easier for different members to take over other members code if needed.
 
-The backend was developed using JavaScript running with \nodejs{} as server framework and Express as a web framework to handle routing. \nodejs{} was chosen because it was the most established framework with wide support and multiple extensions, such as Express.
+The backend was developed using JavaScript running with \nodejs{} as server framework and Express as a web framework to handle routing. \nodejs{} was chosen because it's a well-known and established JavaScript server framework with wide support and multiple extensions, such as Express. 
 
 \subsection{Database} \label{database}
 
@@ -18,7 +18,7 @@ The backend was developed using JavaScript running with \nodejs{} as server fram
 		
 \href{https://www.mongodb.com}{MongoDB} was chosen mainly to complete the MEAN software stack (MongoDB, Express, Angular, \nodejs{}). The majority of the group members working on backend did not have prior experience working with NoSQL databases which presented a good opportunity to learn. MongoDB is a popular choice among NoSQL databases. Mongo uses a JSON-like document structure and JSON is the data format used when different parts of the project services communicate.
 
-\href{http://www.mongoosejs.com}{Mongoose} is a package that extends MongoDB by enforcing a database structure. With Mongoose it's possible to create schemas that describe the format of the data that is to be stored in the database. Mongoose presented a problem to the project by not having consistency. If the schemas were updated there would be a mix of data, some of it stored in the previous format and some in the new. This resulted in a need to either migrate or remove the data in the database after schema updates.
+\href{http://www.mongoosejs.com}{Mongoose} is a package that extends MongoDB by enforcing a database structure. With Mongoose it's possible to create schemas that describe the format of the data that is to be stored in the database. It was chosen to work with Mongoose because the project members believed it would simplify database interactions, but it also presented a consistency problem to the project. If the Mongoose schemas were updated, there would be a mix of data, some of it stored in the previous format and some in the new. This resulted in a need to either migrate or remove the data in the database after schema updates.
 
 While developing it also proved valuable to have a graphical representation of the data. The data was displayed using \href{https://github.com/mrvautin/adminMongo}{AdminMongo} which also enabled developers to create new entries, edit existing data and delete data. Being able to insert and edit data presented some issues throughout the project since the tool has full freedom when inserting data. No input validation or checks to the current database schemas are made. 
 
