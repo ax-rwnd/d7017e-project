@@ -16,7 +16,7 @@ Tester consists of two components; Manager and Runner. Manager replies to reques
 1. Clone the repo: `git clone https://github.com/ax-rwnd/d7017e-project`
 2. Change directory to the Manager folder: `cd d7017e-project/tester`
 3. Install the dependencies for the Manager: `npm i`
-4. (Optional) Select languages by adding/removing dependencies in `Makefile`. For instance, the line `all: python27 python3 java c# haskell` selects the languages Python 2.7, Python 3, Java and C, but not Haskell (since it's commented out).
+4. (Optional) Select languages by adding/removing dependencies in `Makefile`. For instance, the line `all: python27 python3 java c # haskell` selects the languages Python 2.7, Python 3, Java and C, but not Haskell (since it's commented out).
 5. Run the Makefile: `make`
 6. (Optional) Set preferences for Runner in `config/default.js`. There, things like queue lengths and ports may be configured.
 7. Move or link the ssl-certificates `ln -s encryption/private.key.default encryption/private.key && ln -s encryption/server.crt.default encryption/server.crt`
