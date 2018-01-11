@@ -1,61 +1,45 @@
-% Horizontal rule with negative spacing
-\newcommand{\spacerule}[1]{\vspace{-.66\baselineskip}\rule{#1}{.4pt}\par}
+\vspace{2\baselineskip}
 
-% Group members together to keep title code clean
-\newcommand{\membergroup}[4]{%
-    \begin{member}{\raggedright}#1\par\spacerule{\widthof{#1}} #2\end{member}\hfill%
-        \begin{member}{\raggedleft}#3\par\spacerule{\widthof{#3}} #4\end{member}%
-            \par\vspace{\baselineskip}}
+\rule{\linewidth}{.02cm}
 
-% Simple minipage for listing project members
-\newenvironment{member}[1]{\begin{minipage}[t]
-    {.3\textwidth}#1}{\end{minipage}}
+\vspace{\baselineskip}
 
+\begin{minipage}{.45\linewidth}
+\raggedright\Huge Gamified Programming Platform
+\end{minipage}
+\hfill
+\begin{minipage}{.45\linewidth}
+\raggedleft\Large A project in Information and Communication Technology
+\end{minipage}
 
-\begin{center}
-    {\LARGE Gamified Programming Platform}\par
-    {\large\it a project in Information and Communication Technology}
-    \vspace{\baselineskip}
-
-    {\Large \LTU}\\{\large 971 87 Luleå, Sweden}\par
-\end{center}
+\vspace{-2\baselineskip}
 
 \vfill
 
-\membergroup{Nils Fitinghoff}{Software Engineer \\ Tester, Backend}
-            {Anton Jerhamre}{Software Engineer \\ Frontend}
+\Large\it\LTU
 
-\membergroup{David Sandström}{Software Engineer \\ Backend}
-            {Mikael Hedkvist}{Software Engineer \\ Backend}
+\vspace{-.33\baselineskip}
+\rule{\widthof{\LTU{}}}{.02cm}
+\vspace{.66\baselineskip}
 
-\membergroup{Henrik Nilsson Harnert}{Software Engineer \\ Tester, Backend}
-            {Axel Sundbom}{Software Engineer \\ Tester, Frontend \\ Repository Maintainer \\ Hardware Maintainer}
-
-\membergroup{Niklas Fuks}{Project Manager}
-            {Tim Granström}{Software Engineer\\ Backend}
-
-\membergroup{Christopher Rosenvall}{Software Engineer \\ Frontend}
-            {Fredrik Bostrand}{Software Engineer \\ Backend}
-
-\membergroup{Linn Danielsson}{Software Engineer \\ Frontend}
-            {Tobias Axelsson}{Software Engineer \\ Backend}
-
-\membergroup{Rickard Nordlander}{Software Engineer \\ Tester, Frontend}
-            {Axel Vallin}{Software Engineer \\ Frontend}
-
-
-\begin{center}
-    \begin{member}
-    \centering
-    Anders Mikkelä\par
-    \spacerule{\widthof{Anders Mikkelä}}
-        Software Engineer \\
-        Frontend
-    \end{member}
-\end{center}
+\begin{minipage}{.45\linewidth}
+\Large\it\SRT
+\end{minipage}
 
 \vfill
 
 \begin{center}
-    Supervised by\\ Peter Parnes
+\normalsize\url{https://github.com/ax-rwnd/d7017e-project.git} \\
+\normalsize\url{https://www.youtube.com/watch?v=NiJk_54Qsck}
 \end{center}
+
+\vfill
+
+\begin{minipage}[b]{.45\linewidth}
+{\large Supervised by\\ Peter Parnes}
+\vspace{\baselineskip}
+\end{minipage}
+\hfill
+\begin{minipage}[b]{.35\linewidth}
+\includegraphics[width=\linewidth]{img/LTU_logo.png}
+\end{minipage}

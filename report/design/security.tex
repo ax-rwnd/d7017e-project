@@ -4,8 +4,8 @@ A wide variety of attacks can be posed against a system like this; there are web
 Authentication for the frontend is managed using an authentication interceptor. The main purpose of this device is to modify all requests by setting the authentication field in the header of the request for authenticated users. It also collects failed requests in the case of token expiration and tries to refresh the token to retry all failed requests automatically and stay logged in without the user being aware of affected.
 \begin{figure}[hb]
     \centering
-    \includegraphics[width=\textwidth]{auth_schema.png}
-    \caption{Authentication schema}
+    \includegraphics[width=\textwidth]{authentication_sequence.eps}
+    \caption{Successful authentication sequence.}
     \label{fig:auth}
 \end{figure}
 
@@ -28,7 +28,7 @@ The API has three different base roles:
 \item Advanced
 \item Admin
 \end{itemize}
-These are assigned according to the user's role in their school, which is found when logging in through CAS. If the user is a student, a basic role will be assigned, and if the user is a teacher, an advanced role will be assigned. Admin is never assigned automatically and has to be set manually if needed. Depending on the role, different limitations are enforced. A basic user is only allowed to create 3 courses. Admins and advanced users are allowed to create an unlimited number of courses. This is currently the only difference between a basic and an advanced user. The reason a basic user is limited in their number of courses is simply to prevent malicious behaviour. Admins have full access to every route and are not limited in any way. This is mostly affecting course routes. 
+These are assigned according to the user's role in their school, which is found when logging in through CAS. If the user is a student, a basic role will be assigned, and if the user is a teacher, an advanced role will be assigned. Admin is never assigned automatically and has to be set manually if needed. Depending on the role, different limitations are enforced. A basic user is only allowed to create 3 courses. Admins and advanced users are allowed to create an unlimited number of courses. This is currently the only difference between a basic and an advanced user. The reason a basic user is limited in their number of courses is simply to prevent malicious behaviour. Admins have full access to every route and are not limited in any way. This is mostly affecting course routes.
 
 Regardless of a user's base role he has a different role in every course. Every course in turn has three user roles:
 \begin{itemize}
@@ -52,7 +52,7 @@ While sandboxing resolves issues regarding result correctness, it does not remov
 \end{figure}
 If the tester shells are allowed to access the network, an adversary could send test-requests to backends (or public testers) that would in turn make requests to remote hosts. This could partly act as a proxy for some attacker that would like to remain anonymous, but also allow one remotely controlled host to attack many other hosts.
 
-\subsection{Dumping Assignments}
+\subsection{Dumping Assignments}\label{sec:dumping}
 During development, it was found that on some setups, assignments could be dumped with relative ease from memory using standard GNU utilities and code input from the frontend interface. An interesting aspect to note is that since containers share kernel, the protection that usually wards unauthorized users from reading other users' memory varied between kernel versions.
 
 For instance, some payload \texttt{dump.py} would happily extract the memory of the part of tester that ran on docker and executed the python files. This memory in turn contained the answers to the tests that a student would need to complete, effectively allowing a constant-time lookup table to be constructed.

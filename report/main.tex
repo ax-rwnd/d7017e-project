@@ -16,6 +16,7 @@
 \usepackage{enumitem}
 \usepackage{multicol}
 \usepackage{rotating}
+\usepackage{fancyhdr}
 \setlist[itemize]{noitemsep, topsep=4pt}
 \setlist[enumerate]{itemsep=0pt, topsep=4pt}
 
@@ -39,7 +40,11 @@
 
 \input{abbreviations.tex}
 
+\pagestyle{fancy}
+
 \begin{document}
+
+\pagenumbering{gobble}
 
 \begin{titlepage}
     \input{title.tex}
@@ -50,13 +55,17 @@
 
  Recent developments suggest that gamification could be used in the education of programmers as well, and some projects have been made to demonstrate the usefulness of specific techniques already. Here, a more general platform that enables teachers and researchers to put techniques to the test is developed.
 
- To keep the code maintainable, a modularized structure was employed wherein three larger components interact in a loosely-coupled manner. By doing so, the different parts should be possible to scale horizontally and replace if needed.
+ To keep the code maintainable, a modularized structure was employed wherein three larger components interact in a loosely-coupled manner. By doing so, the different parts scale horizontally and can be replaced if needed.
 
- At the end of the development, the site would work fine for simpler programming courses where the focus of the course regards learning a specific language or paradigm. However, some of the core features that are essential to deeper analysis still need to be implemented to unlock the full potential of the platform.
+ At the end of the project, the site supports simple programming courses. However, some of the core features that are essential to deeper analysis still need to be implemented to unlock the full potential of the platform.
  
  \end{abstract}
 
+\input{authors.tex}
+
 \tableofcontents{}
+
+\pagenumbering{arabic}
 
 % NOTE: \addtocontents need to keep this format for the toc to be properly columnized
 \addtocontents{toc}{\protect\begin{multicols}{2}}
