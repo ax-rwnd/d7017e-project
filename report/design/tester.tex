@@ -11,31 +11,15 @@ To achieve isolation all code testing takes place in so called Docker containers
 % add discussion of different ways of managing load and what we chose
 % (Start containers on demand? Keep a pool of containers ready? Predict load or just react? Allocate different amounts of resources for different languages?)
 
-As Backend sends requests to Tester these requests are handled by assigning a free container to serve that request.
-If all containers for a language are busy, requests for that language are enqueued. 
-The containers take around one second to start (NB:\@ on the authors' servers). In order to decrease the response time to backend,
-containers are started preemptively. Once a request has been served another container of the same type is started.
+As Backend sends requests to Tester these requests are handled by assigning a free container to serve that request. If all containers for a language are busy, requests for that language are enqueued. The containers take around one second to start (NB:\@ on the authors' servers). In order to decrease the response time to backend, containers are started preemptively. Once a request has been served another container of the same type is started.
 
-If Tester receives a lot of requests, it will in turn start large number of containers.
-Starting too many containers will affect the overall performance of the system and therefore performance per container.
-This will increase the uncertainty of the timing tests which is undesirable.
+If Tester receives a lot of requests, it will in turn start large number of containers. Starting too many containers will affect the overall performance of the system and therefore performance per container. This will increase the uncertainty of the timing tests which is undesirable.
 
-In order to address this issue the Manager has to keep track of which containers
-are started and which ones are currently processing a request. 
-It is possible to configure the maximum number of containers that
-can be started and to specify the maximum number of containers
-per supported language. It is also possible to configure the number of containers
-that should be started even if no request for that language has been made to keep
-idling containers ready serve new requests. This is done in order to decrease
-response time to Backend.
+In order to address this issue the Manager has to keep track of which containers are started and which ones are currently processing a request. It is possible to configure the maximum number of containers that can be started and to specify the maximum number of containers per supported language. It is also possible to configure the number of containers that should be started even if no request for that language has been made to keep idling containers ready serve new requests. This is done in order to decrease response time to Backend.
 
-Each container is limited to one thread of the processor running at 50\% core speed and
-100MB memory. Because of this each time a student runs the same code a similar
-result can be observed. Timing is always a difficult property to measure but with
-these settings Tester can deliver similar timings multiple times.
+Each container is limited to one thread of the processor running at 50\% core speed and 100MB memory. Because of this each time a student runs the same code a similar result can be observed. Timing is always a difficult property to measure but with these settings Tester can deliver similar timings multiple times.
 
-If a container is hijacked by malicious code the Manager has a timeout that will
-force the container to exit and respond with an error.
+If a container is hijacked by malicious code the Manager has a timeout that will force the container to exit and respond with an error.
 
 \subsection{Test types}\label{sec:testtypes}
 % unit tests are hard to write

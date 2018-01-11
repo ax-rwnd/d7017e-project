@@ -18,17 +18,17 @@ To reduce the amount of time spent with developing a style for the site, the Boo
 \end{figure}
 
 \subsection{Login}
-To authenticate yourself on login you are by default prompted to sign in with LTU's weblogon CAS (Central Authentication Service). 
+To authenticate yourself on login you are by default prompted to sign in with LTU's weblogon CAS (Central Authentication Service) as seen in figure~\ref{fig:login}.
 This provides you with a ticket as an URL parameter and redirects you to path: \url{https://frontend\_ip/Auth} which in turn contacts backend with said ticket to check its validity. If validated the backend responds with a status code of \texttt{200:\@ OK} and a JSON object containing authentication tokens for the user which are saved in local storage. In any other case the user receives status code \texttt{401:\@ Unauthorized} and is prompted to login again.
 \begin{figure}[H]
     \centering
     \includegraphics[width=.45\textwidth]{img/gppinpictures/login2.png}
     \caption{A screenshot depicting the landing page for a user.}
-    \label{fig:student}
+    \label{fig:login}
 \end{figure}
 
 \subsection{User Page}
-Since the user page acts as the front page of the site it should display a good overview to the user. Therefore all courses that a user either has joined or created will be displayed here. To not take up too much space each course is a collapsed panel that can be opened to show any gamification elements available in the course. By clicking on the name of the course the user will be redirected to the page for that course.
+Since the user page acts as the front page of the site it should display a good overview to the user. Therefore all courses that a user either has joined or created will be displayed here. To not take up too much space each course is a collapsed panel as displayed in figure~\ref{fig:frontpage_student_view}. Each panel can be opened to show any gamification elements available in the course. By clicking on the name of the course the user will be redirected to the page for that course.
 
 It is also possible to join a course by selecting a course from a list. This list is displayed in a modal opened by the button above the courses you have joined.  The list does not only show the course code or the name of the course but also the creator of the course. This is because there can be many courses with the same name and/or code.
 
@@ -36,7 +36,7 @@ On the right half of the page you can see which courses you have sent join-reque
 \begin{figure}[H]
     \centering
     \includegraphics[width=.5\textwidth]{img/gppinpictures/user.png}
-    \label{fig:student}
+    \label{fig:frontpage_student_view}
     \caption{The front-page view for a user}
 \end{figure}
 
@@ -44,25 +44,25 @@ On the right half of the page you can see which courses you have sent join-reque
 A user can be a student or a teacher in a course, therefore it felt natural to have two different course pages with corresponding functionality. That is, the student view shows the progress of a single user and the teacher view shows the progress of all students. A user can also create courses which it will be a teacher of. 
 
 \subsubsection{Student Course Page}
-The student course page can be viewed by students that are registered on a course. To have a good overview, panels similar to the user page are used to display different gamification elements that may be available to the course along with the assignments, which is sorted by groups. The assignments are displayed in collapsible panel groups that allow the students to view the assignments and groups in an efficient way. If an assignment is clicked, the student will be directed to the assignment page. 
+The student course page can be viewed by students that are registered on a course and looks like in figure~\ref{fig:course_student_view}. To have a good overview, panels similar to the user page are used to display different gamification elements that may be available to the course along with the assignments, which is sorted by groups. The assignments are displayed in collapsible panel groups that allow the students to view the assignments and groups in an efficient way. If an assignment is clicked, the student will be directed to the assignment page.
 
 % I might have described the gamification elements a bit too much here?
 Depending on which gamification elements are enabled for the course, students will have different layouts. If for example the adventure map module is enabled, a student can see its progress on the map, if it is disabled, the student will not see it.
 
-For instance, say all gamification elements are available, then the student would first see a progress bar. This displays how many assignments the student has completed of a total amount. Then, the student would see the badges, this shows all badges a student has managed to collect, depending on which test and assignments have been passed. After that comes the leader board, which simply displays the score for each student in sorted order. Finally the adventure map, it presents groups and assignments together with a narrative, so the student can see its advancement and what is left and read a story that goes along with the progress.
+For instance, say all gamification elements are available, then the student would first see a progress bar. This displays how many assignments the student has completed of a total amount. Then, the student would see the badges, this shows all badges a student has managed to collect, depending on which test and assignments have been passed. After that comes the leader board, which simply displays the score for each student in sorted order. Finally the adventure map, figure~\ref{fig:adventure_map}, it presents groups and assignments together with a narrative, so the student can see its advancement and what is left and read a story that goes along with the progress.
 \begin{figure}[H]
     \begin{subfigure}{.48\linewidth}
         \centering
         \includegraphics[width=\textwidth]{img/gppinpictures/studentview.png}
         \caption{Student view for a course}
-        \label{fig:student}
+        \label{fig:course_student_view}
     \end{subfigure}
     \hfill
     \begin{subfigure}{.48\linewidth}
         \centering
         \includegraphics[width=\textwidth]{img/gppinpictures/adventuremap.png}
         \caption{An adventure map}
-        \label{fig:student}
+        \label{fig:adventure_map}
     \end{subfigure}
     \caption{Two ways of representing a course.}
 \end{figure}
@@ -79,7 +79,7 @@ Adding a student to a course can be done in several ways. A teacher can either s
 The teacher can also toggle between student and teacher view. The teacher can use this to go through their own courses with groups and assignments to control so that everything is in order. 
 
 \subsubsection{Create Course}
-Creating a course is possible for both ordinary students and teachers. However, students are only allowed to create a maximum of three courses whereas teachers can create any amount. The create course component is also used for updating a course. A course consists of a name, course code, description and the optionally enabled features. Whether the course should be public and if it should be auto-joinable is visualized as check boxes.
+Creating a course is possible for both ordinary students and teachers. However, students are only allowed to create a maximum of three courses whereas teachers can create any amount. This limitation is to hinder the possibility of a student spamming other users with invitation to his or her courses. The create course component is also used for updating a course. A course consists of a name, course code, description and the optionally enabled features. Whether the course should be public and if it should be auto-joinable is visualized as check boxes.
 
 Enabled features are made up of a progress bar, badges, the adventure map and the leader board, this decides if a gamification element should be available in the course or not. Public means that the teacher will make the course public so students can see, request access or join the course. Auto join means that students will be able to join the course freely so no request is required. The course description uses markdown, same as the create assignment page. 
 
