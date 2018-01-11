@@ -44,13 +44,21 @@ Arbitrary code execution is as dangerous as it sounds and needs to be handled ac
 After each series of tests, the container is considered ``spent''. That is, no series of tests may influence any other of series of test, and should the code, for instance, rewrite the programming environment, it will not influence the later tests.
 
 \subsection{Remote Attacks Using Tester}
-While sandboxing resolves issues regarding result correctness, it does not remove the responsibility to deny attempts at remote attacks from ephemeral tester shells. One could picture a scenario (see figure \ref{fig:tester-ddos}) where tester-clusters are used to amplify attacks made from zombie shells by supplying as many parallel malicious scripts as the tester environment will allow.
+While sandboxing resolves issues regarding result correctness, it does not relieve the administrator from the responsibility of denying attempts at remote attacks from ephemeral tester shells. One could picture a scenario (see figure~\ref{fig:tester-ddos}) where tester-clusters are used to amplify attacks made from zombie shells by supplying as many parallel malicious scripts as the tester environment will allow.
 \begin{figure}[ht]
     \centering
     \includegraphics[width=\textwidth]{img/tester_amplification.png}
     \caption{A DDOS scenario involving unsecured tester environments.}\label{fig:tester-ddos}
 \end{figure}
 If the tester shells are allowed to access the network, an adversary could send test-requests to backends (or public testers) that would in turn make requests to remote hosts. This could partly act as a proxy for some attacker that would like to remain anonymous, but also allow one remotely controlled host to attack many other hosts.
+
+There are multiple ways to solve this security concern and they all come with their own drawbacks and advantages. Firstly, there is the option to simply allow connections to be made, but implement a rate limit to keep malicious use down. This takes away the risk of a distributed denial-of-service (DDOS) scenario, where testers could be exploited to deliver large amounts of illicit traffic. However, it would require tester to keep track of which users are allowed to use the network.
+
+Secondly, there is the option to block all communications but the one made to the runner itself. By doing so, the attack vector is minimized and unlikely to cause any trouble. Unfortunately, that would also remove the ability to create assignments that connect to the web for some information, such as scraping exercises. Furthermore, it would require careful setup of firewall rules within the runner that should not be possible to manipulate by the user running the test.
+
+Lastly, much like the second suggestion, there is the option to allow outgoing connections, but place the tester behind NAT (Network Address Translation). Then, firewall rules can be placed on the network to allow/deny connections based on origin and context. This is simpler than the second option, but lets containers hosted under the same NAT contact one another. This means that sending recursive testing requests may be possible.
+
+In order to avoid making the solution needlessly complex, the last method was decided upon. Since \docker{} provides a virtual network mode to place its containers behind NAT, no additional work had to be done in order to set the protection up. Furthermore, the risk of having malicious users perform recursive tests leading to denial of service was deemed small in the context of the development environment.
 
 \subsection{Dumping Assignments}\label{sec:dumping}
 During development, it was found that on some setups, assignments could be dumped with relative ease from memory using standard GNU utilities and code input from the frontend interface. An interesting aspect to note is that since containers share kernel, the protection that usually wards unauthorized users from reading other users' memory varied between kernel versions.
