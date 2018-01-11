@@ -30,18 +30,13 @@ The database design started with the core collections and evolved during develop
 \subsection{Feature}
 As this project focused on adding gamification elements for programming exercises and making programming more fun in general, it was important to include a tool that supports development of future gamification modules. This tool is called \emph{Feature} and is built in such a way that it is possible to easily extend it with more functionality. Feature works by running all of the gamification modules and storing the results of these modules in a Feature collection associated with a student and a course.
 
-Future developers should be able to expand the system with their own gamification elements without having to learn the whole codebase. This flexibility is achieved with a plug-in system that dynamically loads files and runs code on the results from Tester. This was possible by importing all modules inside the features directory. The plug-in modules need to follow a given interface. They have to contain an initiation function and a function that is called once Tester has delivered back results to Backend. 
+Future developers should be able to expand the system with their own gamification elements without having to learn the whole codebase. This flexibility is achieved with a plug-in system that dynamically loads files and runs code on the results from Tester. This was possible by importing all modules inside the features directory. The plug-in modules need to follow a given interface. They have to contain an initiation function and a function that is called once Tester has delivered back results to Backend.
 
-The initiation function connects to an event listener that triggers once Backend
-gets a result back from Tester. When this event is triggered it will call the
-function that executes plug-in specific code. It should be noted that if any of the mandatory tests fail then Feature wont run any gamification plug-ins. Once a plug-in is done calculating it can return results that will be sent back to Frontend.
+The initiation function connects to an event listener that triggers once Backend gets a result back from Tester. When this event is triggered it will call the function that executes plug-in specific code. It should be noted that if any of the mandatory tests fail then Feature wont run any gamification plug-ins. Once a plug-in is done calculating it can return results that will be sent back to Frontend.
 
-Even if extensibility was of high priority when developing this tool, it was not
-possible to fully decouple it from the rest of the codebase. For example, in front of MongoDB, Mongoose is running in order to structure what is stored in the database. This means that if a plug-in needs to store anything in the database, the database schema has to be modified in order to support the desired structure for that plug-in.
+Even if extensibility was of high priority when developing this tool, it was not possible to fully decouple it from the rest of the codebase. For example, in front of MongoDB, Mongoose is running in order to structure what is stored in the database. This means that if a plug-in needs to store anything in the database, the database schema has to be modified in order to support the desired structure for that plug-in.
 
-Such an example is the gamification element called \emph{Progress}. After
-receiving the results from Tester the result is stored in the Feature collection
-of that student, resulting in data that describes the progression of that student's advancements throughout the course.
+Such an example is the gamification element called \emph{Progress}. After receiving the results from Tester the result is stored in the Feature collection of that student, resulting in data that describes the progression of that student's advancements throughout the course.
 
 Another example is \emph{Badge}. Each badge contains information that describes the story behind it and also the goals that have to be achieved in order to earn it. This information is defined in a separate model in the database schema. However, in order to be able to track badges that a student of a course has received the Feature model has to be updated as well.
 
