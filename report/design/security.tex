@@ -4,8 +4,8 @@ A wide variety of attacks can be posed against a system like this; there are web
 Authentication for the frontend is managed using an authentication interceptor. The main purpose of this device is to modify all requests by setting the authentication field in the header of the request for authenticated users. It also collects failed requests in the case of token expiration and tries to refresh the token to retry all failed requests automatically and stay logged in without the user being aware of affected.
 \begin{figure}[hb]
     \centering
-    \includegraphics[width=\textwidth]{auth_schema.png}
-    \caption{Authentication schema: showing 3 different hosts, their active components and arrows with network communication in between.}
+    \includegraphics[width=\textwidth]{authentication_sequence.eps}
+    \caption{Successful authentication sequence.}
     \label{fig:auth}
 \end{figure}
 
