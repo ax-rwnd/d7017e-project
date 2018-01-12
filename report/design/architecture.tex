@@ -47,18 +47,19 @@ As can be seen from the flowcharts in figure~\ref{fig:common_flow}, the user eit
 Since tester has some hidden complexity, an in-depth description of its workflow is provided in figure~\ref{fig:tester_internals}.
 \begin{figure}
     \centering
-    \begin{subfigure}{.35\linewidth}
+
+    \begin{subfigure}{\linewidth}
+    \centering
+    \includegraphics[width=.9\linewidth]{img/manager_usage.png}
+    \caption{How manager uses runner to invoke tests.}
+    \end{subfigure}
+    
+    \begin{subfigure}{.38\linewidth}
     \centering
     \includegraphics[width=.3\linewidth]{img/tester_usage.png}
     \caption{How backend interacts with tester.}
     \end{subfigure}
     %
-    \begin{subfigure}{.55\linewidth}
-    \centering
-    \includegraphics[width=.9\linewidth]{img/manager_usage.png}
-    \caption{How manager uses runner to invoke tests.}
-    \end{subfigure}
-
     \begin{subfigure}{.6\linewidth}
     \centering
     \includegraphics[width=.7\linewidth]{img/runner_usage.png}

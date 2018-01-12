@@ -30,15 +30,16 @@ This provides you with a ticket as an URL parameter and redirects you to path: \
 \subsection{User Page}
 Since the user page acts as the front page of the site it should display a good overview to the user. Therefore all courses that a user either has joined or created will be displayed here. To not take up too much space each course is a collapsed panel as displayed in figure~\ref{fig:frontpage_student_view}. Each panel can be opened to show any gamification elements available in the course. By clicking on the name of the course the user will be redirected to the page for that course.
 
-It is also possible to join a course by selecting a course from a list. This list is displayed in a modal opened by the button above the courses you have joined.  The list does not only show the course code or the name of the course but also the creator of the course. This is because there can be many courses with the same name and/or code.
-
-On the right half of the page you can see which courses you have sent join-requests to and what requests have been sent to your courses. The courses that have allowed students to join the course directly without any confirmation from the teacher will of course not be displayed here. Below the requests there's a list showing any invites sent by teachers to the user. The invites can be accepted or declined.
-\begin{figure}[H]
+\begin{wrapfigure}[12]{r}{8cm}
     \centering
+    \vspace{-\baselineskip}
     \includegraphics[width=.5\textwidth]{img/gppinpictures/user.png}
     \caption{The front-page view for a user}
     \label{fig:frontpage_student_view}
-\end{figure}
+\end{wrapfigure}
+It is also possible to join a course by selecting a course from a list. This list is displayed in a modal opened by the button above the courses you have joined.  The list does not only show the course code or the name of the course but also the creator of the course. This is because there can be many courses with the same name and/or code.
+
+On the right half of the page you can see which courses you have sent join-requests to and what requests have been sent to your courses. The courses that have allowed students to join the course directly without any confirmation from the teacher will of course not be displayed here. Below the requests there's a list showing any invites sent by teachers to the user. The invites can be accepted or declined.
 
 \subsection{Course}
 A user can be a student or a teacher in a course, therefore it felt natural to have two different course pages with corresponding functionality. That is, the student view shows the progress of a single user and the teacher view shows the progress of all students. A user can also create courses which it will be a teacher of. 

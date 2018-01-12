@@ -2,12 +2,12 @@ A wide variety of attacks can be posed against a system like this; there are web
 
 \subsection{Authentication}
 Authentication for the frontend is managed using an authentication interceptor. The main purpose of this device is to modify all requests by setting the authentication field in the header of the request for authenticated users. It also collects failed requests in the case of token expiration and tries to refresh the token to retry all failed requests automatically and stay logged in without the user being aware of affected.
-\begin{figure}[hb]
+\begin{sidewaysfigure}
     \centering
-    \includegraphics[width=\textwidth]{authentication_sequence.eps}
-    \caption{Successful authentication sequence.}
-    \label{fig:auth}
-\end{figure}
+    \includegraphics[width=\textwidth]{img/authentication_sequence.eps}
+    \caption{Overview of the database schema. The arrows point from collections that are referenced to the collections that reference them.}
+    \label{fig:schema}
+\end{sidewaysfigure}
 
 %\subsubsection{Authentication}
 The API endpoint \url{/auth/login/ltu} validates a service ticket issued by CAS at \url{https://weblogon.ltu.se/cas/login} and, if successful, will issue an access token for use at the other access restricted endpoints of the API (see figure \ref{fig:auth}). The access token is a JSON Web Token with a short life span, that is tamper-proof and contains information about the user's id and access level. This approach allows the backend to remain sessionless, as the backend will validate the token at every API request. Since the access token expires quickly a refresh token is issued alongside it. The refresh token has a much longer life span and its only use is to generate new access tokens at the \url{/auth/login/accesstoken} endpoint. The refresh tokens are stored in the database, while the access tokens are not. Revoking a refresh token is done by deleting it from the database. Theft of an access token or refresh token would give the thief access until the token expires or, in the case of refresh tokens, until it is revoked. Stealing tokens is made harder with SSL encryption.
@@ -43,7 +43,7 @@ Arbitrary code execution is as dangerous as it sounds and needs to be handled ac
 
 After each series of tests, the container is considered ``spent''. That is, no series of tests may influence any other of series of test, and should the code, for instance, rewrite the programming environment, it will not influence the later tests.
 
-\subsection{Remote Attacks Using Tester}
+\subsection{Remote Attacks}% Using Tester}
 While sandboxing resolves issues regarding result correctness, it does not relieve the administrator from the responsibility of denying attempts at remote attacks from ephemeral tester shells. One could picture a scenario (see figure~\ref{fig:tester-ddos}) where tester-clusters are used to amplify attacks made from zombie shells by supplying as many parallel malicious scripts as the tester environment will allow.
 \begin{figure}[ht]
     \centering
@@ -69,10 +69,10 @@ When run on a Debian GNU/Linux host, the exploit worked flawlessly, whereas the 
 
 \subsection{Hijacking TCP Sessions}
 Another vulnerability that was identified was the ability to hijack the TCP sessions used to transport test results. The authors acknowledge that an attack like this probably still affects the system, but decided that it is too far out of scope for them to fix.
+\begin{wrapfigure}[10]{l}{7cm}
+    \centering
+    \includegraphics[width=.35\textwidth]{tcp_interception.png}
+    \caption{A TCP hijack may send data pretending to be the tester.}
+\end{wrapfigure}
 
 In fact, should an enterprising student attempt to trick the system by performing such an attack, they should be rewarded for their investigative work, rather than punished for gaming the system. By triggering such a response, the student has clearly shown that they aspire for more than a simple grade and probably do not require gamification to go further.
-\begin{figure}
-    \centering
-    \includegraphics[width=\textwidth]{tcp_interception.png}
-    \caption{A TCP hijack may send data pretending to be the tester.}
-\end{figure}
